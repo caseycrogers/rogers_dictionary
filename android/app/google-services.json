@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "715990126622",
+    "firebase_url": "https://rogers-dicitionary.firebaseio.com",
+    "project_id": "rogers-dicitionary",
+    "storage_bucket": "rogers-dicitionary.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715990126622:android:24553fb6fc1f1c66c95e0f",
+        "android_client_info": {
+          "package_name": "example.rogers_dictionary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "715990126622-0g4m2h0qnt6runf30a91ljj1m1uejo13.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "example.rogers_dictionary",
+            "certificate_hash": "2f950784b75c59abd90396aa7b780b2cfbff4b30"
+          }
+        },
+        {
+          "client_id": "715990126622-nn1r9anogksgm8d79q7qts1plarocir2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHjhgNUTEoKzugh92R4K_dJdcnDP92eog"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "715990126622-nn1r9anogksgm8d79q7qts1plarocir2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
