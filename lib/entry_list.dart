@@ -1,13 +1,31 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:math';
 
-class ArticleList extends StatefulWidget {
+import 'package:async/async.dart';
+import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/util/widgets.dart';
+
+import 'entry_database/entry.dart';
+
+class EntryList extends StatefulWidget {
   @override
-  _ArticleListState createState() => _ArticleListState();
+  _EntryListState createState() => _EntryListState();
+
+  EntryList();
 }
 
-class _ArticleListState extends State<ArticleList> {
-  final _articles = <String>[];
-  final _biggerFont = TextStyle(fontSize: 18.0);
+class _EntryListState extends State<EntryList> {
+  StreamQueue<Entry> _entryStream = MyApp.db.getEntries();
+  final List<Future<Entry>> _entries = List();
+  final _biggerFont = TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
+  Future<Widget> _entryListView;
+
+  @override
+  void initState() {
+    _entryListView = _buildEntries();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,36 +33,49 @@ class _ArticleListState extends State<ArticleList> {
       appBar: AppBar(
         title: Text('Dictionary'),
       ),
-      body: _buildArticles(),
+      body: FutureBuilder(
+        builder: (context, snap) {
+          if (snap.hasData) return snap.data;
+          if (snap.connectionState == ConnectionState.none && !snap.hasData) return loadingWidget();
+          return Container();
+        },
+        future: _entryListView,
+      ),
     );
   }
 
-  Widget _buildArticles() {
-    return ListView.builder(
+  Future<Widget> _buildEntries() async {
+    var size = await MyApp.db.getEntriesSize();
+    return ListView.separated(
       padding: EdgeInsets.all(16.0),
-      itemBuilder: (context, i ) {
-        if (i.isOdd) return Divider();
-
-        final index = i ~/ 2;
-        if (index > 200) return null;
-        if (index >= _articles.length) {
-          var article = "";
-          if ((index + 1) % 3 == 0) article += "fizz ";
-          if ((index + 1) % 5 == 0) article += "buzz";
-          if (((index + 1) % 3) * ((index + 1) % 5) != 0) article += (index + 1).toString();
-          _articles.add(article);
+      itemBuilder: (context, index) {
+        if (index + 2 >= _entries.length) {
+          // Add elements to the list
+          for (var j = _entries.length; j < min(index + 4, size); j++) {
+            _entries.add(_entryStream.next);
+          }
         }
-        return _buildRow(_articles[index]);
+        return FutureBuilder(
+          builder: (context, entrySnap) {
+            if (entrySnap.hasData) return _buildRow(entrySnap.data);
+            print("no data ):");
+            return Container();
+          },
+          future: _entries[index],
+        );
       },
+      separatorBuilder: (c, i) => Divider(),
+      itemCount: size,
     );
   }
 
-  Widget _buildRow(String article) {
+  Widget _buildRow(Entry entry) {
     return ListTile(
       title: Text(
-        article,
+        entry.article,
         style: _biggerFont,
       ),
+      subtitle: Text(entry.translations.join(", ")),
     );
   }
 }
