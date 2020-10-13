@@ -25,6 +25,8 @@ dependencies:
     sdk: flutter
   firebase_core: "0.5.0+1"
   cloud_firestore: "^0.14.1+3"
+  json_annotation: ^3.1.0
+  async: ^2.4.2
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -34,6 +36,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^1.10.3
+  json_serializable: ^3.5.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
