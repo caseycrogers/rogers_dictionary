@@ -16,10 +16,7 @@ abstract class EntryDatabase {
   bool isEnglish() => _english;
 
   // Get all entries in the database
-  StreamQueue<Entry> getEntries({String searchString = ''});
-
-  // Get number of entries
-  Future<int> getEntriesSize();
+  Future<List<Entry>> getEntries({String searchString = ''});
 }
 
 class FirestoreDatabase extends EntryDatabase {
@@ -44,9 +41,8 @@ class FirestoreDatabase extends EntryDatabase {
     return englishDoc().collection(_ENTRIES);
   }
 
-  StreamQueue<Entry> getEntries({String searchString = ''}) {
-    print("1: " + searchString);
-    return StreamQueue(_getEntryStream(searchString));
+  Future<List<Entry>> getEntries({String searchString = ''}) async {
+    return _getEntryStream(searchString);
   }
 
   Future<int> getEntriesSize() async {
@@ -55,13 +51,12 @@ class FirestoreDatabase extends EntryDatabase {
     return metadata.get(_SIZE);
   }
 
-  Stream<Entry> _getEntryStream(String searchString) async* {
+  Future<List<Entry>> _getEntryStream(String searchString) async {
     await init();
-    for (var entry in _queryToEntries(await entriesCol().orderBy('articleId').get(), searchString)) yield entry;
+    return _queryToEntries(await entriesCol().orderBy('articleId').get(), searchString);
   }
   
   List<Entry> _queryToEntries(QuerySnapshot query, String searchString) {
-    print("str: " + searchString);
     return query.docs.map(_docToEntry).where((e) => e.article?.contains(searchString) ?? false).toList();
   }
 
