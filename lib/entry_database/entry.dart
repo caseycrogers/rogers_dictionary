@@ -4,11 +4,14 @@ part 'entry.g.dart';
 
 @JsonSerializable()
 class Entry {
-  final int id;
+  // Run the following to rebuild generated files:
+  // flutter pub run build_runner build --delete-conflicting-outputs
+  final int articleId;
   final String article;
   final List<String> translations;
+  final List<String> partsOfSpeech;
 
-  Entry(this.id, this.article, this.translations);
+  Entry(this.articleId, this.article, this.translations, this.partsOfSpeech);
 
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
