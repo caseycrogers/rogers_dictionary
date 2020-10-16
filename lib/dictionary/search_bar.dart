@@ -21,10 +21,15 @@ class _SearchBarState extends State<SearchBar> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _filter,
-      decoration: new InputDecoration(
-          prefixIcon: new Icon(Icons.search),
+      decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search),
+          suffixIcon: IconButton(
+            onPressed: () => _filter.clear(),
+            icon: Icon(Icons.clear),
+          ),
           hintText: 'search....'
       ),
+
     );
   }
 }
