@@ -16,4 +16,10 @@ class Entry {
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$EntryToJson(this);
+
+  Set<String> _keywords() => {article}..addAll(translations);
+
+  bool keyWordMatches(String searchTerm) {
+    return _keywords().any((keyword) => keyword.contains(searchTerm));
+  }
 }
