@@ -27,7 +27,7 @@ class _SearchBarState extends State<SearchBar> {
             onPressed: () => _filter.clear(),
             icon: Icon(Icons.clear),
           ),
-          hintText: 'search....'
+          hintText: 'search...'
       ),
 
     );

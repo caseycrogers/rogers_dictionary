@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rogers_dictionary/main.dart';
 
@@ -16,7 +15,7 @@ abstract class EntryDatabase {
   bool isEnglish() => _english;
 
   // Get all entries in the database
-  Future<List<Entry>> getEntries({String searchString = ''});
+  Stream<Entry> getEntries({String searchString = ''});
 }
 
 class FirestoreDatabase extends EntryDatabase {
@@ -41,23 +40,27 @@ class FirestoreDatabase extends EntryDatabase {
     return englishDoc().collection(_ENTRIES);
   }
 
-  Future<List<Entry>> getEntries({String searchString = ''}) async {
+  Stream<Entry> getEntries({String searchString = ''}) {
     return _getEntryStream(searchString);
   }
 
-  Future<int> getEntriesSize() async {
+  Stream<Entry> _getEntryStream(String searchString) async* {
     await init();
-    var metadata = await englishDoc().get();
-    return metadata.get(_SIZE);
-  }
-
-  Future<List<Entry>> _getEntryStream(String searchString) async {
-    await init();
-    return _queryToEntries(await entriesCol().orderBy('articleId').get(), searchString);
+    dynamic start = -1;
+    while (true) {
+      var snapshot = await entriesCol()
+          .orderBy('articleId')
+          .startAfter([start])
+          .limit(10)
+          .get();
+      if (snapshot.docs.isEmpty) return;
+      for (var entry in _queryToEntries(snapshot, searchString)) yield entry;
+      start = snapshot.docs.last.get('articleId');
+    }
   }
   
   List<Entry> _queryToEntries(QuerySnapshot query, String searchString) {
-    return query.docs.map(_docToEntry).where((e) => e.article?.contains(searchString) ?? false).toList();
+    return query.docs.map(_docToEntry).where((e) => e.keyWordMatches(searchString) ?? false).toList();
   }
 
   Entry _docToEntry(QueryDocumentSnapshot doc) {
