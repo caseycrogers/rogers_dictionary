@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rogers_dictionary/main.dart';
 
+import 'database_constants.dart';
 import 'entry.dart';
 
 
@@ -19,25 +20,21 @@ abstract class EntryDatabase {
 }
 
 class FirestoreDatabase extends EntryDatabase {
-  static const String _ENTRIES_DB = "entriesDB";
-  static const String _ENGLISH = "english";
-  static const String _SPANISH = "spanish";
-  static const String _ENTRIES = "entries";
-  static const String _SIZE = "size";
 
   FirestoreDatabase _fs;
 
   Future<void> init() async {
     if (_fs != null) return Completer().complete(null);
     await MyApp.isInitialized;
+    print('Firestore initialized!');
   }
 
   DocumentReference englishDoc() {
-    return FirebaseFirestore.instance.collection(_ENTRIES_DB).doc(_ENGLISH);
+    return FirebaseFirestore.instance.collection(ENTRIES_DB).doc(ENGLISH);
   }
 
   CollectionReference entriesCol() {
-    return englishDoc().collection(_ENTRIES);
+    return englishDoc().collection(ENTRIES);
   }
 
   Stream<Entry> getEntries({String searchString = ''}) {
@@ -49,13 +46,15 @@ class FirestoreDatabase extends EntryDatabase {
     dynamic start = -1;
     while (true) {
       var snapshot = await entriesCol()
-          .orderBy('articleId')
+          .orderBy('entry_id')
           .startAfter([start])
-          .limit(10)
+          .limit(3)
           .get();
       if (snapshot.docs.isEmpty) return;
-      for (var entry in _queryToEntries(snapshot, searchString)) yield entry;
-      start = snapshot.docs.last.get('articleId');
+      for (var entry in _queryToEntries(snapshot, searchString)) {
+        yield entry;
+      }
+      start = snapshot.docs.last.get('entry_id');
     }
   }
   
