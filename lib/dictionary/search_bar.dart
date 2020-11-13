@@ -1,30 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class SearchBar extends StatefulWidget {
-  @override
-  _SearchBarState createState() => _SearchBarState(filter);
-
-  final filter = TextEditingController();
-}
-
-class _SearchBarState extends State<SearchBar> {
-  TextEditingController _filter;
-
-  _SearchBarState(this._filter);
-
-  @override
-  void initState() {
-    super.initState();
-  }
+class SearchBar extends StatelessWidget {
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: _filter,
+      controller: textEditingController,
       decoration: InputDecoration(
           prefixIcon: Icon(Icons.search),
           suffixIcon: IconButton(
-            onPressed: () => _filter.clear(),
+            onPressed: () => textEditingController.clear(),
             icon: Icon(Icons.clear),
           ),
           hintText: 'search...'
