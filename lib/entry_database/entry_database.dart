@@ -48,18 +48,20 @@ class FirestoreDatabase extends EntryDatabase {
       var snapshot = await entriesCol()
           .orderBy('entry_id')
           .startAfter([start])
-          .limit(3)
+          .where('keyword_list', arrayContains: searchString)
+          .limit(10)
           .get();
       if (snapshot.docs.isEmpty) return;
-      for (var entry in _queryToEntries(snapshot, searchString)) {
+      for (var entry in _queryToEntries(snapshot)) {
+        print(entry.entryId);
         yield entry;
       }
       start = snapshot.docs.last.get('entry_id');
     }
   }
   
-  List<Entry> _queryToEntries(QuerySnapshot query, String searchString) {
-    return query.docs.map(_docToEntry).where((e) => e.keyWordMatches(searchString) ?? false).toList();
+  List<Entry> _queryToEntries(QuerySnapshot query) {
+    return query.docs.map(_docToEntry).toList();
   }
 
   Entry _docToEntry(QueryDocumentSnapshot doc) {

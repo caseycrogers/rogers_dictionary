@@ -11,29 +11,18 @@ class DictionaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SearchBar searchBar = SearchBar();
-    bool listened = false;
     return ChangeNotifierProvider(
       create: (context) => SearchStringModel(),
       builder: (context, child) {
-        // Add a listener to the search bar from within the notifier provider
-        if (!listened) searchBar.textEditingController.addListener(() {
-          listened = true;
-          context.read<SearchStringModel>().updateSearchString(searchBar.textEditingController.text);
-        });
-
         return Scaffold(
           appBar: AppBar(
             title: Text('Dictionary'),
           ),
           body: Column(children: [
-            searchBar,
+            SearchBar(),
             Flexible(
-              child: Selector<SearchStringModel, String>(
-                selector: (context, searchStringModel) => searchStringModel.text,
-                builder: (context, searchString, child) {
-                  return EntryList(_cumulativeReduce(MyApp.db.getEntries(searchString: searchString)));
-                },
+              child: Consumer<SearchStringModel> (
+                builder: (context, searchStringModel, child) => EntryList(_getEntries(searchStringModel.searchString)),
               ),
             ),
           ]),
@@ -41,6 +30,9 @@ class DictionaryPage extends StatelessWidget {
       },
     );
   }
+
+  Stream<List<Entry>> _getEntries(String searchString) =>
+      _cumulativeReduce(MyApp.db.getEntries(searchString: searchString));
 
   Stream<List<Entry>> _cumulativeReduce(Stream<Entry> stream) {
     var soFar = [];

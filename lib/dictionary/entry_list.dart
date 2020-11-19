@@ -17,28 +17,44 @@ class EntryList extends StatefulWidget {
 }
 
 class _EntryListState extends State<EntryList> {
-  final _biggerFont = TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-  final StreamController<List<Entry>> _entryStreamController = StreamController();
-  final Stream<List<Entry>> _entryStream;
+  Stream<List<Entry>> _entryStream;
+  StreamController<List<Entry>> _entryStreamController;
   StreamSubscription<List<Entry>> _entryStreamSubscription;
 
   _EntryListState(this._entryStream);
 
+  void initStream() {
+    _entryStreamSubscription?.cancel();
+    _entryStreamController?.close();
+
+    _entryStreamController = StreamController();
+    _entryStreamSubscription = widget._entryStream.listen((event) {
+      _entryStreamController.add(event);
+    }
+    )..onDone(() => _entryStreamController.close());
+  }
+
   @override
   void initState() {
-    _entryStreamSubscription = _entryStream.listen((event) {
-        _entryStreamController.add(event);
-      }
-    );
-
     super.initState();
+    initStream();
   }
 
   @override
   void dispose() {
-    _entryStreamController.close();
-
     super.dispose();
+    _entryStreamSubscription?.cancel();
+    _entryStreamController?.close();
+  }
+
+  @override
+  void didUpdateWidget(EntryList oldEntryList) {
+    super.didUpdateWidget(oldEntryList);
+    // Initialize the stream only if it has changed
+    if (_entryStream != widget._entryStream) {
+      _entryStream = widget._entryStream;
+      initStream();
+    }
   }
 
   @override
@@ -58,6 +74,8 @@ class _EntryListState extends State<EntryList> {
       itemCount: isDone ? entries.length : entries.length + 1,
       itemBuilder: (context, index) {
         if (index == entries.length) return LoadingText();
+        // if (index > entries.length - 5 && _entryStreamSubscription.isPaused) _entryStreamSubscription.resume();
+        // if (index <= entries.length - 5 && !_entryStreamSubscription.isPaused) _entryStreamSubscription.pause();
         return _buildRow(entries[index]);
       },
       separatorBuilder: (c, i) => Divider(),
@@ -65,6 +83,7 @@ class _EntryListState extends State<EntryList> {
   }
 
   Widget _buildRow(Entry entry) {
+    // Schema:
     // {meaningId: {partOfSpeech: [translation]}}
     Map<String, Map<String, List<Translation>>> translationMap = {};
     entry.translations.forEach((t) =>
@@ -72,42 +91,35 @@ class _EntryListState extends State<EntryList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              entry.headword,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: _biggerFont,
-            ),
-          ],
+        Text(
+            entry.headword,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1
         ),
         Column(
           children: [
             Row(
-                children: groupBy(
-                    entry.translations,
-                        (t) => t.partOfSpeech).map(
-                        (partOfSpeech, translations) =>
-                        MapEntry(
-                            partOfSpeech,
-                            Row(
-                                children: [
-                                  Text(partOfSpeech + ':'),
-                                  SizedBox(width: 10),
-                                  Column(
-                                      children: translations.map((t) => Text(t.translation)).toList(),
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                  )
-                                ],
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                            )
-                        )
-                ).values.toList()
+              children: groupBy(entry.translations, (t) => t.partOfSpeech).values
+                  .map(_buildTranslations).toList(),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildTranslations(List<Translation> translations) {
+    String partOfSpeech = translations.first.partOfSpeech;
+    return Row(
+      children: [
+        Text(partOfSpeech + ':'),
+        SizedBox(width: 10),
+        Column(
+          children: translations.map((t) => Text(t.translation)).toList(),
+          crossAxisAlignment: CrossAxisAlignment.start,
+        )
+      ],
+      crossAxisAlignment: CrossAxisAlignment.start,
     );
   }
 }
