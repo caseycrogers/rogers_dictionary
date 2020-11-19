@@ -1,12 +1,14 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rogers_dictionary/dictionary/search_string_model.dart';
 
 class SearchBar extends StatelessWidget {
-  final TextEditingController textEditingController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    TextEditingController textEditingController = TextEditingController();
+    textEditingController.addListener(() {
+      context.read<SearchStringModel>().updateSearchString(textEditingController.text);
+    });
     return TextField(
       controller: textEditingController,
       decoration: InputDecoration(

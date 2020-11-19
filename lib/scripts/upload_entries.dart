@@ -21,6 +21,8 @@ const HEADWORD_RESTRICTIVE_LABEL = 'headword_restrictive_label';
 const MEANING_ID = 'meaning_id';
 const TRANSLATION = 'translation';
 
+const KEYWORD_LIST = 'keyword_list';
+
 void main() async {
   Firestore.initialize('rogers-dicitionary');
   var df = await DataFrame.fromCsv('lib/scripts/dictionary_database.csv');
@@ -60,12 +62,30 @@ void main() async {
 }
 
 Future<void> _upload(Entry entry) {
+  var entryMap = entry.toJson();
+  entryMap[KEYWORD_LIST] = _constructSearchList(entry);
   return Firestore.instance
       .collection(ENTRIES_DB)
       .document(ENGLISH)
       .collection(ENTRIES)
       .document(entry.entryId.toString())
-      .set(entry.toJson());
+      .set(entryMap);
+}
+
+List<String> _constructSearchList(Entry entry) {
+  Set<String> keywordSet = Set()
+    ..add(entry.headword)
+    ..addAll(entry.translations.map((t) => t.translation));
+  return keywordSet.expand((k) {
+    Set<String> ret = Set();
+    for (int i = 0; i < k.length; i++) {
+      for (int j = i; j <= k.length; j++) {
+        ret.add(k.substring(i, j));
+      }
+    }
+    ret.add("");
+    return ret.toList();
+  }).toList();
 }
 
 void _assertValid(Map<String, String> row, String header, int index) {
