@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import "package:collection/collection.dart";
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'package:rogers_dictionary/util/default_map.dart';
-import 'package:rogers_dictionary/util/loading_text.dart';
+import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/loading_text.dart';
 import 'dart:core';
+
+import 'package:rogers_dictionary/widgets/entry_widget.dart';
 
 class EntryList extends StatefulWidget {
   final Stream<List<Entry>> _entryStream;
@@ -20,6 +20,7 @@ class _EntryListState extends State<EntryList> {
   Stream<List<Entry>> _entryStream;
   StreamController<List<Entry>> _entryStreamController;
   StreamSubscription<List<Entry>> _entryStreamSubscription;
+  bool hasSeenData = false;
 
   _EntryListState(this._entryStream);
 
@@ -30,8 +31,10 @@ class _EntryListState extends State<EntryList> {
     _entryStreamController = StreamController();
     _entryStreamSubscription = widget._entryStream.listen((event) {
       _entryStreamController.add(event);
-    }
-    )..onDone(() => _entryStreamController.close());
+    })..onDone(() => _entryStreamController.close());
+    // Start with the stream paused
+    _pauseStream();
+    hasSeenData = false;
   }
 
   @override
@@ -63,19 +66,23 @@ class _EntryListState extends State<EntryList> {
           initialData: List<Entry>(),
           stream: _entryStreamController.stream,
           builder: (_, entriesSnap) {
-            return _buildEntries(entriesSnap.data, entriesSnap.connectionState == ConnectionState.done);
+            return _buildEntries(entriesSnap.data, entriesSnap.connectionState);
           }
         );
       }
 
-  Widget _buildEntries(List<Entry> entries, bool isDone) {
+  Widget _buildEntries(List<Entry> entries, ConnectionState state) {
     return ListView.separated(
       padding: EdgeInsets.all(16.0),
-      itemCount: isDone ? entries.length : entries.length + 1,
+      itemCount: state == ConnectionState.done ? entries.length : entries.length + 1,
       itemBuilder: (context, index) {
+        if (state == ConnectionState.waiting || index > entries.length - 5) {
+          _resumeStream();
+        } else {
+          _pauseStream();
+        }
         if (index == entries.length) return LoadingText();
-        // if (index > entries.length - 5 && _entryStreamSubscription.isPaused) _entryStreamSubscription.resume();
-        // if (index <= entries.length - 5 && !_entryStreamSubscription.isPaused) _entryStreamSubscription.pause();
+        // resume the stream if we're within 5 entries of the end of the list
         return _buildRow(entries[index]);
       },
       separatorBuilder: (c, i) => Divider(),
@@ -83,43 +90,14 @@ class _EntryListState extends State<EntryList> {
   }
 
   Widget _buildRow(Entry entry) {
-    // Schema:
-    // {meaningId: {partOfSpeech: [translation]}}
-    Map<String, Map<String, List<Translation>>> translationMap = {};
-    entry.translations.forEach((t) =>
-        translationMap.getOrElse(t.meaningId, {}).getOrElse(t.partOfSpeech, []).add(t));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-            entry.headword,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1
-        ),
-        Column(
-          children: [
-            Row(
-              children: groupBy(entry.translations, (t) => t.partOfSpeech).values
-                  .map(_buildTranslations).toList(),
-            ),
-          ],
-        ),
-      ],
-    );
+    return EntryWidget(entry);
   }
 
-  Widget _buildTranslations(List<Translation> translations) {
-    String partOfSpeech = translations.first.partOfSpeech;
-    return Row(
-      children: [
-        Text(partOfSpeech + ':'),
-        SizedBox(width: 10),
-        Column(
-          children: translations.map((t) => Text(t.translation)).toList(),
-          crossAxisAlignment: CrossAxisAlignment.start,
-        )
-      ],
-      crossAxisAlignment: CrossAxisAlignment.start,
-    );
+  void _pauseStream() {
+    if (!_entryStreamSubscription.isPaused) _entryStreamSubscription.pause();
+  }
+
+  void _resumeStream() {
+    if (_entryStreamSubscription.isPaused) _entryStreamSubscription.resume();
   }
 }

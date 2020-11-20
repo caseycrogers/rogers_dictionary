@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/dictionary/dictionary_page.dart';
+import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/pages/dictionary_page.dart';
 
 import 'entry_database/entry_database.dart';
 
