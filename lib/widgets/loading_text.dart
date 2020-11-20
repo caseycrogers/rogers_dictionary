@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class LoadingText extends StatelessWidget {
-  String _text;
+_LoadingText LoadingText({String text: 'loading'}) => _LoadingText(text);
 
-  LoadingText({String text: 'loading'}) {
-   _text = text;
-  }
+class _LoadingText extends StatelessWidget {
+  final String _text;
+
+  _LoadingText(this._text);
 
   @override
   Widget build(BuildContext context) {
