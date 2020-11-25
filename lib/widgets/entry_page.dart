@@ -12,23 +12,20 @@ class EntryPage extends StatelessWidget {
 
   EntryPage._instance(this._entry, this._preview);
 
-  static Widget asPage(String urlEncodedHeadword) => Scaffold(
-      body: SafeArea(
-          child: FutureBuilder(
-            future: MyApp.db.getEntry(urlEncodedHeadword),
-            builder: (context, snap) {
-              if (!snap.hasData) return Center(child: LoadingText());
-              return EntryPage._instance(snap.data, false);
-            },
-          )
-      )
+  static Widget asPage(String urlEncodedHeadword) => FutureBuilder(
+    future: MyApp.db.getEntry(urlEncodedHeadword),
+    builder: (context, snap) {
+      if (!snap.hasData) return Center(child: LoadingText());
+      return EntryPage._instance(snap.data, false);
+    },
   );
+
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
   @override
   Widget build(BuildContext context) {
     var map = _constructTranslationMap(_entry);
-    var entryWidget = Column(
+    Widget entryWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _headwordLine(context, _entry),
@@ -54,70 +51,75 @@ class EntryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTable(BuildContext context, Map<String, Map<String, List<Translation>>> translationMap) {
-    return Table(
-      columnWidths: {
-        0: IntrinsicColumnWidth(),
-      },
-      children: _buildTranslations(context, translationMap)
-    );
+  Widget _buildTable(BuildContext context,
+      Map<String, Map<String, List<Translation>>> translationMap) {
+    return Table(columnWidths: {
+      0: IntrinsicColumnWidth(),
+    }, children: _buildTranslations(context, translationMap));
   }
 
-  Map<String, Map<String, List<Translation>>> _constructTranslationMap(Entry entry) {
+  Map<String, Map<String, List<Translation>>> _constructTranslationMap(
+      Entry entry) {
     // Schema:
     // {meaningId: {partOfSpeech: [translation]}}
     Map<String, Map<String, List<Translation>>> translationMap = {};
-    _entry.translations.forEach((t) =>
-        translationMap.getOrElse(t.meaningId, {}).getOrElse(t.partOfSpeech, []).add(t));
+    _entry.translations.forEach((t) => translationMap
+        .getOrElse(t.meaningId, {}).getOrElse(t.partOfSpeech, []).add(t));
     return translationMap;
   }
 
   // Return a list of TableRows for all the translations of a single part of speech
-  List<TableRow> _buildTranslations(BuildContext context, Map<String, Map<String, List<Translation>>> meaningMap) {
+  List<TableRow> _buildTranslations(BuildContext context,
+      Map<String, Map<String, List<Translation>>> meaningMap) {
     List<TableRow> translationRows = [];
     meaningMap.forEach((meaningId, partOfSpeechMap) {
       partOfSpeechMap.forEach((partOfSpeech, translations) {
-        translationRows.addAll(_buildPartOfSpeech(context, partOfSpeech, translations));
+        translationRows
+            .addAll(_buildPartOfSpeech(context, partOfSpeech, translations));
       });
     });
     return translationRows;
   }
 
-  List<TableRow> _buildPartOfSpeech(BuildContext context, String partOfSpeech, List<Translation> translations) {
-    if (_preview) return [
-      TableRow(
-        children: [
+  List<TableRow> _buildPartOfSpeech(BuildContext context, String partOfSpeech,
+      List<Translation> translations) {
+    if (_preview)
+      return [
+        TableRow(children: [
           _partOfSpeechText(context, partOfSpeech),
-          _translationText(context, translations
-              .map((t) => t.translation)
-              .join(", "),
+          _translationText(
+            context,
+            translations.map((t) => t.translation).join(", "),
           ),
-        ]
-      )
-    ];
+        ])
+      ];
     return translations.map((t) {
       var translationText = _translationText(context, t.translation);
-      return TableRow(
-        children: [
-          (t == translations.first) ? _partOfSpeechText(context, partOfSpeech) : Container(),
-          translationText,
-        ]
-      );
+      return TableRow(children: [
+        (t == translations.first)
+            ? _partOfSpeechText(context, partOfSpeech)
+            : Container(),
+        translationText,
+      ]);
     }).toList();
   }
 
   Widget _headwordLine(BuildContext context, Entry entry) {
     if (entry.abbreviation == '') return _headwordText(context, entry.headword);
-    if (_preview) return Row(
-      children: [
-        _headwordText(context, _entry.headword),
-        Text(
-          ' abbr ',
-          style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-        ),
-        _headwordAbbreviationText(context, _entry.abbreviation),
-      ],
-    );
+    if (_preview)
+      return Row(
+        children: [
+          _headwordText(context, _entry.headword),
+          Text(
+            ' abbr ',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
+          ),
+          _headwordAbbreviationText(context, _entry.abbreviation),
+        ],
+      );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -126,25 +128,34 @@ class EntryPage extends StatelessWidget {
           children: [
             Text(
               'abbr ',
-              style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
             ),
             _headwordAbbreviationText(context, _entry.abbreviation),
           ],
         ),
-
       ],
     );
   }
 
   Widget _headwordText(BuildContext context, String text) {
-    if (_preview) return Text(
+    if (_preview)
+      return Text(
         text,
-        style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1
+            .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
         overflow: TextOverflow.ellipsis,
-    );
+      );
     return Text(
       text,
-      style: Theme.of(context).textTheme.headline1.merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
+      style: Theme.of(context)
+          .textTheme
+          .headline1
+          .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -152,19 +163,24 @@ class EntryPage extends StatelessWidget {
   Widget _headwordAbbreviationText(BuildContext context, String text) {
     return Text(
       text,
-      style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
+      style: Theme.of(context)
+          .textTheme
+          .bodyText1
+          .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
       overflow: TextOverflow.ellipsis,
     );
   }
 
   Widget _partOfSpeechText(BuildContext context, String text) {
     return Container(
-      padding: EdgeInsets.only(right: 10.0),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodyText2.merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-      )
-    );
+        padding: EdgeInsets.only(right: 10.0),
+        child: Text(
+          text,
+          style: Theme.of(context)
+              .textTheme
+              .bodyText2
+              .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
+        ));
   }
 
   Widget _translationText(BuildContext context, String text) {
