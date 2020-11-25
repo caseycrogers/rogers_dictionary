@@ -43,6 +43,7 @@ Translation _$TranslationFromJson(Map<String, dynamic> json) {
     json['meaning_id'] as String,
     json['part_of_speech'] as String,
     json['translation'] as String,
+    json['should_be_key_phrase'] as bool,
   );
 }
 
@@ -51,4 +52,5 @@ Map<String, dynamic> _$TranslationToJson(Translation instance) =>
       'meaning_id': instance.meaningId,
       'part_of_speech': instance.partOfSpeech,
       'translation': instance.translation,
+      'should_be_key_phrase': instance.shouldBeKeyPhrase,
     };

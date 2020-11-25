@@ -193,9 +193,9 @@ packages:
   df:
     dependency: "direct dev"
     description:
-      name: df
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../df"
+      relative: true
+    source: path
     version: "0.2.1"
   extra_pedantic:
     dependency: transitive

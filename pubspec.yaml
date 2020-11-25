@@ -39,8 +39,9 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^1.10.3
   json_serializable: ^3.5.0
-  df: ^0.2.1
   firedart: ^0.8.3
+  df:
+    path: ../df
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

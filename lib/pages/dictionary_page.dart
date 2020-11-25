@@ -8,6 +8,7 @@ import 'package:rogers_dictionary/main.dart';
 import '../dictionary/entry_list.dart';
 
 class DictionaryPage extends StatelessWidget {
+  static const String route = '/';
 
   @override
   Widget build(BuildContext context) {

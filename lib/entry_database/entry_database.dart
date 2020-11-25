@@ -17,6 +17,9 @@ abstract class EntryDatabase {
 
   // Get all entries in the database
   Stream<List<Entry>> getEntries({String searchString = ''});
+
+  // Get the given entry from the database
+  Future<Entry> getEntry(String urlEncodedHeadword);
 }
 
 class FirestoreDatabase extends EntryDatabase {
@@ -37,6 +40,15 @@ class FirestoreDatabase extends EntryDatabase {
     return englishDoc().collection(ENTRIES);
   }
 
+  @override
+  Future<Entry> getEntry(String urlEncodedHeadword) async {
+    await init();
+    return _docToEntry(
+        await entriesCol().doc(urlEncodedHeadword).get()
+    );
+  }
+
+  @override
   Stream<List<Entry>> getEntries({String searchString = ''}) {
     return _getEntryStream(searchString);
   }
@@ -63,10 +75,14 @@ class FirestoreDatabase extends EntryDatabase {
   }
   
   List<Entry> _queryToEntries(QuerySnapshot query) {
-    return query.docs.map(_docToEntry).toList();
+    return query.docs.map(_queryDocToEntry).toList();
   }
 
-  Entry _docToEntry(QueryDocumentSnapshot doc) {
+  Entry _queryDocToEntry(QueryDocumentSnapshot doc) {
+    return Entry.fromJson(doc.data());
+  }
+
+  Entry _docToEntry(DocumentSnapshot doc) {
     return Entry.fromJson(doc.data());
   }
 }
