@@ -20,7 +20,7 @@ class DictionaryPage extends StatelessWidget {
               appBar: AppBar(
                 title: Text('Dictionary'),
               ),
-              body: EntrySearch(),
+              body: _urlEncodedHeadword != '' ? EntryPage.asPage(_urlEncodedHeadword) : EntrySearch(),
             );
           case Orientation.landscape:
             return Scaffold(
@@ -30,7 +30,7 @@ class DictionaryPage extends StatelessWidget {
               body: Row(
                 children: [
                   Expanded(flex: 1, child: EntrySearch()),
-                  Expanded(flex: 2, child: Container()),
+                  Expanded(flex: 2, child: _urlEncodedHeadword != '' ? EntryPage.asPage(_urlEncodedHeadword) : Container()),
                 ],
               ),
             );

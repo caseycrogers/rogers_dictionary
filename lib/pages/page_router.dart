@@ -2,9 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/entry_page.dart';
-import 'package:rogers_dictionary/widgets/loading_text.dart';
-
-import '../main.dart';
 
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -24,18 +21,17 @@ class PageRouter {
   }
 }
 
-MaterialPageRoute _serveDictionaryPage(RouteSettings settings) {
+Route<dynamic> _serveDictionaryPage(RouteSettings settings) {
   return MaterialPageRoute(
     settings: settings,
     builder: (_) => DictionaryPage(''),
   );
 }
 
-MaterialPageRoute _serveEntryPage(RouteSettings settings) {
+Route<dynamic> _serveEntryPage(RouteSettings settings) {
   String urlEncodedHeadword = settings.name.substring(EntryPage.route.length + 1, settings.name.length);
-
   return MaterialPageRoute(
     settings: settings,
-    builder: (_) => Container(color: Colors.transparent),
+    builder: (_) => DictionaryPage(urlEncodedHeadword),
   );
 }
