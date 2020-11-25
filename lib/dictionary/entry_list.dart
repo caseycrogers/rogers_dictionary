@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
@@ -9,30 +10,30 @@ import 'dart:core';
 import 'package:rogers_dictionary/widgets/entry_page.dart';
 
 class EntryList extends StatefulWidget {
-  final Stream<List<Entry>> _entryStream;
+  final String _searchString;
 
   @override
-  _EntryListState createState() => _EntryListState(_entryStream);
+  _EntryListState createState() => _EntryListState();
 
-  EntryList(this._entryStream);
+  EntryList(this._searchString);
 }
 
 class _EntryListState extends State<EntryList> {
-  Stream<List<Entry>> _entryStream;
   StreamController<List<Entry>> _entryStreamController;
   StreamSubscription<List<Entry>> _entryStreamSubscription;
   bool hasSeenData = false;
 
   ScrollController _scrollController;
 
-  _EntryListState(this._entryStream);
+  _EntryListState();
 
   void initEntryList() {
+    var entryStream = MyApp.db.getEntries(searchString: widget._searchString);
     _entryStreamSubscription?.cancel();
     _entryStreamController?.close();
 
     _entryStreamController = StreamController();
-    _entryStreamSubscription = widget._entryStream.listen((event) {
+    _entryStreamSubscription = entryStream.listen((event) {
       _entryStreamController.add(event);
     })..onDone(() => _entryStreamController.close());
     // Start with the stream paused
@@ -60,9 +61,8 @@ class _EntryListState extends State<EntryList> {
   @override
   void didUpdateWidget(EntryList oldEntryList) {
     super.didUpdateWidget(oldEntryList);
-    // Initialize the stream only if it has changed
-    if (_entryStream != widget._entryStream) {
-      _entryStream = widget._entryStream;
+    // Initialize the stream only if the search string has changed
+    if (oldEntryList._searchString != widget._searchString) {
       initEntryList();
     }
   }
@@ -80,6 +80,7 @@ class _EntryListState extends State<EntryList> {
 
   Widget _buildEntries(List<Entry> entries, ConnectionState state) {
     return ListView.separated(
+      key: PageStorageKey('entry_list'),
       padding: EdgeInsets.all(16.0),
       itemCount: state == ConnectionState.done ? entries.length : entries.length + 1,
       itemBuilder: (context, index) {
@@ -112,7 +113,7 @@ class _EntryListState extends State<EntryList> {
               Expanded(child: EntryPage.asPreview(entry)),
               Icon(
                 Icons.arrow_forward_ios_outlined,
-                color: Colors.black38,
+                color: Theme.of(context).accentIconTheme.color,
               ),
             ],
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

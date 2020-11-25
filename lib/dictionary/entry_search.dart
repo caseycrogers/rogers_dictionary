@@ -19,7 +19,7 @@ class EntrySearch extends StatelessWidget {
             SearchBar(),
             Flexible(
               child: Consumer<SearchStringModel> (
-                builder: (context, searchStringModel, child) => EntryList(_getEntries(searchStringModel.searchString)),
+                builder: (context, searchStringModel, child) => EntryList(searchStringModel.searchString),
               ),
             ),
           ]);
