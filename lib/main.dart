@@ -16,6 +16,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
   static final EntryDatabase db = FirestoreDatabase();
+  static final entrySearchKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +30,9 @@ class MyApp extends StatelessWidget {
             headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
             bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
             bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+          ),
+          accentIconTheme: IconThemeData(
+            color: Colors.black38,
           ),
         ),
       ),

@@ -1,23 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
+
+import 'loading_text.dart';
 
 class EntryPage extends StatelessWidget {
   static const route = '/entries';
   final Entry _entry;
   final bool _preview;
-  final bool _panel;
 
-  EntryPage._instance(this._entry, this._preview, this._panel);
+  EntryPage._instance(this._entry, this._preview);
 
-  static EntryPage asPage(Entry _entry) => EntryPage._instance(_entry, false, false);
-  static EntryPage asPreview(Entry _entry) => EntryPage._instance(_entry, true, false);
-  static EntryPage asPanel(Entry _entry) => EntryPage._instance(_entry, false, true);
+  static Widget asPage(String urlEncodedHeadword) => Scaffold(
+      body: SafeArea(
+          child: FutureBuilder(
+            future: MyApp.db.getEntry(urlEncodedHeadword),
+            builder: (context, snap) {
+              if (!snap.hasData) return Center(child: LoadingText());
+              return EntryPage._instance(snap.data, false);
+            },
+          )
+      )
+  );
+  static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
   @override
   Widget build(BuildContext context) {
-    assert(!(this._preview && this._panel), 'An entry page can\'t be both a preview and a panel.');
     var map = _constructTranslationMap(_entry);
     var entryWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,19 +35,22 @@ class EntryPage extends StatelessWidget {
         _buildTable(context, map),
       ],
     );
-    if (_preview || _panel) return entryWidget;
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('back'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+    if (_preview) return entryWidget;
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Theme.of(context).accentIconTheme.color,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
-        ),
-        body: Container(
-          padding: EdgeInsets.all(20.0),
-          child: entryWidget,
-        ),
+          entryWidget,
+        ],
+      ),
     );
   }
 
@@ -98,12 +110,12 @@ class EntryPage extends StatelessWidget {
     if (entry.abbreviation == '') return _headwordText(context, entry.headword);
     if (_preview) return Row(
       children: [
-        _headwordAbbreviationText(context, _entry.abbreviation),
+        _headwordText(context, _entry.headword),
         Text(
           ' abbr ',
           style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
         ),
-        _headwordText(context, _entry.headword),
+        _headwordAbbreviationText(context, _entry.abbreviation),
       ],
     );
     return Column(
