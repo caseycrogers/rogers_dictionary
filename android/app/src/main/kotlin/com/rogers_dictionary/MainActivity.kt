@@ -1,4 +1,4 @@
-package com.example.rogers_dictionary
+package com.rogers_dictionary
 
 import io.flutter.embedding.android.FlutterActivity
 
