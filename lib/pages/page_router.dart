@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/entry_page.dart';
@@ -24,19 +23,18 @@ class PageRouter {
 }
 
 MaterialPageRoute _serveDictionaryPage(RouteSettings settings) {
-  return MaterialPageRoute(builder: (_) => DictionaryPage());
+  return MaterialPageRoute(
+    settings: settings,
+    builder: (_) => DictionaryPage(),
+  );
 }
 
 MaterialPageRoute _serveEntryPage(RouteSettings settings) {
   String urlEncodedHeadword = settings.name.substring(EntryPage.route.length + 1, settings.name.length);
-  Future<Entry> entryFuture = MyApp.db.getEntry(urlEncodedHeadword).then((value) {
-    print('asdfasdfasdf');
-    print(value);
-    return value;
-  });
   return MaterialPageRoute(
+    settings: settings,
     builder: (_) => FutureBuilder(
-      future: entryFuture,
+      future: MyApp.db.getEntry(urlEncodedHeadword),
       builder: (context, snap) {
         if (!snap.hasData) return Center(child: LoadingText());
         return EntryPage.asPage(snap.data);
