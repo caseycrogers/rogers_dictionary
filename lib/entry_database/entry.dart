@@ -33,6 +33,8 @@ class Entry {
       this.translations,
       );
 
+  String get urlEncodedHeadword => Uri.encodeComponent(headword);
+
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
   bool keyWordMatches(String searchTerm) {
@@ -55,11 +57,14 @@ class Translation {
   final String meaningId;
   final String partOfSpeech;
   final String translation;
+  final bool shouldBeKeyPhrase;
+
 
   Translation(
       this.meaningId,
       this.partOfSpeech,
       this.translation,
+      this.shouldBeKeyPhrase,
       );
 
   factory Translation.fromJson(Map<String, dynamic> json) => _$TranslationFromJson(json);
@@ -130,9 +135,9 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder addTranslation(String meaningId, String partOfSpeech, String translation) {
+  EntryBuilder addTranslation(String meaningId, String partOfSpeech, String translation, bool shouldBeKeyPhrase) {
     assert(translation != '', "You must specify a non-empty translation.");
-    _translations.add(Translation(meaningId, partOfSpeech, translation));
+    _translations.add(Translation(meaningId, partOfSpeech, translation, shouldBeKeyPhrase));
     return this;
   }
 

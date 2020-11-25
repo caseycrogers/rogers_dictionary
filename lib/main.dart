@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/util/focus_utils.dart';
 
 import 'entry_database/entry_database.dart';
+import 'pages/page_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,16 +19,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Dictionary',
-      home: DictionaryPage(),
-      theme: ThemeData(
-        textTheme: TextTheme(
-          headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-          bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+    return GestureDetector(
+      child: MaterialApp(
+        title: 'Dictionary',
+        initialRoute: DictionaryPage.route,
+        onGenerateRoute: PageRouter.generateRoute,
+        theme: ThemeData(
+          textTheme: TextTheme(
+            headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
+            bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+            bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+          ),
         ),
       ),
+      onTap: () => unFocus(context),
     );
   }
 }

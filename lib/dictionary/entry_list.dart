@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/loading_text.dart';
+import 'package:rogers_dictionary/util/focus_utils.dart';
+import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
 
-import 'package:rogers_dictionary/widgets/entry_widget.dart';
+import 'package:rogers_dictionary/widgets/entry_page.dart';
 
 class EntryList extends StatefulWidget {
   final Stream<List<Entry>> _entryStream;
@@ -22,9 +23,11 @@ class _EntryListState extends State<EntryList> {
   StreamSubscription<List<Entry>> _entryStreamSubscription;
   bool hasSeenData = false;
 
+  ScrollController _scrollController;
+
   _EntryListState(this._entryStream);
 
-  void initStream() {
+  void initEntryList() {
     _entryStreamSubscription?.cancel();
     _entryStreamController?.close();
 
@@ -35,12 +38,16 @@ class _EntryListState extends State<EntryList> {
     // Start with the stream paused
     _pauseStream();
     hasSeenData = false;
+
+    _scrollController?.removeListener(_scrollListener);
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
   }
 
   @override
   void initState() {
     super.initState();
-    initStream();
+    initEntryList();
   }
 
   @override
@@ -56,7 +63,7 @@ class _EntryListState extends State<EntryList> {
     // Initialize the stream only if it has changed
     if (_entryStream != widget._entryStream) {
       _entryStream = widget._entryStream;
-      initStream();
+      initEntryList();
     }
   }
 
@@ -81,16 +88,42 @@ class _EntryListState extends State<EntryList> {
         } else {
           _pauseStream();
         }
-        if (index == entries.length) return LoadingText();
+        if (index == entries.length) return Container(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: LoadingText(),
+        );
         // resume the stream if we're within 5 entries of the end of the list
         return _buildRow(entries[index]);
       },
-      separatorBuilder: (c, i) => Divider(),
+      separatorBuilder: (c, i) => Divider(
+        thickness: 1,
+        height: 1,
+      ),
+      controller: _scrollController,
     );
   }
 
   Widget _buildRow(Entry entry) {
-    return EntryWidget(entry);
+    return InkWell(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Expanded(child: EntryPage.asPreview(entry)),
+              Icon(
+                Icons.arrow_forward_ios_outlined,
+                color: Colors.black38,
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+        ),
+        onTap: () {
+          Navigator.of(context).pushNamed(
+              EntryPage.route + '/${entry.urlEncodedHeadword}'
+          );
+        }
+    );
   }
 
   void _pauseStream() {
@@ -99,5 +132,9 @@ class _EntryListState extends State<EntryList> {
 
   void _resumeStream() {
     if (_entryStreamSubscription.isPaused) _entryStreamSubscription.resume();
+  }
+
+  void _scrollListener() {
+   unFocus(context);
   }
 }
