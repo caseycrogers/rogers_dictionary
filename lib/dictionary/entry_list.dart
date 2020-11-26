@@ -121,7 +121,7 @@ class _EntryListState extends State<EntryList> {
         ),
         onTap: () {
           Navigator.of(context).pushNamed(
-              EntryPage.route + '/${entry.urlEncodedHeadword}'
+            EntryPage.route + '/${entry.urlEncodedHeadword}',
           );
         }
     );

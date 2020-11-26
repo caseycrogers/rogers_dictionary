@@ -23,8 +23,10 @@ class MyApp extends StatelessWidget {
     return GestureDetector(
       child: MaterialApp(
         title: 'Dictionary',
-        initialRoute: DictionaryPage.route,
-        onGenerateRoute: PageRouter.generateRoute,
+        home: Navigator(
+          initialRoute: DictionaryPage.route,
+          onGenerateRoute: PageRouter.generateRoute,
+        ),
         theme: ThemeData(
           textTheme: TextTheme(
             headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
