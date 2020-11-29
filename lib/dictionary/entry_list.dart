@@ -8,6 +8,7 @@ import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
 
 import 'package:rogers_dictionary/widgets/entry_page.dart';
+import 'package:stream_summary_builder/stream_summary_builder.dart';
 
 class EntryList extends StatefulWidget {
   final String _searchString;
@@ -19,8 +20,8 @@ class EntryList extends StatefulWidget {
 }
 
 class _EntryListState extends State<EntryList> {
-  StreamController<List<Entry>> _entryStreamController;
-  StreamSubscription<List<Entry>> _entryStreamSubscription;
+  StreamController<Entry> _entryStreamController;
+  StreamSubscription<Entry> _entryStreamSubscription;
   bool hasSeenData = false;
 
   ScrollController _scrollController;
@@ -69,9 +70,10 @@ class _EntryListState extends State<EntryList> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamSummaryBuilder<Entry, List<Entry>>(
           initialData: List<Entry>(),
           stream: _entryStreamController.stream,
+          fold: (summary, value) => List.from(summary)..add(value),
           builder: (_, entriesSnap) {
             return _buildEntries(entriesSnap.data, entriesSnap.connectionState);
           }
@@ -80,7 +82,6 @@ class _EntryListState extends State<EntryList> {
 
   Widget _buildEntries(List<Entry> entries, ConnectionState state) {
     return ListView.separated(
-      key: PageStorageKey('entry_list'),
       padding: EdgeInsets.all(16.0),
       itemCount: state == ConnectionState.done ? entries.length : entries.length + 1,
       itemBuilder: (context, index) {

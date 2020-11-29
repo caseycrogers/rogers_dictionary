@@ -16,7 +16,7 @@ abstract class EntryDatabase {
   bool isEnglish() => _english;
 
   // Get all entries in the database
-  Stream<List<Entry>> getEntries({String searchString = ''});
+  Stream<Entry> getEntries({String searchString = ''});
 
   // Get the given entry from the database
   Future<Entry> getEntry(String urlEncodedHeadword);
@@ -49,13 +49,12 @@ class FirestoreDatabase extends EntryDatabase {
   }
 
   @override
-  Stream<List<Entry>> getEntries({String searchString = ''}) {
+  Stream<Entry> getEntries({String searchString = ''}) {
     return _getEntryStream(searchString);
   }
 
-  Stream<List<Entry>> _getEntryStream(String searchString) async* {
+  Stream<Entry> _getEntryStream(String searchString) async* {
     await init();
-    List<Entry> soFar = [];
     dynamic start = -1;
     while (true) {
       var snapshot = await entriesCol()
@@ -65,11 +64,9 @@ class FirestoreDatabase extends EntryDatabase {
           .limit(10)
           .get();
       if (snapshot.docs.isEmpty) {
-        // If we didn't see any data, return an empty list
-        if (soFar.isEmpty) yield soFar;
         return;
       }
-      for (var entry in _queryToEntries(snapshot)) yield List.from(soFar..add(entry));
+      for (var entry in _queryToEntries(snapshot)) yield entry;
       start = snapshot.docs.last.get('entry_id');
     }
   }

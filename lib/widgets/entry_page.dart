@@ -12,13 +12,16 @@ class EntryPage extends StatelessWidget {
 
   EntryPage._instance(this._entry, this._preview);
 
-  static Widget asPage(String urlEncodedHeadword) => FutureBuilder(
-    future: MyApp.db.getEntry(urlEncodedHeadword),
-    builder: (context, snap) {
-      if (!snap.hasData) return Center(child: LoadingText());
-      return EntryPage._instance(snap.data, false);
-    },
-  );
+  static Widget asPage(String urlEncodedHeadword) {
+    if (urlEncodedHeadword.isEmpty) return Container();
+    return FutureBuilder(
+      future: MyApp.db.getEntry(urlEncodedHeadword),
+      builder: (context, snap) {
+        if (!snap.hasData) return Center(child: LoadingText());
+        return EntryPage._instance(snap.data, false);
+      },
+    );
+  }
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
