@@ -30,31 +30,8 @@ Route<dynamic> _serveDictionaryPage(RouteSettings settings) {
 
 Route<dynamic> _serveEntryPage(RouteSettings settings) {
   String urlEncodedHeadword = settings.name.substring(EntryPage.route.length + 1, settings.name.length);
-  return EntryPageRoute(
-    settings: settings,
-    builder: (_) => DictionaryPage(urlEncodedHeadword),
-
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, _) => DictionaryPage(urlEncodedHeadword,
+        transitionAnimation: CurvedAnimation(curve: Curves.easeIn, parent: animation)),
   );
-}
-
-class EntryPageRoute<T> extends MaterialPageRoute<T> {
-  EntryPageRoute({
-    @required WidgetBuilder builder,
-    RouteSettings settings,
-    bool maintainState = true,
-    bool fullscreenDialog = false,
-  }) : super(
-      builder: builder,
-      maintainState: maintainState,
-      settings: settings,
-      fullscreenDialog: fullscreenDialog);
-
-  @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
-    // Use default animations in portrait mode
-    if (MediaQuery.of(context).orientation == Orientation.portrait)
-      return super.buildTransitions(context, animation, secondaryAnimation, child);
-    return child;
-  }
 }

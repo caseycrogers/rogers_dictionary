@@ -560,6 +560,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0-nullsafety.3"
+  stream_summary_builder:
+    dependency: "direct main"
+    description:
+      name: stream_summary_builder
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0-dev.5"
   stream_transform:
     dependency: transitive
     description:

@@ -16,29 +16,26 @@ void main() async {
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
   static final EntryDatabase db = FirestoreDatabase();
-  static final entrySearchKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: MaterialApp(
-        title: 'Dictionary',
-        home: Navigator(
-          initialRoute: DictionaryPage.route,
+        child: MaterialApp(
+          title: 'Dictionary',
           onGenerateRoute: PageRouter.generateRoute,
-        ),
-        theme: ThemeData(
-          textTheme: TextTheme(
-            headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
-            bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
-            bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+          initialRoute: DictionaryPage.route,
+          theme: ThemeData(
+            textTheme: TextTheme(
+              headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
+              bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+              bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+            ),
+            accentIconTheme: IconThemeData(
+              color: Colors.black38,
+            ),
           ),
-          accentIconTheme: IconThemeData(
-            color: Colors.black38,
-          ),
         ),
-      ),
-      onTap: () => unFocus(context),
+        onTap: () => unFocus(context),
     );
   }
 }
