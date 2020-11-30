@@ -20,22 +20,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        child: MaterialApp(
-          title: 'Dictionary',
-          onGenerateRoute: PageRouter.generateRoute,
-          initialRoute: DictionaryPage.route,
-          theme: ThemeData(
-            textTheme: TextTheme(
-              headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
-              bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
-              bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
-            ),
-            accentIconTheme: IconThemeData(
-              color: Colors.black38,
+          child: MaterialApp(
+            title: 'Dictionary',
+            onGenerateRoute: PageRouter.generateRoute,
+            initialRoute: DictionaryPage.route,
+            theme: ThemeData(
+              textTheme: TextTheme(
+                headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
+                bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+              ),
+              accentIconTheme: IconThemeData(
+                color: Colors.black38,
+              ),
             ),
           ),
-        ),
-        onTap: () => unFocus(context),
-    );
+          onTap: () => unFocus(context),
+      );
   }
 }

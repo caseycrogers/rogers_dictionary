@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/entry_page.dart';
 
@@ -23,15 +24,24 @@ class PageRouter {
 
 Route<dynamic> _serveDictionaryPage(RouteSettings settings) {
   return MaterialPageRoute(
-    settings: settings,
-    builder: (_) => DictionaryPage(''),
+    settings: settings.copyWith(arguments: DictionaryPageModel.empty()),
+    builder: (context) {
+      return DictionaryPage();
+    },
   );
 }
 
 Route<dynamic> _serveEntryPage(RouteSettings settings) {
-  String urlEncodedHeadword = settings.name.substring(EntryPage.route.length + 1, settings.name.length);
+  var headword = settings.name.split('/').last;
   return PageRouteBuilder(
-    pageBuilder: (context, animation, _) => DictionaryPage(urlEncodedHeadword,
-        transitionAnimation: CurvedAnimation(curve: Curves.easeIn, parent: animation)),
+    settings: settings,
+    pageBuilder: (context, animation, _) {
+      //context
+      //    .select<SelectedEntryModel, SelectedEntryModel>((value) => value)
+      //    .selectEntry(MyApp.db.getEntry(headword), headword);
+      return DictionaryPage(
+          transitionAnimation: CurvedAnimation(curve: Curves.easeIn, parent: animation)
+      );
+    }
   );
 }

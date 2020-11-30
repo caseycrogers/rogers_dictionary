@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
-
-import 'loading_text.dart';
 
 class EntryPage extends StatelessWidget {
   static const route = '/entries';
@@ -12,16 +10,18 @@ class EntryPage extends StatelessWidget {
 
   EntryPage._instance(this._entry, this._preview);
 
-  static Widget asPage(String urlEncodedHeadword) {
-    if (urlEncodedHeadword.isEmpty) return Container();
-    return FutureBuilder(
-      future: MyApp.db.getEntry(urlEncodedHeadword),
-      builder: (context, snap) {
-        if (!snap.hasData) return Center(child: LoadingText());
-        return EntryPage._instance(snap.data, false);
-      },
-    );
-  }
+  static Widget asPage() => Builder(
+    builder: (context) {
+      if (!DictionaryPageModel.of(context).hasSelection) return Container();
+      return FutureBuilder(
+        future: DictionaryPageModel.of(context).entry,
+        builder: (context, snap) {
+          if (!snap.hasData) return Center(child: CircularProgressIndicator());
+          return EntryPage._instance(snap.data, false);
+        },
+      );
+    }
+  );
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
