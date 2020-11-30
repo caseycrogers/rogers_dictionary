@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
@@ -123,6 +124,7 @@ class _EntryListState extends State<EntryList> {
         onTap: () {
           Navigator.of(context).pushNamed(
             EntryPage.route + '/${entry.urlEncodedHeadword}',
+            arguments: DictionaryPageModel.copyWith(context, entry: entry),
           );
         }
     );
