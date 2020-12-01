@@ -24,6 +24,7 @@ const TRANSLATION = 'translation';
 const SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
 
 const KEYWORD_LIST = 'keyword_list';
+const URL_ENCODED_HEADWORD = 'url_encoded_headword';
 
 void uploadEntries(bool debug, bool verbose) async {
   Firestore.initialize('rogers-dicitionary');
@@ -36,7 +37,7 @@ void uploadEntries(bool debug, bool verbose) async {
   var i = 0;
   List<Future<void>> uploadFutures = [];
 
-  while (i < df.length) {
+  while (i < 100) {
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD] != '') {
       // Start a new entry for a new headword
@@ -75,6 +76,7 @@ void uploadEntries(bool debug, bool verbose) async {
 Future<void> _upload(Entry entry, bool debug, bool verbose) {
   var entryMap = entry.toJson();
   entryMap[KEYWORD_LIST] = _constructSearchList(entry);
+  entryMap[URL_ENCODED_HEADWORD] = entry.urlEncodedHeadword;
   if (verbose) {
     print('Entry:\n${entry.toJson()}');
     print('Keywords:\n${entryMap[KEYWORD_LIST]}');

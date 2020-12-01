@@ -14,7 +14,7 @@ class EntryPage extends StatelessWidget {
     builder: (context) {
       if (!DictionaryPageModel.of(context).hasSelection) return Container();
       return FutureBuilder(
-        future: DictionaryPageModel.of(context).entry,
+        future: DictionaryPageModel.of(context).selectedEntry,
         builder: (context, snap) {
           if (!snap.hasData) return Center(child: CircularProgressIndicator());
           return EntryPage._instance(snap.data, false);
@@ -48,7 +48,9 @@ class EntryPage extends StatelessWidget {
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          entryWidget,
+          Expanded(
+            child: entryWidget,
+          ),
         ],
       ),
     );
@@ -175,15 +177,13 @@ class EntryPage extends StatelessWidget {
   }
 
   Widget _partOfSpeechText(BuildContext context, String text) {
-    return Container(
-        padding: EdgeInsets.only(right: 10.0),
-        child: Text(
-          text,
-          style: Theme.of(context)
-              .textTheme
-              .bodyText2
-              .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-        ));
+    return Text(
+      text,
+      style: Theme.of(context)
+          .textTheme
+          .bodyText2
+          .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
+    );
   }
 
   Widget _translationText(BuildContext context, String text) {

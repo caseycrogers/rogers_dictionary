@@ -1,6 +1,5 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/dictionary/entry_search.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/widgets/entry_page.dart';

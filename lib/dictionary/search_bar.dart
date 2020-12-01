@@ -2,30 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 
 class SearchBar extends StatefulWidget {
-  final String _initialString;
-
-  SearchBar(this._initialString);
-
   @override
-  _SearchBarState createState() => _SearchBarState(_initialString);
+  _SearchBarState createState() => _SearchBarState();
 }
 
 class _SearchBarState extends State<SearchBar> {
-  bool _hasText = false;
+  bool _hasText;
   TextEditingController _textEditingController;
-  final String _initialString;
 
-  _SearchBarState(this._initialString);
-
-  @override
-  void initState() {
-    super.initState();
-
-    _textEditingController = TextEditingController(text: _initialString);
-  }
+  get _searchStringModel => DictionaryPageModel.of(context).searchStringModel;
 
   @override
   Widget build(BuildContext context) {
+    _textEditingController ??= TextEditingController(text: _searchStringModel.value);
+    _hasText ??= _textEditingController.text.isNotEmpty;
     return FocusScope(
       child: Focus(
         child: TextField(
@@ -48,8 +38,11 @@ class _SearchBarState extends State<SearchBar> {
   }
 
   void _onTextChanged(String newText) {
-    if (DictionaryPageModel.of(context).searchStringModel.value == newText) return;
-    DictionaryPageModel.of(context).searchStringModel.value = newText;
+    print(_searchStringModel.value.toString() + ',' + newText.toString());
+    if (_searchStringModel.value == newText) return;
+    DictionaryPageModel.of(context).entries.clear();
+    DictionaryPageModel.of(context).startAfter = '';
+    _searchStringModel.value = newText;
     setState(() {
       _hasText = _textEditingController.text.isNotEmpty;
     });

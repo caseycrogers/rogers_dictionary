@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
@@ -12,107 +11,68 @@ import 'package:rogers_dictionary/widgets/entry_page.dart';
 import 'package:stream_summary_builder/stream_summary_builder.dart';
 
 class EntryList extends StatefulWidget {
-  final String _searchString;
-
   @override
   _EntryListState createState() => _EntryListState();
 
-  EntryList(this._searchString);
+  EntryList();
 }
 
 class _EntryListState extends State<EntryList> {
-  StreamController<Entry> _entryStreamController;
-  StreamSubscription<Entry> _entryStreamSubscription;
-  bool hasSeenData = false;
-
-  ScrollController _scrollController;
-
-  _EntryListState();
-
-  void initEntryList() {
-    var entryStream = MyApp.db.getEntries(searchString: widget._searchString);
-    _entryStreamSubscription?.cancel();
-    _entryStreamController?.close();
-
-    _entryStreamController = StreamController();
-    _entryStreamSubscription = entryStream.listen((event) {
-      _entryStreamController.add(event);
-    })..onDone(() => _entryStreamController.close());
-    // Start with the stream paused
-    _pauseStream();
-    hasSeenData = false;
-
-    _scrollController?.removeListener(_scrollListener);
-    _scrollController = ScrollController();
-    _scrollController.addListener(_scrollListener);
-  }
+  get _dictionaryPageModel => DictionaryPageModel.of(context);
 
   @override
   void initState() {
     super.initState();
-    initEntryList();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _entryStreamSubscription?.cancel();
-    _entryStreamController?.close();
-  }
-
-  @override
-  void didUpdateWidget(EntryList oldEntryList) {
-    super.didUpdateWidget(oldEntryList);
-    // Initialize the stream only if the search string has changed
-    if (oldEntryList._searchString != widget._searchString) {
-      initEntryList();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    var searchStringModel = context.watch<SearchStringModel>();
+    var entryStream = MyApp.db.getEntries(searchString: searchStringModel.value, startAfter: _dictionaryPageModel.startAfter);
     return StreamSummaryBuilder<Entry, List<Entry>>(
-          initialData: List<Entry>(),
-          stream: _entryStreamController.stream,
-          fold: (summary, value) => List.from(summary)..add(value),
-          builder: (_, entriesSnap) {
-            return _buildEntries(entriesSnap.data, entriesSnap.connectionState);
-          }
-        );
-      }
+        initialData: _dictionaryPageModel.entries,
+        stream: entryStream,
+        fold: (_, value) => _dictionaryPageModel.entries..add(value),
+        builder: (_, entriesSnap) {
+          return _buildEntries(entriesSnap.data, entriesSnap.connectionState);
+        }
+    );
+  }
 
   Widget _buildEntries(List<Entry> entries, ConnectionState state) {
     return ListView.separated(
-      padding: EdgeInsets.all(16.0),
       itemCount: state == ConnectionState.done ? entries.length : entries.length + 1,
       itemBuilder: (context, index) {
-        if (state == ConnectionState.waiting || index > entries.length - 5) {
-          _resumeStream();
-        } else {
-          _pauseStream();
-        }
+        //if (state == ConnectionState.waiting || index > entries.length - 5) {
+        //  _resumeStream();
+        //} else {
+        //  _pauseStream();
+        //}
         if (index == entries.length) return Container(
           padding: EdgeInsets.symmetric(vertical: 10.0),
           child: LoadingText(),
         );
         // resume the stream if we're within 5 entries of the end of the list
-        return _buildRow(entries[index]);
+        return _buildRow(entries, index);
       },
       separatorBuilder: (c, i) => Divider(
         thickness: 1,
         height: 1,
       ),
-      controller: _scrollController,
+      controller: _dictionaryPageModel.scrollController,
     );
   }
 
-  Widget _buildRow(Entry entry) {
-    return InkWell(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
+  Widget _buildRow(List<Entry> entries, int index) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      color: entries[index].headword == _dictionaryPageModel.selectedHeadword
+          ? Theme.of(context).selectedRowColor
+          : Theme.of(context).scaffoldBackgroundColor,
+      child: InkWell(
           child: Row(
             children: [
-              Expanded(child: EntryPage.asPreview(entry)),
+              Expanded(child: EntryPage.asPreview(entries[index])),
               Icon(
                 Icons.arrow_forward_ios_outlined,
                 color: Theme.of(context).accentIconTheme.color,
@@ -120,23 +80,24 @@ class _EntryListState extends State<EntryList> {
             ],
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
           ),
-        ),
-        onTap: () {
-          Navigator.of(context).pushNamed(
-            EntryPage.route + '/${entry.urlEncodedHeadword}',
-            arguments: DictionaryPageModel.copyWith(context, entry: entry),
-          );
-        }
+          onTap: () {
+            unFocus(context);
+            Navigator.of(context).pushNamed(
+              EntryPage.route + '/${entries[index].urlEncodedHeadword}',
+              arguments: DictionaryPageModel.copy(context, entries[index]),
+            );
+          }
+      ),
     );
   }
 
-  void _pauseStream() {
-    if (!_entryStreamSubscription.isPaused) _entryStreamSubscription.pause();
-  }
+  //void _pauseStream() {
+  //  if (!_entryStreamSubscription.isPaused) _entryStreamSubscription.pause();
+  //}
 
-  void _resumeStream() {
-    if (_entryStreamSubscription.isPaused) _entryStreamSubscription.resume();
-  }
+  //void _resumeStream() {
+  //  if (_entryStreamSubscription.isPaused) _entryStreamSubscription.resume();
+  //}
 
   void _scrollListener() {
    unFocus(context);

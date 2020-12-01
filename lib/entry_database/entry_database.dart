@@ -7,18 +7,18 @@ import 'database_constants.dart';
 import 'entry.dart';
 
 
-// A database interface for fetching dictionary entries
+// A database interface for fetching dictionary entries.
 abstract class EntryDatabase {
-  // Whether or not the dictionary is in english mode or spanish mode
+  // Whether or not the dictionary is in english mode or spanish mode.
   bool _english = true;
   void setEnglish() => _english = true;
   void setSpanish() => _english = false;
   bool isEnglish() => _english;
 
-  // Get all entries in the database
-  Stream<Entry> getEntries({String searchString = ''});
+  // Fetch entries from the database.
+  Stream<Entry> getEntries({String searchString, String startAfter});
 
-  // Get the given entry from the database
+  // Get the given entry from the database.
   Future<Entry> getEntry(String urlEncodedHeadword);
 }
 
@@ -29,7 +29,6 @@ class FirestoreDatabase extends EntryDatabase {
   Future<void> init() async {
     if (_fs != null) return Completer().complete(null);
     await MyApp.isInitialized;
-    print('Firestore initialized!');
   }
 
   DocumentReference englishDoc() {
@@ -49,17 +48,17 @@ class FirestoreDatabase extends EntryDatabase {
   }
 
   @override
-  Stream<Entry> getEntries({String searchString = ''}) {
-    return _getEntryStream(searchString);
+  Stream<Entry> getEntries({String searchString: '', String startAfter: ''}) {
+    return _getEntryStream(searchString, startAfter);
   }
 
-  Stream<Entry> _getEntryStream(String searchString) async* {
+  Stream<Entry> _getEntryStream(String searchString, urlEncodedHeadword) async* {
     await init();
-    dynamic start = -1;
+    dynamic lastSeen = urlEncodedHeadword;
     while (true) {
       var snapshot = await entriesCol()
-          .orderBy('entry_id')
-          .startAfter([start])
+          .orderBy('url_encoded_headword')
+          .startAfter([lastSeen])
           .where('keyword_list', arrayContains: searchString)
           .limit(10)
           .get();
@@ -67,7 +66,7 @@ class FirestoreDatabase extends EntryDatabase {
         return;
       }
       for (var entry in _queryToEntries(snapshot)) yield entry;
-      start = snapshot.docs.last.get('entry_id');
+      lastSeen = snapshot.docs.last.get('url_encoded_headword');
     }
   }
   

@@ -33,7 +33,7 @@ class Entry {
       this.translations,
       );
 
-  String get urlEncodedHeadword => Uri.encodeComponent(headword);
+  String get urlEncodedHeadword => entryId.toString().padLeft(4, '0') + '_' + Uri.encodeComponent(headword);
 
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 

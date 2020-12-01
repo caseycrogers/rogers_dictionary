@@ -4,33 +4,65 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/search_string_model.dart';
 
-@immutable
 class DictionaryPageModel {
-  final Future<Entry> entry;
-  final String headword;
+  // Selected entry state.
+  Future<Entry> selectedEntry;
+  String selectedHeadword;
+
+  get hasSelection => selectedHeadword.isNotEmpty;
+
+  // Search string state.
   final SearchStringModel searchStringModel;
 
-  get hasSelection => headword.isNotEmpty;
+  // EntryList state.
+  final List<Entry> entries;
+  String startAfter;
+  final ScrollController scrollController;
 
   static DictionaryPageModel of(BuildContext context) =>
       ModalRoute.of(context).settings.arguments;
 
-  factory DictionaryPageModel.empty() =>
-      DictionaryPageModel._(null, '', SearchStringModel());
+  factory DictionaryPageModel.empty() => DictionaryPageModel._(
+      selectedEntry: null,
+      selectedHeadword: '',
+      searchStringModel: SearchStringModel._(''),
+      entries: [],
+      startAfter: '',
+      scrollController: ScrollController());
 
   factory DictionaryPageModel.fromHeadword(String urlEncodedHeadword) =>
-      DictionaryPageModel._(Future.value(MyApp.db.getEntry(urlEncodedHeadword)),
-          urlEncodedHeadword, SearchStringModel());
+      DictionaryPageModel._(
+          selectedEntry: MyApp.db.getEntry(urlEncodedHeadword),
+          selectedHeadword: urlEncodedHeadword,
+          searchStringModel: SearchStringModel._(''),
+          entries: [],
+          // Truncate the last letter because we want to include urlEncodedHeadword
+          startAfter:
+              urlEncodedHeadword.substring(0, urlEncodedHeadword.length - 1),
+          scrollController: ScrollController());
 
-  factory DictionaryPageModel.copyWith(BuildContext context, {Entry entry}) =>
-      DictionaryPageModel.of(context)._copyWith(entry: entry);
+  factory DictionaryPageModel.copy(BuildContext context, Entry newEntry) =>
+      DictionaryPageModel.of(context)._copy(newEntry);
 
-  DictionaryPageModel _copyWith({Entry entry}) => DictionaryPageModel._(
-      Future.value(entry ?? this.entry),
-      entry.urlEncodedHeadword,
-      searchStringModel);
+  DictionaryPageModel _copy(Entry newEntry) => DictionaryPageModel._(
+      selectedEntry: Future.value(newEntry),
+      selectedHeadword: newEntry.headword,
+      searchStringModel: SearchStringModel._(searchStringModel.value),
+      entries: List.from(entries),
+      startAfter: entries.last.urlEncodedHeadword,
+      scrollController:
+          ScrollController(initialScrollOffset: scrollController.offset));
 
-  DictionaryPageModel._(this.entry, this.headword, this.searchStringModel);
+  DictionaryPageModel._(
+      {@required this.selectedEntry,
+      @required this.selectedHeadword,
+      @required this.searchStringModel,
+      @required this.entries,
+      @required this.startAfter,
+      @required this.scrollController});
+}
+
+class SearchStringModel extends ValueNotifier<String> {
+  SearchStringModel._(String initialSearchString) : super(initialSearchString);
 }
