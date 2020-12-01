@@ -16,24 +16,27 @@ class _SearchBarState extends State<SearchBar> {
   Widget build(BuildContext context) {
     _textEditingController ??= TextEditingController(text: _searchStringModel.value);
     _hasText ??= _textEditingController.text.isNotEmpty;
-    return FocusScope(
-      child: Focus(
-        child: TextField(
-          controller: _textEditingController,
-          decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search),
-              suffixIcon: _hasText ? IconButton(
-                onPressed: () {
-                  _textEditingController.clear();
-                  _onTextChanged('');
-                },
-                icon: Icon(Icons.clear),
-              ) : null,
-              hintText: 'search...'
-          ),
-          onChanged: _onTextChanged,
+    return Container(
+      color: Theme.of(context).dialogBackgroundColor,
+      child: FocusScope(
+        child: Focus(
+          child: TextField(
+            controller: _textEditingController,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                suffixIcon: _hasText ? IconButton(
+                  onPressed: () {
+                    _textEditingController.clear();
+                    _onTextChanged('');
+                  },
+                  icon: Icon(Icons.clear),
+                ) : null,
+                hintText: 'search...'
+            ),
+            onChanged: _onTextChanged,
+          )
         )
-      )
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 
 class EntryPage extends StatelessWidget {
@@ -10,18 +11,22 @@ class EntryPage extends StatelessWidget {
 
   EntryPage._instance(this._entry, this._preview);
 
-  static Widget asPage() => Builder(
-    builder: (context) {
-      if (!DictionaryPageModel.of(context).hasSelection) return Container();
-      return FutureBuilder(
-        future: DictionaryPageModel.of(context).selectedEntry,
-        builder: (context, snap) {
-          if (!snap.hasData) return Center(child: CircularProgressIndicator());
-          return EntryPage._instance(snap.data, false);
-        },
-      );
-    }
-  );
+  static Widget asPage() => Builder(builder: (context) {
+        if (!DictionaryPageModel.of(context).hasSelection)
+          return Container(color: Theme.of(context).scaffoldBackgroundColor);
+        return SizedBox.expand(
+          child: Container(
+            color: Theme.of(context).cardColor,
+            child: FutureBuilder(
+            future: DictionaryPageModel.of(context).selectedEntry,
+            builder: (context, snap) {
+              if (!snap.hasData)
+                return Center(child: CircularProgressIndicator());
+              return EntryPage._instance(snap.data, false);
+            },
+        ),
+          ));
+      });
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
@@ -46,7 +51,13 @@ class EntryPage extends StatelessWidget {
               Icons.arrow_back,
               color: Theme.of(context).accentIconTheme.color,
             ),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (MediaQuery.of(context).orientation == Orientation.portrait) {
+                return Navigator.of(context).popUntil(
+                    (route) => route.settings.name == DictionaryPage.route);
+              }
+              Navigator.of(context).pop();
+            },
           ),
           Expanded(
             child: entryWidget,
@@ -177,13 +188,14 @@ class EntryPage extends StatelessWidget {
   }
 
   Widget _partOfSpeechText(BuildContext context, String text) {
-    return Text(
-      text,
+    return Container(
+        child: Text(
+      text + ' ',
       style: Theme.of(context)
           .textTheme
           .bodyText2
           .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-    );
+    ));
   }
 
   Widget _translationText(BuildContext context, String text) {

@@ -33,6 +33,11 @@ class MyApp extends StatelessWidget {
               accentIconTheme: IconThemeData(
                 color: Colors.black38,
               ),
+              appBarTheme: AppBarTheme(
+                color: Colors.amberAccent
+              ),
+              selectedRowColor: Colors.amber.shade50,
+              shadowColor: Colors.grey.withOpacity(.5),
             ),
           ),
           onTap: () => unFocus(context),
