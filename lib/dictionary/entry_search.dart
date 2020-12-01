@@ -12,24 +12,14 @@ class EntrySearch extends StatelessWidget {
   Widget build(BuildContext context) {
     DictionaryPageModel pageModel = DictionaryPageModel.of(context);
     SearchStringModel initialModel = pageModel.searchStringModel;
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          boxShadow: [BoxShadow(
-            color: Colors.grey.withOpacity(.5),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          )]),
-      child: Column(children: [
-        SearchBar(),
-        Expanded(
-          child: ChangeNotifierProvider.value(
-            value: initialModel,
-            child: EntryList(),
-          ),
+    return Column(children: [
+      SearchBar(),
+      Expanded(
+        child: ChangeNotifierProvider.value(
+          value: initialModel,
+          child: EntryList(),
         ),
-      ]),
-    );
+      ),
+    ]);
   }
 }

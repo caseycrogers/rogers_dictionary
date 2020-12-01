@@ -22,38 +22,38 @@ class DictionaryPage extends StatelessWidget {
           title: Text('Dictionary'),
         ),
         body: AnimatedBuilder(
-          animation: transitionAnimation,
-          builder: (context, _) => _buildOrientedPage(context, constraints)
-        ),
+            animation: transitionAnimation,
+            builder: (context, _) => _buildOrientedPage(context, constraints)),
       ),
     );
   }
 
-  Widget _buildOrientedPage(
-      BuildContext context,
-      BoxConstraints constraints) {
+  Widget _buildOrientedPage(BuildContext context, BoxConstraints constraints) {
     DictionaryPageModel dictionaryPageModel = DictionaryPageModel.of(context);
     switch (MediaQuery.of(context).orientation) {
       case Orientation.portrait:
         return Stack(
           children: [
-            Container(width: constraints.maxWidth, height: constraints.maxHeight),
             Positioned(
               child: SlideTransition(
                 position: Tween<Offset>(
-                    begin: Offset(1.0, 0.0),
-                    end: dictionaryPageModel.hasSelection ? Offset(0.0, 0.0) : Offset(1.0, 0.0)
-                ).animate(transitionAnimation),
+                        begin: Offset(1.0, 0.0),
+                        end: dictionaryPageModel.hasSelection
+                            ? Offset(0.0, 0.0)
+                            : Offset(1.0, 0.0))
+                    .animate(transitionAnimation),
                 child: EntryPage.asPage(),
               ),
             ),
             Positioned(
               child: SlideTransition(
-                  position: Tween<Offset>(
-                      begin: Offset(0.0, 0.0),
-                      end: dictionaryPageModel.hasSelection ? Offset(-1.0, 0.0) : Offset(0.0, 0.0)
-                  ).animate(transitionAnimation),
-                  child: EntrySearch(),
+                position: Tween<Offset>(
+                        begin: Offset(0.0, 0.0),
+                        end: dictionaryPageModel.hasSelection
+                            ? Offset(-1.0, 0.0)
+                            : Offset(0.0, 0.0))
+                    .animate(transitionAnimation),
+                child: EntrySearch(),
               ),
             ),
           ],
@@ -61,18 +61,46 @@ class DictionaryPage extends StatelessWidget {
       case Orientation.landscape:
         return Stack(
           children: [
-            Container(width: constraints.maxWidth, height: constraints.maxHeight),
+            Container(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                color: Theme.of(context).scaffoldBackgroundColor),
             Positioned(
               left: constraints.maxWidth / 3.0,
-              width: 2.0*constraints.maxWidth / 3.0,
+              width: 2.0 * constraints.maxWidth / 3.0,
               child: SlideTransition(
-                position: Tween<Offset>(begin: Offset(-1.0, 0.0), end: Offset(0.0, 0.0)).animate(transitionAnimation),
-                child: EntryPage.asPage(),
+                position: Tween<Offset>(
+                        begin: Offset(-1.0, 0.0), end: Offset(-0.0, 0.0))
+                    .animate(transitionAnimation),
+                child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Theme.of(context).shadowColor,
+                            spreadRadius: 4.0,
+                            blurRadius: 4.0,
+                            offset: Offset(0.0, 0.0)),
+                      ],
+                    ),
+                    height: constraints.maxHeight,
+                    width: 2.0 * constraints.maxWidth / 3.0,
+                    child: EntryPage.asPage()),
               ),
             ),
-            Positioned(
-              width: constraints.maxWidth / 3.0,
-              height: constraints.maxHeight,
+            Container(
+                width: constraints.maxWidth / 3.0,
+                height: constraints.maxHeight,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Theme.of(context).shadowColor,
+                        spreadRadius: 4.0,
+                        blurRadius: 4.0,
+                        offset: Offset(0.0, 0.0)),
+                  ],
+                ),
               child: EntrySearch(),
             ),
           ],
