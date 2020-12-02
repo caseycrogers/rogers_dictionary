@@ -65,7 +65,9 @@ class FirestoreDatabase extends EntryDatabase {
       if (snapshot.docs.isEmpty) {
         return;
       }
-      for (var entry in _queryToEntries(snapshot)) yield entry;
+      for (var entry in _queryToEntries(snapshot)) {
+        yield entry;
+      }
       lastSeen = snapshot.docs.last.get('url_encoded_headword');
     }
   }
