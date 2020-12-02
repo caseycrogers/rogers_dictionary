@@ -56,34 +56,39 @@ class _EntryListState extends State<EntryList> {
 
   Widget _buildRow(
       BuildContext context, AsyncSnapshot<List<Entry>> snapshot, int index) {
-    if (!snapshot.hasData || snapshot.data.isEmpty) return LoadingText();
+    if (!snapshot.hasData) return LoadingText();
     DictionaryPageModel.of(context).entries = snapshot.data;
     var entries = snapshot.data;
     var isSelected = entries[index].headword ==
         DictionaryPageModel.of(context).selectedHeadword;
-    return InkWell(
-        child: Container(
-          decoration: _shadowDecoration(isSelected),
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Row(
-            children: [
-              Expanded(child: EntryPage.asPreview(entries[index])),
-              Icon(
-                Icons.arrow_forward_ios_outlined,
-                color: Theme.of(context).accentIconTheme.color,
+    return Column(
+      children: [
+        InkWell(
+            child: Container(
+              decoration: _shadowDecoration(isSelected),
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Row(
+                children: [
+                  Expanded(child: EntryPage.asPreview(entries[index])),
+                  Icon(
+                    Icons.arrow_forward_ios_outlined,
+                    color: Theme.of(context).accentIconTheme.color,
+                  ),
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          ),
-        ),
-        onTap: () {
-          if (isSelected) return;
-          unFocus(context);
-          Navigator.of(context).pushNamed(
-            EntryPage.route + '/${entries[index].urlEncodedHeadword}',
-            arguments: DictionaryPageModel.copy(context, entries[index]),
-          );
-        });
+            ),
+            onTap: () {
+              if (isSelected) return;
+              unFocus(context);
+              Navigator.of(context).pushNamed(
+                EntryPage.route + '/${entries[index].urlEncodedHeadword}',
+                arguments: DictionaryPageModel.copy(context, entries[index]),
+              );
+            }),
+        if (index < snapshot.data.length - 1) Divider(thickness: 1.0, height: 1.0,),
+      ],
+    );
   }
 
   BoxDecoration _shadowDecoration(bool isSelected) {
