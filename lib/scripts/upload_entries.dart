@@ -37,7 +37,7 @@ void uploadEntries(bool debug, bool verbose) async {
   var i = 0;
   List<Future<void>> uploadFutures = [];
 
-  while (i < 100) {
+  while (i < rows.length) {
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD] != '') {
       // Start a new entry for a new headword
