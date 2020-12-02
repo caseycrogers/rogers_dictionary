@@ -16,7 +16,7 @@ class DictionaryPageModel {
   final SearchStringModel searchStringModel;
 
   // EntryList state.
-  final List<Entry> entries;
+  List<Entry> entries;
   String startAfter;
   final ScrollController scrollController;
 
@@ -50,7 +50,9 @@ class DictionaryPageModel {
       selectedHeadword: newEntry.headword,
       searchStringModel: SearchStringModel._(searchStringModel.value),
       entries: List.from(entries),
-      startAfter: entries.last.urlEncodedHeadword,
+      startAfter: entries.isNotEmpty
+          ? entries.last.urlEncodedHeadword
+          : '',
       scrollController:
           ScrollController(initialScrollOffset: scrollController.offset));
 

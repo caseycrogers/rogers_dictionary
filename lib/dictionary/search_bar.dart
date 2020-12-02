@@ -41,10 +41,7 @@ class _SearchBarState extends State<SearchBar> {
   }
 
   void _onTextChanged(String newText) {
-    print(_searchStringModel.value.toString() + ',' + newText.toString());
     if (_searchStringModel.value == newText) return;
-    DictionaryPageModel.of(context).entries.clear();
-    DictionaryPageModel.of(context).startAfter = '';
     _searchStringModel.value = newText;
     setState(() {
       _hasText = _textEditingController.text.isNotEmpty;
