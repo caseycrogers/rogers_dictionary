@@ -45,6 +45,10 @@ class _EntryListState extends State<EntryList> {
     return AsyncListView<Entry>(
         initialData: DictionaryPageModel.of(context).entries,
         stream: _currStream,
+        loadingWidget: Container(
+          padding: EdgeInsets.all(16.0),
+          child: LoadingText()
+        ),
         itemBuilder: _buildRow,
         controller: DictionaryPageModel.of(context).scrollController,
     );
