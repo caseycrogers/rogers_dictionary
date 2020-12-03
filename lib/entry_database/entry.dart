@@ -21,19 +21,20 @@ class Entry {
   final List<Translation> translations;
 
   Entry(
-      this.headword,
-      this.entryId,
-      this.runOnParent,
-      this.runOnText,
-      this.abbreviation,
-      this.namingStandard,
-      this.alternateHeadword,
-      this.alternateHeadwordAbbreviation,
-      this.alternateHeadwordNamingStandard,
-      this.translations,
-      );
+    this.headword,
+    this.entryId,
+    this.runOnParent,
+    this.runOnText,
+    this.abbreviation,
+    this.namingStandard,
+    this.alternateHeadword,
+    this.alternateHeadwordAbbreviation,
+    this.alternateHeadwordNamingStandard,
+    this.translations,
+  );
 
-  String get urlEncodedHeadword => entryId.toString().padLeft(4, '0') + '_' + Uri.encodeComponent(headword);
+  String get urlEncodedHeadword =>
+      entryId.toString().padLeft(4, '0') + '_' + Uri.encodeComponent(headword);
 
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
@@ -43,7 +44,8 @@ class Entry {
 
   Map<String, dynamic> toJson() => _$EntryToJson(this);
 
-  Set<String> _keywords() => {headword}..addAll(translations.map((e) => e.translation));
+  Set<String> _keywords() =>
+      {headword}..addAll(translations.map((e) => e.translation));
 
   @override
   String toString() {
@@ -58,16 +60,20 @@ class Translation {
   final String partOfSpeech;
   final String translation;
   final bool shouldBeKeyPhrase;
-
+  final String examplePhrase;
+  final String editorialNote;
 
   Translation(
-      this.meaningId,
-      this.partOfSpeech,
-      this.translation,
-      this.shouldBeKeyPhrase,
-      );
+    this.meaningId,
+    this.partOfSpeech,
+    this.translation,
+    this.shouldBeKeyPhrase,
+    this.examplePhrase,
+    this.editorialNote,
+  );
 
-  factory Translation.fromJson(Map<String, dynamic> json) => _$TranslationFromJson(json);
+  factory Translation.fromJson(Map<String, dynamic> json) =>
+      _$TranslationFromJson(json);
 
   Map<String, dynamic> toJson() => _$TranslationToJson(this);
 
@@ -125,27 +131,37 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder alternateHeadwordAbbreviation(String alternateHeadwordAbbreviation) {
+  EntryBuilder alternateHeadwordAbbreviation(
+      String alternateHeadwordAbbreviation) {
     _alternateHeadwordAbbreviation = alternateHeadwordAbbreviation;
     return this;
   }
 
-  EntryBuilder alternateHeadwordNamingStandard(String alternateHeadwordNamingStandard) {
+  EntryBuilder alternateHeadwordNamingStandard(
+      String alternateHeadwordNamingStandard) {
     _alternateHeadwordNamingStandard = alternateHeadwordNamingStandard;
     return this;
   }
 
-  EntryBuilder addTranslation(String meaningId, String partOfSpeech, String translation, bool shouldBeKeyPhrase) {
-    assert(translation != '', "You must specify a non-empty translation.");
-    _translations.add(Translation(meaningId, partOfSpeech, translation, shouldBeKeyPhrase));
+  EntryBuilder addTranslation(
+      String meaningId,
+      String partOfSpeech,
+      String translation,
+      bool shouldBeKeyPhrase,
+      String examplePhrase,
+      String editorialNote) {
+    assert(translation != '',
+        "You must specify a non-empty translation. Headword: $_headword");
+    _translations.add(Translation(meaningId, partOfSpeech, translation,
+        shouldBeKeyPhrase, examplePhrase, editorialNote));
     return this;
   }
-
 
   Entry build() {
     assert(_headword != null, "You must specify a non null headword.");
     assert(_entryId != null, "You must specify a non null entry id.");
-    assert(_translations.length != 0, "You must specify one or more translations.");
+    assert(_translations.length != 0,
+        "You must specify one or more translations.");
     return Entry(
       _headword,
       _entryId,
