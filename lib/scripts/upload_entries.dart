@@ -22,6 +22,8 @@ const HEADWORD_RESTRICTIVE_LABEL = 'headword_restrictive_label';
 const MEANING_ID = 'meaning_id';
 const TRANSLATION = 'translation';
 const SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
+const EXAMPLE_PHRASE = 'example_phrase';
+const EDITORIAL_NOTE = 'editorial_note';
 
 const KEYWORD_LIST = 'keyword_list';
 const URL_ENCODED_HEADWORD = 'url_encoded_headword';
@@ -37,11 +39,13 @@ void uploadEntries(bool debug, bool verbose) async {
   var i = 0;
   List<Future<void>> uploadFutures = [];
 
-  while (i < rows.length) {
+  while (i < rows.length && i < 1000) {
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD] != '') {
+      if (row[HEADWORD].startsWith('Aff')) ;
       // Start a new entry for a new headword
-      if (builder != null) uploadFutures.add(_upload(builder.build(), debug, verbose));
+      if (builder != null)
+        uploadFutures.add(_upload(builder.build(), debug, verbose));
       if (row[PART_OF_SPEECH] == '' || row[TRANSLATION] == '') {
         print('Invalid empty cells for ${row[HEADWORD]} at row $i, skipping.');
         while (row[HEADWORD] == '') {
@@ -60,11 +64,18 @@ void uploadEntries(bool debug, bool verbose) async {
           .namingStandard(row[NAMING_STANDARD])
           .alternateHeadword(row[ALTERNATE_HEADWORD])
           .alternateHeadwordAbbreviation(row[ALTERNATE_HEADWORD_ABBREVIATION])
-          .alternateHeadwordNamingStandard(row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
+          .alternateHeadwordNamingStandard(
+              row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
     }
     if (row[PART_OF_SPEECH] != '') partOfSpeech = row[PART_OF_SPEECH];
     if (row[MEANING_ID] != '') meaningId = row[MEANING_ID];
-    builder.addTranslation(meaningId, partOfSpeech, row[TRANSLATION], row[SHOULD_BE_KEY_PHRASE] != 'F');
+    builder.addTranslation(
+        meaningId,
+        partOfSpeech,
+        row[TRANSLATION],
+        row[SHOULD_BE_KEY_PHRASE] != 'F',
+        row[EXAMPLE_PHRASE],
+        row[EDITORIAL_NOTE]);
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
@@ -94,8 +105,8 @@ Future<void> _upload(Entry entry, bool debug, bool verbose) {
 
 List<String> _constructSearchList(Entry entry) {
   Set<String> keywordSet = Set()
-    ..add(entry.headword)
-    ..addAll(entry.translations.map((t) => t.translation));
+    ..add(entry.headword.toLowerCase())
+    ..addAll(entry.translations.map((t) => t.translation.toLowerCase()));
   return keywordSet.expand((k) {
     Set<String> ret = Set();
     for (int i = 0; i < k.length; i++) {
@@ -109,7 +120,8 @@ List<String> _constructSearchList(Entry entry) {
 }
 
 void _assertValid(Map<String, String> row, String header, int index) {
-  assert(row[header] != '', 'Invalid empty $header at index $index.\nRow:\n$row');
+  assert(
+      row[header] != '', 'Invalid empty $header at index $index.\nRow:\n$row');
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {

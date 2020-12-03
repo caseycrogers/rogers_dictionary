@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
@@ -14,18 +15,41 @@ class EntryPage extends StatelessWidget {
   static Widget asPage() => Builder(builder: (context) {
         if (!DictionaryPageModel.of(context).hasSelection)
           return Container(color: Theme.of(context).scaffoldBackgroundColor);
-        return SizedBox.expand(
-          child: Container(
-            color: Theme.of(context).cardColor,
-            child: FutureBuilder(
-            future: DictionaryPageModel.of(context).selectedEntry,
-            builder: (context, snap) {
-              if (!snap.hasData)
-                return Center(child: CircularProgressIndicator());
-              return EntryPage._instance(snap.data, false);
-            },
-        ),
-          ));
+        return LayoutBuilder(
+          builder: (context, constraints) => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (MediaQuery.of(context).orientation == Orientation.portrait)
+                IconButton(
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Theme.of(context).accentIconTheme.color,
+                  ),
+                  onPressed: () {
+                    if (MediaQuery.of(context).orientation ==
+                        Orientation.portrait) {
+                      return Navigator.of(context).popUntil((route) =>
+                          route.settings.name == DictionaryPage.route);
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: FutureBuilder(
+                    future: DictionaryPageModel.of(context).selectedEntry,
+                    builder: (context, snap) {
+                      if (!snap.hasData)
+                        return Center(child: CircularProgressIndicator());
+                      return EntryPage._instance(snap.data, false);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       });
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
@@ -37,34 +61,14 @@ class EntryPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _headwordLine(context, _entry),
+        if (!_preview) Divider(),
         _buildTable(context, map),
       ],
     );
     if (_preview) return entryWidget;
     return Container(
-      padding: EdgeInsets.all(10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Theme.of(context).accentIconTheme.color,
-            ),
-            onPressed: () {
-              if (MediaQuery.of(context).orientation == Orientation.portrait) {
-                return Navigator.of(context).popUntil(
-                    (route) => route.settings.name == DictionaryPage.route);
-              }
-              Navigator.of(context).pop();
-            },
-          ),
-          Expanded(
-            child: entryWidget,
-          ),
-        ],
-      ),
-    );
+        padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+        child: entryWidget);
   }
 
   Widget _buildTable(BuildContext context,
@@ -110,12 +114,16 @@ class EntryPage extends StatelessWidget {
         ])
       ];
     return translations.map((t) {
-      var translationText = _translationText(context, t.translation);
       return TableRow(children: [
         (t == translations.first)
             ? _partOfSpeechText(context, partOfSpeech)
             : Container(),
-        translationText,
+        t != translations.last
+            ? Container(
+                child: _translationText(context, t.translation + ','),
+                padding: EdgeInsets.only(bottom: 8.0),
+              )
+            : _translationText(context, t.translation),
       ]);
     }).toList();
   }
@@ -188,21 +196,23 @@ class EntryPage extends StatelessWidget {
   }
 
   Widget _partOfSpeechText(BuildContext context, String text) {
+    var pos = text == 'na' ? '--' : text;
     return Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: Text(
-      text + ' ',
-      style: Theme.of(context)
-          .textTheme
-          .bodyText2
-          .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-    ));
+          pos,
+          style: Theme.of(context)
+              .textTheme
+              .bodyText2
+              .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
+        ));
   }
 
   Widget _translationText(BuildContext context, String text) {
     return Text(
       text,
       style: Theme.of(context).textTheme.bodyText2,
-      overflow: TextOverflow.ellipsis,
+      overflow: _preview ? TextOverflow.ellipsis : TextOverflow.visible,
     );
   }
 }
