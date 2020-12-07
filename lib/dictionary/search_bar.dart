@@ -21,6 +21,7 @@ class _SearchBarState extends State<SearchBar> {
       child: FocusScope(
         child: Focus(
           child: TextField(
+            style: TextStyle(fontSize: 20.0),
             controller: _textEditingController,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search),

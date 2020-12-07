@@ -12,6 +12,7 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
     json['entry_id'] as int,
     json['run_on_parent'] as String,
     json['run_on_text'] as String,
+    (json['run_ons'] as List)?.map((e) => e as String)?.toList(),
     json['abbreviation'] as String,
     json['naming_standard'] as String,
     json['alternate_headword'] as String,
@@ -29,6 +30,7 @@ Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
       'entry_id': instance.entryId,
       'run_on_parent': instance.runOnParent,
       'run_on_text': instance.runOnText,
+      'run_ons': instance.runOns,
       'abbreviation': instance.abbreviation,
       'naming_standard': instance.namingStandard,
       'alternate_headword': instance.alternateHeadword,
@@ -44,6 +46,8 @@ Translation _$TranslationFromJson(Map<String, dynamic> json) {
     json['part_of_speech'] as String,
     json['translation'] as String,
     json['should_be_key_phrase'] as bool,
+    json['translation_feminine_indicator'] as String,
+    json['gender_and_plural'] as String,
     json['example_phrase'] as String,
     json['editorial_note'] as String,
   );
@@ -55,6 +59,8 @@ Map<String, dynamic> _$TranslationToJson(Translation instance) =>
       'part_of_speech': instance.partOfSpeech,
       'translation': instance.translation,
       'should_be_key_phrase': instance.shouldBeKeyPhrase,
+      'translation_feminine_indicator': instance.translationFeminineIndicator,
+      'gender_and_plural': instance.genderAndPlural,
       'example_phrase': instance.examplePhrase,
       'editorial_note': instance.editorialNote,
     };

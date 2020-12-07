@@ -50,9 +50,7 @@ class DictionaryPageModel {
       selectedHeadword: newEntry.headword,
       searchStringModel: SearchStringModel._(searchStringModel.value),
       entries: List.from(entries),
-      startAfter: entries.isNotEmpty
-          ? entries.last.urlEncodedHeadword
-          : '',
+      startAfter: startAfter,
       scrollController:
           ScrollController(initialScrollOffset: scrollController.offset));
 

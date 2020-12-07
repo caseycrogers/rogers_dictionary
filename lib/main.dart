@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 
@@ -23,12 +24,13 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: 'Dictionary',
             onGenerateRoute: PageRouter.generateRoute,
-            initialRoute: DictionaryPage.route,
+            initialRoute: DictionaryPage.route, // 'dictionary'
             theme: ThemeData(
               textTheme: TextTheme(
-                headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold),
-                bodyText1: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
-                bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold).merge(GoogleFonts.openSans()),
+                headline2: TextStyle(fontSize: 22.0, color: Colors.black54, fontWeight: FontWeight.bold).merge(GoogleFonts.openSans()),
+                bodyText1: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal).merge(GoogleFonts.openSans()),
+                bodyText2: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal).merge(GoogleFonts.openSans()),
               ),
               accentIconTheme: IconThemeData(
                 color: Colors.black38,

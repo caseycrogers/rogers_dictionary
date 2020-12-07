@@ -12,6 +12,7 @@ class Entry {
   final int entryId;
   final String runOnParent;
   final String runOnText;
+  final List<String> runOns;
   final String abbreviation;
   final String namingStandard;
   final String alternateHeadword;
@@ -25,6 +26,7 @@ class Entry {
     this.entryId,
     this.runOnParent,
     this.runOnText,
+    this.runOns,
     this.abbreviation,
     this.namingStandard,
     this.alternateHeadword,
@@ -60,6 +62,8 @@ class Translation {
   final String partOfSpeech;
   final String translation;
   final bool shouldBeKeyPhrase;
+  final String translationFeminineIndicator;
+  final String genderAndPlural;
   final String examplePhrase;
   final String editorialNote;
 
@@ -68,6 +72,8 @@ class Translation {
     this.partOfSpeech,
     this.translation,
     this.shouldBeKeyPhrase,
+    this.translationFeminineIndicator,
+    this.genderAndPlural,
     this.examplePhrase,
     this.editorialNote,
   );
@@ -88,6 +94,7 @@ class EntryBuilder {
   int _entryId;
   String _runOnParent;
   String _runOnText;
+  List<String> _runOns;
   String _abbreviation;
   String _namingStandard;
   String _alternateHeadword;
@@ -113,6 +120,13 @@ class EntryBuilder {
 
   EntryBuilder runOnText(String runOnText) {
     _runOnText = runOnText;
+    return this;
+  }
+
+  EntryBuilder addRunOn(String runOn) {
+    assert(runOn != '',
+        "You must specify a non-empty run on. Headword: $_headword");
+    _runOns.add(runOn);
     return this;
   }
 
@@ -148,12 +162,21 @@ class EntryBuilder {
       String partOfSpeech,
       String translation,
       bool shouldBeKeyPhrase,
+      String translationFeminineIndicator,
+      String genderAndPlural,
       String examplePhrase,
       String editorialNote) {
     assert(translation != '',
         "You must specify a non-empty translation. Headword: $_headword");
-    _translations.add(Translation(meaningId, partOfSpeech, translation,
-        shouldBeKeyPhrase, examplePhrase, editorialNote));
+    _translations.add(Translation(
+        meaningId,
+        partOfSpeech,
+        translation,
+        shouldBeKeyPhrase,
+        translationFeminineIndicator,
+        genderAndPlural,
+        examplePhrase,
+        editorialNote));
     return this;
   }
 
@@ -167,6 +190,7 @@ class EntryBuilder {
       _entryId,
       _runOnParent,
       _runOnText,
+      _runOns,
       _abbreviation,
       _namingStandard,
       _alternateHeadword,
