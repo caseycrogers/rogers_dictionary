@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/dictionary/entry_search.dart';
@@ -5,7 +6,11 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/widgets/entry_page.dart';
 
 class DictionaryPage extends StatelessWidget {
-  static const String route = '/';
+  static const String route = '/dictionary';
+  static const String selectedEntryQueryParameter = 'entry';
+
+  static bool matchesRoute(Uri uri) =>
+      ListEquality().equals(uri.pathSegments, ['dictionary']);
 
   final Animation<double> transitionAnimation;
 
@@ -78,8 +83,8 @@ class DictionaryPage extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                             color: Theme.of(context).shadowColor,
-                            spreadRadius: 4.0,
-                            blurRadius: 4.0,
+                            spreadRadius: 2.0,
+                            blurRadius: 2.0,
                             offset: Offset(0.0, 0.0)),
                       ],
                     ),
@@ -89,18 +94,18 @@ class DictionaryPage extends StatelessWidget {
               ),
             ),
             Container(
-                width: constraints.maxWidth / 3.0,
-                height: constraints.maxHeight,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Theme.of(context).shadowColor,
-                        spreadRadius: 4.0,
-                        blurRadius: 4.0,
-                        offset: Offset(0.0, 0.0)),
-                  ],
-                ),
+              width: constraints.maxWidth / 3.0,
+              height: constraints.maxHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                      color: Theme.of(context).shadowColor,
+                      spreadRadius: 2.0,
+                      blurRadius: 2.0,
+                      offset: Offset(0.0, 0.0)),
+                ],
+              ),
               child: EntrySearch(),
             ),
           ],

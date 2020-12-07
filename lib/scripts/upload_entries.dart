@@ -22,13 +22,15 @@ const HEADWORD_RESTRICTIVE_LABEL = 'headword_restrictive_label';
 const MEANING_ID = 'meaning_id';
 const TRANSLATION = 'translation';
 const SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
+const TRANSLATION_FEMININE_INDICATOR = 'translation_feminine_indicator';
+const GENDER_AND_PLURAL = 'gender_and_plural';
 const EXAMPLE_PHRASE = 'example_phrase';
 const EDITORIAL_NOTE = 'editorial_note';
 
 const KEYWORD_LIST = 'keyword_list';
 const URL_ENCODED_HEADWORD = 'url_encoded_headword';
 
-void uploadEntries(bool debug, bool verbose) async {
+Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   Firestore.initialize('rogers-dicitionary');
   var df = await DataFrame.fromCsv('lib/scripts/dictionary_database.csv');
 
@@ -37,15 +39,11 @@ void uploadEntries(bool debug, bool verbose) async {
   String partOfSpeech;
   String meaningId;
   var i = 0;
-  List<Future<void>> uploadFutures = [];
+  Map<String, EntryBuilder> entryBuilders = {};
 
-  while (i < rows.length && i < 1000) {
+  while (i < 3000) {
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD] != '') {
-      if (row[HEADWORD].startsWith('Aff')) ;
-      // Start a new entry for a new headword
-      if (builder != null)
-        uploadFutures.add(_upload(builder.build(), debug, verbose));
       if (row[PART_OF_SPEECH] == '' || row[TRANSLATION] == '') {
         print('Invalid empty cells for ${row[HEADWORD]} at row $i, skipping.');
         while (row[HEADWORD] == '') {
@@ -66,6 +64,7 @@ void uploadEntries(bool debug, bool verbose) async {
           .alternateHeadwordAbbreviation(row[ALTERNATE_HEADWORD_ABBREVIATION])
           .alternateHeadwordNamingStandard(
               row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
+      entryBuilders[row[HEADWORD]] = builder;
     }
     if (row[PART_OF_SPEECH] != '') partOfSpeech = row[PART_OF_SPEECH];
     if (row[MEANING_ID] != '') meaningId = row[MEANING_ID];
@@ -74,14 +73,15 @@ void uploadEntries(bool debug, bool verbose) async {
         partOfSpeech,
         row[TRANSLATION],
         row[SHOULD_BE_KEY_PHRASE] != 'F',
+        row[TRANSLATION_FEMININE_INDICATOR],
+        row[GENDER_AND_PLURAL],
         row[EXAMPLE_PHRASE],
         row[EDITORIAL_NOTE]);
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
-  // Run one last time for the final entry
-  uploadFutures.add(_upload(builder.build(), debug, verbose));
-  await Future.wait(uploadFutures);
+  var uploadFutures = entryBuilders.values.map((b) => _upload(b.build(), debug, verbose));
+  return Future.wait(uploadFutures);
 }
 
 Future<void> _upload(Entry entry, bool debug, bool verbose) {
@@ -110,6 +110,8 @@ List<String> _constructSearchList(Entry entry) {
   return keywordSet.expand((k) {
     Set<String> ret = Set();
     for (int i = 0; i < k.length; i++) {
+      // Only start substrings at the start of words.
+      if (!(i == 0 || [' ', '-', '.'].contains(k.substring(i - 1, i)))) continue;
       for (int j = i; j <= k.length; j++) {
         ret.add(k.substring(i, j));
       }
@@ -130,11 +132,11 @@ MapEntry<String, String> _parseCell(String key, dynamic value) {
   return MapEntry(key.trim(), value.trim());
 }
 
-void main(List<String> arguments) {
+void main(List<String> arguments) async {
   final parser = ArgParser()
     ..addFlag('debug', abbr: 'd', defaultsTo: false)
     ..addFlag('verbose', abbr: 'v', defaultsTo: false);
   var argResults = parser.parse(arguments);
 
-  uploadEntries(argResults['debug'] as bool, argResults['verbose'] as bool);
+  await uploadEntries(argResults['debug'] as bool, argResults['verbose'] as bool);
 }

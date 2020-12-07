@@ -4,9 +4,9 @@ import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
+import 'package:rogers_dictionary/util/text_utils.dart';
 
 class EntryPage extends StatelessWidget {
-  static const route = '/entries';
   final Entry _entry;
   final bool _preview;
 
@@ -16,38 +16,45 @@ class EntryPage extends StatelessWidget {
         if (!DictionaryPageModel.of(context).hasSelection)
           return Container(color: Theme.of(context).scaffoldBackgroundColor);
         return LayoutBuilder(
-          builder: (context, constraints) => Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (MediaQuery.of(context).orientation == Orientation.portrait)
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Theme.of(context).accentIconTheme.color,
+          builder: (context, constraints) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                (MediaQuery.of(context).orientation == Orientation.portrait)
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Theme.of(context).accentIconTheme.color,
+                        ),
+                        onPressed: () {
+                          if (MediaQuery.of(context).orientation ==
+                              Orientation.portrait) {
+                            return Navigator.of(context).popUntil((route) =>
+                                route.settings.name == DictionaryPage.route);
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    : Container(width: 20.0),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: FutureBuilder(
+                        future: DictionaryPageModel.of(context).selectedEntry,
+                        builder: (context, snap) {
+                          if (!snap.hasData)
+                            return Center(child: CircularProgressIndicator());
+                          return EntryPage._instance(snap.data, false);
+                        },
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    if (MediaQuery.of(context).orientation ==
-                        Orientation.portrait) {
-                      return Navigator.of(context).popUntil((route) =>
-                          route.settings.name == DictionaryPage.route);
-                    }
-                    Navigator.of(context).pop();
-                  },
                 ),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: FutureBuilder(
-                    future: DictionaryPageModel.of(context).selectedEntry,
-                    builder: (context, snap) {
-                      if (!snap.hasData)
-                        return Center(child: CircularProgressIndicator());
-                      return EntryPage._instance(snap.data, false);
-                    },
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       });
@@ -66,16 +73,36 @@ class EntryPage extends StatelessWidget {
       ],
     );
     if (_preview) return entryWidget;
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-        child: entryWidget);
+    return Column(
+      children: [
+        entryWidget,
+        _buildEditorialNotes(context),
+      ],
+    );
+  }
+
+  Widget _buildEditorialNotes(BuildContext context) {
+    var notes = _entry.translations
+        .where((t) => t.editorialNote != null && t.editorialNote != '')
+        .map((t) => editorialText(context, t.editorialNote));
+    if (notes.isEmpty) return Container();
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(height: 48.0),
+          Text("Editorial Notes"),
+          Divider(),
+        ]..addAll(notes));
   }
 
   Widget _buildTable(BuildContext context,
       Map<String, Map<String, List<Translation>>> translationMap) {
-    return Table(columnWidths: {
-      0: IntrinsicColumnWidth(),
-    }, children: _buildTranslations(context, translationMap));
+    return Table(
+        columnWidths: {
+          0: IntrinsicColumnWidth(),
+        },
+        defaultVerticalAlignment: TableCellVerticalAlignment.top,
+        children: _buildTranslations(context, translationMap));
   }
 
   Map<String, Map<String, List<Translation>>> _constructTranslationMap(
@@ -88,52 +115,56 @@ class EntryPage extends StatelessWidget {
     return translationMap;
   }
 
-  // Return a list of TableRows for all the translations of a single part of speech
+  // Return a list of TableRows corresponding to each part of speech.
   List<TableRow> _buildTranslations(BuildContext context,
       Map<String, Map<String, List<Translation>>> meaningMap) {
-    List<TableRow> translationRows = [];
+    List<TableRow> partofSpeechTableRows = [];
     meaningMap.forEach((meaningId, partOfSpeechMap) {
       partOfSpeechMap.forEach((partOfSpeech, translations) {
-        translationRows
-            .addAll(_buildPartOfSpeech(context, partOfSpeech, translations));
+        partofSpeechTableRows
+            .add(_buildPartOfSpeechTableRow(context, partOfSpeech, translations));
       });
     });
-    return translationRows;
+    return partofSpeechTableRows;
   }
 
-  List<TableRow> _buildPartOfSpeech(BuildContext context, String partOfSpeech,
+  TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
       List<Translation> translations) {
     if (_preview)
-      return [
-        TableRow(children: [
-          _partOfSpeechText(context, partOfSpeech),
-          _translationText(
-            context,
-            translations.map((t) => t.translation).join(", "),
-          ),
-        ])
-      ];
-    return translations.map((t) {
       return TableRow(children: [
-        (t == translations.first)
-            ? _partOfSpeechText(context, partOfSpeech)
-            : Container(),
-        t != translations.last
-            ? Container(
-                child: _translationText(context, t.translation + ','),
-                padding: EdgeInsets.only(bottom: 8.0),
-              )
-            : _translationText(context, t.translation),
+        partOfSpeechText(context, partOfSpeech, _preview),
+        translationText(context,
+            translations.map((t) => t.translation).join(', '), _preview),
       ]);
-    }).toList();
+    return TableRow(
+      children: [
+        partOfSpeechText(context, partOfSpeech, _preview),
+         Padding(
+           padding: const EdgeInsets.only(top: 4.0),
+           child: Column(
+            children: translations
+                .map((t) => Row(
+                      children: [
+                        translationText(context, t.translation, _preview),
+                        if ((t.genderAndPlural ?? '') != '')
+                          genderAndPluralText(context, ' ' + t.genderAndPlural),
+                        if (t != translations.last) Text(','),
+                      ],
+                    ))
+                .toList(),
+        ),
+         ),
+      ],
+    );
   }
 
   Widget _headwordLine(BuildContext context, Entry entry) {
-    if (entry.abbreviation == '') return _headwordText(context, entry.headword);
+    if (entry.abbreviation == '')
+      return headwordText(context, entry.headword, _preview);
     if (_preview)
       return Row(
         children: [
-          _headwordText(context, _entry.headword),
+          headwordText(context, _entry.headword, _preview),
           Text(
             ' abbr ',
             style: Theme.of(context)
@@ -141,13 +172,18 @@ class EntryPage extends StatelessWidget {
                 .bodyText1
                 .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
           ),
-          _headwordAbbreviationText(context, _entry.abbreviation),
+          headwordAbbreviationText(context, _entry.abbreviation),
         ],
       );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _headwordText(context, _entry.headword),
+        Row(
+          children: [
+            headwordText(context, _entry.headword, _preview),
+            headwordText(context, '#' + _entry.urlEncodedHeadword, _preview),
+          ],
+        ),
         Row(
           children: [
             Text(
@@ -157,62 +193,10 @@ class EntryPage extends StatelessWidget {
                   .bodyText1
                   .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
             ),
-            _headwordAbbreviationText(context, _entry.abbreviation),
+            headwordAbbreviationText(context, _entry.abbreviation),
           ],
         ),
       ],
-    );
-  }
-
-  Widget _headwordText(BuildContext context, String text) {
-    if (_preview)
-      return Text(
-        text,
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
-        overflow: TextOverflow.ellipsis,
-      );
-    return Text(
-      text,
-      style: Theme.of(context)
-          .textTheme
-          .headline1
-          .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
-  Widget _headwordAbbreviationText(BuildContext context, String text) {
-    return Text(
-      text,
-      style: Theme.of(context)
-          .textTheme
-          .bodyText1
-          .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
-  Widget _partOfSpeechText(BuildContext context, String text) {
-    var pos = text == 'na' ? '--' : text;
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text(
-          pos,
-          style: Theme.of(context)
-              .textTheme
-              .bodyText2
-              .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-        ));
-  }
-
-  Widget _translationText(BuildContext context, String text) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.bodyText2,
-      overflow: _preview ? TextOverflow.ellipsis : TextOverflow.visible,
     );
   }
 }
