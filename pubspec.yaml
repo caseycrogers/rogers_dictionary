@@ -20,7 +20,6 @@ dependencies:
   rxdart: ^0.24.1
   async_list_view: ^0.0.1-dev.5
   google_fonts: ^1.1.1
-  mdi: ^3.0.0
 
   cupertino_icons: ^1.0.0
 

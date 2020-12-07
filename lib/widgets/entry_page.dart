@@ -63,20 +63,13 @@ class EntryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var map = _constructTranslationMap(_entry);
-    Widget entryWidget = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _headwordLine(context, _entry),
         if (!_preview) Divider(),
-        _buildTable(context, map),
-      ],
-    );
-    if (_preview) return entryWidget;
-    return Column(
-      children: [
-        entryWidget,
-        _buildEditorialNotes(context),
+        _buildTable(context, _constructTranslationMap(_entry)),
+        if (!_preview) _buildEditorialNotes(context),
       ],
     );
   }
@@ -118,14 +111,14 @@ class EntryPage extends StatelessWidget {
   // Return a list of TableRows corresponding to each part of speech.
   List<TableRow> _buildTranslations(BuildContext context,
       Map<String, Map<String, List<Translation>>> meaningMap) {
-    List<TableRow> partofSpeechTableRows = [];
+    List<TableRow> partOfSpeechTableRows = [];
     meaningMap.forEach((meaningId, partOfSpeechMap) {
       partOfSpeechMap.forEach((partOfSpeech, translations) {
-        partofSpeechTableRows
+        partOfSpeechTableRows
             .add(_buildPartOfSpeechTableRow(context, partOfSpeech, translations));
       });
     });
-    return partofSpeechTableRows;
+    return partOfSpeechTableRows;
   }
 
   TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
@@ -133,24 +126,29 @@ class EntryPage extends StatelessWidget {
     if (_preview)
       return TableRow(children: [
         partOfSpeechText(context, partOfSpeech, _preview),
-        translationText(context,
-            translations.map((t) => t.translation).join(', '), _preview),
+        Padding(
+          padding: const EdgeInsets.only(top: 7.0),
+          child: translationText(context,
+              translations.map((t) => t.translation).join(', '), _preview),
+        ),
       ]);
     return TableRow(
       children: [
         partOfSpeechText(context, partOfSpeech, _preview),
          Padding(
-           padding: const EdgeInsets.only(top: 4.0),
+           padding: const EdgeInsets.only(top: 7.0),
            child: Column(
             children: translations
-                .map((t) => Row(
-                      children: [
-                        translationText(context, t.translation, _preview),
-                        if ((t.genderAndPlural ?? '') != '')
-                          genderAndPluralText(context, ' ' + t.genderAndPlural),
-                        if (t != translations.last) Text(','),
-                      ],
-                    ))
+                .map((t) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Row(
+                        children: [
+                          Expanded(child: translationText(context, t.translation, _preview)),
+                          if ((t.genderAndPlural ?? '') != '')
+                            genderAndPluralText(context, ' ' + t.genderAndPlural),
+                        ],
+                      ),
+                ))
                 .toList(),
         ),
          ),
