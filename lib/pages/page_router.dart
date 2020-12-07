@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/util/platform_utils.dart';
-import 'package:rogers_dictionary/widgets/entry_page.dart';
 
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
