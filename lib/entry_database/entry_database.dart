@@ -6,13 +6,15 @@ import 'package:rogers_dictionary/main.dart';
 import 'database_constants.dart';
 import 'entry.dart';
 
-
 // A database interface for fetching dictionary entries.
 abstract class EntryDatabase {
   // Whether or not the dictionary is in english mode or spanish mode.
   bool _english = true;
+
   void setEnglish() => _english = true;
+
   void setSpanish() => _english = false;
+
   bool isEnglish() => _english;
 
   // Fetch entries from the database.
@@ -23,7 +25,6 @@ abstract class EntryDatabase {
 }
 
 class FirestoreDatabase extends EntryDatabase {
-
   FirestoreDatabase _fs;
 
   Future<void> init() async {
@@ -42,9 +43,7 @@ class FirestoreDatabase extends EntryDatabase {
   @override
   Future<Entry> getEntry(String urlEncodedHeadword) async {
     await init();
-    return _docToEntry(
-        await entriesCol().doc(urlEncodedHeadword).get()
-    );
+    return _docToEntry(await entriesCol().doc(urlEncodedHeadword).get());
   }
 
   @override
@@ -52,12 +51,12 @@ class FirestoreDatabase extends EntryDatabase {
     return _getEntryStream(searchString, startAfter);
   }
 
-  Stream<Entry> _getEntryStream(String searchString, urlEncodedHeadword) async* {
+  Stream<Entry> _getEntryStream(String searchString, String startAfter) async* {
     await init();
-    dynamic lastSeen = urlEncodedHeadword;
+    dynamic lastSeen = startAfter;
     while (true) {
       var snapshot = await entriesCol()
-          .orderBy('url_encoded_headword')
+          .orderBy('order_by_field')
           .startAfter([lastSeen])
           .where('keyword_list', arrayContains: searchString)
           .limit(10)
@@ -68,10 +67,10 @@ class FirestoreDatabase extends EntryDatabase {
       for (var entry in _queryToEntries(snapshot)) {
         yield entry;
       }
-      lastSeen = snapshot.docs.last.get('url_encoded_headword');
+      lastSeen = snapshot.docs.last.get('order_by_field');
     }
   }
-  
+
   List<Entry> _queryToEntries(QuerySnapshot query) {
     return query.docs.map(_queryDocToEntry).toList();
   }
