@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
@@ -30,8 +31,7 @@ class EntryPage extends StatelessWidget {
                         onPressed: () {
                           if (MediaQuery.of(context).orientation ==
                               Orientation.portrait) {
-                            return Navigator.of(context).popUntil((route) =>
-                                route.settings.name == DictionaryPage.route);
+                            return Navigator.of(context).pop();
                           }
                           Navigator.of(context).pop();
                         },
@@ -69,9 +69,40 @@ class EntryPage extends StatelessWidget {
         _headwordLine(context, _entry),
         if (!_preview) Divider(),
         _buildTable(context, _constructTranslationMap(_entry)),
+        if (!_preview) _buildRelated(context),
         if (!_preview) _buildEditorialNotes(context),
       ],
     );
+  }
+
+  Widget _buildRelated(BuildContext context) {
+    if (_entry.runOnParent.isEmpty && _entry.runOns.isEmpty) return Container();
+    var relatedList = ([_entry.runOnParent]..addAll(_entry.runOns))
+        .where((s) => s.isNotEmpty)
+        .map(
+          (encodedHeadword) => TextSpan(
+              text: Entry.urlDecode(encodedHeadword),
+              style: TextStyle(
+                  color: Colors.blue, decoration: TextDecoration.underline),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  DictionaryPage.pushPage(context, urlEncodedHeadword: encodedHeadword);
+                }),
+        )
+        .toList();
+    relatedList = relatedList.expand((span) => [
+      span,
+      if (span != relatedList.last) TextSpan(text: ', '),
+    ]).toList();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(height: 48.0),
+      Text("Related"),
+      Divider(),
+      RichText(
+          text: TextSpan(
+              children: relatedList,
+              style: Theme.of(context).textTheme.bodyText2)),
+    ]);
   }
 
   Widget _buildEditorialNotes(BuildContext context) {
@@ -114,8 +145,8 @@ class EntryPage extends StatelessWidget {
     List<TableRow> partOfSpeechTableRows = [];
     meaningMap.forEach((meaningId, partOfSpeechMap) {
       partOfSpeechMap.forEach((partOfSpeech, translations) {
-        partOfSpeechTableRows
-            .add(_buildPartOfSpeechTableRow(context, partOfSpeech, translations));
+        partOfSpeechTableRows.add(
+            _buildPartOfSpeechTableRow(context, partOfSpeech, translations));
       });
     });
     return partOfSpeechTableRows;
@@ -135,23 +166,27 @@ class EntryPage extends StatelessWidget {
     return TableRow(
       children: [
         partOfSpeechText(context, partOfSpeech, _preview),
-         Padding(
-           padding: const EdgeInsets.only(top: 7.0),
-           child: Column(
+        Padding(
+          padding: const EdgeInsets.only(top: 7.0),
+          child: Column(
             children: translations
                 .map((t) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Row(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Row(
                         children: [
-                          Expanded(child: translationText(context, t.translation, _preview)),
+                          Flexible(
+                            child: translationText(
+                                context, t.translation, _preview),
+                          ),
                           if ((t.genderAndPlural ?? '') != '')
-                            genderAndPluralText(context, ' ' + t.genderAndPlural),
+                            genderAndPluralText(
+                                context, ' ' + t.genderAndPlural),
                         ],
                       ),
-                ))
+                    ))
                 .toList(),
+          ),
         ),
-         ),
       ],
     );
   }
@@ -176,12 +211,6 @@ class EntryPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            headwordText(context, _entry.headword, _preview),
-            headwordText(context, '#' + _entry.urlEncodedHeadword, _preview),
-          ],
-        ),
         Row(
           children: [
             Text(

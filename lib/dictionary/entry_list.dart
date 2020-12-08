@@ -98,11 +98,7 @@ class _EntryListState extends State<EntryList> {
             onTap: () {
               if (isSelected) return;
               unFocus(context);
-              Navigator.of(context).pushNamed(
-                DictionaryPage.route +
-                    '?entry=${entries[index].urlEncodedHeadword}',
-                arguments: DictionaryPageModel.copy(context, entries[index]),
-              );
+              DictionaryPage.pushPage(context, entry: entries[index]);
             }),
         if (index < snapshot.data.length - 1)
           Divider(

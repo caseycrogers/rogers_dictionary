@@ -38,7 +38,8 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
     padding: EdgeInsets.only(right: 8.0),
     alignment: Alignment.centerRight,
     child: Chip(
-        padding: EdgeInsets.all(0.0),
+        padding:
+            EdgeInsets.only(bottom: 2.0, top: -0.0, left: 0.0, right: 2.0),
         label: Text(
           pos,
           style: Theme.of(context)

@@ -8,6 +8,7 @@ part of 'entry.dart';
 
 Entry _$EntryFromJson(Map<String, dynamic> json) {
   return Entry(
+    json['url_encoded_headword'] as String,
     json['headword'] as String,
     json['entry_id'] as int,
     json['run_on_parent'] as String,
@@ -26,6 +27,7 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
+      'url_encoded_headword': instance.urlEncodedHeadword,
       'headword': instance.headword,
       'entry_id': instance.entryId,
       'run_on_parent': instance.runOnParent,

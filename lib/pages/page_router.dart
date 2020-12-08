@@ -7,7 +7,6 @@ import 'package:rogers_dictionary/util/platform_utils.dart';
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     var uri = Uri.parse(settings.name);
-    print(uri.pathSegments);
     if (DictionaryPage.matchesRoute(uri) || uri.pathSegments.isEmpty)
       return _serveDictionaryPage(settings, uri);
 

@@ -8,6 +8,7 @@ part 'entry.g.dart';
 class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
+  final String urlEncodedHeadword;
   final String headword;
   final int entryId;
   final String runOnParent;
@@ -22,6 +23,7 @@ class Entry {
   final List<Translation> translations;
 
   Entry(
+    this.urlEncodedHeadword,
     this.headword,
     this.entryId,
     this.runOnParent,
@@ -35,8 +37,16 @@ class Entry {
     this.translations,
   );
 
-  String get urlEncodedHeadword =>
-      entryId.toString().padLeft(4, '0') + '_' + Uri.encodeComponent(headword);
+  static String urlDecode(String urlEncodedHeadword) {
+    return Uri.decodeComponent(
+        (urlEncodedHeadword.split('_')..removeAt(0)).join(''));
+  }
+
+  static String urlEncode(String headword, int entryId) {
+    return entryId.toString().padLeft(4, '0') +
+        '_' +
+        Uri.encodeComponent(headword);
+  }
 
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
@@ -90,11 +100,12 @@ class Translation {
 }
 
 class EntryBuilder {
+  String _urlEncodedHeadword;
   String _headword;
   int _entryId;
   String _runOnParent;
   String _runOnText;
-  List<String> _runOns;
+  List<String> _runOns = [];
   String _abbreviation;
   String _namingStandard;
   String _alternateHeadword;
@@ -102,6 +113,15 @@ class EntryBuilder {
   String _alternateHeadwordNamingStandard;
 
   List<Translation> _translations = [];
+
+  String getUrlEncodedHeadword() {
+    return _urlEncodedHeadword;
+  }
+
+  EntryBuilder urlEncodedHeadword(String urlEncodedHeadword) {
+    _urlEncodedHeadword = urlEncodedHeadword;
+    return this;
+  }
 
   EntryBuilder headword(String headword) {
     _headword = headword;
@@ -181,11 +201,14 @@ class EntryBuilder {
   }
 
   Entry build() {
+    assert(_urlEncodedHeadword != null,
+        "You must specify a non null url encoded headword.");
     assert(_headword != null, "You must specify a non null headword.");
     assert(_entryId != null, "You must specify a non null entry id.");
     assert(_translations.length != 0,
         "You must specify one or more translations.");
     return Entry(
+      _urlEncodedHeadword,
       _headword,
       _entryId,
       _runOnParent,
