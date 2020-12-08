@@ -41,22 +41,36 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
-  while (i < 3000) {
+  while (i < rows.length) {
+    if (i % 500 == 0) print('$i/${rows.length} complete!');
     Map<String, String> row = rows.elementAt(i);
-    if (row[HEADWORD] != '') {
-      if (row[PART_OF_SPEECH] == '' || row[TRANSLATION] == '') {
-        print('Invalid empty cells for ${row[HEADWORD]} at row $i, skipping.');
-        while (row[HEADWORD] == '') {
+    if (row[HEADWORD].isNotEmpty) {
+      if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENT].isEmpty) || row[TRANSLATION].isEmpty) {
+        print('Invalid empty cells for \'${row[HEADWORD]}\' at row $i, skipping.');
+        i += 1;
+        row = rows.elementAt(i);
+        while (row[HEADWORD].isEmpty) {
           i += 1;
           row = rows.elementAt(i);
         }
-        i += 1;
         continue;
       }
+      var urlEncoded = Entry.urlEncode(row[HEADWORD], i);
+      var urlEncodedParent = '';
+      if (row[RUN_ON_PARENT].isNotEmpty) {
+        var parent = entryBuilders[row[RUN_ON_PARENT]];
+        if (parent == null) {
+          print("Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
+        } else {
+          parent.addRunOn(urlEncoded);
+          urlEncodedParent = parent.getUrlEncodedHeadword();
+        }
+      }
       builder = EntryBuilder()
+          .urlEncodedHeadword(urlEncoded)
           .entryId(i)
           .headword(row[HEADWORD])
-          .runOnParent(row[RUN_ON_PARENT])
+          .runOnParent(urlEncodedParent)
           .runOnText(row[RUN_ON_TEXT])
           .abbreviation(row[ABBREVIATION])
           .namingStandard(row[NAMING_STANDARD])
@@ -81,6 +95,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   }
   assert(builder != null, "Did not generate any entries!");
   var uploadFutures = entryBuilders.values.map((b) => _upload(b.build(), debug, verbose));
+  print('done?');
   return Future.wait(uploadFutures);
 }
 
