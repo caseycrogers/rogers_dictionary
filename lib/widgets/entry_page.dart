@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 
@@ -86,7 +85,7 @@ class EntryPage extends StatelessWidget {
                   color: Colors.blue, decoration: TextDecoration.underline),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  DictionaryPage.pushPage(context, urlEncodedHeadword: encodedHeadword);
+                  DictionaryPageModel.onHeadwordSelected(context, encodedHeadword);
                 }),
         )
         .toList();

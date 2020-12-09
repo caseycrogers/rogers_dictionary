@@ -33,13 +33,13 @@ Widget headwordAbbreviationText(BuildContext context, String text) {
 }
 
 Widget partOfSpeechText(BuildContext context, String text, bool preview) {
-  var pos = text == 'na' ? '-' : text;
+  var pos = ['na', ''].contains(text) ? '-' : text;
   return Container(
     padding: EdgeInsets.only(right: 8.0),
     alignment: Alignment.centerRight,
     child: Chip(
         padding:
-            EdgeInsets.only(bottom: 2.0, top: -0.0, left: 0.0, right: 2.0),
+            EdgeInsets.only(bottom: 1.0, top: -1.0, left: 0.0, right: 0.0),
         label: Text(
           pos,
           style: Theme.of(context)

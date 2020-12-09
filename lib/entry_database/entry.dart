@@ -8,7 +8,7 @@ part 'entry.g.dart';
 class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
-  final String urlEncodedHeadword;
+  final String orderByField;
   final String headword;
   final int entryId;
   final String runOnParent;
@@ -23,7 +23,7 @@ class Entry {
   final List<Translation> translations;
 
   Entry(
-    this.urlEncodedHeadword,
+    this.orderByField,
     this.headword,
     this.entryId,
     this.runOnParent,
@@ -42,11 +42,16 @@ class Entry {
         (urlEncodedHeadword.split('_')..removeAt(0)).join(''));
   }
 
-  static String urlEncode(String headword, int entryId) {
-    return entryId.toString().padLeft(4, '0') +
-        '_' +
-        Uri.encodeComponent(headword);
+  static String urlEncode(String headword) {
+    return Uri.encodeComponent(headword);
   }
+
+  static String generateOrderByField(String headword, int entryId) {
+    return entryId.toString().padLeft(4, '0') +
+        '_' + urlEncode(headword);
+  }
+
+  get urlEncodedHeadword => Entry.urlEncode(headword);
 
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
@@ -118,7 +123,7 @@ class EntryBuilder {
     return _urlEncodedHeadword;
   }
 
-  EntryBuilder urlEncodedHeadword(String urlEncodedHeadword) {
+  EntryBuilder orderByField(String urlEncodedHeadword) {
     _urlEncodedHeadword = urlEncodedHeadword;
     return this;
   }

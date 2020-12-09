@@ -28,7 +28,7 @@ const EXAMPLE_PHRASE = 'example_phrase';
 const EDITORIAL_NOTE = 'editorial_note';
 
 const KEYWORD_LIST = 'keyword_list';
-const URL_ENCODED_HEADWORD = 'url_encoded_headword';
+const ORDER_BY_FIELD = 'order_by_field';
 
 Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   Firestore.initialize('rogers-dicitionary');
@@ -55,7 +55,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
         }
         continue;
       }
-      var urlEncoded = Entry.urlEncode(row[HEADWORD], i);
+      var urlEncoded = Entry.urlEncode(row[HEADWORD]);
       var urlEncodedParent = '';
       if (row[RUN_ON_PARENT].isNotEmpty) {
         var parent = entryBuilders[row[RUN_ON_PARENT]];
@@ -67,7 +67,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
         }
       }
       builder = EntryBuilder()
-          .urlEncodedHeadword(urlEncoded)
+          .orderByField(Entry.generateOrderByField(row[HEADWORD], i))
           .entryId(i)
           .headword(row[HEADWORD])
           .runOnParent(urlEncodedParent)
@@ -79,6 +79,8 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
           .alternateHeadwordNamingStandard(
               row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
       entryBuilders[row[HEADWORD]] = builder;
+      partOfSpeech = '';
+      meaningId = '';
     }
     if (row[PART_OF_SPEECH] != '') partOfSpeech = row[PART_OF_SPEECH];
     if (row[MEANING_ID] != '') meaningId = row[MEANING_ID];
@@ -102,7 +104,6 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
 Future<void> _upload(Entry entry, bool debug, bool verbose) {
   var entryMap = entry.toJson();
   entryMap[KEYWORD_LIST] = _constructSearchList(entry);
-  entryMap[URL_ENCODED_HEADWORD] = entry.urlEncodedHeadword;
   if (verbose) {
     print('Entry:\n${entry.toJson()}');
     print('Keywords:\n${entryMap[KEYWORD_LIST]}');
@@ -134,11 +135,6 @@ List<String> _constructSearchList(Entry entry) {
     ret.add("");
     return ret.toList();
   }).toList();
-}
-
-void _assertValid(Map<String, String> row, String header, int index) {
-  assert(
-      row[header] != '', 'Invalid empty $header at index $index.\nRow:\n$row');
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
