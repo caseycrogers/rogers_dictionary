@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
-import 'package:rogers_dictionary/util/platform_utils.dart';
 
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -21,29 +21,15 @@ class PageRouter {
 }
 
 Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
-  if (uri.queryParameters
-      .containsKey(DictionaryPage.selectedEntryQueryParameter)) {
-    var newSettings = settings.copyWith(
-        arguments: settings.arguments ??
-            DictionaryPageModel.fromHeadword(uri
-                .queryParameters[DictionaryPage.selectedEntryQueryParameter]));
-    return PageRouteBuilder(
-        settings: newSettings,
-        pageBuilder: (context, animation, _) {
-          //context
-          //    .select<SelectedEntryModel, SelectedEntryModel>((value) => value)
-          //    .selectEntry(MyApp.db.getEntry(headword), headword);
-          return DictionaryPage(
-            transitionAnimation: isMobile(context)
-                ? CurvedAnimation(curve: Curves.easeIn, parent: animation)
-                : AlwaysStoppedAnimation(1.0),
-          );
-        });
-  }
-  return MaterialPageRoute(
-    settings: settings.copyWith(arguments: DictionaryPageModel.empty()),
-    builder: (context) {
-      return DictionaryPage();
-    },
-  );
+  var newArguments = (settings.arguments ?? DictionaryPageModel.empty())
+      as DictionaryPageModel;
+  return PageRouteBuilder(
+      settings: settings.copyWith(name: settings.name, arguments: newArguments),
+      pageBuilder: (context, animation, _) {
+        return DictionaryPage(
+          transitionAnimation: (!kIsWeb && newArguments.animateTransition)
+              ? CurvedAnimation(curve: Curves.easeIn, parent: animation)
+              : AlwaysStoppedAnimation(1.0),
+        );
+      });
 }

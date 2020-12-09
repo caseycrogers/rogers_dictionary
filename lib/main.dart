@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rogers_dictionary/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 
 import 'entry_database/entry_database.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: 'Dictionary',
             onGenerateRoute: PageRouter.generateRoute,
-            initialRoute: DictionaryPage.route, // 'dictionary'
+            initialRoute: DictionaryPageModel.route, // 'dictionary'
             theme: ThemeData(
               textTheme: TextTheme(
                 headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold).merge(GoogleFonts.openSans()),
