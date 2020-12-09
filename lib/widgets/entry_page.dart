@@ -79,20 +79,23 @@ class EntryPage extends StatelessWidget {
     var relatedList = ([_entry.runOnParent]..addAll(_entry.runOns))
         .where((s) => s.isNotEmpty)
         .map(
-          (encodedHeadword) => TextSpan(
-              text: Entry.urlDecode(encodedHeadword),
+          (headword) => TextSpan(
+              text: headword,
               style: TextStyle(
                   color: Colors.blue, decoration: TextDecoration.underline),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  DictionaryPageModel.onHeadwordSelected(context, encodedHeadword);
+                  DictionaryPageModel.onHeadwordSelected(
+                      context, Entry.urlEncode(headword));
                 }),
         )
         .toList();
-    relatedList = relatedList.expand((span) => [
-      span,
-      if (span != relatedList.last) TextSpan(text: ', '),
-    ]).toList();
+    relatedList = relatedList
+        .expand((span) => [
+              span,
+              if (span != relatedList.last) TextSpan(text: ', '),
+            ])
+        .toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(height: 48.0),
       Text("Related"),

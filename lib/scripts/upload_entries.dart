@@ -45,8 +45,10 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
     if (i % 500 == 0) print('$i/${rows.length} complete!');
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD].isNotEmpty) {
-      if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENT].isEmpty) || row[TRANSLATION].isEmpty) {
-        print('Invalid empty cells for \'${row[HEADWORD]}\' at row $i, skipping.');
+      if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENT].isEmpty) ||
+          row[TRANSLATION].isEmpty) {
+        print(
+            'Invalid empty cells for \'${row[HEADWORD]}\' at row $i, skipping.');
         i += 1;
         row = rows.elementAt(i);
         while (row[HEADWORD].isEmpty) {
@@ -55,22 +57,21 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
         }
         continue;
       }
-      var urlEncoded = Entry.urlEncode(row[HEADWORD]);
       var urlEncodedParent = '';
       if (row[RUN_ON_PARENT].isNotEmpty) {
         var parent = entryBuilders[row[RUN_ON_PARENT]];
         if (parent == null) {
-          print("Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
+          print(
+              "Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
         } else {
-          parent.addRunOn(urlEncoded);
-          urlEncodedParent = parent.getUrlEncodedHeadword();
+          parent.addRunOn(row[HEADWORD]);
         }
       }
       builder = EntryBuilder()
           .orderByField(Entry.generateOrderByField(row[HEADWORD], i))
           .entryId(i)
           .headword(row[HEADWORD])
-          .runOnParent(urlEncodedParent)
+          .runOnParent(row[RUN_ON_PARENT])
           .runOnText(row[RUN_ON_TEXT])
           .abbreviation(row[ABBREVIATION])
           .namingStandard(row[NAMING_STANDARD])
@@ -96,7 +97,8 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
-  var uploadFutures = entryBuilders.values.map((b) => _upload(b.build(), debug, verbose));
+  var uploadFutures =
+      entryBuilders.values.map((b) => _upload(b.build(), debug, verbose));
   print('done?');
   return Future.wait(uploadFutures);
 }
@@ -127,7 +129,8 @@ List<String> _constructSearchList(Entry entry) {
     Set<String> ret = Set();
     for (int i = 0; i < k.length; i++) {
       // Only start substrings at the start of words.
-      if (!(i == 0 || [' ', '-', '.'].contains(k.substring(i - 1, i)))) continue;
+      if (!(i == 0 || [' ', '-', '.'].contains(k.substring(i - 1, i))))
+        continue;
       for (int j = i; j <= k.length; j++) {
         ret.add(k.substring(i, j));
       }
@@ -149,5 +152,6 @@ void main(List<String> arguments) async {
     ..addFlag('verbose', abbr: 'v', defaultsTo: false);
   var argResults = parser.parse(arguments);
 
-  await uploadEntries(argResults['debug'] as bool, argResults['verbose'] as bool);
+  await uploadEntries(
+      argResults['debug'] as bool, argResults['verbose'] as bool);
 }
