@@ -21,10 +21,10 @@ class PageRouter {
 }
 
 Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
-  var newArguments = (settings.arguments ?? DictionaryPageModel.empty())
-      as DictionaryPageModel;
+  var newArguments = DictionaryPageModel.fromQueryParams(uri.queryParameters);
   return PageRouteBuilder(
-      settings: settings.copyWith(name: settings.name, arguments: newArguments),
+      settings: settings.copyWith(
+          name: settings.name, arguments: settings.arguments ?? newArguments),
       pageBuilder: (context, animation, _) {
         return DictionaryPage(
           transitionAnimation: (!kIsWeb && newArguments.animateTransition)

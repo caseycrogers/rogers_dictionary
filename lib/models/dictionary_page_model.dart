@@ -21,7 +21,7 @@ class DictionaryPageModel {
       queryParameters: {
         selectedEntryQueryParameter: selectedEntryHeadword,
         searchStringQueryParameter: searchString
-      }..removeWhere((key, value) => value == null));
+      }..removeWhere((key, value) => value == ''));
 
   final bool animateTransition;
 
@@ -51,8 +51,7 @@ class DictionaryPageModel {
 
   factory DictionaryPageModel.fromQueryParams(Map<String, String> queryParams) {
     var encodedHeadword = queryParams[selectedEntryQueryParameter];
-    var searchString = queryParams[selectedEntryQueryParameter];
-    print('headword: $encodedHeadword');
+    var searchString = queryParams[searchStringQueryParameter];
     return DictionaryPageModel._(
         selectedEntry:
             encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
@@ -139,6 +138,7 @@ class DictionaryPageModel {
       BuildContext context, String newUrlEncodedHeadword) {
     var oldModel = DictionaryPageModel.of(context);
     // Only update if the value has actually changed
+    print(newUrlEncodedHeadword);
     if (newUrlEncodedHeadword == oldModel.selectedEntryHeadword) return;
     oldModel._copyWithEncodedHeadword(newUrlEncodedHeadword)._pushPage(context);
   }
