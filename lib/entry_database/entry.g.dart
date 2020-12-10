@@ -50,6 +50,7 @@ Translation _$TranslationFromJson(Map<String, dynamic> json) {
     json['should_be_key_phrase'] as bool,
     json['translation_feminine_indicator'] as String,
     json['gender_and_plural'] as String,
+    json['translation_abbreviation'] as String,
     json['example_phrase'] as String,
     json['editorial_note'] as String,
   );
@@ -63,6 +64,7 @@ Map<String, dynamic> _$TranslationToJson(Translation instance) =>
       'should_be_key_phrase': instance.shouldBeKeyPhrase,
       'translation_feminine_indicator': instance.translationFeminineIndicator,
       'gender_and_plural': instance.genderAndPlural,
+      'translation_abbreviation': instance.translationAbbreviation,
       'example_phrase': instance.examplePhrase,
       'editorial_note': instance.editorialNote,
     };

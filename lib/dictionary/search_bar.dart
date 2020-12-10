@@ -6,7 +6,7 @@ class SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     var dictionaryPageModel = DictionaryPageModel.of(context);
     var controller =
-        TextEditingController(text: dictionaryPageModel.searchString);
+        TextEditingController.fromValue(dictionaryPageModel.textValue);
     var _hasText = controller.text.isNotEmpty;
     return Container(
       color: Theme.of(context).dialogBackgroundColor,
@@ -15,7 +15,7 @@ class SearchBar extends StatelessWidget {
               onFocusChange: (hasFocus) =>
                   dictionaryPageModel.searchBarHasFocus = hasFocus,
               child: TextField(
-                autofocus: dictionaryPageModel.searchBarHasFocus,
+                // autofocus: dictionaryPageModel.searchBarHasFocus,
                 style: TextStyle(fontSize: 20.0),
                 controller: controller,
                 decoration: InputDecoration(
