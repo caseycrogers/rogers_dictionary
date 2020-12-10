@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:rogers_dictionary/models/search_string_model.dart';
+import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'package:flutter/cupertino.dart';
@@ -10,35 +10,31 @@ import 'package:rogers_dictionary/main.dart';
 
 class DictionaryPageModel {
   static const String route = '/dictionary';
-  static const String selectedEntryQueryParameter = 'entry';
-  static const String searchStringQueryParameter = 'search';
+  static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
+  static const String SEARCH_STRING_QUERY_PARAM = 'search';
+
+  final bool animateTransition;
 
   // Selected entry state.
   Future<Entry> selectedEntry;
   String selectedEntryHeadword;
 
-  get hasSelection => selectedEntryHeadword.isNotEmpty;
-
-  get searchString => searchStringModel.value;
-
-  get uri => Uri(
-      path: route,
-      queryParameters: {
-        selectedEntryQueryParameter: selectedEntryHeadword,
-        searchStringQueryParameter: searchString
-      }..removeWhere((key, value) => value == ''));
-
-  final bool animateTransition;
-
-  // Search bar state.
-  final SearchStringModel searchStringModel;
+  // Entry search state
+  final EntrySearchModel entrySearchModel;
   bool searchBarHasFocus;
 
-  // EntryList state.
-  final Stream<Entry> entryStream;
-  List<Entry> entries;
-  final String startAfter;
-  final ScrollController scrollController;
+  get hasSelection => selectedEntryHeadword.isNotEmpty;
+
+  get searchString => entrySearchModel.searchString;
+
+  get uri {
+    var params = <String, String>{};
+    if (selectedEntryHeadword != '')
+      params[SELECTED_ENTRY_QUERY_PARAM] = selectedEntryHeadword;
+    if (selectedEntryHeadword != '')
+      params[SEARCH_STRING_QUERY_PARAM] = searchString;
+    return Uri(path: route, queryParameters: params.isNotEmpty ? params : null);
+  }
 
   static DictionaryPageModel of(BuildContext context) =>
       ModalRoute.of(context).settings.arguments;
@@ -46,86 +42,54 @@ class DictionaryPageModel {
   factory DictionaryPageModel.empty() => DictionaryPageModel._(
       selectedEntry: null,
       selectedEntryHeadword: '',
-      searchStringModel: SearchStringModel.empty(),
+      entrySearchModel: EntrySearchModel.empty(),
       searchBarHasFocus: false,
-      entries: [],
-      entryStream: Stream.empty(),
-      startAfter: '',
-      scrollController: ScrollController(),
       animateTransition: true);
 
   factory DictionaryPageModel.fromQueryParams(Map<String, String> queryParams) {
-    var encodedHeadword = queryParams[selectedEntryQueryParameter];
-    var searchString = queryParams[searchStringQueryParameter];
+    var encodedHeadword = queryParams[SELECTED_ENTRY_QUERY_PARAM];
+    var searchString = queryParams[SEARCH_STRING_QUERY_PARAM];
     return DictionaryPageModel._(
         selectedEntry:
             encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
         selectedEntryHeadword: encodedHeadword ?? '',
-        searchStringModel: SearchStringModel(searchString ?? ''),
+        entrySearchModel: EntrySearchModel(searchString ?? ''),
         searchBarHasFocus: false,
-        entryStream: MyApp.db.getEntries(searchString: searchString),
-        entries: [],
-        // Truncate the last letter because we want to include urlEncodedHeadword
-        startAfter: '',
-        scrollController: ScrollController(),
         animateTransition: false);
   }
 
   DictionaryPageModel _copyWithEntry(Entry newEntry) {
-    return _copyWith(
-        Future.value(newEntry), newEntry.urlEncodedHeadword, searchString,
+    return _copyWith(Future.value(newEntry), newEntry.urlEncodedHeadword,
         maintainFocus: false);
   }
 
   DictionaryPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
-    return _copyWith(
-        MyApp.db.getEntry(newEncodedHeadword), newEncodedHeadword, searchString,
+    return _copyWith(MyApp.db.getEntry(newEncodedHeadword), newEncodedHeadword,
         maintainFocus: false);
   }
 
-  DictionaryPageModel _copyWithSearchString(String newSearchString) {
-    if (newSearchString == '') return DictionaryPageModel.empty();
-    return _copyWith(selectedEntry, selectedEntryHeadword, newSearchString,
-        resetEntries: true, animateTransition: false);
-  }
-
-  DictionaryPageModel _copyWith(FutureOr<Entry> newEntry,
-      String newEncodedHeadword, String newSearchString,
-      {bool resetEntries: false,
-      bool animateTransition: true,
-      bool maintainFocus: true}) {
-    var newStartAfter =
-        (entries.isEmpty || resetEntries) ? '' : entries.last.orderByField;
+  DictionaryPageModel _copyWith(
+      FutureOr<Entry> newEntry, String newEncodedHeadword,
+      {bool animateTransition: true, bool maintainFocus: true}) {
     return DictionaryPageModel._(
         selectedEntry: newEntry,
         selectedEntryHeadword: newEncodedHeadword,
-        searchStringModel: SearchStringModel(newSearchString),
+        entrySearchModel: entrySearchModel.copy(),
         searchBarHasFocus: maintainFocus && searchBarHasFocus,
-        entryStream: MyApp.db.getEntries(
-            searchString: newSearchString, startAfter: newStartAfter),
-        entries: resetEntries ? [] : List.from(entries),
-        startAfter: newStartAfter,
-        scrollController: (scrollController.hasClients && !resetEntries)
-            ? ScrollController(initialScrollOffset: scrollController.offset)
-            : scrollController,
         animateTransition: animateTransition);
   }
 
   DictionaryPageModel._(
       {@required this.selectedEntry,
       @required this.selectedEntryHeadword,
-      @required this.searchStringModel,
+      @required this.entrySearchModel,
       @required this.searchBarHasFocus,
-      @required this.entryStream,
-      @required this.entries,
-      @required this.startAfter,
-      @required this.scrollController,
       @required this.animateTransition});
 
   static void onSearchStringChanged(
       BuildContext context, String newSearchString) {
     var dictionaryPageModel = DictionaryPageModel.of(context);
-    dictionaryPageModel.searchStringModel.value = newSearchString;
+    dictionaryPageModel.entrySearchModel.onSearchStringChanged(newSearchString);
     if (kIsWeb) dictionaryPageModel._pushQueryParams(context);
   }
 
@@ -146,13 +110,6 @@ class DictionaryPageModel {
 
   void _pushQueryParams(BuildContext context) {
     html.window.history.replaceState(null, '', uri.toString());
-  }
-
-  void _pushReplacementPage(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed(
-      uri.toString(),
-      arguments: this,
-    );
   }
 
   void _pushPage(BuildContext context) {

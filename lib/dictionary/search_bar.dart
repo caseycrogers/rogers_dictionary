@@ -43,8 +43,10 @@ class _SearchBarState extends State<SearchBar> {
             prefixIcon: Icon(Icons.search),
             suffixIcon: _hasText
                 ? IconButton(
-                    onPressed: () =>
-                        DictionaryPageModel.onSearchStringChanged(context, ''),
+                    onPressed: () {
+                      controller.clear();
+                      DictionaryPageModel.onSearchStringChanged(context, '');
+                    },
                     icon: Icon(Icons.clear),
                   )
                 : null,
