@@ -52,6 +52,7 @@ class FirestoreDatabase extends EntryDatabase {
   }
 
   Stream<Entry> _getEntryStream(String searchString, String startAfter) async* {
+    var i = 0;
     await init();
     dynamic lastSeen = startAfter;
     while (true) {
@@ -65,8 +66,9 @@ class FirestoreDatabase extends EntryDatabase {
         return;
       }
       for (var entry in _queryToEntries(snapshot)) {
-        print(entry.entryId);
         yield entry;
+        print(i);
+        i++;
       }
       lastSeen = snapshot.docs.last.get('order_by_field');
     }

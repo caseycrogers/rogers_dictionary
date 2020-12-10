@@ -21,28 +21,37 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-          child: MaterialApp(
-            title: 'Dictionary',
-            onGenerateRoute: PageRouter.generateRoute,
-            initialRoute: DictionaryPageModel.route, // 'dictionary'
-            theme: ThemeData(
-              textTheme: TextTheme(
-                headline1: TextStyle(fontSize: 36.0, color: Colors.black, fontWeight: FontWeight.bold).merge(GoogleFonts.openSans()),
-                headline2: TextStyle(fontSize: 22.0, color: Colors.black54, fontWeight: FontWeight.bold).merge(GoogleFonts.openSans()),
-                bodyText1: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal).merge(GoogleFonts.openSans()),
-                bodyText2: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal).merge(GoogleFonts.openSans()),
-              ),
-              accentIconTheme: IconThemeData(
-                color: Colors.black38,
-              ),
-              appBarTheme: AppBarTheme(
-                color: Colors.amberAccent
-              ),
-              selectedRowColor: Colors.amber.shade50,
-              shadowColor: Colors.grey.withOpacity(.5),
-            ),
+      child: MaterialApp(
+        title: 'Dictionary',
+        onGenerateRoute: PageRouter.generateRoute,
+        // TODO: Initial route breaks '#' navigation, refactor away from initial route?
+        initialRoute: DictionaryPageModel.route,
+        theme: ThemeData(
+          textTheme: TextTheme(
+            headline1: TextStyle(
+                    fontSize: 36.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold)
+                .merge(GoogleFonts.openSans()),
+            headline2: TextStyle(
+                    fontSize: 22.0,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold)
+                .merge(GoogleFonts.openSans()),
+            bodyText1: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal)
+                .merge(GoogleFonts.openSans()),
+            bodyText2: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal)
+                .merge(GoogleFonts.openSans()),
           ),
-          onTap: () => unFocus(context),
-      );
+          accentIconTheme: IconThemeData(
+            color: Colors.black38,
+          ),
+          appBarTheme: AppBarTheme(color: Colors.amberAccent),
+          selectedRowColor: Colors.amber.shade50,
+          shadowColor: Colors.grey.withOpacity(.5),
+        ),
+      ),
+      onTap: () => unFocus(context),
+    );
   }
 }
