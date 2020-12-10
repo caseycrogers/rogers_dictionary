@@ -15,44 +15,47 @@ class EntryPage extends StatelessWidget {
   static Widget asPage() => Builder(builder: (context) {
         if (!DictionaryPageModel.of(context).hasSelection)
           return Container(color: Theme.of(context).scaffoldBackgroundColor);
-        return LayoutBuilder(
-          builder: (context, constraints) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                (MediaQuery.of(context).orientation == Orientation.portrait)
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Theme.of(context).accentIconTheme.color,
+        return Container(
+          color: Theme.of(context).cardColor,
+          child: LayoutBuilder(
+            builder: (context, constraints) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  (MediaQuery.of(context).orientation == Orientation.portrait)
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Theme.of(context).accentIconTheme.color,
+                          ),
+                          onPressed: () {
+                            if (MediaQuery.of(context).orientation ==
+                                Orientation.portrait) {
+                              return Navigator.of(context).pop();
+                            }
+                            Navigator.of(context).pop();
+                          },
+                        )
+                      : Container(width: 20.0),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: FutureBuilder(
+                          future: DictionaryPageModel.of(context).selectedEntry,
+                          builder: (context, snap) {
+                            if (!snap.hasData)
+                              return Center(child: CircularProgressIndicator());
+                            return EntryPage._instance(snap.data, false);
+                          },
                         ),
-                        onPressed: () {
-                          if (MediaQuery.of(context).orientation ==
-                              Orientation.portrait) {
-                            return Navigator.of(context).pop();
-                          }
-                          Navigator.of(context).pop();
-                        },
-                      )
-                    : Container(width: 20.0),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: FutureBuilder(
-                        future: DictionaryPageModel.of(context).selectedEntry,
-                        builder: (context, snap) {
-                          if (!snap.hasData)
-                            return Center(child: CircularProgressIndicator());
-                          return EntryPage._instance(snap.data, false);
-                        },
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
