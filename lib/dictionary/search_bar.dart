@@ -15,7 +15,7 @@ class SearchBar extends StatelessWidget {
               onFocusChange: (hasFocus) =>
                   dictionaryPageModel.searchBarHasFocus = hasFocus,
               child: TextField(
-                // autofocus: dictionaryPageModel.searchBarHasFocus,
+                autofocus: dictionaryPageModel.searchBarHasFocus,
                 style: TextStyle(fontSize: 20.0),
                 controller: controller,
                 decoration: InputDecoration(

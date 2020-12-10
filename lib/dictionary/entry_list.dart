@@ -41,8 +41,8 @@ class EntryList extends StatelessWidget {
     if (!snapshot.hasData) return LoadingText();
     DictionaryPageModel.of(context).entries = snapshot.data;
     var entry = snapshot.data[index];
-    var isSelected =
-        entry.headword == DictionaryPageModel.of(context).selectedEntryHeadword;
+    var isSelected = entry.urlEncodedHeadword ==
+        DictionaryPageModel.of(context).selectedEntryHeadword;
     return Column(
       children: [
         InkWell(
