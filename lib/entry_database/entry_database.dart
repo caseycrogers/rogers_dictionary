@@ -48,7 +48,7 @@ class FirestoreDatabase extends EntryDatabase {
 
   @override
   Stream<Entry> getEntries({String searchString: '', String startAfter: ''}) {
-    return _getEntryStream(searchString, startAfter);
+    return _getEntryStream(searchString, startAfter).asBroadcastStream();
   }
 
   Stream<Entry> _getEntryStream(String searchString, String startAfter) async* {

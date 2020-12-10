@@ -11,9 +11,9 @@ class PageRouter {
       return _serveDictionaryPage(settings, uri);
 
     // Route not recognized, display 404 page
-    return MaterialPageRoute(
+    return PageRouteBuilder(
         settings: settings,
-        builder: (_) => Scaffold(
+        pageBuilder: (context, animation, _) => Scaffold(
               body:
                   Center(child: Text('No route defined for ${settings.name}')),
             ));
@@ -25,11 +25,12 @@ Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
   return PageRouteBuilder(
       settings: settings.copyWith(
           name: settings.name, arguments: settings.arguments ?? newArguments),
-      pageBuilder: (context, animation, _) {
-        return DictionaryPage(
-          transitionAnimation: (!kIsWeb && newArguments.animateTransition)
-              ? CurvedAnimation(curve: Curves.easeIn, parent: animation)
-              : AlwaysStoppedAnimation(1.0),
-        );
-      });
+      pageBuilder: (context, animation, _) =>
+          DictionaryPage(animation: _getAnimation(context, animation)));
 }
+
+Animation<double> _getAnimation(
+        BuildContext context, Animation<double> animation) =>
+    (!kIsWeb && DictionaryPageModel.of(context).animateTransition)
+        ? CurvedAnimation(curve: Curves.easeIn, parent: animation)
+        : AlwaysStoppedAnimation(1.0);

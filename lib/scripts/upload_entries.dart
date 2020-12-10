@@ -10,7 +10,7 @@ import 'package:df/df.dart';
 const HEADWORD = 'headword';
 const RUN_ON_PARENT = 'run_on_parent';
 const RUN_ON_TEXT = 'run_on_text';
-const ABBREVIATION = 'abbreviation';
+const HEADWORD_ABBREVIATION = 'headword_abbreviation';
 const NAMING_STANDARD = 'naming_standard';
 const ALTERNATE_HEADWORD = 'alternate_headword';
 const ALTERNATE_HEADWORD_ABBREVIATION = 'alternate_headword_abbreviation';
@@ -24,6 +24,7 @@ const TRANSLATION = 'translation';
 const SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
 const TRANSLATION_FEMININE_INDICATOR = 'translation_feminine_indicator';
 const GENDER_AND_PLURAL = 'gender_and_plural';
+const TRANSLATION_ABBREVIATION = 'translation_abbreviation';
 const EXAMPLE_PHRASE = 'example_phrase';
 const EDITORIAL_NOTE = 'editorial_note';
 
@@ -57,7 +58,6 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
         }
         continue;
       }
-      var urlEncodedParent = '';
       if (row[RUN_ON_PARENT].isNotEmpty) {
         var parent = entryBuilders[row[RUN_ON_PARENT]];
         if (parent == null) {
@@ -73,7 +73,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
           .headword(row[HEADWORD])
           .runOnParent(row[RUN_ON_PARENT])
           .runOnText(row[RUN_ON_TEXT])
-          .abbreviation(row[ABBREVIATION])
+          .headwordAbbreviation(row[HEADWORD_ABBREVIATION])
           .namingStandard(row[NAMING_STANDARD])
           .alternateHeadword(row[ALTERNATE_HEADWORD])
           .alternateHeadwordAbbreviation(row[ALTERNATE_HEADWORD_ABBREVIATION])
@@ -92,6 +92,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
         row[SHOULD_BE_KEY_PHRASE] != 'F',
         row[TRANSLATION_FEMININE_INDICATOR],
         row[GENDER_AND_PLURAL],
+        row[HEADWORD_ABBREVIATION],
         row[EXAMPLE_PHRASE],
         row[EDITORIAL_NOTE]);
     i++;

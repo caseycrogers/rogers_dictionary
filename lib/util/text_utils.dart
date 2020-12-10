@@ -10,7 +10,6 @@ Text headwordText(BuildContext context, String text, bool preview) {
           .textTheme
           .bodyText1
           .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
-      overflow: TextOverflow.ellipsis,
     );
   return Text(
     text,
@@ -38,8 +37,7 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
     padding: EdgeInsets.only(right: 8.0),
     alignment: Alignment.centerRight,
     child: Chip(
-        padding:
-            EdgeInsets.only(bottom: 1.0, top: -1.0, left: 0.0, right: 0.0),
+        padding: EdgeInsets.only(bottom: 1.0, top: -1.0, left: 0.0, right: 0.0),
         label: Text(
           pos,
           style: Theme.of(context)

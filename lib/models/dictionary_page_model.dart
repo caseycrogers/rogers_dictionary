@@ -16,6 +16,8 @@ class DictionaryPageModel {
 
   get hasSelection => selectedEntryHeadword.isNotEmpty;
 
+  get searchString => textValue.text;
+
   get uri => Uri(
       path: route,
       queryParameters: {
@@ -26,7 +28,7 @@ class DictionaryPageModel {
   final bool animateTransition;
 
   // Search bar state.
-  final String searchString;
+  final TextEditingValue textValue;
   bool searchBarHasFocus;
 
   // EntryList state.
@@ -41,7 +43,7 @@ class DictionaryPageModel {
   factory DictionaryPageModel.empty() => DictionaryPageModel._(
       selectedEntry: null,
       selectedEntryHeadword: '',
-      searchString: '',
+      textValue: TextEditingValue.empty,
       searchBarHasFocus: false,
       entries: [],
       entryStream: Stream.empty(),
@@ -56,7 +58,7 @@ class DictionaryPageModel {
         selectedEntry:
             encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
         selectedEntryHeadword: encodedHeadword ?? '',
-        searchString: searchString ?? '',
+        textValue: TextEditingValue(text: searchString ?? ''),
         searchBarHasFocus: false,
         entryStream: MyApp.db.getEntries(searchString: searchString),
         entries: [],
@@ -94,7 +96,7 @@ class DictionaryPageModel {
     return DictionaryPageModel._(
         selectedEntry: newEntry,
         selectedEntryHeadword: newEncodedHeadword,
-        searchString: newSearchString,
+        textValue: textValue.copyWith(text: newSearchString),
         searchBarHasFocus: maintainFocus && searchBarHasFocus,
         entryStream: MyApp.db.getEntries(
             searchString: newSearchString, startAfter: newStartAfter),
@@ -109,7 +111,7 @@ class DictionaryPageModel {
   DictionaryPageModel._(
       {@required this.selectedEntry,
       @required this.selectedEntryHeadword,
-      @required this.searchString,
+      @required this.textValue,
       @required this.searchBarHasFocus,
       @required this.entryStream,
       @required this.entries,

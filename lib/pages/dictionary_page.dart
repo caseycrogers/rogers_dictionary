@@ -9,12 +9,9 @@ class DictionaryPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
       ListEquality().equals(uri.pathSegments, ['dictionary']);
 
-  final Animation<double> transitionAnimation;
+  final Animation<double> animation;
 
-  @override
-  final key = PageStorageKey('dictionary_page');
-
-  DictionaryPage({this.transitionAnimation: kAlwaysCompleteAnimation});
+  DictionaryPage({@required this.animation});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +21,7 @@ class DictionaryPage extends StatelessWidget {
           title: Text('Dictionary'),
         ),
         body: AnimatedBuilder(
-            animation: transitionAnimation,
+            animation: ModalRoute.of(context).animation,
             builder: (context, _) => _buildOrientedPage(context, constraints)),
       ),
     );
@@ -43,19 +40,19 @@ class DictionaryPage extends StatelessWidget {
                         end: dictionaryPageModel.hasSelection
                             ? Offset(0.0, 0.0)
                             : Offset(1.0, 0.0))
-                    .animate(transitionAnimation),
+                    .animate(animation),
                 child: EntryPage.asPage(),
               ),
             ),
             Positioned(
               child: SlideTransition(
                 position: Tween<Offset>(
-                        begin: Offset(0.0, 0.0),
+                        begin: Offset.zero,
                         end: dictionaryPageModel.hasSelection
                             ? Offset(-1.0, 0.0)
-                            : Offset(0.0, 0.0))
-                    .animate(transitionAnimation),
-                child: EntrySearch(),
+                            : Offset.zero)
+                    .animate(animation),
+                child: Container(child: EntrySearch()),
               ),
             ),
           ],
@@ -73,7 +70,7 @@ class DictionaryPage extends StatelessWidget {
               child: SlideTransition(
                 position: Tween<Offset>(
                         begin: Offset(-1.0, 0.0), end: Offset(-0.0, 0.0))
-                    .animate(transitionAnimation),
+                    .animate(animation),
                 child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
@@ -90,20 +87,24 @@ class DictionaryPage extends StatelessWidget {
                     child: EntryPage.asPage()),
               ),
             ),
-            Container(
-              width: constraints.maxWidth / 3.0,
-              height: constraints.maxHeight,
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                boxShadow: [
-                  BoxShadow(
-                      color: Theme.of(context).shadowColor,
-                      spreadRadius: 2.0,
-                      blurRadius: 2.0,
-                      offset: Offset(0.0, 0.0)),
-                ],
+            Positioned(
+              child: SlideTransition(
+                position: AlwaysStoppedAnimation(Offset.zero),
+                child: Container(
+                    width: constraints.maxWidth / 3.0,
+                    height: constraints.maxHeight,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Theme.of(context).shadowColor,
+                            spreadRadius: 2.0,
+                            blurRadius: 2.0,
+                            offset: Offset(0.0, 0.0)),
+                      ],
+                    ),
+                    child: EntrySearch()),
               ),
-              child: EntrySearch(),
             ),
           ],
         );

@@ -47,8 +47,7 @@ class Entry {
   }
 
   static String generateOrderByField(String headword, int entryId) {
-    return entryId.toString().padLeft(4, '0') +
-        '_' + urlEncode(headword);
+    return entryId.toString().padLeft(4, '0') + '_' + urlEncode(headword);
   }
 
   get urlEncodedHeadword => Entry.urlEncode(headword);
@@ -79,6 +78,7 @@ class Translation {
   final bool shouldBeKeyPhrase;
   final String translationFeminineIndicator;
   final String genderAndPlural;
+  final String translationAbbreviation;
   final String examplePhrase;
   final String editorialNote;
 
@@ -89,6 +89,7 @@ class Translation {
     this.shouldBeKeyPhrase,
     this.translationFeminineIndicator,
     this.genderAndPlural,
+    this.translationAbbreviation,
     this.examplePhrase,
     this.editorialNote,
   );
@@ -111,7 +112,7 @@ class EntryBuilder {
   String _runOnParent;
   String _runOnText;
   List<String> _runOns = [];
-  String _abbreviation;
+  String _headwordAbbreviation;
   String _namingStandard;
   String _alternateHeadword;
   String _alternateHeadwordAbbreviation;
@@ -155,8 +156,8 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder abbreviation(String abbreviation) {
-    _abbreviation = abbreviation;
+  EntryBuilder headwordAbbreviation(String headwordAbbreviation) {
+    _headwordAbbreviation = headwordAbbreviation;
     return this;
   }
 
@@ -189,6 +190,7 @@ class EntryBuilder {
       bool shouldBeKeyPhrase,
       String translationFeminineIndicator,
       String genderAndPlural,
+      String translationAbbreviation,
       String examplePhrase,
       String editorialNote) {
     assert(translation != '',
@@ -200,6 +202,7 @@ class EntryBuilder {
         shouldBeKeyPhrase,
         translationFeminineIndicator,
         genderAndPlural,
+        translationAbbreviation,
         examplePhrase,
         editorialNote));
     return this;
@@ -219,7 +222,7 @@ class EntryBuilder {
       _runOnParent,
       _runOnText,
       _runOns,
-      _abbreviation,
+      _headwordAbbreviation,
       _namingStandard,
       _alternateHeadword,
       _alternateHeadwordAbbreviation,
