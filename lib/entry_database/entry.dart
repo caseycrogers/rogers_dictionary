@@ -12,7 +12,6 @@ class Entry {
   final String headword;
   final int entryId;
   final String runOnParent;
-  final String runOnText;
   final List<String> runOns;
   final String abbreviation;
   final String namingStandard;
@@ -27,7 +26,6 @@ class Entry {
     this.headword,
     this.entryId,
     this.runOnParent,
-    this.runOnText,
     this.runOns,
     this.abbreviation,
     this.namingStandard,
@@ -220,7 +218,6 @@ class EntryBuilder {
       _headword,
       _entryId,
       _runOnParent,
-      _runOnText,
       _runOns,
       _headwordAbbreviation,
       _namingStandard,

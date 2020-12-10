@@ -17,6 +17,7 @@ class DictionaryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text('Dictionary'),
         ),
@@ -63,7 +64,7 @@ class DictionaryPage extends StatelessWidget {
             Container(
                 width: constraints.maxWidth,
                 height: constraints.maxHeight,
-                color: Theme.of(context).scaffoldBackgroundColor),
+                color: Colors.transparent),
             Positioned(
               left: constraints.maxWidth / 3.0,
               width: 2.0 * constraints.maxWidth / 3.0,
