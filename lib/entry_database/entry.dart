@@ -14,10 +14,10 @@ class Entry {
   final String runOnParent;
   final List<String> runOns;
   final String abbreviation;
-  final String namingStandard;
+  final String namingStandard; // TODO: Display in entry page
   final String alternateHeadword;
   final String alternateHeadwordAbbreviation;
-  final String alternateHeadwordNamingStandard;
+  final String alternateHeadwordNamingStandard; // TODO: Display in entry page
 
   final List<Translation> translations;
 
@@ -74,10 +74,10 @@ class Translation {
   final String partOfSpeech;
   final String translation;
   final bool shouldBeKeyPhrase;
-  final String translationFeminineIndicator;
+  final String translationFeminineIndicator; // TODO: Display in entry page
   final String genderAndPlural;
-  final String translationAbbreviation;
-  final String examplePhrase;
+  final String translationAbbreviation; // TODO: Display in entry page
+  final String examplePhrase; // TODO: Display in entry page
   final String editorialNote;
 
   Translation(

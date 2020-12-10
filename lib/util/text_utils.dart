@@ -2,33 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
+TextStyle _headline1(BuildContext context) =>
+    Theme.of(context).textTheme.headline1.copyWith(fontWeight: FontWeight.bold);
+
+TextStyle _bold1(BuildContext context) =>
+    Theme.of(context).textTheme.bodyText1.copyWith(fontWeight: FontWeight.bold);
+
+TextStyle _italic1(BuildContext context) =>
+    Theme.of(context).textTheme.bodyText1.copyWith(fontStyle: FontStyle.italic);
+
 Text headwordText(BuildContext context, String text, bool preview) {
   if (preview)
     return Text(
       text,
-      style: Theme.of(context)
-          .textTheme
-          .bodyText1
-          .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
+      style: _bold1(context),
     );
   return Text(
     text,
-    style: Theme.of(context)
-        .textTheme
-        .headline1
-        .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
+    style: _headline1(context),
   );
 }
 
-Widget headwordAbbreviationText(BuildContext context, String text) {
-  return Text(
-    text,
-    style: Theme.of(context)
-        .textTheme
-        .bodyText1
-        .merge(TextStyle(fontWeight: FontWeight.bold, inherit: true)),
-    overflow: TextOverflow.ellipsis,
-  );
+Widget headwordAbbreviationLine(BuildContext context, String text) {
+  if (text.isEmpty) return Container();
+  return RichText(
+      text: TextSpan(
+    style: _bold1(context),
+    children: [
+      TextSpan(
+        text: 'abbr ',
+        style: _italic1(context),
+      ),
+      TextSpan(
+        text: text,
+      ),
+    ],
+  ));
+}
+
+Widget alternateHeadwordLine(
+    BuildContext context, String altHeadword, String altAbbreviation) {
+  if (altHeadword.isEmpty) return Container();
+  return RichText(
+      text: TextSpan(
+    style: Theme.of(context).textTheme.bodyText1,
+    children: [
+      TextSpan(text: 'alt. ', style: _italic1(context)),
+      TextSpan(text: altHeadword, style: _bold1(context)),
+      if (altAbbreviation.isNotEmpty)
+        TextSpan(
+          text: ' abbr ',
+          style: _italic1(context),
+        ),
+      if (altAbbreviation.isNotEmpty)
+        TextSpan(
+          text: altAbbreviation,
+          style: _bold1(context),
+        ),
+    ],
+  ));
 }
 
 Widget partOfSpeechText(BuildContext context, String text, bool preview) {

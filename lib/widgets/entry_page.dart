@@ -197,23 +197,13 @@ class EntryPage extends StatelessWidget {
   }
 
   Widget _headwordLine(BuildContext context, Entry entry) {
-    if (entry.abbreviation == '')
-      return headwordText(context, entry.headword, _preview);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         headwordText(context, entry.headword, _preview),
-        if (entry.abbreviation != '')
-          Row(
-            children: [
-              Text(
-                'abbr ',
-                style: Theme.of(context).textTheme.bodyText1.merge(
-                    TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-              ),
-              headwordAbbreviationText(context, _entry.abbreviation),
-            ],
-          ),
+        headwordAbbreviationLine(context, entry.abbreviation),
+        alternateHeadwordLine(context, entry.alternateHeadword,
+            entry.alternateHeadwordAbbreviation),
       ],
     );
   }
