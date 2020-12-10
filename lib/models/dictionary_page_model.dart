@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:rogers_dictionary/models/search_string_model.dart';
+import 'package:universal_html/html.dart' as html;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +19,7 @@ class DictionaryPageModel {
 
   get hasSelection => selectedEntryHeadword.isNotEmpty;
 
-  get searchString => textValue.text;
+  get searchString => searchStringModel.value;
 
   get uri => Uri(
       path: route,
@@ -28,7 +31,7 @@ class DictionaryPageModel {
   final bool animateTransition;
 
   // Search bar state.
-  final TextEditingValue textValue;
+  final SearchStringModel searchStringModel;
   bool searchBarHasFocus;
 
   // EntryList state.
@@ -43,7 +46,7 @@ class DictionaryPageModel {
   factory DictionaryPageModel.empty() => DictionaryPageModel._(
       selectedEntry: null,
       selectedEntryHeadword: '',
-      textValue: TextEditingValue.empty,
+      searchStringModel: SearchStringModel.empty(),
       searchBarHasFocus: false,
       entries: [],
       entryStream: Stream.empty(),
@@ -58,7 +61,7 @@ class DictionaryPageModel {
         selectedEntry:
             encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
         selectedEntryHeadword: encodedHeadword ?? '',
-        textValue: TextEditingValue(text: searchString ?? ''),
+        searchStringModel: SearchStringModel(searchString ?? ''),
         searchBarHasFocus: false,
         entryStream: MyApp.db.getEntries(searchString: searchString),
         entries: [],
@@ -96,7 +99,7 @@ class DictionaryPageModel {
     return DictionaryPageModel._(
         selectedEntry: newEntry,
         selectedEntryHeadword: newEncodedHeadword,
-        textValue: textValue.copyWith(text: newSearchString),
+        searchStringModel: SearchStringModel(newSearchString),
         searchBarHasFocus: maintainFocus && searchBarHasFocus,
         entryStream: MyApp.db.getEntries(
             searchString: newSearchString, startAfter: newStartAfter),
@@ -111,7 +114,7 @@ class DictionaryPageModel {
   DictionaryPageModel._(
       {@required this.selectedEntry,
       @required this.selectedEntryHeadword,
-      @required this.textValue,
+      @required this.searchStringModel,
       @required this.searchBarHasFocus,
       @required this.entryStream,
       @required this.entries,
@@ -121,12 +124,9 @@ class DictionaryPageModel {
 
   static void onSearchStringChanged(
       BuildContext context, String newSearchString) {
-    var oldModel = DictionaryPageModel.of(context);
-    // Only update if the value has actually changed
-    if (newSearchString == oldModel.searchString) return;
-    oldModel
-        ._copyWithSearchString(newSearchString)
-        ._pushReplacementPage(context);
+    var dictionaryPageModel = DictionaryPageModel.of(context);
+    dictionaryPageModel.searchStringModel.value = newSearchString;
+    if (kIsWeb) dictionaryPageModel._pushQueryParams(context);
   }
 
   static void onEntrySelected(BuildContext context, Entry newEntry) {
@@ -140,9 +140,12 @@ class DictionaryPageModel {
       BuildContext context, String newUrlEncodedHeadword) {
     var oldModel = DictionaryPageModel.of(context);
     // Only update if the value has actually changed
-    print(newUrlEncodedHeadword);
     if (newUrlEncodedHeadword == oldModel.selectedEntryHeadword) return;
     oldModel._copyWithEncodedHeadword(newUrlEncodedHeadword)._pushPage(context);
+  }
+
+  void _pushQueryParams(BuildContext context) {
+    html.window.history.replaceState(null, '', uri.toString());
   }
 
   void _pushReplacementPage(BuildContext context) {

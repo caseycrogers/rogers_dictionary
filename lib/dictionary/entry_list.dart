@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_string_model.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
 
@@ -12,27 +14,33 @@ import 'package:rogers_dictionary/widgets/entry_page.dart';
 class EntryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var searchString = DictionaryPageModel.of(context).searchString;
-    if (searchString.isEmpty)
-      return Padding(
-        padding: EdgeInsets.all(30.0),
-        child: Center(
-            child: Text("Enter text above to search for a translation!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
-                ))),
-      );
-    return AsyncListView<Entry>(
-      initialData: DictionaryPageModel.of(context).entries,
-      stream: DictionaryPageModel.of(context).entryStream,
-      loadingWidget: Container(
-        padding: EdgeInsets.all(16.0),
-        child: LoadingText(),
-      ),
-      itemBuilder: _buildRow,
-      controller: DictionaryPageModel.of(context).scrollController,
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    var dictionaryPageModel = DictionaryPageModel.of(context);
+    return ChangeNotifierProvider.value(
+      value: dictionaryPageModel.searchStringModel,
+      builder: (context, _) {
+        var searchString = context.watch<SearchStringModel>().value;
+        if (searchString.isEmpty)
+          return Padding(
+            padding: EdgeInsets.all(30.0),
+            child: Center(
+                child: Text("Enter text above to search for a translation!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ))),
+          );
+        return AsyncListView<Entry>(
+          initialData: dictionaryPageModel.entries,
+          stream: dictionaryPageModel.entryStream,
+          loadingWidget: Container(
+            padding: EdgeInsets.all(16.0),
+            child: LoadingText(),
+          ),
+          itemBuilder: _buildRow,
+          controller: dictionaryPageModel.scrollController,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        );
+      },
     );
   }
 
