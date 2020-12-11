@@ -7,9 +7,6 @@ class EntrySearch extends StatelessWidget {
   static const String route = '/';
 
   @override
-  Key key = ValueKey('EntrySearch');
-
-  @override
   Widget build(BuildContext context) {
     return Column(children: [
       SearchBar(),

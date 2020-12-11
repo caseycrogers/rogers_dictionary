@@ -67,7 +67,6 @@ class FirestoreDatabase extends EntryDatabase {
       }
       for (var entry in _queryToEntries(snapshot)) {
         yield entry;
-        print(i);
         i++;
       }
       lastSeen = snapshot.docs.last.get('order_by_field');

@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         title: 'Dictionary',
         onGenerateRoute: PageRouter.generateRoute,
         // TODO: Initial route breaks '#' navigation, refactor away from initial route?
-        initialRoute: DictionaryPageModel.route,
+        initialRoute: '#/' + DictionaryPageModel.route,
         theme: ThemeData(
           textTheme: TextTheme(
             headline1: TextStyle(

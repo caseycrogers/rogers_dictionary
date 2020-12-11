@@ -22,18 +22,26 @@ class DictionaryPage extends StatelessWidget {
           title: Text('Dictionary'),
         ),
         body: AnimatedBuilder(
+            child: EntrySearch(),
             animation: ModalRoute.of(context).animation,
-            builder: (context, _) => _buildOrientedPage(context, constraints)),
+            builder: (context, entrySearch) =>
+                _buildOrientedPage(context, constraints, entrySearch)),
       ),
     );
   }
 
-  Widget _buildOrientedPage(BuildContext context, BoxConstraints constraints) {
+  Widget _buildOrientedPage(BuildContext context, BoxConstraints constraints,
+      EntrySearch entrySearch) {
     DictionaryPageModel dictionaryPageModel = DictionaryPageModel.of(context);
     switch (MediaQuery.of(context).orientation) {
       case Orientation.portrait:
         return Stack(
           children: [
+            Container(
+              color: Theme.of(context).cardColor,
+              width: constraints.maxWidth,
+              height: constraints.maxHeight,
+            ),
             Positioned(
               child: SlideTransition(
                 position: Tween<Offset>(
@@ -53,7 +61,10 @@ class DictionaryPage extends StatelessWidget {
                             ? Offset(-1.0, 0.0)
                             : Offset.zero)
                     .animate(animation),
-                child: Container(child: EntrySearch()),
+                // Need to keep entry search in the same position in the widget tree
+                // to maintain state across screen rotation
+                child: DecoratedBox(
+                    child: entrySearch, decoration: BoxDecoration()),
               ),
             ),
           ],
@@ -89,11 +100,11 @@ class DictionaryPage extends StatelessWidget {
               ),
             ),
             Positioned(
+              width: constraints.maxWidth / 3.0,
+              height: constraints.maxHeight,
               child: SlideTransition(
                 position: AlwaysStoppedAnimation(Offset.zero),
-                child: Container(
-                    width: constraints.maxWidth / 3.0,
-                    height: constraints.maxHeight,
+                child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       boxShadow: [
@@ -104,7 +115,7 @@ class DictionaryPage extends StatelessWidget {
                             offset: Offset(0.0, 0.0)),
                       ],
                     ),
-                    child: EntrySearch()),
+                    child: entrySearch),
               ),
             ),
           ],
