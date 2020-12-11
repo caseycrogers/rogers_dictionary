@@ -23,21 +23,7 @@ class EntryPage extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  (MediaQuery.of(context).orientation == Orientation.portrait)
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Theme.of(context).accentIconTheme.color,
-                          ),
-                          onPressed: () {
-                            if (MediaQuery.of(context).orientation ==
-                                Orientation.portrait) {
-                              return Navigator.of(context).pop();
-                            }
-                            Navigator.of(context).pop();
-                          },
-                        )
-                      : Container(width: 20.0),
+                  _iconButton(context),
                   Expanded(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
@@ -62,6 +48,23 @@ class EntryPage extends StatelessWidget {
       });
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
+
+  static Widget _iconButton(BuildContext context) =>
+      (MediaQuery.of(context).orientation == Orientation.portrait)
+          ? IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: Theme.of(context).accentIconTheme.color,
+              ),
+              onPressed: () {
+                if (MediaQuery.of(context).orientation ==
+                    Orientation.portrait) {
+                  return Navigator.of(context).pop();
+                }
+                Navigator.of(context).pop();
+              },
+            )
+          : Container(width: 20.0);
 
   @override
   Widget build(BuildContext context) {

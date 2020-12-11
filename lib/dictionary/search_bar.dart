@@ -52,7 +52,6 @@ class _SearchBarState extends State<SearchBar> {
                 : null,
             hintText: 'search...'),
         onChanged: (newSearchString) {
-          print(newSearchString);
           DictionaryPageModel.onSearchStringChanged(context, newSearchString);
         },
       ),

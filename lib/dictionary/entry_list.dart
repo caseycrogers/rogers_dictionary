@@ -14,32 +14,34 @@ import 'package:rogers_dictionary/widgets/entry_page.dart';
 class EntryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: DictionaryPageModel.of(context).entrySearchModel,
-      builder: (context, _) {
-        var entrySearchModel = context.watch<EntrySearchModel>();
-        if (entrySearchModel.isEmpty)
-          return Padding(
-            padding: EdgeInsets.all(30.0),
-            child: Center(
-                child: Text("Enter text above to search for a translation!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ))),
+    return Container(
+      color: Theme.of(context).cardColor,
+      child: ChangeNotifierProvider.value(
+        value: DictionaryPageModel.of(context).entrySearchModel,
+        builder: (context, _) {
+          var entrySearchModel = context.watch<EntrySearchModel>();
+          if (entrySearchModel.isEmpty)
+            return Padding(
+              padding: EdgeInsets.all(30.0),
+              child: Text("Enter text above to search for a translation!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey,
+                  )),
+            );
+          return AsyncListView<Entry>(
+            initialData: entrySearchModel.entries,
+            stream: entrySearchModel.entryStream,
+            loadingWidget: Container(
+              padding: EdgeInsets.all(16.0),
+              child: LoadingText(),
+            ),
+            itemBuilder: _buildRow(entrySearchModel),
+            controller: entrySearchModel.scrollController,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           );
-        return AsyncListView<Entry>(
-          initialData: entrySearchModel.entries,
-          stream: entrySearchModel.entryStream,
-          loadingWidget: Container(
-            padding: EdgeInsets.all(16.0),
-            child: LoadingText(),
-          ),
-          itemBuilder: _buildRow(entrySearchModel),
-          controller: entrySearchModel.scrollController,
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        );
-      },
+        },
+      ),
     );
   }
 
