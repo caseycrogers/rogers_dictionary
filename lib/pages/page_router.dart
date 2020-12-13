@@ -23,14 +23,13 @@ class PageRouter {
 Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
   var newArguments = DictionaryPageModel.fromQueryParams(uri.queryParameters);
   return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 200),
       settings: settings.copyWith(
           name: settings.name, arguments: settings.arguments ?? newArguments),
-      pageBuilder: (context, animation, _) =>
+      pageBuilder: (context, animation, secondaryAnimation) =>
           DictionaryPage(animation: _getAnimation(context, animation)));
 }
 
 Animation<double> _getAnimation(
         BuildContext context, Animation<double> animation) =>
-    (!kIsWeb && DictionaryPageModel.of(context).animateTransition)
-        ? CurvedAnimation(curve: Curves.easeIn, parent: animation)
-        : AlwaysStoppedAnimation(1.0);
+    (!kIsWeb) ? (animation) : AlwaysStoppedAnimation(1.0);

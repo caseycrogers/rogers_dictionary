@@ -38,11 +38,13 @@ class DictionaryPage extends StatelessWidget {
         return Stack(
           children: [
             Container(
-              color: Theme.of(context).cardColor,
+              color: Colors.transparent,
               width: constraints.maxWidth,
               height: constraints.maxHeight,
             ),
             Positioned(
+              width: constraints.maxWidth,
+              height: constraints.maxHeight,
               child: SlideTransition(
                 position: Tween<Offset>(
                         begin: Offset(1.0, 0.0),
@@ -53,20 +55,19 @@ class DictionaryPage extends StatelessWidget {
                 child: EntryPage.asPage(),
               ),
             ),
-            Positioned(
-              child: SlideTransition(
-                position: Tween<Offset>(
-                        begin: Offset.zero,
-                        end: dictionaryPageModel.hasSelection
-                            ? Offset(-1.0, 0.0)
-                            : Offset.zero)
-                    .animate(animation),
-                // Need to keep entry search in the same position in the widget tree
-                // to maintain state across screen rotation
-                child: DecoratedBox(
-                    child: entrySearch, decoration: BoxDecoration()),
+            if (!dictionaryPageModel.hasSelection)
+              Positioned(
+                child: SlideTransition(
+                  position: AlwaysStoppedAnimation(Offset.zero),
+                  // Need to keep entry search in the same position in the widget tree
+                  // to maintain state across screen rotation
+                  child: Container(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                      child: entrySearch,
+                      decoration: BoxDecoration()),
+                ),
               ),
-            ),
           ],
         );
       case Orientation.landscape:
@@ -104,7 +105,7 @@ class DictionaryPage extends StatelessWidget {
               height: constraints.maxHeight,
               child: SlideTransition(
                 position: AlwaysStoppedAnimation(Offset.zero),
-                child: DecoratedBox(
+                child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       boxShadow: [

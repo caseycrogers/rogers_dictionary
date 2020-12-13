@@ -13,8 +13,6 @@ class DictionaryPageModel {
   static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
   static const String SEARCH_STRING_QUERY_PARAM = 'search';
 
-  final bool animateTransition;
-
   // Selected entry state.
   Future<Entry> selectedEntry;
   String selectedEntryHeadword;
@@ -43,8 +41,7 @@ class DictionaryPageModel {
       selectedEntry: null,
       selectedEntryHeadword: '',
       entrySearchModel: EntrySearchModel.empty(),
-      searchBarHasFocus: false,
-      animateTransition: true);
+      searchBarHasFocus: false);
 
   factory DictionaryPageModel.fromQueryParams(Map<String, String> queryParams) {
     var encodedHeadword = queryParams[SELECTED_ENTRY_QUERY_PARAM];
@@ -54,8 +51,7 @@ class DictionaryPageModel {
             encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
         selectedEntryHeadword: encodedHeadword ?? '',
         entrySearchModel: EntrySearchModel(searchString ?? ''),
-        searchBarHasFocus: false,
-        animateTransition: false);
+        searchBarHasFocus: false);
   }
 
   DictionaryPageModel _copyWithEntry(Entry newEntry) {
@@ -75,16 +71,14 @@ class DictionaryPageModel {
         selectedEntry: newEntry,
         selectedEntryHeadword: newEncodedHeadword,
         entrySearchModel: entrySearchModel.copy(),
-        searchBarHasFocus: maintainFocus && searchBarHasFocus,
-        animateTransition: animateTransition);
+        searchBarHasFocus: maintainFocus && searchBarHasFocus);
   }
 
   DictionaryPageModel._(
       {@required this.selectedEntry,
       @required this.selectedEntryHeadword,
       @required this.entrySearchModel,
-      @required this.searchBarHasFocus,
-      @required this.animateTransition});
+      @required this.searchBarHasFocus});
 
   static void onSearchStringChanged(
       BuildContext context, String newSearchString) {

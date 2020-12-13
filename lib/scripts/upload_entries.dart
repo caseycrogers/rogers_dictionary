@@ -11,20 +11,20 @@ const HEADWORD = 'headword';
 const RUN_ON_PARENT = 'run_on_parent';
 const RUN_ON_TEXT = 'run_on_text';
 const HEADWORD_ABBREVIATION = 'headword_abbreviation';
-const NAMING_STANDARD = 'naming_standard';
 const ALTERNATE_HEADWORD = 'alternate_headword';
-const ALTERNATE_HEADWORD_ABBREVIATION = 'alternate_headword_abbreviation';
 const ALTERNATE_HEADWORD_NAMING_STANDARD = 'alternate_headword_naming_standard';
-const REDIRECT_HEADWORD = 'redirect_headword';
-const IRREGULAR_INFLECTION = 'irregular_inflection';
+const IRREGULAR_INFLECTIONS = 'irregular_inflections';
 const PART_OF_SPEECH = 'part_of_speech';
 const HEADWORD_RESTRICTIVE_LABEL = 'headword_restrictive_label';
-const MEANING_ID = 'meaning_id';
+
+const HEADWORD_PARENTHETICAL_QUALIFIER = 'headword_parenthetical_qualifier';
 const TRANSLATION = 'translation';
 const SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
-const TRANSLATION_FEMININE_INDICATOR = 'translation_feminine_indicator';
 const GENDER_AND_PLURAL = 'gender_and_plural';
+const TRANSLATION_NAMING_STANDARD = 'translation_naming_standard';
 const TRANSLATION_ABBREVIATION = 'translation_abbreviation';
+const TRANSLATION_PARENTHETICAL_QUALIFIER =
+    'translation_parenthetical_qualifier';
 const EXAMPLE_PHRASE = 'example_phrase';
 const EDITORIAL_NOTE = 'editorial_note';
 
@@ -38,7 +38,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   var rows = df.rows.map((row) => row.map(_parseCell));
   EntryBuilder builder;
   String partOfSpeech;
-  String meaningId;
+  String headwordParentheticalQualifier;
   var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
@@ -72,29 +72,33 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
           .entryId(i)
           .headword(row[HEADWORD])
           .runOnParent(row[RUN_ON_PARENT])
-          .runOnText(row[RUN_ON_TEXT])
           .headwordAbbreviation(row[HEADWORD_ABBREVIATION])
-          .namingStandard(row[NAMING_STANDARD])
           .alternateHeadword(row[ALTERNATE_HEADWORD])
-          .alternateHeadwordAbbreviation(row[ALTERNATE_HEADWORD_ABBREVIATION])
           .alternateHeadwordNamingStandard(
               row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
       entryBuilders[row[HEADWORD]] = builder;
       partOfSpeech = '';
-      meaningId = '';
+      headwordParentheticalQualifier = '';
     }
-    if (row[PART_OF_SPEECH] != '') partOfSpeech = row[PART_OF_SPEECH];
-    if (row[MEANING_ID] != '') meaningId = row[MEANING_ID];
+    if (row[PART_OF_SPEECH].isNotEmpty) {
+      partOfSpeech = row[PART_OF_SPEECH];
+      // Reset the qualifier
+      headwordParentheticalQualifier = '';
+    }
+    if (row[HEADWORD_PARENTHETICAL_QUALIFIER].isNotEmpty)
+      headwordParentheticalQualifier = row[HEADWORD_PARENTHETICAL_QUALIFIER];
     builder.addTranslation(
-        meaningId,
-        partOfSpeech,
-        row[TRANSLATION],
-        row[SHOULD_BE_KEY_PHRASE] != 'F',
-        row[TRANSLATION_FEMININE_INDICATOR],
-        row[GENDER_AND_PLURAL],
-        row[HEADWORD_ABBREVIATION],
-        row[EXAMPLE_PHRASE],
-        row[EDITORIAL_NOTE]);
+        partOfSpeech: partOfSpeech,
+        irregularInflections: row[IRREGULAR_INFLECTIONS],
+        headwordParentheticalQualifier: headwordParentheticalQualifier,
+        translation: row[TRANSLATION],
+        genderAndPlural: row[GENDER_AND_PLURAL],
+        translationNamingStandard: row[TRANSLATION_NAMING_STANDARD],
+        translationAbbreviation: row[TRANSLATION_ABBREVIATION],
+        translationParentheticalQualifier:
+            row[TRANSLATION_PARENTHETICAL_QUALIFIER],
+        examplePhrase: row[EXAMPLE_PHRASE],
+        editorialNote: row[EDITORIAL_NOTE]);
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
@@ -143,7 +147,6 @@ List<String> _constructSearchList(Entry entry) {
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
   if (!(value is String)) value = '';
-  if (key == MEANING_ID && value == '') value = '0';
   return MapEntry(key.trim(), value.trim());
 }
 

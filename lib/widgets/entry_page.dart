@@ -74,8 +74,8 @@ class EntryPage extends StatelessWidget {
         _headwordLine(context, _entry),
         if (!_preview) Divider(),
         _buildTable(context, _constructTranslationMap(_entry)),
-        if (!_preview) _buildRelated(context),
         if (!_preview) _buildEditorialNotes(context),
+        if (!_preview) _buildRelated(context),
       ],
     );
   }
@@ -127,8 +127,8 @@ class EntryPage extends StatelessWidget {
         ]..addAll(notes));
   }
 
-  Widget _buildTable(BuildContext context,
-      Map<String, Map<String, List<Translation>>> translationMap) {
+  Widget _buildTable(
+      BuildContext context, Map<String, List<Translation>> translationMap) {
     return Table(
         columnWidths: {
           0: IntrinsicColumnWidth(),
@@ -137,25 +137,22 @@ class EntryPage extends StatelessWidget {
         children: _buildTranslations(context, translationMap));
   }
 
-  Map<String, Map<String, List<Translation>>> _constructTranslationMap(
-      Entry entry) {
+  Map<String, List<Translation>> _constructTranslationMap(Entry entry) {
     // Schema:
-    // {meaningId: {partOfSpeech: [translation]}}
-    Map<String, Map<String, List<Translation>>> translationMap = {};
-    _entry.translations.forEach((t) => translationMap
-        .getOrElse(t.meaningId, {}).getOrElse(t.partOfSpeech, []).add(t));
+    // {partOfSpeech: [translation]}
+    Map<String, List<Translation>> translationMap = {};
+    _entry.translations
+        .forEach((t) => translationMap.getOrElse(t.partOfSpeech, []).add(t));
     return translationMap;
   }
 
   // Return a list of TableRows corresponding to each part of speech.
-  List<TableRow> _buildTranslations(BuildContext context,
-      Map<String, Map<String, List<Translation>>> meaningMap) {
+  List<TableRow> _buildTranslations(
+      BuildContext context, Map<String, List<Translation>> translationMap) {
     List<TableRow> partOfSpeechTableRows = [];
-    meaningMap.forEach((meaningId, partOfSpeechMap) {
-      partOfSpeechMap.forEach((partOfSpeech, translations) {
-        partOfSpeechTableRows.add(
-            _buildPartOfSpeechTableRow(context, partOfSpeech, translations));
-      });
+    translationMap.forEach((partOfSpeech, translations) {
+      partOfSpeechTableRows
+          .add(_buildPartOfSpeechTableRow(context, partOfSpeech, translations));
     });
     return partOfSpeechTableRows;
   }
@@ -204,9 +201,8 @@ class EntryPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         headwordText(context, entry.headword, _preview),
-        headwordAbbreviationLine(context, entry.abbreviation),
-        alternateHeadwordLine(context, entry.alternateHeadword,
-            entry.alternateHeadwordAbbreviation),
+        headwordAbbreviationLine(context, entry.headwordAbbreviation),
+        alternateHeadwordLine(context, entry.alternateHeadword),
       ],
     );
   }
