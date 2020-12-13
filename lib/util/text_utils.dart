@@ -40,8 +40,7 @@ Widget headwordAbbreviationLine(BuildContext context, String text) {
   ));
 }
 
-Widget alternateHeadwordLine(
-    BuildContext context, String altHeadword, String altAbbreviation) {
+Widget alternateHeadwordLine(BuildContext context, String altHeadword) {
   if (altHeadword.isEmpty) return Container();
   return RichText(
       text: TextSpan(
@@ -49,16 +48,6 @@ Widget alternateHeadwordLine(
     children: [
       TextSpan(text: 'alt. ', style: _italic1(context)),
       TextSpan(text: altHeadword, style: _bold1(context)),
-      if (altAbbreviation.isNotEmpty)
-        TextSpan(
-          text: ' abbr ',
-          style: _italic1(context),
-        ),
-      if (altAbbreviation.isNotEmpty)
-        TextSpan(
-          text: altAbbreviation,
-          style: _bold1(context),
-        ),
     ],
   ));
 }

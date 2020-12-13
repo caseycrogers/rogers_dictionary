@@ -9,31 +9,27 @@ class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
   final String orderByField;
-  final String headword;
   final int entryId;
+  final String headword;
   final String runOnParent;
   final List<String> runOns;
-  final String abbreviation;
-  final String namingStandard; // TODO: Display in entry page
+  final String headwordAbbreviation;
   final String alternateHeadword;
-  final String alternateHeadwordAbbreviation;
-  final String alternateHeadwordNamingStandard; // TODO: Display in entry page
+  final String alternateHeadwordNamingStandard; // TODO: Display in entry page.
 
   final List<Translation> translations;
 
-  Entry(
-    this.orderByField,
-    this.headword,
-    this.entryId,
-    this.runOnParent,
-    this.runOns,
-    this.abbreviation,
-    this.namingStandard,
-    this.alternateHeadword,
-    this.alternateHeadwordAbbreviation,
-    this.alternateHeadwordNamingStandard,
-    this.translations,
-  );
+  Entry({
+    @required this.orderByField,
+    @required this.entryId,
+    @required this.headword,
+    @required this.runOnParent,
+    @required this.runOns,
+    @required this.headwordAbbreviation,
+    @required this.alternateHeadword,
+    @required this.alternateHeadwordNamingStandard,
+    @required this.translations,
+  });
 
   static String urlDecode(String urlEncodedHeadword) {
     return Uri.decodeComponent(
@@ -70,27 +66,30 @@ class Entry {
 @immutable
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Translation {
-  final String meaningId;
   final String partOfSpeech;
+  final String irregularInflections;
+  final String headwordParentheticalQualifier; // TODO: Display in entry page.
   final String translation;
-  final bool shouldBeKeyPhrase;
-  final String translationFeminineIndicator; // TODO: Display in entry page
   final String genderAndPlural;
-  final String translationAbbreviation; // TODO: Display in entry page
-  final String examplePhrase; // TODO: Display in entry page
+  final String translationNamingStandard; // TODO: Display in entry page.
+  final String translationAbbreviation; // TODO: Display in entry page.
+  final String
+      translationParentheticalQualifier; // TODO: Display in entry page.
+  final String examplePhrase; // TODO: Display in entry page.
   final String editorialNote;
 
-  Translation(
-    this.meaningId,
-    this.partOfSpeech,
-    this.translation,
-    this.shouldBeKeyPhrase,
-    this.translationFeminineIndicator,
-    this.genderAndPlural,
-    this.translationAbbreviation,
-    this.examplePhrase,
-    this.editorialNote,
-  );
+  Translation({
+    @required this.partOfSpeech,
+    @required this.irregularInflections,
+    @required this.headwordParentheticalQualifier,
+    @required this.translation,
+    @required this.genderAndPlural,
+    @required this.translationNamingStandard,
+    @required this.translationAbbreviation,
+    @required this.translationParentheticalQualifier,
+    @required this.examplePhrase,
+    @required this.editorialNote,
+  });
 
   factory Translation.fromJson(Map<String, dynamic> json) =>
       _$TranslationFromJson(json);
@@ -104,26 +103,23 @@ class Translation {
 }
 
 class EntryBuilder {
-  String _urlEncodedHeadword;
+  String _orderByField;
   String _headword;
   int _entryId;
   String _runOnParent;
-  String _runOnText;
   List<String> _runOns = [];
   String _headwordAbbreviation;
-  String _namingStandard;
   String _alternateHeadword;
-  String _alternateHeadwordAbbreviation;
   String _alternateHeadwordNamingStandard;
 
   List<Translation> _translations = [];
 
   String getUrlEncodedHeadword() {
-    return _urlEncodedHeadword;
+    return _orderByField;
   }
 
-  EntryBuilder orderByField(String urlEncodedHeadword) {
-    _urlEncodedHeadword = urlEncodedHeadword;
+  EntryBuilder orderByField(String orderByField) {
+    _orderByField = orderByField;
     return this;
   }
 
@@ -142,11 +138,6 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder runOnText(String runOnText) {
-    _runOnText = runOnText;
-    return this;
-  }
-
   EntryBuilder addRunOn(String runOn) {
     assert(runOn != '',
         "You must specify a non-empty run on. Headword: $_headword");
@@ -159,19 +150,8 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder namingStandard(String namingStandard) {
-    _namingStandard = namingStandard;
-    return this;
-  }
-
   EntryBuilder alternateHeadword(String alternateHeadword) {
     _alternateHeadword = alternateHeadword;
-    return this;
-  }
-
-  EntryBuilder alternateHeadwordAbbreviation(
-      String alternateHeadwordAbbreviation) {
-    _alternateHeadwordAbbreviation = alternateHeadwordAbbreviation;
     return this;
   }
 
@@ -181,50 +161,51 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder addTranslation(
-      String meaningId,
-      String partOfSpeech,
-      String translation,
-      bool shouldBeKeyPhrase,
-      String translationFeminineIndicator,
-      String genderAndPlural,
-      String translationAbbreviation,
-      String examplePhrase,
-      String editorialNote) {
+  EntryBuilder addTranslation({
+    @required String partOfSpeech,
+    @required String irregularInflections,
+    @required String headwordParentheticalQualifier,
+    @required String translation,
+    @required String genderAndPlural,
+    @required String translationNamingStandard,
+    @required String translationAbbreviation,
+    @required String translationParentheticalQualifier,
+    @required String examplePhrase,
+    @required String editorialNote,
+  }) {
     assert(translation != '',
         "You must specify a non-empty translation. Headword: $_headword");
     _translations.add(Translation(
-        meaningId,
-        partOfSpeech,
-        translation,
-        shouldBeKeyPhrase,
-        translationFeminineIndicator,
-        genderAndPlural,
-        translationAbbreviation,
-        examplePhrase,
-        editorialNote));
+        partOfSpeech: partOfSpeech,
+        irregularInflections: irregularInflections,
+        headwordParentheticalQualifier: headwordParentheticalQualifier,
+        translation: translation,
+        genderAndPlural: genderAndPlural,
+        translationNamingStandard: translationNamingStandard,
+        translationAbbreviation: translationAbbreviation,
+        translationParentheticalQualifier: translationParentheticalQualifier,
+        examplePhrase: examplePhrase,
+        editorialNote: editorialNote));
     return this;
   }
 
   Entry build() {
-    assert(_urlEncodedHeadword != null,
+    assert(_orderByField != null,
         "You must specify a non null url encoded headword.");
     assert(_headword != null, "You must specify a non null headword.");
     assert(_entryId != null, "You must specify a non null entry id.");
     assert(_translations.length != 0,
         "You must specify one or more translations.");
     return Entry(
-      _urlEncodedHeadword,
-      _headword,
-      _entryId,
-      _runOnParent,
-      _runOns,
-      _headwordAbbreviation,
-      _namingStandard,
-      _alternateHeadword,
-      _alternateHeadwordAbbreviation,
-      _alternateHeadwordNamingStandard,
-      _translations,
+      orderByField: _orderByField,
+      entryId: _entryId,
+      headword: _headword,
+      runOnParent: _runOnParent,
+      runOns: _runOns,
+      headwordAbbreviation: _headwordAbbreviation,
+      alternateHeadword: _alternateHeadword,
+      alternateHeadwordNamingStandard: _alternateHeadwordNamingStandard,
+      translations: _translations,
     );
   }
 }

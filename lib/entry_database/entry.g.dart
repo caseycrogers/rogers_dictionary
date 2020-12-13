@@ -8,17 +8,16 @@ part of 'entry.dart';
 
 Entry _$EntryFromJson(Map<String, dynamic> json) {
   return Entry(
-    json['order_by_field'] as String,
-    json['headword'] as String,
-    json['entry_id'] as int,
-    json['run_on_parent'] as String,
-    (json['run_ons'] as List)?.map((e) => e as String)?.toList(),
-    json['abbreviation'] as String,
-    json['naming_standard'] as String,
-    json['alternate_headword'] as String,
-    json['alternate_headword_abbreviation'] as String,
-    json['alternate_headword_naming_standard'] as String,
-    (json['translations'] as List)
+    orderByField: json['order_by_field'] as String,
+    entryId: json['entry_id'] as int,
+    headword: json['headword'] as String,
+    runOnParent: json['run_on_parent'] as String,
+    runOns: (json['run_ons'] as List)?.map((e) => e as String)?.toList(),
+    headwordAbbreviation: json['headword_abbreviation'] as String,
+    alternateHeadword: json['alternate_headword'] as String,
+    alternateHeadwordNamingStandard:
+        json['alternate_headword_naming_standard'] as String,
+    translations: (json['translations'] as List)
         ?.map((e) =>
             e == null ? null : Translation.fromJson(e as Map<String, dynamic>))
         ?.toList(),
@@ -27,14 +26,12 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
       'order_by_field': instance.orderByField,
-      'headword': instance.headword,
       'entry_id': instance.entryId,
+      'headword': instance.headword,
       'run_on_parent': instance.runOnParent,
       'run_ons': instance.runOns,
-      'abbreviation': instance.abbreviation,
-      'naming_standard': instance.namingStandard,
+      'headword_abbreviation': instance.headwordAbbreviation,
       'alternate_headword': instance.alternateHeadword,
-      'alternate_headword_abbreviation': instance.alternateHeadwordAbbreviation,
       'alternate_headword_naming_standard':
           instance.alternateHeadwordNamingStandard,
       'translations': instance.translations?.map((e) => e?.toJson())?.toList(),
@@ -42,27 +39,33 @@ Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
 
 Translation _$TranslationFromJson(Map<String, dynamic> json) {
   return Translation(
-    json['meaning_id'] as String,
-    json['part_of_speech'] as String,
-    json['translation'] as String,
-    json['should_be_key_phrase'] as bool,
-    json['translation_feminine_indicator'] as String,
-    json['gender_and_plural'] as String,
-    json['translation_abbreviation'] as String,
-    json['example_phrase'] as String,
-    json['editorial_note'] as String,
+    partOfSpeech: json['part_of_speech'] as String,
+    irregularInflections: json['irregular_inflections'] as String,
+    headwordParentheticalQualifier:
+        json['headword_parenthetical_qualifier'] as String,
+    translation: json['translation'] as String,
+    genderAndPlural: json['gender_and_plural'] as String,
+    translationNamingStandard: json['translation_naming_standard'] as String,
+    translationAbbreviation: json['translation_abbreviation'] as String,
+    translationParentheticalQualifier:
+        json['translation_parenthetical_qualifier'] as String,
+    examplePhrase: json['example_phrase'] as String,
+    editorialNote: json['editorial_note'] as String,
   );
 }
 
 Map<String, dynamic> _$TranslationToJson(Translation instance) =>
     <String, dynamic>{
-      'meaning_id': instance.meaningId,
       'part_of_speech': instance.partOfSpeech,
+      'irregular_inflections': instance.irregularInflections,
+      'headword_parenthetical_qualifier':
+          instance.headwordParentheticalQualifier,
       'translation': instance.translation,
-      'should_be_key_phrase': instance.shouldBeKeyPhrase,
-      'translation_feminine_indicator': instance.translationFeminineIndicator,
       'gender_and_plural': instance.genderAndPlural,
+      'translation_naming_standard': instance.translationNamingStandard,
       'translation_abbreviation': instance.translationAbbreviation,
+      'translation_parenthetical_qualifier':
+          instance.translationParentheticalQualifier,
       'example_phrase': instance.examplePhrase,
       'editorial_note': instance.editorialNote,
     };
