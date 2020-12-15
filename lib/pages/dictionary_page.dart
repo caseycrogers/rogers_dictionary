@@ -101,11 +101,11 @@ class DictionaryPage extends StatelessWidget {
               ),
             ),
             Positioned(
-              width: constraints.maxWidth / 3.0,
-              height: constraints.maxHeight,
               child: SlideTransition(
                 position: AlwaysStoppedAnimation(Offset.zero),
                 child: Container(
+                    width: constraints.maxWidth / 3.0,
+                    height: constraints.maxHeight,
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       boxShadow: [

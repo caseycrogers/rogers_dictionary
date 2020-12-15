@@ -11,15 +11,11 @@ TextStyle _bold1(BuildContext context) =>
 TextStyle _italic1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1.copyWith(fontStyle: FontStyle.italic);
 
-Text headwordText(BuildContext context, String text, bool preview) {
-  if (preview)
-    return Text(
-      text,
-      style: _bold1(context),
-    );
-  return Text(
+Widget headwordText(BuildContext context, String text, bool preview) {
+  return OverflowMarkdown(
     text,
-    style: _headline1(context),
+    TextOverflow.visible,
+    defaultStyle: preview ? _bold1(context) : _headline1(context),
   );
 }
 
@@ -40,7 +36,8 @@ Widget headwordAbbreviationLine(BuildContext context, String text) {
   ));
 }
 
-Widget alternateHeadwordLine(BuildContext context, String altHeadword) {
+Widget alternateHeadwordLine(
+    BuildContext context, String altHeadword, String namingStandard) {
   if (altHeadword.isEmpty) return Container();
   return RichText(
       text: TextSpan(
@@ -75,14 +72,16 @@ Widget translationText(BuildContext context, String text, bool preview) {
       defaultStyle: Theme.of(context).textTheme.bodyText2);
 }
 
+Widget parentheticalText(BuildContext context, String text) {
+  if (text.isEmpty) return Container();
+  return Chip(
+      backgroundColor: Colors.tealAccent.withOpacity(.4),
+      padding: EdgeInsets.only(bottom: 1.0, top: -1.0, left: 0.0, right: 0.0),
+      label: Text(text, style: _italic1(context)));
+}
+
 Widget genderAndPluralText(BuildContext context, String text) {
-  return Text(
-    text,
-    style: Theme.of(context)
-        .textTheme
-        .bodyText2
-        .merge(TextStyle(fontStyle: FontStyle.italic, inherit: true)),
-  );
+  return Text(text, style: _italic1(context));
 }
 
 Widget editorialText(BuildContext context, String text) {
@@ -106,14 +105,16 @@ class OverflowMarkdown extends StatelessWidget {
     var isItalic = false;
     var buff = StringBuffer();
     var i = 0;
+
+    TextStyle getTextStyle() => defaultStyle.copyWith(
+          fontWeight: isBold ? FontWeight.bold : null,
+          fontStyle: isItalic ? FontStyle.italic : null,
+        );
+
     addSpan() {
       spans.add(TextSpan(
         text: buff.toString(),
-        style: TextStyle(
-          fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-          fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
-          inherit: true,
-        ),
+        style: getTextStyle(),
       ));
       buff.clear();
     }

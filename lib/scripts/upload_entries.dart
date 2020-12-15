@@ -76,6 +76,8 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
           .alternateHeadword(row[ALTERNATE_HEADWORD])
           .alternateHeadwordNamingStandard(
               row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
+      if (entryBuilders.keys.contains(row[HEADWORD]))
+        print('Duplicate headword ${row[HEADWORD]} at line $i');
       entryBuilders[row[HEADWORD]] = builder;
       partOfSpeech = '';
       headwordParentheticalQualifier = '';
