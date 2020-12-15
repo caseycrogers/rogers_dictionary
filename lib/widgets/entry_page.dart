@@ -87,8 +87,7 @@ class EntryPage extends StatelessWidget {
         .map(
           (headword) => TextSpan(
               text: headword,
-              style: TextStyle(
-                  color: Colors.blue, decoration: TextDecoration.underline),
+              style: TextStyle(color: Colors.blue),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   DictionaryPageModel.onHeadwordSelected(
@@ -104,7 +103,11 @@ class EntryPage extends StatelessWidget {
         .toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(height: 48.0),
-      Text("Related"),
+      Text("Related",
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1
+              .copyWith(fontWeight: FontWeight.bold)),
       Divider(),
       RichText(
           text: TextSpan(
@@ -122,7 +125,11 @@ class EntryPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(height: 48.0),
-          Text("Editorial Notes"),
+          Text("Editorial Notes",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(fontWeight: FontWeight.bold)),
           Divider(),
         ]..addAll(notes));
   }
@@ -168,29 +175,41 @@ class EntryPage extends StatelessWidget {
               translations.map((t) => t.translation).join(', '), _preview),
         ),
       ]);
+    String parenthetical = '';
     return TableRow(
       children: [
         partOfSpeechText(context, partOfSpeech, _preview),
-        Padding(
-          padding: const EdgeInsets.only(top: 7.0),
-          child: Column(
-            children: translations
-                .map((t) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: translationText(
-                                context, t.translation, _preview),
-                          ),
-                          if ((t.genderAndPlural ?? '') != '')
-                            genderAndPluralText(
-                                context, ' ' + t.genderAndPlural),
-                        ],
-                      ),
-                    ))
-                .toList(),
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: translations.expand((t) {
+            var parentheticalChanged =
+                t.headwordParentheticalQualifier != parenthetical;
+            parenthetical = t.headwordParentheticalQualifier;
+            return [
+              if (parentheticalChanged)
+                parentheticalText(context, parenthetical),
+              SizedBox(height: 7.0),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: translations.any((a) =>
+                                  a.headwordParentheticalQualifier.isNotEmpty)
+                              ? 20.0
+                              : 0.0),
+                      child: translationText(context, t.translation, _preview),
+                    ),
+                  ),
+                  if ((t.genderAndPlural ?? '') != '')
+                    genderAndPluralText(context, ' ' + t.genderAndPlural),
+                ],
+              ),
+              SizedBox(height: 12.0),
+            ];
+          }).toList(),
         ),
       ],
     );
@@ -202,7 +221,8 @@ class EntryPage extends StatelessWidget {
       children: [
         headwordText(context, entry.headword, _preview),
         headwordAbbreviationLine(context, entry.headwordAbbreviation),
-        alternateHeadwordLine(context, entry.alternateHeadword),
+        alternateHeadwordLine(context, entry.alternateHeadword,
+            entry.alternateHeadwordNamingStandard),
       ],
     );
   }
