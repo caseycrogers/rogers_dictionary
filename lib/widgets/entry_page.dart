@@ -171,11 +171,13 @@ class EntryPage extends StatelessWidget {
         partOfSpeechText(context, partOfSpeech, _preview),
         Padding(
           padding: const EdgeInsets.only(top: 7.0),
-          child: translationText(context,
-              translations.map((t) => t.translation).join(', '), _preview),
+          child: previewTranslationLine(
+              context, translations.map((t) => t.translation).join(', ')),
         ),
       ]);
     String parenthetical = '';
+    final hasParenthetical =
+        translations.any((t) => t.headwordParentheticalQualifier.isNotEmpty);
     return TableRow(
       children: [
         partOfSpeechText(context, partOfSpeech, _preview),
@@ -189,25 +191,7 @@ class EntryPage extends StatelessWidget {
             return [
               if (parentheticalChanged)
                 parentheticalText(context, parenthetical),
-              SizedBox(height: 7.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          left: translations.any((a) =>
-                                  a.headwordParentheticalQualifier.isNotEmpty)
-                              ? 20.0
-                              : 0.0),
-                      child: translationText(context, t.translation, _preview),
-                    ),
-                  ),
-                  if ((t.genderAndPlural ?? '') != '')
-                    genderAndPluralText(context, ' ' + t.genderAndPlural),
-                ],
-              ),
-              SizedBox(height: 12.0),
+              _translationContent(context, t, hasParenthetical),
             ];
           }).toList(),
         ),
@@ -215,12 +199,37 @@ class EntryPage extends StatelessWidget {
     );
   }
 
+  Widget _translationContent(
+      BuildContext context, Translation translation, bool indent) {
+    return Indent(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 7.0),
+          translationLine(context, translation),
+          Indent(
+            child:
+                abbreviationLine(context, translation.translationAbbreviation),
+          ),
+          _exampleText(context, translation.examplePhrase),
+          SizedBox(height: 12.0),
+        ],
+      ),
+      size: indent ? null : 0.0,
+    );
+  }
+
+  Widget _exampleText(BuildContext context, String exampleText) {
+    if (exampleText.isEmpty) return Container();
+    return OverflowMarkdown('*Ex:* $exampleText', TextOverflow.visible);
+  }
+
   Widget _headwordLine(BuildContext context, Entry entry) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         headwordText(context, entry.headword, _preview),
-        headwordAbbreviationLine(context, entry.headwordAbbreviation),
+        abbreviationLine(context, entry.headwordAbbreviation),
         alternateHeadwordLine(context, entry.alternateHeadword,
             entry.alternateHeadwordNamingStandard),
       ],
