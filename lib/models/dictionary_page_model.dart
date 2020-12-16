@@ -66,7 +66,7 @@ class DictionaryPageModel {
 
   DictionaryPageModel _copyWith(
       FutureOr<Entry> newEntry, String newEncodedHeadword,
-      {bool animateTransition: true, bool maintainFocus: true}) {
+      {bool maintainFocus: true}) {
     return DictionaryPageModel._(
         selectedEntry: newEntry,
         selectedEntryHeadword: newEncodedHeadword,

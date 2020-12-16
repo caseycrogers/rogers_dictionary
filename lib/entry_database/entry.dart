@@ -15,7 +15,7 @@ class Entry {
   final List<String> runOns;
   final String headwordAbbreviation;
   final String alternateHeadword;
-  final String alternateHeadwordNamingStandard; // TODO: Display in entry page.
+  final String alternateHeadwordNamingStandard;
 
   final List<Translation> translations;
 
@@ -68,14 +68,13 @@ class Entry {
 class Translation {
   final String partOfSpeech;
   final String irregularInflections;
-  final String headwordParentheticalQualifier; // TODO: Display in entry page.
+  final String headwordParentheticalQualifier;
   final String translation;
   final String genderAndPlural;
-  final String translationNamingStandard; // TODO: Display in entry page.
-  final String translationAbbreviation; // TODO: Display in entry page.
-  final String
-      translationParentheticalQualifier; // TODO: Display in entry page.
-  final String examplePhrase; // TODO: Display in entry page.
+  final String translationNamingStandard;
+  final String translationAbbreviation;
+  final String translationParentheticalQualifier;
+  final String examplePhrase;
   final String editorialNote;
 
   Translation({
