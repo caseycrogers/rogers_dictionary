@@ -12,67 +12,82 @@ class EntryPage extends StatelessWidget {
 
   EntryPage._instance(this._entry, this._preview);
 
-  static Widget asPage() => Builder(builder: (context) {
-        if (!DictionaryPageModel.of(context).hasSelection)
-          return Container(color: Theme.of(context).scaffoldBackgroundColor);
-        return Container(
-          color: Theme.of(context).cardColor,
-          child: LayoutBuilder(
-            builder: (context, constraints) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _iconButton(context),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: FutureBuilder(
-                          future: DictionaryPageModel.of(context).selectedEntry,
-                          builder: (context, snap) {
-                            if (!snap.hasData)
-                              return Center(child: CircularProgressIndicator());
-                            return EntryPage._instance(snap.data, false);
-                          },
+  static Widget asPage() => Builder(
+        builder: (context) {
+          if (!DictionaryPageModel.of(context).hasSelection)
+            return Container(color: Theme.of(context).scaffoldBackgroundColor);
+          return Container(
+            color: Theme.of(context).cardColor,
+            child: FutureBuilder(
+              future: DictionaryPageModel.of(context).selectedEntry,
+              builder: (context, snap) {
+                if (!snap.hasData)
+                  return Center(child: CircularProgressIndicator());
+                var entry = snap.data;
+                const pad = 24.0;
+                return LayoutBuilder(
+                  builder: (context, constraints) => Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: pad),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _iconButton(context),
+                            Expanded(
+                                child: headwordLine(context, entry, false)),
+                          ],
                         ),
                       ),
-                    ),
+                      Divider(indent: pad, endIndent: pad),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Padding(
+                            padding: const EdgeInsets.all(pad),
+                            child: FutureBuilder(
+                              future:
+                                  DictionaryPageModel.of(context).selectedEntry,
+                              builder: (context, snap) {
+                                if (!snap.hasData)
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                return EntryPage._instance(entry, false);
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          ),
-        );
-      });
+          );
+        },
+      );
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
-  static Widget _iconButton(BuildContext context) =>
-      (MediaQuery.of(context).orientation == Orientation.portrait)
-          ? IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).accentIconTheme.color,
-              ),
-              onPressed: () {
-                if (MediaQuery.of(context).orientation ==
-                    Orientation.portrait) {
-                  return Navigator.of(context).pop();
-                }
-                Navigator.of(context).pop();
-              },
-            )
-          : Container(width: 20.0);
+  static Widget _iconButton(BuildContext context) => IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: Theme.of(context).accentIconTheme.color,
+        ),
+        onPressed: () {
+          if (MediaQuery.of(context).orientation == Orientation.portrait) {
+            return Navigator.of(context).pop();
+          }
+          Navigator.of(context).pop();
+        },
+      );
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _headwordLine(context, _entry),
-        if (!_preview) Divider(),
+        if (_preview) headwordLine(context, _entry, _preview),
         _buildTable(context, _constructTranslationMap(_entry)),
         if (!_preview) _buildEditorialNotes(context),
         if (!_preview) _buildRelated(context),
@@ -112,7 +127,7 @@ class EntryPage extends StatelessWidget {
       RichText(
           text: TextSpan(
               children: relatedList,
-              style: Theme.of(context).textTheme.bodyText2)),
+              style: Theme.of(context).textTheme.bodyText1)),
     ]);
   }
 
@@ -172,7 +187,7 @@ class EntryPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 7.0),
           child: previewTranslationLine(
-              context, translations.map((t) => t.translation).join(', ')),
+              context, translations.first, translations.length != 1),
         ),
       ]);
     String parenthetical = '';
@@ -184,15 +199,19 @@ class EntryPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
-          children: translations.expand((t) {
+          children: translations.map((t) {
             var parentheticalChanged =
                 t.headwordParentheticalQualifier != parenthetical;
             parenthetical = t.headwordParentheticalQualifier;
-            return [
-              if (parentheticalChanged)
-                parentheticalText(context, parenthetical),
-              _translationContent(context, t, hasParenthetical),
-            ];
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (parentheticalChanged)
+                  parentheticalText(context, parenthetical),
+                if (!parentheticalChanged) SizedBox(height: 5.0),
+                _translationContent(context, t, hasParenthetical),
+              ],
+            );
           }).toList(),
         ),
       ],
@@ -201,38 +220,24 @@ class EntryPage extends StatelessWidget {
 
   Widget _translationContent(
       BuildContext context, Translation translation, bool indent) {
-    return Indent(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 7.0),
-          translationLine(context, translation),
           Indent(
-            child:
-                abbreviationLine(context, translation.translationAbbreviation),
+              child: translationLine(context, translation),
+              size: indent ? null : 0.0),
+          Indent(
+            child: Indent(
+              child: abbreviationLine(
+                  context, translation.translationAbbreviation),
+            ),
           ),
-          _exampleText(context, translation.examplePhrase),
-          SizedBox(height: 12.0),
+          exampleText(context, translation.examplePhrase),
+          SizedBox(height: 0.0),
         ],
       ),
-      size: indent ? null : 0.0,
-    );
-  }
-
-  Widget _exampleText(BuildContext context, String exampleText) {
-    if (exampleText.isEmpty) return Container();
-    return OverflowMarkdown('*Ex:* $exampleText', TextOverflow.visible);
-  }
-
-  Widget _headwordLine(BuildContext context, Entry entry) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        headwordText(context, entry.headword, _preview),
-        abbreviationLine(context, entry.headwordAbbreviation),
-        alternateHeadwordLine(context, entry.alternateHeadword,
-            entry.alternateHeadwordNamingStandard),
-      ],
     );
   }
 }

@@ -28,8 +28,10 @@ class Indent extends StatelessWidget {
 
 Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
     backgroundColor: color,
-    padding: EdgeInsets.only(bottom: 1.0, top: -1.0, left: 0.0, right: 0.0),
-    label: text);
+    padding: EdgeInsets.all(0.0),
+    label: text,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16.0))));
 
 Widget headwordText(BuildContext context, String text, bool preview) {
   return OverflowMarkdown(
@@ -74,15 +76,28 @@ Widget alternateHeadwordLine(
 
 TextSpan _namingStandard(BuildContext context, String namingStandard) {
   if (namingStandard == 'i') namingStandard = 'INN';
-  if (namingStandard.isNotEmpty) return TextSpan(text: ' $namingStandard');
+  if (namingStandard.isNotEmpty)
+    return TextSpan(text: '', children: [
+      TextSpan(text: ' ('),
+      TextSpan(text: namingStandard, style: _italic1(context)),
+      TextSpan(text: ')', style: TextStyle(letterSpacing: 5.0)),
+    ]);
   return TextSpan();
 }
 
 Widget _translationParenthetical(
     BuildContext context, String translationParenthetical) {
   if (translationParenthetical.isNotEmpty)
-    return _chip(
-        context, Text(' $translationParenthetical', style: _italic1(context)));
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: Wrap(
+        children: translationParenthetical
+            .split(';')
+            .map((q) => _chip(context,
+                Text(q, style: _italic1(context).copyWith(fontSize: 20.0))))
+            .toList(),
+      ),
+    );
   return Container();
 }
 
@@ -100,28 +115,24 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
   );
 }
 
-Widget previewTranslationLine(BuildContext context, String text) {
-  return Text(text, style: _normal1(context));
+Widget previewTranslationLine(
+    BuildContext context, Translation translation, bool addEllipsis) {
+  var text = translation.translation;
+  if (translation.genderAndPlural.isNotEmpty)
+    text += ' *${translation.genderAndPlural}*';
+  if (addEllipsis) text += '...';
+  return OverflowMarkdown(text, TextOverflow.visible);
 }
 
 Widget translationLine(BuildContext context, Translation translation) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.start,
+  return Wrap(
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      Expanded(
-        child: Padding(
-          padding: EdgeInsets.only(
-              top: translation.translationParentheticalQualifier.isNotEmpty
-                  ? 7.0
-                  : 0.0),
-          child: OverflowMarkdown(translation.translation, TextOverflow.visible,
-              appendSpans: [
-                _genderAndPluralText(context, translation.genderAndPlural),
-                _namingStandard(context, translation.translationNamingStandard)
-              ]),
-        ),
-      ),
+      OverflowMarkdown(translation.translation, TextOverflow.visible,
+          appendSpans: [
+            _genderAndPluralText(context, translation.genderAndPlural),
+            _namingStandard(context, translation.translationNamingStandard)
+          ]),
       _translationParenthetical(
           context, translation.translationParentheticalQualifier),
     ],
@@ -130,10 +141,11 @@ Widget translationLine(BuildContext context, Translation translation) {
 
 Widget parentheticalText(BuildContext context, String text) {
   if (text.isEmpty) return Container();
-  return Chip(
-      backgroundColor: Colors.tealAccent.withOpacity(.4),
-      padding: EdgeInsets.only(bottom: 1.0, top: -1.0, left: 0.0, right: 0.0),
-      label: Text(text, style: _italic1(context)));
+  return _chip(
+    context,
+    Text(text, style: _italic1(context)),
+    color: Colors.cyan.shade100,
+  );
 }
 
 TextSpan _genderAndPluralText(BuildContext context, String text) {
@@ -145,6 +157,58 @@ Widget editorialText(BuildContext context, String text) {
   return MarkdownBody(
     data: text,
     shrinkWrap: true,
+  );
+}
+
+Widget exampleText(BuildContext context, String exampleText) {
+  if (exampleText.isEmpty) return Container();
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      SizedBox(height: 16.0),
+      DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Example Phrases:', style: _italic1(context)),
+              Column(
+                children: exampleText
+                    .split('...')
+                    .map((example) => OverflowMarkdown(
+                        example.replaceAll('\.\.', ' '), TextOverflow.visible,
+                        defaultStyle: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(height: 1.5)))
+                    .toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget headwordLine(BuildContext context, Entry entry, bool preview) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      headwordText(
+          context,
+          entry.headwordAbbreviation.isEmpty
+              ? entry.headword
+              : '${entry.headword} (${entry.headwordAbbreviation})',
+          preview),
+      alternateHeadwordLine(context, entry.alternateHeadword,
+          entry.alternateHeadwordNamingStandard),
+    ],
   );
 }
 

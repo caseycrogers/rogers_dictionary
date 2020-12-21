@@ -18,7 +18,7 @@ dependencies:
   flutter_markdown: ^0.5.1
   provider: ^4.1.0
   rxdart: ^0.24.1
-  async_list_view: ^0.0.1-dev.5
+  async_list_view: ^0.0.1-dev.8
   google_fonts: ^1.1.1
   universal_html: ^1.2.1
 
@@ -30,8 +30,7 @@ dev_dependencies:
   build_runner: ^1.10.3
   json_serializable: ^3.5.0
   firedart: ^0.8.3
-  df:
-    path: ../df
+  df: ^0.3.0
 
 flutter:
   uses-material-design: true

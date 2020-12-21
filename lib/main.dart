@@ -38,9 +38,9 @@ class MyApp extends StatelessWidget {
                     color: Colors.black54,
                     fontWeight: FontWeight.bold)
                 .merge(GoogleFonts.openSans()),
-            bodyText1: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal)
+            bodyText1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.normal)
                 .merge(GoogleFonts.openSans()),
-            bodyText2: TextStyle(fontSize: 22.0, fontWeight: FontWeight.normal)
+            bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)
                 .merge(GoogleFonts.openSans()),
           ),
           accentIconTheme: IconThemeData(
