@@ -39,7 +39,7 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   EntryBuilder builder;
   String partOfSpeech;
   String headwordParentheticalQualifier;
-  var i = 0;
+  var i = 9995;
   Map<String, EntryBuilder> entryBuilders = {};
 
   while (i < rows.length) {

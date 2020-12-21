@@ -10,11 +10,13 @@ class EntrySearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      SearchBar(),
-      Expanded(
-        child: EntryList(),
-      ),
-    ]);
+    return Column(
+      children: [
+        SearchBar(),
+        Expanded(
+          child: EntryList(),
+        ),
+      ],
+    );
   }
 }

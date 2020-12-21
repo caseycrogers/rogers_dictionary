@@ -64,7 +64,11 @@ class DictionaryPage extends StatelessWidget {
                   child: Container(
                       width: constraints.maxWidth,
                       height: constraints.maxHeight,
-                      child: entrySearch,
+                      child: Row(
+                        children: [
+                          Expanded(child: entrySearch),
+                        ],
+                      ),
                       decoration: BoxDecoration()),
                 ),
               ),
@@ -87,13 +91,6 @@ class DictionaryPage extends StatelessWidget {
                 child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Theme.of(context).shadowColor,
-                            spreadRadius: 2.0,
-                            blurRadius: 2.0,
-                            offset: Offset(0.0, 0.0)),
-                      ],
                     ),
                     height: constraints.maxHeight,
                     width: 2.0 * constraints.maxWidth / 3.0,
@@ -108,15 +105,13 @@ class DictionaryPage extends StatelessWidget {
                     height: constraints.maxHeight,
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Theme.of(context).shadowColor,
-                            spreadRadius: 2.0,
-                            blurRadius: 2.0,
-                            offset: Offset(0.0, 0.0)),
-                      ],
                     ),
-                    child: entrySearch),
+                    child: Row(
+                      children: [
+                        Expanded(child: entrySearch),
+                        VerticalDivider(width: 0.0),
+                      ],
+                    )),
               ),
             ),
           ],
