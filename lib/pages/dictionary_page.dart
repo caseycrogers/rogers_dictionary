@@ -15,109 +15,109 @@ class DictionaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: Text('Dictionary'),
-        ),
-        body: AnimatedBuilder(
-            child: EntrySearch(),
-            animation: ModalRoute.of(context).animation,
-            builder: (context, entrySearch) =>
-                _buildOrientedPage(context, constraints, entrySearch)),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: Text('Dictionary'),
       ),
+      body: AnimatedBuilder(
+          child: EntrySearch(),
+          animation: ModalRoute.of(context).animation,
+          builder: (context, entrySearch) =>
+              _buildOrientedPage(context, entrySearch)),
     );
   }
 
-  Widget _buildOrientedPage(BuildContext context, BoxConstraints constraints,
-      EntrySearch entrySearch) {
+  Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
     DictionaryPageModel dictionaryPageModel = DictionaryPageModel.of(context);
-    switch (MediaQuery.of(context).orientation) {
-      case Orientation.portrait:
-        return Stack(
-          children: [
-            Container(
-              color: Colors.transparent,
-              width: constraints.maxWidth,
-              height: constraints.maxHeight,
-            ),
-            Positioned(
-              width: constraints.maxWidth,
-              height: constraints.maxHeight,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                        begin: Offset(1.0, 0.0),
-                        end: dictionaryPageModel.hasSelection
-                            ? Offset(0.0, 0.0)
-                            : Offset(1.0, 0.0))
-                    .animate(animation),
-                child: EntryPage.asPage(),
-              ),
-            ),
-            if (!dictionaryPageModel.hasSelection)
-              Positioned(
-                child: SlideTransition(
-                  position: AlwaysStoppedAnimation(Offset.zero),
-                  // Need to keep entry search in the same position in the widget tree
-                  // to maintain state across screen rotation
-                  child: Container(
-                      width: constraints.maxWidth,
-                      height: constraints.maxHeight,
-                      child: Row(
-                        children: [
-                          Expanded(child: entrySearch),
-                        ],
-                      ),
-                      decoration: BoxDecoration()),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        switch (MediaQuery.of(context).orientation) {
+          case Orientation.portrait:
+            return Stack(
+              children: [
+                Container(
+                  color: Colors.transparent,
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
                 ),
-              ),
-          ],
-        );
-      case Orientation.landscape:
-        return Stack(
-          children: [
-            Container(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight,
-                color: Colors.transparent),
-            Positioned(
-              left: constraints.maxWidth / 3.0,
-              width: 2.0 * constraints.maxWidth / 3.0,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                        begin: Offset(-1.0, 0.0), end: Offset(-0.0, 0.0))
-                    .animate(animation),
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                    ),
+                Positioned(
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                            begin: Offset(1.0, 0.0),
+                            end: dictionaryPageModel.hasSelection
+                                ? Offset(0.0, 0.0)
+                                : Offset(1.0, 0.0))
+                        .animate(animation),
+                    child: EntryPage.asPage(),
+                  ),
+                ),
+                if (!dictionaryPageModel.hasSelection)
+                  Positioned(
+                    width: constraints.maxWidth,
                     height: constraints.maxHeight,
-                    width: 2.0 * constraints.maxWidth / 3.0,
-                    child: EntryPage.asPage()),
-              ),
-            ),
-            Positioned(
-              child: SlideTransition(
-                position: AlwaysStoppedAnimation(Offset.zero),
-                child: Container(
-                    width: constraints.maxWidth / 3.0,
-                    height: constraints.maxHeight,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
+                    child: SlideTransition(
+                      position: AlwaysStoppedAnimation(Offset.zero),
+                      // Need to keep entry search in the same position in the widget tree
+                      // to maintain state across screen rotation
+                      child: DecoratedBox(
+                          child: Row(
+                            children: [
+                              Expanded(child: entrySearch),
+                            ],
+                          ),
+                          decoration: BoxDecoration()),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(child: entrySearch),
-                        VerticalDivider(width: 0.0),
-                      ],
-                    )),
-              ),
-            ),
-          ],
-        );
-      default:
-        return Container();
-    }
+                  ),
+              ],
+            );
+          case Orientation.landscape:
+            return Stack(
+              children: [
+                Container(
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                    color: Colors.transparent),
+                Positioned(
+                  left: constraints.maxWidth / 3.0,
+                  height: constraints.maxHeight,
+                  width: 2.0 * constraints.maxWidth / 3.0,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                            begin: Offset(-1.0, 0.0), end: Offset(-0.0, 0.0))
+                        .animate(animation),
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                        ),
+                        child: EntryPage.asPage()),
+                  ),
+                ),
+                Positioned(
+                  width: constraints.maxWidth / 3.0,
+                  height: constraints.maxHeight,
+                  child: SlideTransition(
+                    position: AlwaysStoppedAnimation(Offset.zero),
+                    child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(child: entrySearch),
+                            VerticalDivider(width: 0.0),
+                          ],
+                        )),
+                  ),
+                ),
+              ],
+            );
+          default:
+            return Container();
+        }
+      },
+    );
   }
 }

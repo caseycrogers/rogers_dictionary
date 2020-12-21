@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 
+import 'overflow_markdown.dart';
+
 TextStyle _headline1(BuildContext context) =>
     Theme.of(context).textTheme.headline1.copyWith(fontWeight: FontWeight.bold);
 
@@ -36,7 +38,6 @@ Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
 Widget headwordText(BuildContext context, String text, bool preview) {
   return OverflowMarkdown(
     text,
-    TextOverflow.visible,
     defaultStyle: preview ? _bold1(context) : _headline1(context),
   );
 }
@@ -121,18 +122,17 @@ Widget previewTranslationLine(
   if (translation.genderAndPlural.isNotEmpty)
     text += ' *${translation.genderAndPlural}*';
   if (addEllipsis) text += '...';
-  return OverflowMarkdown(text, TextOverflow.visible);
+  return OverflowMarkdown(text);
 }
 
 Widget translationLine(BuildContext context, Translation translation) {
   return Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      OverflowMarkdown(translation.translation, TextOverflow.visible,
-          appendSpans: [
-            _genderAndPluralText(context, translation.genderAndPlural),
-            _namingStandard(context, translation.translationNamingStandard)
-          ]),
+      OverflowMarkdown(translation.translation, appendSpans: [
+        _genderAndPluralText(context, translation.genderAndPlural),
+        _namingStandard(context, translation.translationNamingStandard)
+      ]),
       _translationParenthetical(
           context, translation.translationParentheticalQualifier),
     ],
@@ -181,7 +181,7 @@ Widget exampleText(BuildContext context, String exampleText) {
                 children: exampleText
                     .split('...')
                     .map((example) => OverflowMarkdown(
-                        example.replaceAll('\.\.', ' '), TextOverflow.visible,
+                        example.replaceAll('\.\.', ' '),
                         defaultStyle: Theme.of(context)
                             .textTheme
                             .bodyText1
@@ -210,79 +210,4 @@ Widget headwordLine(BuildContext context, Entry entry, bool preview) {
           entry.alternateHeadwordNamingStandard),
     ],
   );
-}
-
-class OverflowMarkdown extends StatelessWidget {
-  final String data;
-  final TextOverflow overflow;
-  final TextStyle defaultStyle;
-  final List<TextSpan> appendSpans;
-
-  OverflowMarkdown(this.data, this.overflow,
-      {this.defaultStyle, this.appendSpans});
-
-  @override
-  Widget build(BuildContext context) {
-    var spans = <TextSpan>[];
-    var isBold = false;
-    var isItalic = false;
-    var buff = StringBuffer();
-    var i = 0;
-
-    TextStyle getTextStyle() => (defaultStyle ?? _normal1(context)).copyWith(
-          fontWeight: isBold ? FontWeight.bold : null,
-          fontStyle: isItalic ? FontStyle.italic : null,
-        );
-
-    addSpan() {
-      spans.add(TextSpan(
-        text: buff.toString(),
-        style: getTextStyle(),
-      ));
-      buff.clear();
-    }
-
-    while (i < data.length) {
-      if (data[i] == '\\') {
-        assert(i != data.length,
-            'Invalid escape character at end of string in $data');
-        buff.write(data[i + 1]);
-        i += 2;
-        continue;
-      }
-      if (i + 2 < data.length && data.substring(i, i + 2) == '**') {
-        if (!isBold) {
-          addSpan();
-          isBold = true;
-        } else {
-          addSpan();
-          isBold = false;
-        }
-        i += 2;
-        continue;
-      }
-      if (data[i] == '*') {
-        if (!isItalic) {
-          addSpan();
-          isItalic = true;
-        } else {
-          addSpan();
-          isItalic = false;
-        }
-        i += 1;
-        continue;
-      }
-      buff.write(data[i]);
-      i += 1;
-    }
-    addSpan();
-    assert(!isItalic, "Unclosed italic mark in $data");
-    assert(!isBold, "Unclosed bold mark in $data");
-    return RichText(
-      overflow: overflow,
-      text: TextSpan(
-          style: defaultStyle ?? Theme.of(context).textTheme.bodyText1,
-          children: spans..addAll(appendSpans ?? [])),
-    );
-  }
 }

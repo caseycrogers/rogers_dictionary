@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
+import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 
 class EntryPage extends StatelessWidget {
@@ -25,41 +26,39 @@ class EntryPage extends StatelessWidget {
                   return Center(child: CircularProgressIndicator());
                 var entry = snap.data;
                 const pad = 24.0;
-                return LayoutBuilder(
-                  builder: (context, constraints) => Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: pad),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _iconButton(context),
-                            Expanded(
-                                child: headwordLine(context, entry, false)),
-                          ],
-                        ),
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0, left: 4.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _iconButton(context),
+                          Expanded(child: headwordLine(context, entry, false)),
+                        ],
                       ),
-                      Divider(indent: pad, endIndent: pad),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: Padding(
-                            padding: const EdgeInsets.all(pad),
-                            child: FutureBuilder(
-                              future:
-                                  DictionaryPageModel.of(context).selectedEntry,
-                              builder: (context, snap) {
-                                if (!snap.hasData)
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                return EntryPage._instance(entry, false);
-                              },
-                            ),
+                    ),
+                    Divider(indent: pad, endIndent: pad, height: 0.0),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: pad, right: pad, bottom: pad),
+                          child: FutureBuilder(
+                            future:
+                                DictionaryPageModel.of(context).selectedEntry,
+                            builder: (context, snap) {
+                              if (!snap.hasData)
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              return EntryPage._instance(entry, false);
+                            },
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -69,17 +68,20 @@ class EntryPage extends StatelessWidget {
 
   static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
 
-  static Widget _iconButton(BuildContext context) => IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: Theme.of(context).accentIconTheme.color,
+  static Widget _iconButton(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).accentIconTheme.color,
+          ),
+          onPressed: () {
+            if (MediaQuery.of(context).orientation == Orientation.portrait) {
+              return Navigator.of(context).pop();
+            }
+            Navigator.of(context).pop();
+          },
         ),
-        onPressed: () {
-          if (MediaQuery.of(context).orientation == Orientation.portrait) {
-            return Navigator.of(context).pop();
-          }
-          Navigator.of(context).pop();
-        },
       );
 
   @override
@@ -97,23 +99,26 @@ class EntryPage extends StatelessWidget {
 
   Widget _buildRelated(BuildContext context) {
     if (_entry.runOnParent.isEmpty && _entry.runOns.isEmpty) return Container();
-    var relatedList = ([_entry.runOnParent]..addAll(_entry.runOns))
+    List<Widget> relatedList = ([_entry.runOnParent]..addAll(_entry.runOns))
         .where((s) => s.isNotEmpty)
         .map(
-          (headword) => TextSpan(
-              text: headword,
-              style: TextStyle(color: Colors.blue),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  DictionaryPageModel.onHeadwordSelected(
-                      context, Entry.urlEncode(headword));
-                }),
+          (headword) => TextButton(
+              child: OverflowMarkdown(headword,
+                  defaultStyle: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(color: Colors.blue)),
+              onPressed: () {
+                DictionaryPageModel.onHeadwordSelected(
+                    context, Entry.urlEncode(headword));
+              }),
         )
         .toList();
     relatedList = relatedList
         .expand((span) => [
               span,
-              if (span != relatedList.last) TextSpan(text: ', '),
+              if (span != relatedList.last)
+                Text(', ', style: Theme.of(context).textTheme.bodyText1),
             ])
         .toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -124,10 +129,7 @@ class EntryPage extends StatelessWidget {
               .bodyText1
               .copyWith(fontWeight: FontWeight.bold)),
       Divider(),
-      RichText(
-          text: TextSpan(
-              children: relatedList,
-              style: Theme.of(context).textTheme.bodyText1)),
+      Wrap(children: relatedList),
     ]);
   }
 
