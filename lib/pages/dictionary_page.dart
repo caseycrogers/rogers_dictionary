@@ -9,9 +9,7 @@ class DictionaryPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
       ListEquality().equals(uri.pathSegments, ['dictionary']);
 
-  final Animation<double> animation;
-
-  DictionaryPage({@required this.animation});
+  DictionaryPage();
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +18,15 @@ class DictionaryPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Dictionary'),
       ),
-      body: AnimatedBuilder(
-          child: EntrySearch(),
-          animation: ModalRoute.of(context).animation,
-          builder: (context, entrySearch) =>
-              _buildOrientedPage(context, entrySearch)),
+      body: _buildOrientedPage(context, EntrySearch()),
     );
   }
 
   Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
-    DictionaryPageModel dictionaryPageModel = DictionaryPageModel.of(context);
+    final animation = ModalRoute.of(context).animation;
+    final exitAnimation = ModalRoute.of(context).secondaryAnimation;
+    final dictionaryPageModel = DictionaryPageModel.of(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         switch (MediaQuery.of(context).orientation) {
@@ -59,16 +56,19 @@ class DictionaryPage extends StatelessWidget {
                     width: constraints.maxWidth,
                     height: constraints.maxHeight,
                     child: SlideTransition(
-                      position: AlwaysStoppedAnimation(Offset.zero),
+                      position: Tween<Offset>(
+                              begin: Offset(0.0, 0.0), end: Offset(-1.0, 0.0))
+                          .animate(exitAnimation),
                       // Need to keep entry search in the same position in the widget tree
                       // to maintain state across screen rotation
                       child: DecoratedBox(
-                          child: Row(
-                            children: [
-                              Expanded(child: entrySearch),
-                            ],
-                          ),
-                          decoration: BoxDecoration()),
+                        child: Row(
+                          children: [
+                            Expanded(child: entrySearch),
+                          ],
+                        ),
+                        decoration: BoxDecoration(),
+                      ),
                     ),
                   ),
               ],

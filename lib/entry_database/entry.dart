@@ -31,6 +31,33 @@ class Entry {
     @required this.translations,
   });
 
+  @JsonKey(ignore: true)
+  static final Map<String, String> _partOfSpeechAbbreviationMap = {
+    'adj': 'adjective',
+    'adv': 'adverb',
+    'f': 'feminine noun',
+    'fpl': 'feminine plural noun',
+    'm': 'masculine noun',
+    'mpl': 'masculine plural noun',
+    'vi': 'intransitive verb',
+    'vr': 'reflexive verb',
+    'vt': 'transitive verb',
+    'interj': 'interjection',
+    'n': 'noun',
+    'npl': 'plural noun',
+    'prep': 'preposition',
+  };
+
+  static String longPartOfSpeech(String partOfSpeech) {
+    return partOfSpeech.replaceAll(' ', '').splitMapJoin(
+          '[&,]',
+          onNonMatch: (partOfSpeechComponent) =>
+              _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
+              partOfSpeechComponent,
+          onMatch: (separator) => separator.group(0) == '&' ? ' and ' : ', ',
+        );
+  }
+
   static String urlDecode(String urlEncodedHeadword) {
     return Uri.decodeComponent(
         (urlEncodedHeadword.split('_')..removeAt(0)).join(''));

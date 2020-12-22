@@ -1,9 +1,9 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
+import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 
@@ -23,7 +23,12 @@ class EntryPage extends StatelessWidget {
               future: DictionaryPageModel.of(context).selectedEntry,
               builder: (context, snap) {
                 if (!snap.hasData)
-                  return Center(child: CircularProgressIndicator());
+                  // Only display if loading is slow.
+                  return Delayed(
+                    initialChild: Container(color: Colors.orange),
+                    child: Container(),
+                    delay: Duration(milliseconds: 50),
+                  );
                 var entry = snap.data;
                 const pad = 24.0;
                 return Column(
@@ -45,16 +50,7 @@ class EntryPage extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(
                               left: pad, right: pad, bottom: pad),
-                          child: FutureBuilder(
-                            future:
-                                DictionaryPageModel.of(context).selectedEntry,
-                            builder: (context, snap) {
-                              if (!snap.hasData)
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              return EntryPage._instance(entry, false);
-                            },
-                          ),
+                          child: EntryPage._instance(entry, false),
                         ),
                       ),
                     ),
@@ -79,7 +75,9 @@ class EntryPage extends StatelessWidget {
             if (MediaQuery.of(context).orientation == Orientation.portrait) {
               return Navigator.of(context).pop();
             }
-            Navigator.of(context).pop();
+            Navigator.of(context).popUntil((route) =>
+                route.settings.name.endsWith(DictionaryPageModel.route) ||
+                route.isFirst);
           },
         ),
       );
@@ -183,38 +181,49 @@ class EntryPage extends StatelessWidget {
 
   TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
       List<Translation> translations) {
+    String parenthetical = '';
+    final hasParenthetical =
+        translations.any((t) => t.headwordParentheticalQualifier.isNotEmpty);
     if (_preview)
       return TableRow(children: [
-        partOfSpeechText(context, partOfSpeech, _preview),
+        Container(
+          child: partOfSpeechText(context, partOfSpeech, _preview),
+          alignment: Alignment.centerRight,
+        ),
         Padding(
           padding: const EdgeInsets.only(top: 7.0),
           child: previewTranslationLine(
               context, translations.first, translations.length != 1),
         ),
       ]);
-    String parenthetical = '';
-    final hasParenthetical =
-        translations.any((t) => t.headwordParentheticalQualifier.isNotEmpty);
     return TableRow(
       children: [
-        partOfSpeechText(context, partOfSpeech, _preview),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
-          children: translations.map((t) {
-            var parentheticalChanged =
-                t.headwordParentheticalQualifier != parenthetical;
-            parenthetical = t.headwordParentheticalQualifier;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (parentheticalChanged)
-                  parentheticalText(context, parenthetical),
-                if (!parentheticalChanged) SizedBox(height: 5.0),
-                _translationContent(context, t, hasParenthetical),
-              ],
-            );
-          }).toList(),
+          children: [
+            partOfSpeechText(context, partOfSpeech, _preview),
+            Indent(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: translations.map((t) {
+                  var parentheticalChanged =
+                      t.headwordParentheticalQualifier != parenthetical;
+                  parenthetical = t.headwordParentheticalQualifier;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (parentheticalChanged)
+                        parentheticalText(context, parenthetical),
+                      if (!parentheticalChanged) SizedBox(height: 5.0),
+                      _translationContent(context, t, hasParenthetical),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
         ),
       ],
     );
