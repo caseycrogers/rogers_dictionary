@@ -104,9 +104,9 @@ Widget _translationParenthetical(
 
 Widget partOfSpeechText(BuildContext context, String text, bool preview) {
   var pos = ['na', ''].contains(text) ? '-' : text;
+  if (!preview) pos = Entry.longPartOfSpeech(pos);
   return Container(
     padding: EdgeInsets.only(right: 8.0),
-    alignment: Alignment.centerRight,
     child: _chip(
         context,
         Text(

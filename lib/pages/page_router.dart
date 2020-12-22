@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
@@ -26,10 +25,7 @@ Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
       transitionDuration: Duration(milliseconds: 200),
       settings: settings.copyWith(
           name: settings.name, arguments: settings.arguments ?? newArguments),
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          DictionaryPage(animation: _getAnimation(context, animation)));
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return DictionaryPage();
+      });
 }
-
-Animation<double> _getAnimation(
-        BuildContext context, Animation<double> animation) =>
-    (!kIsWeb) ? (animation) : AlwaysStoppedAnimation(1.0);
