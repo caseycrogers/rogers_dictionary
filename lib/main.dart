@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rogers_dictionary/entry_database/sqlite_database.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 
@@ -16,7 +18,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
-  static final EntryDatabase db = FirestoreDatabase();
+  static final EntryDatabase db = SqliteDatabase();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,6 @@ class MyApp extends StatelessWidget {
           ),
           appBarTheme: AppBarTheme(color: Colors.amberAccent),
           selectedRowColor: Colors.amber.shade50,
-          shadowColor: Colors.grey.withOpacity(.5),
         ),
       ),
       onTap: () => unFocus(context),

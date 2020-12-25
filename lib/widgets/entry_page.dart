@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
@@ -25,7 +26,7 @@ class EntryPage extends StatelessWidget {
                 if (!snap.hasData)
                   // Only display if loading is slow.
                   return Delayed(
-                    initialChild: Container(color: Colors.orange),
+                    initialChild: Container(),
                     child: Container(),
                     delay: Duration(milliseconds: 50),
                   );
@@ -97,26 +98,29 @@ class EntryPage extends StatelessWidget {
 
   Widget _buildRelated(BuildContext context) {
     if (_entry.runOnParent.isEmpty && _entry.runOns.isEmpty) return Container();
-    List<Widget> relatedList = ([_entry.runOnParent]..addAll(_entry.runOns))
-        .where((s) => s.isNotEmpty)
-        .map(
-          (headword) => TextButton(
-              child: OverflowMarkdown(headword,
-                  defaultStyle: Theme.of(context)
-                      .textTheme
-                      .bodyText1
-                      .copyWith(color: Colors.blue)),
-              onPressed: () {
+    List<String> relatedList = [_entry.runOnParent]..addAll(_entry.runOns);
+    List<TextSpan> relatedSpans = relatedList.where((s) => s.isNotEmpty).expand(
+      (headword) {
+        return [
+          TextSpan(
+            text: headword,
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Colors.blue),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
                 DictionaryPageModel.onHeadwordSelected(
                     context, Entry.urlEncode(headword));
-              }),
-        )
-        .toList();
+              },
+          ),
+          if (headword != relatedList.last) TextSpan(text: ', '),
+        ];
+      },
+    ).toList();
     relatedList = relatedList
         .expand((span) => [
               span,
-              if (span != relatedList.last)
-                Text(', ', style: Theme.of(context).textTheme.bodyText1),
             ])
         .toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -127,7 +131,10 @@ class EntryPage extends StatelessWidget {
               .bodyText1
               .copyWith(fontWeight: FontWeight.bold)),
       Divider(),
-      Wrap(children: relatedList),
+      RichText(
+          text: TextSpan(
+              children: relatedSpans,
+              style: Theme.of(context).textTheme.bodyText1)),
     ]);
   }
 
@@ -191,7 +198,7 @@ class EntryPage extends StatelessWidget {
           alignment: Alignment.centerRight,
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 7.0),
+          padding: const EdgeInsets.only(top: 6.0),
           child: previewTranslationLine(
               context, translations.first, translations.length != 1),
         ),

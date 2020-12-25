@@ -50,7 +50,7 @@ class Entry {
 
   static String longPartOfSpeech(String partOfSpeech) {
     return partOfSpeech.replaceAll(' ', '').splitMapJoin(
-          '[&,]',
+          RegExp('[&,]'),
           onNonMatch: (partOfSpeechComponent) =>
               _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
               partOfSpeechComponent,

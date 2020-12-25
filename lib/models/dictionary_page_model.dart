@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 
 class DictionaryPageModel {
-  static const String route = '/dictionary';
+  static const String route = 'dictionary';
   static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
   static const String SEARCH_STRING_QUERY_PARAM = 'search';
 
