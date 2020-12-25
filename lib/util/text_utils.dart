@@ -30,7 +30,7 @@ class Indent extends StatelessWidget {
 
 Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
     backgroundColor: color,
-    padding: EdgeInsets.all(0.0),
+    padding: EdgeInsets.zero.add(EdgeInsets.only(bottom: 2.0)),
     label: text,
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16.0))));
@@ -59,20 +59,26 @@ Widget abbreviationLine(BuildContext context, String text) {
   ));
 }
 
-Widget alternateHeadwordLine(
-    BuildContext context, String altHeadword, String namingStandard) {
+Widget alternateHeadwordLine(BuildContext context, String altHeadword,
+    String namingStandard, bool preview) {
   if (altHeadword.isEmpty) return Container();
-  return Row(children: [
-    RichText(
-        text: TextSpan(
-      style: _normal1(context),
-      children: [
-        TextSpan(text: 'alt. ', style: _italic1(context)),
-        TextSpan(text: altHeadword, style: _bold1(context)),
-        _namingStandard(context, namingStandard),
-      ],
-    )),
-  ]);
+  return Row(
+    children: [
+      Flexible(
+        child: RichText(
+          overflow: preview ? TextOverflow.ellipsis : TextOverflow.visible,
+          text: TextSpan(
+            style: _normal1(context),
+            children: [
+              TextSpan(text: 'alt. ', style: _italic1(context)),
+              TextSpan(text: altHeadword, style: _bold1(context)),
+              _namingStandard(context, namingStandard),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 TextSpan _namingStandard(BuildContext context, String namingStandard) {
@@ -108,11 +114,13 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
   return Container(
     padding: EdgeInsets.only(right: 8.0),
     child: _chip(
-        context,
-        Text(
-          pos,
-          style: _italic1(context),
-        )),
+      context,
+      Text(
+        pos,
+        style: _italic1(context),
+      ),
+      color: Colors.grey.shade400,
+    ),
   );
 }
 
@@ -169,7 +177,7 @@ Widget exampleText(BuildContext context, String exampleText) {
       DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          borderRadius: BorderRadius.all(Radius.circular(16.0)),
         ),
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
@@ -182,10 +190,7 @@ Widget exampleText(BuildContext context, String exampleText) {
                     .split('...')
                     .map((example) => OverflowMarkdown(
                         example.replaceAll('\.\.', ' '),
-                        defaultStyle: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(height: 1.5)))
+                        defaultStyle: _normal1(context).copyWith(height: 1.5)))
                     .toList(),
               ),
             ],
@@ -207,7 +212,7 @@ Widget headwordLine(BuildContext context, Entry entry, bool preview) {
               : '${entry.headword} (${entry.headwordAbbreviation})',
           preview),
       alternateHeadwordLine(context, entry.alternateHeadword,
-          entry.alternateHeadwordNamingStandard),
+          entry.alternateHeadwordNamingStandard, preview),
     ],
   );
 }

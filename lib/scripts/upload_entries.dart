@@ -1,13 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:algolia/algolia.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 
 import 'package:args/args.dart';
 import 'package:firedart/firedart.dart';
 import 'package:df/df.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+const URL_ENCODED_HEADWORD = 'url_encoded_headword';
 const HEADWORD = 'headword';
+const ENTRY_ID = 'entry_id';
+
 const RUN_ON_PARENT = 'run_on_parent';
 const RUN_ON_TEXT = 'run_on_text';
 const HEADWORD_ABBREVIATION = 'headword_abbreviation';
@@ -32,17 +39,16 @@ const KEYWORD_LIST = 'keyword_list';
 const ORDER_BY_FIELD = 'order_by_field';
 
 Future<List<void>> uploadEntries(bool debug, bool verbose) async {
-  Firestore.initialize('rogers-dicitionary');
   var df = await DataFrame.fromCsv('lib/scripts/dictionary_database.csv');
 
   var rows = df.rows.map((row) => row.map(_parseCell));
   EntryBuilder builder;
   String partOfSpeech;
   String headwordParentheticalQualifier;
-  var i = 9995;
+  var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
-  while (i < rows.length) {
+  while (i < rows.length && i < 3000) {
     if (i % 500 == 0) print('$i/${rows.length} complete!');
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD].isNotEmpty) {
@@ -104,28 +110,9 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
-  var uploadFutures =
-      entryBuilders.values.map((b) => _upload(b.build(), debug, verbose));
+  await _uploadSqlFlite(
+      entryBuilders.values.map((b) => b.build()).toList(), debug, verbose);
   print('done?');
-  return Future.wait(uploadFutures);
-}
-
-Future<void> _upload(Entry entry, bool debug, bool verbose) {
-  var entryMap = entry.toJson();
-  entryMap[KEYWORD_LIST] = _constructSearchList(entry);
-  if (verbose) {
-    print('Entry:\n${entry.toJson()}');
-    print('Keywords:\n${entryMap[KEYWORD_LIST]}');
-  }
-  if (debug) {
-    return (Completer()..complete()).future;
-  }
-  return Firestore.instance
-      .collection(ENTRIES_DB)
-      .document(ENGLISH)
-      .collection(ENTRIES)
-      .document(entry.urlEncodedHeadword)
-      .set(entryMap);
 }
 
 List<String> _constructSearchList(Entry entry) {
@@ -145,6 +132,79 @@ List<String> _constructSearchList(Entry entry) {
     ret.add("");
     return ret.toList();
   }).toList();
+}
+
+Future<void> _uploadFirestore(List<Entry> entries, bool debug, bool verbose) {
+  Firestore.initialize('rogers-dicitionary');
+  return Future.wait(
+    entries.map((entry) {
+      var entryMap = entry.toJson()
+        ..addEntries([MapEntry(KEYWORD_LIST, _constructSearchList(entry))]);
+      if (verbose) {
+        print('Entry:\n${entry.toJson()}');
+        print('Keywords:\n${entryMap[KEYWORD_LIST]}');
+      }
+      if (debug) {
+        return (Completer()..complete()).future;
+      }
+      return Firestore.instance
+          .collection(ENTRIES_DB)
+          .document(ENGLISH)
+          .collection(ENTRIES)
+          .document(entry.urlEncodedHeadword)
+          .set(entryMap);
+    }),
+  );
+}
+
+Future<void> _uploadSqlFlite(
+    List<Entry> entries, bool debug, bool verbose) async {
+  const path =
+      'C:/Users/Waffl/Documents/code/rogers_dictionary/assets/entries.db';
+  sqfliteFfiInit();
+  var db = await databaseFactoryFfi.openDatabase(path);
+  await db.execute('''DROP TABLE English''');
+  await db.execute('''CREATE TABLE English (
+    $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
+    $ENTRY_ID INTEGER NOT NULL,
+    $HEADWORD STRING NOT NULL,
+    $RUN_ON_PARENT STRING,
+    $HEADWORD_ABBREVIATION STRING,
+    $ALTERNATE_HEADWORD String,
+    translations STRING NOT NULL,
+    entry_blob STRING NOT NULL
+  )''');
+  var batch = db.batch();
+  for (var entry in entries) {
+    var entryRecord = {
+      URL_ENCODED_HEADWORD: entry.urlEncodedHeadword,
+      ENTRY_ID: entry.entryId,
+      HEADWORD: entry.headword,
+      RUN_ON_PARENT: entry.runOnParent,
+      HEADWORD_ABBREVIATION: entry.headwordAbbreviation,
+      ALTERNATE_HEADWORD: entry.alternateHeadword,
+      'translations': entry.translations.join('|'),
+      'entry_blob': jsonEncode(entry.toJson()),
+    };
+    if (true) print(entryRecord);
+    batch.insert('English', entryRecord);
+  }
+  print('result: ${await batch.commit()}');
+}
+
+Future<void> _uploadAlgolia(
+    List<Entry> entries, bool debug, bool verbose) async {
+  // Read from a key file that's included in .gitignore to keep the private key private
+  String privateKey = jsonDecode(
+      File('/keys/rogers_dictionary/algolia.key').readAsStringSync())['key'];
+  Algolia algolia =
+      Algolia.init(applicationId: '4Z50QMD69C', apiKey: privateKey);
+  var batch = algolia.index('english_entries').batch();
+  for (var entry in entries) {
+    batch.updateObject(entry.toJson()
+      ..addEntries([MapEntry('objectID', entry.urlEncodedHeadword)]));
+  }
+  return (await batch.commit()).taskStatus();
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
