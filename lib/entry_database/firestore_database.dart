@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/entry_database/entry_database.dart';
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/search_options.dart';
 
 import 'database_constants.dart';
 
@@ -30,7 +31,10 @@ class FirestoreDatabase extends EntryDatabase {
   }
 
   @override
-  Stream<Entry> getEntries({String searchString: '', String startAfter: ''}) {
+  Stream<Entry> getEntries(
+      {String searchString: '',
+      String startAfter: '',
+      SearchOptions searchOptions}) {
     return _getEntryStream(searchString, startAfter);
   }
 

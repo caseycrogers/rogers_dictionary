@@ -5,38 +5,12 @@ import 'dart:io';
 import 'package:algolia/algolia.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'package:args/args.dart';
 import 'package:firedart/firedart.dart';
 import 'package:df/df.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
-const URL_ENCODED_HEADWORD = 'url_encoded_headword';
-const HEADWORD = 'headword';
-const ENTRY_ID = 'entry_id';
-
-const RUN_ON_PARENT = 'run_on_parent';
-const RUN_ON_TEXT = 'run_on_text';
-const HEADWORD_ABBREVIATION = 'headword_abbreviation';
-const ALTERNATE_HEADWORD = 'alternate_headword';
-const ALTERNATE_HEADWORD_NAMING_STANDARD = 'alternate_headword_naming_standard';
-const IRREGULAR_INFLECTIONS = 'irregular_inflections';
-const PART_OF_SPEECH = 'part_of_speech';
-const HEADWORD_RESTRICTIVE_LABEL = 'headword_restrictive_label';
-
-const HEADWORD_PARENTHETICAL_QUALIFIER = 'headword_parenthetical_qualifier';
-const TRANSLATION = 'translation';
-const SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
-const GENDER_AND_PLURAL = 'gender_and_plural';
-const TRANSLATION_NAMING_STANDARD = 'translation_naming_standard';
-const TRANSLATION_ABBREVIATION = 'translation_abbreviation';
-const TRANSLATION_PARENTHETICAL_QUALIFIER =
-    'translation_parenthetical_qualifier';
-const EXAMPLE_PHRASE = 'example_phrase';
-const EDITORIAL_NOTE = 'editorial_note';
-
-const KEYWORD_LIST = 'keyword_list';
-const ORDER_BY_FIELD = 'order_by_field';
 
 Future<List<void>> uploadEntries(bool debug, bool verbose) async {
   var df = await DataFrame.fromCsv('lib/scripts/dictionary_database.csv');
@@ -171,6 +145,10 @@ Future<void> _uploadSqlFlite(
     $RUN_ON_PARENT STRING,
     $HEADWORD_ABBREVIATION STRING,
     $ALTERNATE_HEADWORD String,
+    $HEADWORD$WITHOUT_DIACRITICAL_MARKS STRING NOT NULL,
+    $RUN_ON_PARENT$WITHOUT_DIACRITICAL_MARKS STRING,
+    $HEADWORD_ABBREVIATION$WITHOUT_DIACRITICAL_MARKS STRING,
+    $ALTERNATE_HEADWORD$WITHOUT_DIACRITICAL_MARKS String,
     translations STRING NOT NULL,
     entry_blob STRING NOT NULL
   )''');
@@ -183,6 +161,14 @@ Future<void> _uploadSqlFlite(
       RUN_ON_PARENT: entry.runOnParent,
       HEADWORD_ABBREVIATION: entry.headwordAbbreviation,
       ALTERNATE_HEADWORD: entry.alternateHeadword,
+      HEADWORD + WITHOUT_DIACRITICAL_MARKS:
+          entry.headword.withoutDiacriticalMarks,
+      RUN_ON_PARENT + WITHOUT_DIACRITICAL_MARKS:
+          entry.runOnParent.withoutDiacriticalMarks,
+      HEADWORD_ABBREVIATION + WITHOUT_DIACRITICAL_MARKS:
+          entry.headwordAbbreviation.withoutDiacriticalMarks,
+      ALTERNATE_HEADWORD + WITHOUT_DIACRITICAL_MARKS:
+          entry.alternateHeadword.withoutDiacriticalMarks,
       'translations': entry.translations.join('|'),
       'entry_blob': jsonEncode(entry.toJson()),
     };

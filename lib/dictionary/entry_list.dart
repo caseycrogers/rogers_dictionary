@@ -30,6 +30,16 @@ class EntryList extends StatelessWidget {
                   )),
             );
           return AsyncListView<Entry>(
+            noResultsWidgetBuilder: (context) => Container(
+              child: Padding(
+                padding: EdgeInsets.all(30.0),
+                child: Text("No results! Check for typos.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                    )),
+              ),
+            ),
             initialData: entrySearchModel.entries,
             stream: entrySearchModel.entryStream,
             loadingWidget: Container(
