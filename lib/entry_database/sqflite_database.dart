@@ -2,13 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/entry_database/entry_database.dart';
+import 'package:rogers_dictionary/models/search_options.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqliteDatabase extends EntryDatabase {
+class SqfliteDatabase extends EntryDatabase {
   Future<Database> _dbFuture = _getDatabase();
 
   // We need an int that represents no string match and is larger than any
@@ -16,30 +20,46 @@ class SqliteDatabase extends EntryDatabase {
   static const NO_MATCH = 1000;
 
   String _sqlRelevancyScore(String searchString, String columnName) {
-    final index =
-        'CASE WHEN $columnName LIKE "$searchString%" THEN 1 ELSE INSTR(LOWER($columnName), LOWER(" $searchString")) END';
+    final index = 'INSTR(LOWER(" " || $columnName), LOWER(" $searchString"))';
     return '''CASE 
     WHEN $index = 0
     THEN $NO_MATCH
-    ELSE INSTR(SUBSTR($columnName || " ", $index + ${searchString.length}), " ")
+    ELSE INSTR(SUBSTR(" " || $columnName || " ", $index + ${searchString.length + 1}), " ")
     END''';
   }
 
   @override
-  Stream<Entry> getEntries({String searchString, String startAfter}) async* {
+  Stream<Entry> getEntries({
+    @required String searchString,
+    @required String startAfter,
+    @required SearchOptions searchOptions,
+  }) async* {
     int offset = 0;
     var db = await _dbFuture;
+    String orderByClause;
+    final suffix = searchOptions.ignoreAccents ? WITHOUT_DIACRITICAL_MARKS : '';
+    if (searchOptions.ignoreAccents)
+      searchString = searchString.withoutDiacriticalMarks;
+    switch (searchOptions.sortBy) {
+      case SortOrder.relevance:
+        orderByClause = '${_sqlRelevancyScore(searchString, HEADWORD)}, '
+            '${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION)}, '
+            '${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORD)}, '
+            'headword';
+        break;
+      case SortOrder.alphabetical:
+        orderByClause = 'headword';
+        break;
+    }
     while (true) {
       var snapshot = await db.query(
         'English',
-        where: '${_sqlRelevancyScore(searchString, 'headword')} != $NO_MATCH '
-            'OR ${_sqlRelevancyScore(searchString, 'headword_abbreviation')} != $NO_MATCH '
-            'OR ${_sqlRelevancyScore(searchString, 'alternate_headword')} != $NO_MATCH '
+        where:
+            '${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH '
+            'OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION + suffix)} != $NO_MATCH '
+            'OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORD + suffix)} != $NO_MATCH '
             'AND url_encoded_headword > "$startAfter"',
-        orderBy: '${_sqlRelevancyScore(searchString, 'headword')}, '
-            '${_sqlRelevancyScore(searchString, 'headword_abbreviation')}, '
-            '${_sqlRelevancyScore(searchString, 'alternate_headword')}, '
-            'headword',
+        orderBy: orderByClause,
         limit: 20,
         offset: offset,
       );

@@ -29,7 +29,7 @@ class Indent extends StatelessWidget {
 }
 
 Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
-    backgroundColor: color,
+    backgroundColor: color ?? Colors.grey.shade300,
     padding: EdgeInsets.zero.add(EdgeInsets.only(bottom: 2.0)),
     label: text,
     shape: RoundedRectangleBorder(
@@ -119,7 +119,6 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
         pos,
         style: _italic1(context),
       ),
-      color: Colors.grey.shade400,
     ),
   );
 }
