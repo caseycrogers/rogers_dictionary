@@ -46,6 +46,7 @@ class Entry {
     'n': 'noun',
     'npl': 'plural noun',
     'prep': 'preposition',
+    '-': 'phrase',
   };
 
   static String longPartOfSpeech(String partOfSpeech) {

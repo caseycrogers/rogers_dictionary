@@ -5,16 +5,16 @@ import 'package:rogers_dictionary/entry_database/entry.dart';
 
 import 'overflow_markdown.dart';
 
-TextStyle _headline1(BuildContext context) =>
+TextStyle headline1(BuildContext context) =>
     Theme.of(context).textTheme.headline1.copyWith(fontWeight: FontWeight.bold);
 
-TextStyle _normal1(BuildContext context) =>
+TextStyle normal1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1;
 
-TextStyle _bold1(BuildContext context) =>
+TextStyle bold1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1.copyWith(fontWeight: FontWeight.bold);
 
-TextStyle _italic1(BuildContext context) =>
+TextStyle italic1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1.copyWith(fontStyle: FontStyle.italic);
 
 class Indent extends StatelessWidget {
@@ -38,7 +38,7 @@ Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
 Widget headwordText(BuildContext context, String text, bool preview) {
   return OverflowMarkdown(
     text,
-    defaultStyle: preview ? _bold1(context) : _headline1(context),
+    defaultStyle: preview ? bold1(context) : headline1(context),
   );
 }
 
@@ -46,11 +46,11 @@ Widget abbreviationLine(BuildContext context, String text) {
   if (text.isEmpty) return Container();
   return RichText(
       text: TextSpan(
-    style: _bold1(context),
+    style: bold1(context),
     children: [
       TextSpan(
         text: 'abbr ',
-        style: _italic1(context),
+        style: italic1(context),
       ),
       TextSpan(
         text: text,
@@ -68,10 +68,10 @@ Widget alternateHeadwordLine(BuildContext context, String altHeadword,
         child: RichText(
           overflow: preview ? TextOverflow.ellipsis : TextOverflow.visible,
           text: TextSpan(
-            style: _normal1(context),
+            style: normal1(context),
             children: [
-              TextSpan(text: 'alt. ', style: _italic1(context)),
-              TextSpan(text: altHeadword, style: _bold1(context)),
+              TextSpan(text: 'alt. ', style: italic1(context)),
+              TextSpan(text: altHeadword, style: bold1(context)),
               _namingStandard(context, namingStandard),
             ],
           ),
@@ -86,7 +86,7 @@ TextSpan _namingStandard(BuildContext context, String namingStandard) {
   if (namingStandard.isNotEmpty)
     return TextSpan(text: '', children: [
       TextSpan(text: ' ('),
-      TextSpan(text: namingStandard, style: _italic1(context)),
+      TextSpan(text: namingStandard, style: italic1(context)),
       TextSpan(text: ')', style: TextStyle(letterSpacing: 5.0)),
     ]);
   return TextSpan();
@@ -101,7 +101,7 @@ Widget _translationParenthetical(
         children: translationParenthetical
             .split(';')
             .map((q) => _chip(context,
-                Text(q, style: _italic1(context).copyWith(fontSize: 20.0))))
+                Text(q, style: italic1(context).copyWith(fontSize: 20.0))))
             .toList(),
       ),
     );
@@ -117,7 +117,7 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
       context,
       Text(
         pos,
-        style: _italic1(context),
+        style: italic1(context),
       ),
     ),
   );
@@ -150,14 +150,14 @@ Widget parentheticalText(BuildContext context, String text) {
   if (text.isEmpty) return Container();
   return _chip(
     context,
-    Text(text, style: _italic1(context)),
+    Text(text, style: italic1(context)),
     color: Colors.cyan.shade100,
   );
 }
 
 TextSpan _genderAndPluralText(BuildContext context, String text) {
   if (text.isEmpty) return TextSpan();
-  return TextSpan(text: ' $text', style: _italic1(context));
+  return TextSpan(text: ' $text', style: italic1(context));
 }
 
 Widget editorialText(BuildContext context, String text) {
@@ -183,13 +183,13 @@ Widget exampleText(BuildContext context, String exampleText) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Example Phrases:', style: _italic1(context)),
+              Text('Example Phrases:', style: italic1(context)),
               Column(
                 children: exampleText
                     .split('...')
                     .map((example) => OverflowMarkdown(
                         example.replaceAll('\.\.', ' '),
-                        defaultStyle: _normal1(context).copyWith(height: 1.5)))
+                        defaultStyle: normal1(context).copyWith(height: 1.5)))
                     .toList(),
               ),
             ],

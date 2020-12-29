@@ -9,20 +9,42 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 
+enum TranslationMode {
+  English,
+  Spanish,
+}
+
+TranslationMode oppositeTranslationMode(TranslationMode translationMode) =>
+    translationMode == TranslationMode.English
+        ? TranslationMode.Spanish
+        : TranslationMode.English;
+
+const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
+
 class DictionaryPageModel {
   static const String route = 'dictionary';
   static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
   static const String SEARCH_STRING_QUERY_PARAM = 'search';
   static const String SORT_BY_QUERY_PARAM = 'sortBy';
 
+  static DictionaryPageModel _lastEnglishPageModel =
+      DictionaryPageModel.empty(translationMode: TranslationMode.English);
+  static DictionaryPageModel _lastSpanishModel =
+      DictionaryPageModel.empty(translationMode: TranslationMode.Spanish);
+
+  // Translation mode state.
+  final TranslationMode translationMode;
+
   // Selected entry state.
-  Future<Entry> selectedEntry;
-  String selectedEntryHeadword;
+  final Future<Entry> selectedEntry;
+  final String selectedEntryHeadword;
 
   // Entry search state
   final EntrySearchModel entrySearchModel;
   bool searchBarHasFocus;
   bool expandSearchOptions;
+
+  bool get isEnglish => translationMode == TranslationMode.English;
 
   bool get hasSelection => selectedEntryHeadword.isNotEmpty;
 
@@ -44,7 +66,10 @@ class DictionaryPageModel {
   static DictionaryPageModel of(BuildContext context) =>
       ModalRoute.of(context).settings.arguments;
 
-  factory DictionaryPageModel.empty() => DictionaryPageModel._(
+  factory DictionaryPageModel.empty(
+          {@required TranslationMode translationMode}) =>
+      DictionaryPageModel._(
+        translationMode: translationMode,
         selectedEntry: null,
         selectedEntryHeadword: '',
         entrySearchModel: EntrySearchModel.empty(),
@@ -53,32 +78,46 @@ class DictionaryPageModel {
       );
 
   factory DictionaryPageModel.fromQueryParams(Map<String, String> queryParams) {
-    var encodedHeadword = queryParams[SELECTED_ENTRY_QUERY_PARAM];
-    var searchString = queryParams[SEARCH_STRING_QUERY_PARAM];
-    return DictionaryPageModel._(
-      selectedEntry:
-          encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
-      selectedEntryHeadword: encodedHeadword ?? '',
-      entrySearchModel:
-          EntrySearchModel(searchString ?? '', SearchOptions.empty()),
-      searchBarHasFocus: false,
-      expandSearchOptions: false,
-    );
+    throw UnimplementedError(
+        'Query Params is no longer up to date and should not be used.');
+    // var encodedHeadword = queryParams[SELECTED_ENTRY_QUERY_PARAM];
+    // var searchString = queryParams[SEARCH_STRING_QUERY_PARAM];
+    // return DictionaryPageModel._(
+    //   translationMode: DEFAULT_TRANSLATION_MODE,
+    //   selectedEntry:
+    //       encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
+    //   selectedEntryHeadword: encodedHeadword ?? '',
+    //   entrySearchModel:
+    //       EntrySearchModel(searchString ?? '', SearchOptions.empty()),
+    //   searchBarHasFocus: false,
+    //   expandSearchOptions: false,
+    // );
   }
 
   DictionaryPageModel _copyWithEntry(Entry newEntry) {
-    return _copyWith(Future.value(newEntry), newEntry.urlEncodedHeadword);
+    return _copyWith(
+        newSelectedEntry: Future.value(newEntry),
+        newEncodedHeadword: newEntry.urlEncodedHeadword);
   }
 
   DictionaryPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
-    return _copyWith(MyApp.db.getEntry(newEncodedHeadword), newEncodedHeadword);
+    return _copyWith(
+        newSelectedEntry: MyApp.db.getEntry(newEncodedHeadword),
+        newEncodedHeadword: newEncodedHeadword);
   }
 
   DictionaryPageModel _copyWith(
-      FutureOr<Entry> newEntry, String newEncodedHeadword) {
+      {DictionaryPageModel newOppositeModeModel,
+      FutureOr<Entry> newSelectedEntry,
+      String newEncodedHeadword}) {
+    assert((newSelectedEntry != null && newEncodedHeadword != null) ||
+        (newSelectedEntry == null && newEncodedHeadword == null));
+    assert(newOppositeModeModel == null ||
+        newOppositeModeModel.translationMode != translationMode);
     return DictionaryPageModel._(
-      selectedEntry: newEntry,
-      selectedEntryHeadword: newEncodedHeadword,
+      translationMode: translationMode,
+      selectedEntry: newSelectedEntry ?? selectedEntry,
+      selectedEntryHeadword: newEncodedHeadword ?? selectedEntryHeadword,
       entrySearchModel: entrySearchModel.copy(),
       searchBarHasFocus: false,
       expandSearchOptions: expandSearchOptions,
@@ -86,12 +125,25 @@ class DictionaryPageModel {
   }
 
   DictionaryPageModel._({
+    @required this.translationMode,
     @required this.selectedEntry,
     @required this.selectedEntryHeadword,
     @required this.entrySearchModel,
     @required this.searchBarHasFocus,
     @required this.expandSearchOptions,
   });
+
+  static void onTranslationModeChanged(
+      BuildContext context, TranslationMode newTranslationMode) {
+    var oldModel = DictionaryPageModel.of(context);
+    if (newTranslationMode == oldModel.translationMode) return;
+    if (oldModel.isEnglish) {
+      _lastEnglishPageModel = oldModel;
+      return _lastSpanishModel._copyWith()._pushPage(context);
+    }
+    _lastSpanishModel = oldModel;
+    return _lastEnglishPageModel._copyWith()._pushPage(context);
+  }
 
   static void onSearchChanged(BuildContext context, String newSearchString,
       SearchOptions newSearchOptions) {

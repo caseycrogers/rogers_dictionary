@@ -11,20 +11,23 @@ class PageRouter {
 
     // Route not recognized, display 404 page
     return PageRouteBuilder(
-        settings: settings,
-        pageBuilder: (context, animation, _) => Scaffold(
-              body:
-                  Center(child: Text('No route defined for ${settings.name}')),
-            ));
+      settings: settings,
+      pageBuilder: (context, animation, _) => Scaffold(
+        body: Center(child: Text('No route defined for ${settings.name}')),
+      ),
+    );
   }
 }
 
 Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
-  var newArguments = DictionaryPageModel.fromQueryParams(uri.queryParameters);
+  //var newArguments = DictionaryPageModel.fromQueryParams(uri.queryParameters);
   return PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 200),
       settings: settings.copyWith(
-          name: settings.name, arguments: settings.arguments ?? newArguments),
+          name: settings.name,
+          arguments: settings.arguments ??
+              DictionaryPageModel.empty(
+                  translationMode: DEFAULT_TRANSLATION_MODE)),
       pageBuilder: (context, animation, secondaryAnimation) {
         return DictionaryPage();
       });

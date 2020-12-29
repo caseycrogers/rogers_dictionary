@@ -49,7 +49,6 @@ class MyApp extends StatelessWidget {
             color: Colors.black38,
           ),
           appBarTheme: AppBarTheme(color: Colors.amberAccent),
-          selectedRowColor: Colors.amber.shade50,
         ),
       ),
       onTap: () => unFocus(context),

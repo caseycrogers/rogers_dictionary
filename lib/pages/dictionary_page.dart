@@ -3,22 +3,51 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/dictionary/entry_search.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/entry_page.dart';
+import 'dart:collection';
 
 class DictionaryPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
       ListEquality().equals(uri.pathSegments, ['dictionary']);
 
-  DictionaryPage();
+  TranslationMode _indexToTranslationMode(BuildContext context, int index) =>
+      _navigationItems(context).keys.toList()[index];
+
+  int _translationModeToIndex(
+      BuildContext context, TranslationMode translationMode) {
+    assert(translationMode != null);
+    return _navigationItems(context).keys.toList().indexOf(translationMode);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: Text('Dictionary'),
+    final dictionaryPage = DictionaryPageModel.of(context);
+    final primaryColor =
+        dictionaryPage.isEnglish ? Colors.indigoAccent : Colors.amberAccent;
+    final secondaryColor = dictionaryPage.isEnglish
+        ? Colors.indigo.shade100
+        : Colors.amber.shade100;
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        appBarTheme: AppBarTheme(color: primaryColor),
       ),
-      body: _buildOrientedPage(context, EntrySearch()),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text('Dictionary'),
+        ),
+        body: _buildOrientedPage(context, EntrySearch()),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex:
+              _translationModeToIndex(context, dictionaryPage.translationMode),
+          backgroundColor: secondaryColor,
+          items: _navigationItems(context).values.toList(),
+          onTap: (index) => DictionaryPageModel.onTranslationModeChanged(
+              context, _indexToTranslationMode(context, index)),
+        ),
+      ),
     );
   }
 
@@ -120,4 +149,37 @@ class DictionaryPage extends StatelessWidget {
       },
     );
   }
+
+  LinkedHashMap<TranslationMode, BottomNavigationBarItem> _navigationItems(
+          BuildContext context) =>
+      LinkedHashMap.fromEntries(
+        [
+          MapEntry(
+            TranslationMode.English,
+            BottomNavigationBarItem(
+              icon: Text('EN', style: bold1(context)),
+              activeIcon: Text('EN',
+                  style: bold1(context).copyWith(shadows: _textShadow)),
+              label: TranslationMode.English.toString().split('.').last,
+            ),
+          ),
+          MapEntry(
+            TranslationMode.Spanish,
+            BottomNavigationBarItem(
+              icon: Text('ES', style: bold1(context)),
+              activeIcon: Text('ES',
+                  style: bold1(context).copyWith(shadows: _textShadow)),
+              label: TranslationMode.Spanish.toString().split('.').last,
+            ),
+          ),
+        ],
+      );
+
+  static const List<Shadow> _textShadow = [
+    Shadow(
+      offset: Offset.zero,
+      blurRadius: 4.0,
+      color: Colors.blue,
+    ),
+  ];
 }
