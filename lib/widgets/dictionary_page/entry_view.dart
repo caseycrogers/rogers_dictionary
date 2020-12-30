@@ -5,14 +5,13 @@ import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
-import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 
-class EntryPage extends StatelessWidget {
+class EntryView extends StatelessWidget {
   final Entry _entry;
   final bool _preview;
 
-  EntryPage._instance(this._entry, this._preview);
+  EntryView._instance(this._entry, this._preview);
 
   static Widget asPage() => Builder(
         builder: (context) {
@@ -51,7 +50,7 @@ class EntryPage extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(
                               left: pad, right: pad, bottom: pad),
-                          child: EntryPage._instance(entry, false),
+                          child: EntryView._instance(entry, false),
                         ),
                       ),
                     ),
@@ -63,7 +62,7 @@ class EntryPage extends StatelessWidget {
         },
       );
 
-  static Widget asPreview(Entry entry) => EntryPage._instance(entry, true);
+  static Widget asPreview(Entry entry) => EntryView._instance(entry, true);
 
   static Widget _iconButton(BuildContext context) => Padding(
         padding: const EdgeInsets.all(4.0),

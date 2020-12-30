@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/dictionary/entry_search.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
-import 'package:rogers_dictionary/widgets/entry_page.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'dart:collection';
 
 class DictionaryPage extends StatelessWidget {
@@ -24,7 +24,7 @@ class DictionaryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final dictionaryPage = DictionaryPageModel.of(context);
     final primaryColor =
-        dictionaryPage.isEnglish ? Colors.indigoAccent : Colors.amberAccent;
+        dictionaryPage.isEnglish ? Colors.indigo : Colors.amber;
     final secondaryColor = dictionaryPage.isEnglish
         ? Colors.indigo.shade100
         : Colors.amber.shade100;
@@ -40,6 +40,8 @@ class DictionaryPage extends StatelessWidget {
         ),
         body: _buildOrientedPage(context, EntrySearch()),
         bottomNavigationBar: BottomNavigationBar(
+          selectedLabelStyle: TextStyle(color: Colors.black),
+          unselectedLabelStyle: TextStyle(color: Colors.white),
           currentIndex:
               _translationModeToIndex(context, dictionaryPage.translationMode),
           backgroundColor: secondaryColor,
@@ -77,7 +79,7 @@ class DictionaryPage extends StatelessWidget {
                                 ? Offset(0.0, 0.0)
                                 : Offset(1.0, 0.0))
                         .animate(animation),
-                    child: EntryPage.asPage(),
+                    child: EntryView.asPage(),
                   ),
                 ),
                 if (!dictionaryPageModel.hasSelection)
@@ -121,7 +123,7 @@ class DictionaryPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Theme.of(context).cardColor,
                         ),
-                        child: EntryPage.asPage()),
+                        child: EntryView.asPage()),
                   ),
                 ),
                 Positioned(
@@ -157,29 +159,27 @@ class DictionaryPage extends StatelessWidget {
           MapEntry(
             TranslationMode.English,
             BottomNavigationBarItem(
-              icon: Text('EN', style: bold1(context)),
-              activeIcon: Text('EN',
-                  style: bold1(context).copyWith(shadows: _textShadow)),
+              icon: Text('EN', style: _inactiveTextStyle(context)),
+              activeIcon: Text('EN', style: _activeTextStyle(context)),
               label: TranslationMode.English.toString().split('.').last,
             ),
           ),
           MapEntry(
             TranslationMode.Spanish,
             BottomNavigationBarItem(
-              icon: Text('ES', style: bold1(context)),
-              activeIcon: Text('ES',
-                  style: bold1(context).copyWith(shadows: _textShadow)),
+              icon: Text('ES', style: _inactiveTextStyle(context)),
+              activeIcon: Text('ES', style: _activeTextStyle(context)),
               label: TranslationMode.Spanish.toString().split('.').last,
             ),
           ),
         ],
       );
 
-  static const List<Shadow> _textShadow = [
-    Shadow(
-      offset: Offset.zero,
-      blurRadius: 4.0,
-      color: Colors.blue,
-    ),
-  ];
+  TextStyle _activeTextStyle(BuildContext context) => bold1(context).copyWith(
+        color: Colors.blue,
+        fontSize: normal1(context).fontSize + 2,
+      );
+
+  TextStyle _inactiveTextStyle(BuildContext context) =>
+      bold1(context).copyWith(color: Colors.black54);
 }

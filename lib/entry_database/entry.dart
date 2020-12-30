@@ -14,8 +14,8 @@ class Entry {
   final String runOnParent;
   final List<String> runOns;
   final String headwordAbbreviation;
-  final String alternateHeadword;
-  final String alternateHeadwordNamingStandard;
+  final List<String> alternateHeadwords;
+  final List<String> alternateHeadwordNamingStandards;
 
   final List<Translation> translations;
 
@@ -26,8 +26,8 @@ class Entry {
     @required this.runOnParent,
     @required this.runOns,
     @required this.headwordAbbreviation,
-    @required this.alternateHeadword,
-    @required this.alternateHeadwordNamingStandard,
+    @required this.alternateHeadwords,
+    @required this.alternateHeadwordNamingStandards,
     @required this.translations,
   });
 
@@ -136,8 +136,8 @@ class EntryBuilder {
   String _runOnParent;
   List<String> _runOns = [];
   String _headwordAbbreviation;
-  String _alternateHeadword;
-  String _alternateHeadwordNamingStandard;
+  List<String> _alternateHeadwords = [];
+  List<String> _alternateHeadwordNamingStandards = [];
 
   List<Translation> _translations = [];
 
@@ -177,14 +177,19 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder alternateHeadword(String alternateHeadword) {
-    _alternateHeadword = alternateHeadword;
+  EntryBuilder alternateHeadwords(List<String> alternateHeadwords) {
+    _alternateHeadwords = alternateHeadwords;
     return this;
   }
 
-  EntryBuilder alternateHeadwordNamingStandard(
-      String alternateHeadwordNamingStandard) {
-    _alternateHeadwordNamingStandard = alternateHeadwordNamingStandard;
+  EntryBuilder alternateHeadwordNamingStandards(
+      List<String> alternateHeadwordNamingStandards) {
+    assert(
+        _alternateHeadwords.length >= alternateHeadwordNamingStandards.length);
+    _alternateHeadwordNamingStandards = alternateHeadwordNamingStandards;
+    _alternateHeadwordNamingStandards.addAll(List.generate(
+        _alternateHeadwords.length - _alternateHeadwordNamingStandards.length,
+        (_) => ''));
     return this;
   }
 
@@ -230,8 +235,8 @@ class EntryBuilder {
       runOnParent: _runOnParent,
       runOns: _runOns,
       headwordAbbreviation: _headwordAbbreviation,
-      alternateHeadword: _alternateHeadword,
-      alternateHeadwordNamingStandard: _alternateHeadwordNamingStandard,
+      alternateHeadwords: _alternateHeadwords,
+      alternateHeadwordNamingStandards: _alternateHeadwordNamingStandards,
       translations: _translations,
     );
   }

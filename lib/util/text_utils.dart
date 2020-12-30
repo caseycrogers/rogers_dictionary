@@ -59,22 +59,32 @@ Widget abbreviationLine(BuildContext context, String text) {
   ));
 }
 
-Widget alternateHeadwordLine(BuildContext context, String altHeadword,
-    String namingStandard, bool preview) {
-  if (altHeadword.isEmpty) return Container();
+Widget alternateHeadwordLine(
+    BuildContext context,
+    List<String> alternateHeadwords,
+    List<String> namingStandards,
+    bool preview) {
+  if (alternateHeadwords.isEmpty) return Container();
   return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Flexible(
-        child: RichText(
-          overflow: preview ? TextOverflow.ellipsis : TextOverflow.visible,
-          text: TextSpan(
-            style: normal1(context),
-            children: [
-              TextSpan(text: 'alt. ', style: italic1(context)),
-              TextSpan(text: altHeadword, style: bold1(context)),
-              _namingStandard(context, namingStandard),
-            ],
-          ),
+      Text('alt. ', style: italic1(context)),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: alternateHeadwords
+              .asMap()
+              .keys
+              .map((i) => RichText(
+                    overflow:
+                        preview ? TextOverflow.ellipsis : TextOverflow.visible,
+                    text: TextSpan(style: normal1(context), children: [
+                      TextSpan(
+                          text: alternateHeadwords[i], style: bold1(context)),
+                      _namingStandard(context, namingStandards[i]),
+                    ]),
+                  ))
+              .toList(),
         ),
       ),
     ],
@@ -83,6 +93,7 @@ Widget alternateHeadwordLine(BuildContext context, String altHeadword,
 
 TextSpan _namingStandard(BuildContext context, String namingStandard) {
   if (namingStandard == 'i') namingStandard = 'INN';
+  if (namingStandard == 'u') namingStandard = 'USAN';
   if (namingStandard.isNotEmpty)
     return TextSpan(text: '', children: [
       TextSpan(text: ' ('),
@@ -210,8 +221,8 @@ Widget headwordLine(BuildContext context, Entry entry, bool preview) {
               ? entry.headword
               : '${entry.headword} (${entry.headwordAbbreviation})',
           preview),
-      alternateHeadwordLine(context, entry.alternateHeadword,
-          entry.alternateHeadwordNamingStandard, preview),
+      alternateHeadwordLine(context, entry.alternateHeadwords,
+          entry.alternateHeadwordNamingStandards, preview),
     ],
   );
 }

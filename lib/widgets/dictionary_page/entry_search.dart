@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/dictionary/search_bar.dart';
 
 import 'entry_list.dart';
+import 'search_bar.dart';
 
 class EntrySearch extends StatelessWidget {
   static const String route = '/';

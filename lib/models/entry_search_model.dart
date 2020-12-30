@@ -3,8 +3,6 @@ import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 
-import 'dictionary_page_model.dart';
-
 class EntrySearchModel with ChangeNotifier {
   String _searchString;
   SearchOptions _searchOptions;
