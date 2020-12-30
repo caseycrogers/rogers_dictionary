@@ -14,9 +14,13 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
     runOnParent: json['run_on_parent'] as String,
     runOns: (json['run_ons'] as List)?.map((e) => e as String)?.toList(),
     headwordAbbreviation: json['headword_abbreviation'] as String,
-    alternateHeadword: json['alternate_headword'] as String,
-    alternateHeadwordNamingStandard:
-        json['alternate_headword_naming_standard'] as String,
+    alternateHeadwords: (json['alternate_headwords'] as List)
+        ?.map((e) => e as String)
+        ?.toList(),
+    alternateHeadwordNamingStandards:
+        (json['alternate_headword_naming_standards'] as List)
+            ?.map((e) => e as String)
+            ?.toList(),
     translations: (json['translations'] as List)
         ?.map((e) =>
             e == null ? null : Translation.fromJson(e as Map<String, dynamic>))
@@ -31,9 +35,9 @@ Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
       'run_on_parent': instance.runOnParent,
       'run_ons': instance.runOns,
       'headword_abbreviation': instance.headwordAbbreviation,
-      'alternate_headword': instance.alternateHeadword,
-      'alternate_headword_naming_standard':
-          instance.alternateHeadwordNamingStandard,
+      'alternate_headwords': instance.alternateHeadwords,
+      'alternate_headword_naming_standards':
+          instance.alternateHeadwordNamingStandards,
       'translations': instance.translations?.map((e) => e?.toJson())?.toList(),
     };
 

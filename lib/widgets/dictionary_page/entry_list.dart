@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
 
-import 'package:rogers_dictionary/widgets/entry_page.dart';
+import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/dictionary_page/entry_view.dart';
 
 class EntryList extends StatelessWidget {
   @override
@@ -72,7 +72,7 @@ class EntryList extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                 child: Row(
                   children: [
-                    Expanded(child: EntryPage.asPreview(entry)),
+                    Expanded(child: EntryView.asPreview(entry)),
                     Icon(
                       Icons.arrow_forward_ios_outlined,
                       color: Theme.of(context).accentIconTheme.color,

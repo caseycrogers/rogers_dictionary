@@ -44,7 +44,7 @@ class SqfliteDatabase extends EntryDatabase {
       case SortOrder.relevance:
         orderByClause = '${_sqlRelevancyScore(searchString, HEADWORD)}, '
             '${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION)}, '
-            '${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORD)}, '
+            '${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS)}, '
             'headword';
         break;
       case SortOrder.alphabetical:
@@ -57,7 +57,7 @@ class SqfliteDatabase extends EntryDatabase {
         where:
             '${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH '
             'OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION + suffix)} != $NO_MATCH '
-            'OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORD + suffix)} != $NO_MATCH '
+            'OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS + suffix)} != $NO_MATCH '
             'AND url_encoded_headword > "$startAfter"',
         orderBy: orderByClause,
         limit: 20,

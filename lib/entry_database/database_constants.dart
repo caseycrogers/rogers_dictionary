@@ -11,8 +11,9 @@ const ENTRY_ID = 'entry_id';
 const RUN_ON_PARENT = 'run_on_parent';
 const RUN_ON_TEXT = 'run_on_text';
 const HEADWORD_ABBREVIATION = 'headword_abbreviation';
-const ALTERNATE_HEADWORD = 'alternate_headword';
-const ALTERNATE_HEADWORD_NAMING_STANDARD = 'alternate_headword_naming_standard';
+const ALTERNATE_HEADWORDS = 'alternate_headwords';
+const ALTERNATE_HEADWORD_NAMING_STANDARDS =
+    'alternate_headword_naming_standards';
 const IRREGULAR_INFLECTIONS = 'irregular_inflections';
 const PART_OF_SPEECH = 'part_of_speech';
 const HEADWORD_RESTRICTIVE_LABEL = 'headword_restrictive_label';

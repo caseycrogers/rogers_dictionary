@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:algolia/algolia.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -10,10 +9,14 @@ import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:args/args.dart';
 import 'package:firedart/firedart.dart';
 import 'package:df/df.dart';
+import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-Future<List<void>> uploadEntries(bool debug, bool verbose) async {
-  var df = await DataFrame.fromCsv('lib/scripts/dictionary_database.csv');
+Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
+  var filePath = join(Directory.current.path, 'lib', 'scripts',
+      'dictionary_database-${isSpanish ? 'spanish' : 'english'}.csv');
+  print('Uploading: $filePath.');
+  var df = await DataFrame.fromCsv(filePath);
 
   var rows = df.rows.map((row) => row.map(_parseCell));
   EntryBuilder builder;
@@ -39,13 +42,9 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
         continue;
       }
       if (row[RUN_ON_PARENT].isNotEmpty) {
-        var parent = entryBuilders[row[RUN_ON_PARENT]];
-        if (parent == null) {
-          print(
-              "Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
-        } else {
-          parent.addRunOn(row[HEADWORD]);
-        }
+        entryBuilders[row[RUN_ON_PARENT]]?.addRunOn(row[HEADWORD]) ??
+            print(
+                "Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
       }
       builder = EntryBuilder()
           .orderByField(Entry.generateOrderByField(row[HEADWORD], i))
@@ -53,9 +52,9 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
           .headword(row[HEADWORD])
           .runOnParent(row[RUN_ON_PARENT])
           .headwordAbbreviation(row[HEADWORD_ABBREVIATION])
-          .alternateHeadword(row[ALTERNATE_HEADWORD])
-          .alternateHeadwordNamingStandard(
-              row[ALTERNATE_HEADWORD_NAMING_STANDARD]);
+          .alternateHeadwords(row[ALTERNATE_HEADWORDS].split('|'))
+          .alternateHeadwordNamingStandards(
+              row[ALTERNATE_HEADWORD_NAMING_STANDARDS].split('|'));
       if (entryBuilders.keys.contains(row[HEADWORD]))
         print('Duplicate headword ${row[HEADWORD]} at line $i');
       entryBuilders[row[HEADWORD]] = builder;
@@ -84,9 +83,8 @@ Future<List<void>> uploadEntries(bool debug, bool verbose) async {
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
-  await _uploadSqlFlite(
+  return _uploadSqlFlite(
       entryBuilders.values.map((b) => b.build()).toList(), debug, verbose);
-  print('done?');
 }
 
 List<String> _constructSearchList(Entry entry) {
@@ -144,11 +142,11 @@ Future<void> _uploadSqlFlite(
     $HEADWORD STRING NOT NULL,
     $RUN_ON_PARENT STRING,
     $HEADWORD_ABBREVIATION STRING,
-    $ALTERNATE_HEADWORD String,
+    $ALTERNATE_HEADWORDS String,
     $HEADWORD$WITHOUT_DIACRITICAL_MARKS STRING NOT NULL,
     $RUN_ON_PARENT$WITHOUT_DIACRITICAL_MARKS STRING,
     $HEADWORD_ABBREVIATION$WITHOUT_DIACRITICAL_MARKS STRING,
-    $ALTERNATE_HEADWORD$WITHOUT_DIACRITICAL_MARKS String,
+    $ALTERNATE_HEADWORDS$WITHOUT_DIACRITICAL_MARKS String,
     translations STRING NOT NULL,
     entry_blob STRING NOT NULL
   )''');
@@ -160,50 +158,37 @@ Future<void> _uploadSqlFlite(
       HEADWORD: entry.headword,
       RUN_ON_PARENT: entry.runOnParent,
       HEADWORD_ABBREVIATION: entry.headwordAbbreviation,
-      ALTERNATE_HEADWORD: entry.alternateHeadword,
+      ALTERNATE_HEADWORDS: entry.alternateHeadwords.join(' | '),
       HEADWORD + WITHOUT_DIACRITICAL_MARKS:
           entry.headword.withoutDiacriticalMarks,
       RUN_ON_PARENT + WITHOUT_DIACRITICAL_MARKS:
           entry.runOnParent.withoutDiacriticalMarks,
       HEADWORD_ABBREVIATION + WITHOUT_DIACRITICAL_MARKS:
           entry.headwordAbbreviation.withoutDiacriticalMarks,
-      ALTERNATE_HEADWORD + WITHOUT_DIACRITICAL_MARKS:
-          entry.alternateHeadword.withoutDiacriticalMarks,
+      ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS: entry.alternateHeadwords
+          .map((alt) => alt.withoutDiacriticalMarks)
+          .join('|'),
       'translations': entry.translations.join('|'),
       'entry_blob': jsonEncode(entry.toJson()),
     };
-    if (true) print(entryRecord);
+    if (verbose) print(entryRecord);
     batch.insert('English', entryRecord);
   }
-  print('result: ${await batch.commit()}');
-}
-
-Future<void> _uploadAlgolia(
-    List<Entry> entries, bool debug, bool verbose) async {
-  // Read from a key file that's included in .gitignore to keep the private key private
-  String privateKey = jsonDecode(
-      File('/keys/rogers_dictionary/algolia.key').readAsStringSync())['key'];
-  Algolia algolia =
-      Algolia.init(applicationId: '4Z50QMD69C', apiKey: privateKey);
-  var batch = algolia.index('english_entries').batch();
-  for (var entry in entries) {
-    batch.updateObject(entry.toJson()
-      ..addEntries([MapEntry('objectID', entry.urlEncodedHeadword)]));
-  }
-  return (await batch.commit()).taskStatus();
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
   if (!(value is String)) value = '';
-  return MapEntry(key.trim(), value.trim());
+  var str = value as String;
+  return MapEntry(key.trim(), str.trim().replaceAll(' | ', '|'));
 }
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
     ..addFlag('debug', abbr: 'd', defaultsTo: false)
-    ..addFlag('verbose', abbr: 'v', defaultsTo: false);
+    ..addFlag('verbose', abbr: 'v', defaultsTo: false)
+    ..addFlag('spanish', abbr: 's', defaultsTo: false);
   var argResults = parser.parse(arguments);
 
-  await uploadEntries(
-      argResults['debug'] as bool, argResults['verbose'] as bool);
+  await uploadEntries(argResults['debug'] as bool,
+      argResults['verbose'] as bool, argResults['spanish'] as bool);
 }
