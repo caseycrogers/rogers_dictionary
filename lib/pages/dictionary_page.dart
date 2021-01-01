@@ -176,7 +176,7 @@ class DictionaryPage extends StatelessWidget {
       );
 
   TextStyle _activeTextStyle(BuildContext context) => bold1(context).copyWith(
-        color: Colors.blue,
+        color: Colors.black,
         fontSize: normal1(context).fontSize + 2,
       );
 

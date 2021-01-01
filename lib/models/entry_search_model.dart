@@ -11,24 +11,26 @@ class EntrySearchModel with ChangeNotifier {
   List<Entry> _entries;
   ScrollController _scrollController;
 
-  get searchString => _searchString;
+  String get searchString => _searchString;
 
-  get searchOptions => _searchOptions;
+  SearchOptions get searchOptions => _searchOptions;
 
-  get startAfter => _startAfter;
+  String get startAfter => _startAfter;
 
-  get entryStream => _entryStream;
+  Stream<Entry> get entryStream => _entryStream;
 
-  get entries => _entries;
+  List<Entry> get entries => _entries;
 
-  get scrollController => _scrollController;
+  ScrollController get scrollController => _scrollController;
 
-  get isEmpty => _searchString.isEmpty;
+  bool get isEmpty => _searchString.isEmpty;
 
   EntrySearchModel._(this._searchString, this._searchOptions, this._startAfter,
       this._entries, this._scrollController) {
-    _entryStream =
-        MyApp.db.getEntries(searchString: searchString, startAfter: startAfter);
+    _entryStream = MyApp.db.getEntries(
+        searchString: searchString,
+        startAfter: startAfter,
+        searchOptions: searchOptions);
   }
 
   EntrySearchModel(String searchString, SearchOptions searchOptions)

@@ -53,11 +53,11 @@ class SqfliteDatabase extends EntryDatabase {
     }
     while (true) {
       var snapshot = await db.query(
-        'English',
+        ENGLISH,
         where:
-            '${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH '
+            '(${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH '
             'OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION + suffix)} != $NO_MATCH '
-            'OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS + suffix)} != $NO_MATCH '
+            'OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS + suffix)} != $NO_MATCH) '
             'AND url_encoded_headword > "$startAfter"',
         orderBy: orderByClause,
         limit: 20,
@@ -92,7 +92,7 @@ class SqfliteDatabase extends EntryDatabase {
 
 Future<Database> _getDatabase() async {
   var databasesPath = await getDatabasesPath();
-  var path = join(databasesPath, "entries.db");
+  var path = join(databasesPath, "$ENTRIES.db");
 
   // Check if the database exists
   var exists = await databaseExists(path);
@@ -104,10 +104,12 @@ Future<Database> _getDatabase() async {
     // Make sure the parent directory exists
     try {
       await Directory(dirname(path)).create(recursive: true);
-    } catch (_) {}
+    } catch (e) {
+      print(e);
+    }
 
     // Copy from asset
-    ByteData data = await rootBundle.load(join("assets", "entries.db"));
+    ByteData data = await rootBundle.load(join("assets", "$ENTRIES.db"));
     List<int> bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 

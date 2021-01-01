@@ -8,7 +8,6 @@ part of 'entry.dart';
 
 Entry _$EntryFromJson(Map<String, dynamic> json) {
   return Entry(
-    orderByField: json['order_by_field'] as String,
     entryId: json['entry_id'] as int,
     headword: json['headword'] as String,
     runOnParent: json['run_on_parent'] as String,
@@ -29,7 +28,6 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
-      'order_by_field': instance.orderByField,
       'entry_id': instance.entryId,
       'headword': instance.headword,
       'run_on_parent': instance.runOnParent,
