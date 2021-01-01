@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
@@ -12,9 +11,12 @@ import 'package:df/df.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+const ROGERS_DICTIONARY =
+    'C:\\Users\\Waffl\\Documents\\code\\rogers_dictionary';
+
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
-  var filePath = join(Directory.current.path, 'lib', 'scripts',
-      'dictionary_database-${isSpanish ? 'spanish' : 'english'}.csv');
+  var filePath = join(ROGERS_DICTIONARY, 'lib', 'scripts',
+      'dictionary_database-${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv');
   print('Uploading: $filePath.');
   var df = await DataFrame.fromCsv(filePath);
 
@@ -25,7 +27,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
-  while (i < rows.length && i < 3000) {
+  while (i < rows.length && i < 50) {
     if (i % 500 == 0) print('$i/${rows.length} complete!');
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD].isNotEmpty) {
@@ -47,7 +49,6 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
                 "Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
       }
       builder = EntryBuilder()
-          .orderByField(Entry.generateOrderByField(row[HEADWORD], i))
           .entryId(i)
           .headword(row[HEADWORD])
           .runOnParent(row[RUN_ON_PARENT])
@@ -84,7 +85,11 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   }
   assert(builder != null, "Did not generate any entries!");
   return _uploadSqlFlite(
-      entryBuilders.values.map((b) => b.build()).toList(), debug, verbose);
+    isSpanish ? SPANISH : ENGLISH,
+    entryBuilders.values.map((b) => b.build()).toList(),
+    debug,
+    verbose,
+  );
 }
 
 List<String> _constructSearchList(Entry entry) {
@@ -130,13 +135,17 @@ Future<void> _uploadFirestore(List<Entry> entries, bool debug, bool verbose) {
 }
 
 Future<void> _uploadSqlFlite(
-    List<Entry> entries, bool debug, bool verbose) async {
-  const path =
-      'C:/Users/Waffl/Documents/code/rogers_dictionary/assets/entries.db';
+  String tableName,
+  List<Entry> entries,
+  bool debug,
+  bool verbose,
+) async {
+  final path = join(ROGERS_DICTIONARY, 'assets', 'entries.db');
+  print('Writing to: $path.');
   sqfliteFfiInit();
   var db = await databaseFactoryFfi.openDatabase(path);
-  await db.execute('''DROP TABLE English''');
-  await db.execute('''CREATE TABLE English (
+  await db.execute('''DROP TABLE $tableName''');
+  await db.execute('''CREATE TABLE $tableName (
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
     $HEADWORD STRING NOT NULL,
@@ -172,8 +181,9 @@ Future<void> _uploadSqlFlite(
       'entry_blob': jsonEncode(entry.toJson()),
     };
     if (verbose) print(entryRecord);
-    batch.insert('English', entryRecord);
+    batch.insert(tableName, entryRecord);
   }
+  return batch.commit().then((_) => null);
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
@@ -191,4 +201,5 @@ void main(List<String> arguments) async {
 
   await uploadEntries(argResults['debug'] as bool,
       argResults['verbose'] as bool, argResults['spanish'] as bool);
+  print('done?');
 }

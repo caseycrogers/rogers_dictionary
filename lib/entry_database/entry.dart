@@ -8,7 +8,6 @@ part 'entry.g.dart';
 class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
-  final String orderByField;
   final int entryId;
   final String headword;
   final String runOnParent;
@@ -20,7 +19,6 @@ class Entry {
   final List<Translation> translations;
 
   Entry({
-    @required this.orderByField,
     @required this.entryId,
     @required this.headword,
     @required this.runOnParent,
@@ -130,7 +128,6 @@ class Translation {
 }
 
 class EntryBuilder {
-  String _orderByField;
   String _headword;
   int _entryId;
   String _runOnParent;
@@ -140,15 +137,6 @@ class EntryBuilder {
   List<String> _alternateHeadwordNamingStandards = [];
 
   List<Translation> _translations = [];
-
-  String getUrlEncodedHeadword() {
-    return _orderByField;
-  }
-
-  EntryBuilder orderByField(String orderByField) {
-    _orderByField = orderByField;
-    return this;
-  }
 
   EntryBuilder headword(String headword) {
     _headword = headword;
@@ -222,14 +210,11 @@ class EntryBuilder {
   }
 
   Entry build() {
-    assert(_orderByField != null,
-        "You must specify a non null url encoded headword.");
     assert(_headword != null, "You must specify a non null headword.");
     assert(_entryId != null, "You must specify a non null entry id.");
     assert(_translations.length != 0,
         "You must specify one or more translations.");
     return Entry(
-      orderByField: _orderByField,
       entryId: _entryId,
       headword: _headword,
       runOnParent: _runOnParent,

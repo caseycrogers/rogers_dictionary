@@ -23,7 +23,7 @@ class EntryList extends StatelessWidget {
           if (entrySearchModel.isEmpty)
             return Padding(
               padding: EdgeInsets.all(30.0),
-              child: Text("Enter text above to search for a translation!",
+              child: Text('Enter text above to search for a translation!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.grey,
@@ -33,7 +33,7 @@ class EntryList extends StatelessWidget {
             noResultsWidgetBuilder: (context) => Container(
               child: Padding(
                 padding: EdgeInsets.all(30.0),
-                child: Text("No results! Check for typos.",
+                child: Text('No results! Check for typos.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey,

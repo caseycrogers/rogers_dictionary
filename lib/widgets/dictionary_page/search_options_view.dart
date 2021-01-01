@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 
 class SearchOptionsView extends StatelessWidget {
-  void Function(SearchOptions) onSearchChanged;
-  void Function(bool) onExpansionChanged;
+  final void Function(SearchOptions) onSearchChanged;
+  final void Function(bool) onExpansionChanged;
 
   SearchOptionsView(
       {@required this.onSearchChanged, @required this.onExpansionChanged});
@@ -32,9 +33,7 @@ class SearchOptionsView extends StatelessWidget {
             tilePadding: EdgeInsets.symmetric(horizontal: 12.0),
             childrenPadding: EdgeInsets.symmetric(horizontal: 12.0),
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
                 children: [
                   Row(
                     children: [

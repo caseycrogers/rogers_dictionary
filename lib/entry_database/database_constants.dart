@@ -1,6 +1,6 @@
 const String ENTRIES_DB = "entriesDB";
-const String ENGLISH = "english";
-const String SPANISH = "spanish";
+const String ENGLISH = "English";
+const String SPANISH = "Spanish";
 const String ENTRIES = "entries";
 
 // Column/field names.
