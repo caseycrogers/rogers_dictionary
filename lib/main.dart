@@ -47,7 +47,6 @@ class MyApp extends StatelessWidget {
           accentIconTheme: IconThemeData(
             color: Colors.black38,
           ),
-          appBarTheme: AppBarTheme(color: Colors.amberAccent),
         ),
       ),
       onTap: () => unFocus(context),

@@ -64,7 +64,8 @@ Widget alternateHeadwordLine(
     List<String> alternateHeadwords,
     List<String> namingStandards,
     bool preview) {
-  if (alternateHeadwords.isEmpty) return Container();
+  if (alternateHeadwords.where((alt) => alt.isNotEmpty).isEmpty)
+    return Container();
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [

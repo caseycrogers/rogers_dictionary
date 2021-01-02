@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 
 class EntrySearchModel with ChangeNotifier {
+  // Duplicated here because we need it to construct the entry stream.
+  final TranslationMode _translationMode;
   String _searchString;
   SearchOptions _searchOptions;
   String _startAfter;
@@ -25,21 +28,30 @@ class EntrySearchModel with ChangeNotifier {
 
   bool get isEmpty => _searchString.isEmpty;
 
-  EntrySearchModel._(this._searchString, this._searchOptions, this._startAfter,
-      this._entries, this._scrollController) {
-    _entryStream = MyApp.db.getEntries(
+  EntrySearchModel._(
+      this._translationMode,
+      this._searchString,
+      this._searchOptions,
+      this._startAfter,
+      this._entries,
+      this._scrollController) {
+    _entryStream = MyApp.db.getEntries(_translationMode,
         searchString: searchString,
         startAfter: startAfter,
         searchOptions: searchOptions);
   }
 
-  EntrySearchModel(String searchString, SearchOptions searchOptions)
-      : this._(searchString, searchOptions, '', [], ScrollController());
+  EntrySearchModel(TranslationMode translationMode, String searchString,
+      SearchOptions searchOptions)
+      : this._(translationMode, searchString, searchOptions, '', [],
+            ScrollController());
 
-  EntrySearchModel.empty()
-      : this._('', SearchOptions.empty(), '', [], ScrollController());
+  EntrySearchModel.empty(TranslationMode translationMode)
+      : this._(translationMode, '', SearchOptions.empty(), '', [],
+            ScrollController());
 
   EntrySearchModel copy() => EntrySearchModel._(
+      _translationMode,
       _searchString,
       _searchOptions,
       _startAfter,
@@ -57,7 +69,7 @@ class EntrySearchModel with ChangeNotifier {
     _searchOptions = newSearchOptions;
     _startAfter = '';
     _entries = [];
-    _entryStream = MyApp.db.getEntries(
+    _entryStream = MyApp.db.getEntries(_translationMode,
         searchString: _searchString,
         startAfter: _startAfter,
         searchOptions: _searchOptions);
