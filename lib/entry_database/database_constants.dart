@@ -8,7 +8,7 @@ const URL_ENCODED_HEADWORD = 'url_encoded_headword';
 const HEADWORD = 'headword';
 const ENTRY_ID = 'entry_id';
 
-const RUN_ON_PARENT = 'run_on_parent';
+const RUN_ON_PARENTS = 'run_on_parents';
 const RUN_ON_TEXT = 'run_on_text';
 const HEADWORD_ABBREVIATION = 'headword_abbreviation';
 const ALTERNATE_HEADWORDS = 'alternate_headwords';

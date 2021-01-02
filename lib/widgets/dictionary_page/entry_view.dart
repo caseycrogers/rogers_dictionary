@@ -96,8 +96,9 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildRelated(BuildContext context) {
-    if (_entry.runOnParent.isEmpty && _entry.runOns.isEmpty) return Container();
-    List<String> relatedList = [_entry.runOnParent]..addAll(_entry.runOns);
+    if (_entry.runOnParents.isEmpty && _entry.runOns.isEmpty)
+      return Container();
+    List<String> relatedList = _entry.runOnParents..addAll(_entry.runOns);
     List<TextSpan> relatedSpans = relatedList.where((s) => s.isNotEmpty).expand(
       (headword) {
         return [

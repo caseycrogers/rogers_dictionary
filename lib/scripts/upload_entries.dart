@@ -27,11 +27,11 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
-  while (i < rows.length && i < 50) {
+  while (i < rows.length) {
     if (i % 500 == 0) print('$i/${rows.length} complete!');
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD].isNotEmpty) {
-      if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENT].isEmpty) ||
+      if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENTS].isEmpty) ||
           row[TRANSLATION].isEmpty) {
         print(
             'Invalid empty cells for \'${row[HEADWORD]}\' at row $i, skipping.');
@@ -43,19 +43,27 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         }
         continue;
       }
-      if (row[RUN_ON_PARENT].isNotEmpty) {
-        entryBuilders[row[RUN_ON_PARENT]]?.addRunOn(row[HEADWORD]) ??
-            print(
-                "Missing run on parent \'${row[RUN_ON_PARENT]}\' for entry \'${row[HEADWORD]}\'");
+      var parents = <String>[];
+      if (row[RUN_ON_PARENTS].isNotEmpty) {
+        parents = row[RUN_ON_PARENTS].split('|');
+        parents.forEach((parent) {
+          entryBuilders[parent]?.addRunOn(row[HEADWORD]) ??
+              print(
+                  "Missing run on parent \'$parent\' for entry \'${row[HEADWORD]}\'");
+        });
       }
       builder = EntryBuilder()
           .entryId(i)
           .headword(row[HEADWORD])
-          .runOnParent(row[RUN_ON_PARENT])
+          .runOnParents(parents)
           .headwordAbbreviation(row[HEADWORD_ABBREVIATION])
-          .alternateHeadwords(row[ALTERNATE_HEADWORDS].split('|'))
+          .alternateHeadwords(row[ALTERNATE_HEADWORDS].isEmpty
+              ? []
+              : row[ALTERNATE_HEADWORDS].split('|'))
           .alternateHeadwordNamingStandards(
-              row[ALTERNATE_HEADWORD_NAMING_STANDARDS].split('|'));
+              row[ALTERNATE_HEADWORD_NAMING_STANDARDS].isEmpty
+                  ? []
+                  : row[ALTERNATE_HEADWORD_NAMING_STANDARDS].split('|'));
       if (entryBuilders.keys.contains(row[HEADWORD]))
         print('Duplicate headword ${row[HEADWORD]} at line $i');
       entryBuilders[row[HEADWORD]] = builder;
@@ -149,14 +157,13 @@ Future<void> _uploadSqlFlite(
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
     $HEADWORD STRING NOT NULL,
-    $RUN_ON_PARENT STRING,
+    $RUN_ON_PARENTS STRING,
     $HEADWORD_ABBREVIATION STRING,
     $ALTERNATE_HEADWORDS String,
     $HEADWORD$WITHOUT_DIACRITICAL_MARKS STRING NOT NULL,
-    $RUN_ON_PARENT$WITHOUT_DIACRITICAL_MARKS STRING,
+    $RUN_ON_PARENTS$WITHOUT_DIACRITICAL_MARKS STRING,
     $HEADWORD_ABBREVIATION$WITHOUT_DIACRITICAL_MARKS STRING,
     $ALTERNATE_HEADWORDS$WITHOUT_DIACRITICAL_MARKS String,
-    translations STRING NOT NULL,
     entry_blob STRING NOT NULL
   )''');
   var batch = db.batch();
@@ -165,19 +172,18 @@ Future<void> _uploadSqlFlite(
       URL_ENCODED_HEADWORD: entry.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headword,
-      RUN_ON_PARENT: entry.runOnParent,
+      RUN_ON_PARENTS: entry.runOnParents.join(' | '),
       HEADWORD_ABBREVIATION: entry.headwordAbbreviation,
       ALTERNATE_HEADWORDS: entry.alternateHeadwords.join(' | '),
       HEADWORD + WITHOUT_DIACRITICAL_MARKS:
           entry.headword.withoutDiacriticalMarks,
-      RUN_ON_PARENT + WITHOUT_DIACRITICAL_MARKS:
-          entry.runOnParent.withoutDiacriticalMarks,
+      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS:
+          entry.runOnParents.map((p) => p.withoutDiacriticalMarks).join(' | '),
       HEADWORD_ABBREVIATION + WITHOUT_DIACRITICAL_MARKS:
           entry.headwordAbbreviation.withoutDiacriticalMarks,
       ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS: entry.alternateHeadwords
           .map((alt) => alt.withoutDiacriticalMarks)
-          .join('|'),
-      'translations': entry.translations.join('|'),
+          .join(' | '),
       'entry_blob': jsonEncode(entry.toJson()),
     };
     if (verbose) print(entryRecord);
@@ -189,7 +195,13 @@ Future<void> _uploadSqlFlite(
 MapEntry<String, String> _parseCell(String key, dynamic value) {
   if (!(value is String)) value = '';
   var str = value as String;
-  return MapEntry(key.trim(), str.trim().replaceAll(' | ', '|'));
+  return MapEntry(
+      key.trim(),
+      str
+          .trim()
+          .replaceAll(' | ', '|')
+          .replaceAll('| ', '|')
+          .replaceAll(' |', '|'));
 }
 
 void main(List<String> arguments) async {

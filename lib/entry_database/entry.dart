@@ -10,7 +10,7 @@ class Entry {
   // flutter pub run build_runner build --delete-conflicting-outputs
   final int entryId;
   final String headword;
-  final String runOnParent;
+  final List<String> runOnParents;
   final List<String> runOns;
   final String headwordAbbreviation;
   final List<String> alternateHeadwords;
@@ -21,7 +21,7 @@ class Entry {
   Entry({
     @required this.entryId,
     @required this.headword,
-    @required this.runOnParent,
+    @required this.runOnParents,
     @required this.runOns,
     @required this.headwordAbbreviation,
     @required this.alternateHeadwords,
@@ -130,7 +130,7 @@ class Translation {
 class EntryBuilder {
   String _headword;
   int _entryId;
-  String _runOnParent;
+  List<String> _runOnParents;
   List<String> _runOns = [];
   String _headwordAbbreviation;
   List<String> _alternateHeadwords = [];
@@ -148,8 +148,8 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder runOnParent(String runOnParent) {
-    _runOnParent = runOnParent;
+  EntryBuilder runOnParents(List<String> runOnParents) {
+    _runOnParents = runOnParents;
     return this;
   }
 
@@ -217,7 +217,7 @@ class EntryBuilder {
     return Entry(
       entryId: _entryId,
       headword: _headword,
-      runOnParent: _runOnParent,
+      runOnParents: _runOnParents,
       runOns: _runOns,
       headwordAbbreviation: _headwordAbbreviation,
       alternateHeadwords: _alternateHeadwords,

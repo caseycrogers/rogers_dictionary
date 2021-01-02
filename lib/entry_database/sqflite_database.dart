@@ -8,6 +8,7 @@ import 'package:path/path.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/entry_database/entry_database.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
@@ -29,7 +30,8 @@ class SqfliteDatabase extends EntryDatabase {
   }
 
   @override
-  Stream<Entry> getEntries({
+  Stream<Entry> getEntries(
+    TranslationMode translationMode, {
     @required String searchString,
     @required String startAfter,
     @required SearchOptions searchOptions,
@@ -53,7 +55,7 @@ class SqfliteDatabase extends EntryDatabase {
     }
     while (true) {
       var snapshot = await db.query(
-        ENGLISH,
+        translationMode == TranslationMode.English ? ENGLISH : SPANISH,
         where:
             '(${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH '
             'OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION + suffix)} != $NO_MATCH '
@@ -74,11 +76,12 @@ class SqfliteDatabase extends EntryDatabase {
   }
 
   @override
-  Future<Entry> getEntry(String urlEncodedHeadword) async {
+  Future<Entry> getEntry(
+      TranslationMode translationMode, String urlEncodedHeadword) async {
     var db = await _dbFuture;
     return _rowToEntry(await db
         .query(
-          'English',
+          translationMode == TranslationMode.English ? ENGLISH : SPANISH,
           where: 'url_encoded_headword = "$urlEncodedHeadword"',
           limit: 1,
         )

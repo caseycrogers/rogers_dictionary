@@ -72,7 +72,7 @@ class DictionaryPageModel {
         translationMode: translationMode,
         selectedEntry: null,
         selectedEntryHeadword: '',
-        entrySearchModel: EntrySearchModel.empty(),
+        entrySearchModel: EntrySearchModel.empty(translationMode),
         searchBarHasFocus: false,
         expandSearchOptions: false,
       );
@@ -102,7 +102,8 @@ class DictionaryPageModel {
 
   DictionaryPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
     return _copyWith(
-        newSelectedEntry: MyApp.db.getEntry(newEncodedHeadword),
+        newSelectedEntry:
+            MyApp.db.getEntry(translationMode, newEncodedHeadword),
         newEncodedHeadword: newEncodedHeadword);
   }
 
