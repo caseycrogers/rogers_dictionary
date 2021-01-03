@@ -28,26 +28,28 @@ class MyApp extends StatelessWidget {
         // TODO: Initial route breaks '#' navigation, refactor away from initial route?
         initialRoute: '#/' + DictionaryPageModel.route,
         theme: ThemeData(
-          textTheme: TextTheme(
-            headline1: TextStyle(
-                    fontSize: 36.0,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold)
-                .merge(GoogleFonts.openSans()),
-            headline2: TextStyle(
-                    fontSize: 22.0,
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold)
-                .merge(GoogleFonts.openSans()),
-            bodyText1: TextStyle(fontSize: 24.0, fontWeight: FontWeight.normal)
-                .merge(GoogleFonts.openSans()),
-            bodyText2: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)
-                .merge(GoogleFonts.openSans()),
-          ),
-          accentIconTheme: IconThemeData(
-            color: Colors.black38,
-          ),
-        ),
+            textTheme: TextTheme(
+              headline1: TextStyle(
+                      fontSize: 36.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold)
+                  .merge(GoogleFonts.openSans()),
+              headline2: TextStyle(
+                      fontSize: 22.0,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.bold)
+                  .merge(GoogleFonts.openSans()),
+              bodyText1:
+                  TextStyle(fontSize: 24.0, fontWeight: FontWeight.normal)
+                      .merge(GoogleFonts.openSans()),
+              bodyText2:
+                  TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)
+                      .merge(GoogleFonts.openSans()),
+            ),
+            accentIconTheme: IconThemeData(
+              color: Colors.black38,
+            ),
+            backgroundColor: Colors.white),
       ),
       onTap: () => unFocus(context),
     );

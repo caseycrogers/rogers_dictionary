@@ -6,79 +6,49 @@ import 'package:rogers_dictionary/models/search_options.dart';
 
 class SearchOptionsView extends StatelessWidget {
   final void Function(SearchOptions) onSearchChanged;
-  final void Function(bool) onExpansionChanged;
 
-  SearchOptionsView(
-      {@required this.onSearchChanged, @required this.onExpansionChanged});
+  SearchOptionsView({@required this.onSearchChanged});
 
   @override
   Widget build(BuildContext context) {
     final dictionaryPageModel = DictionaryPageModel.of(context);
-    return ListTileTheme(
-      dense: true,
-      minVerticalPadding: 0.0,
-      child: Theme(
-        data: ThemeData(
-          visualDensity: VisualDensity(vertical: -4),
-        ),
-        child: ExpansionTile(
-            key: PageStorageKey('search_options_tile'),
-            initiallyExpanded: dictionaryPageModel.expandSearchOptions,
-            collapsedBackgroundColor: Colors.grey.shade100,
-            backgroundColor: Theme.of(context).cardColor,
-            title: Text(
-              'Search Options',
-              style: TextStyle(color: Colors.black, fontSize: 18.0),
-            ),
-            tilePadding: EdgeInsets.symmetric(horizontal: 12.0),
-            childrenPadding: EdgeInsets.symmetric(horizontal: 12.0),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      color: Theme.of(context).accentColor,
+      child: Wrap(
+        children: [
+          Row(
             children: [
-              Wrap(
-                children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Text('sort:'),
-                      ),
-                      Container(
-                        child: DropdownButton<SortOrder>(
-                          style: TextStyle(color: Colors.black, fontSize: 20.0),
-                          value: dictionaryPageModel.searchOptions.sortBy,
-                          items: SortOrder.values
-                              .map((sortOrder) => DropdownMenuItem(
-                                    value: sortOrder,
-                                    child: Text(
-                                      sortOrder.toString().split('.').last,
-                                    ),
-                                  ))
-                              .toList(),
-                          onChanged: (SortOrder sortBy) => onSearchChanged(
-                              dictionaryPageModel.searchOptions
-                                  .copyWith(newSortBy: sortBy)),
-                          underline: Container(),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Text('ignore accents'),
-                      ),
-                      Switch(
-                          value:
-                              dictionaryPageModel.searchOptions.ignoreAccents,
-                          onChanged: (value) => onSearchChanged(
-                              dictionaryPageModel.searchOptions
-                                  .copyWith(newIgnoreAccents: value))),
-                    ],
-                  ),
-                ],
+              Text('sort: '),
+              DropdownButton<SortOrder>(
+                style: TextStyle(color: Colors.black, fontSize: 20.0),
+                value: dictionaryPageModel.searchOptions.sortBy,
+                items: SortOrder.values
+                    .map((sortOrder) => DropdownMenuItem(
+                          value: sortOrder,
+                          child: Text(
+                            sortOrder.toString().split('.').last,
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (SortOrder sortBy) => onSearchChanged(
+                    dictionaryPageModel.searchOptions
+                        .copyWith(newSortBy: sortBy)),
+                underline: Container(),
               ),
             ],
-            onExpansionChanged: onExpansionChanged),
+          ),
+          Row(
+            children: [
+              Text('ignore accents'),
+              Switch(
+                  value: dictionaryPageModel.searchOptions.ignoreAccents,
+                  onChanged: (value) => onSearchChanged(dictionaryPageModel
+                      .searchOptions
+                      .copyWith(newIgnoreAccents: value))),
+            ],
+          ),
+        ],
       ),
     );
   }

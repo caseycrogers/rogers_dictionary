@@ -16,7 +16,7 @@ class EntryView extends StatelessWidget {
   static Widget asPage() => Builder(
         builder: (context) {
           if (!DictionaryPageModel.of(context).hasSelection)
-            return Container(color: Theme.of(context).scaffoldBackgroundColor);
+            return Container(color: Theme.of(context).backgroundColor);
           return Container(
             color: Theme.of(context).cardColor,
             child: FutureBuilder(
