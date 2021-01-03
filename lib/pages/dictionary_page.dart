@@ -1,3 +1,4 @@
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,9 @@ class DictionaryPage extends StatelessWidget {
 
     return Theme(
       data: Theme.of(context).copyWith(
-        appBarTheme: AppBarTheme(color: primaryColor),
+        appBarTheme: AppBarTheme(color: primaryColor, elevation: 0.0),
+        primaryColor: primaryColor,
+        accentColor: secondaryColor,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -39,15 +42,17 @@ class DictionaryPage extends StatelessWidget {
           title: Text('Dictionary'),
         ),
         body: _buildOrientedPage(context, EntrySearch()),
-        bottomNavigationBar: BottomNavigationBar(
-          selectedLabelStyle: TextStyle(color: Colors.black),
-          unselectedLabelStyle: TextStyle(color: Colors.white),
-          currentIndex:
-              _translationModeToIndex(context, dictionaryPage.translationMode),
-          backgroundColor: secondaryColor,
-          items: _navigationItems(context).values.toList(),
-          onTap: (index) => DictionaryPageModel.onTranslationModeChanged(
-              context, _indexToTranslationMode(context, index)),
+        bottomNavigationBar: Theme(
+          data: Theme.of(context).copyWith(primaryColor: Colors.black),
+          child: BottomNavyBar(
+            selectedIndex: _translationModeToIndex(
+                context, dictionaryPage.translationMode),
+            backgroundColor: Theme.of(context).backgroundColor,
+            items: _navigationItems(context).values.toList(),
+            onItemSelected: (index) =>
+                DictionaryPageModel.onTranslationModeChanged(
+                    context, _indexToTranslationMode(context, index)),
+          ),
         ),
       ),
     );
@@ -152,24 +157,26 @@ class DictionaryPage extends StatelessWidget {
     );
   }
 
-  LinkedHashMap<TranslationMode, BottomNavigationBarItem> _navigationItems(
+  LinkedHashMap<TranslationMode, BottomNavyBarItem> _navigationItems(
           BuildContext context) =>
       LinkedHashMap.fromEntries(
         [
           MapEntry(
             TranslationMode.English,
-            BottomNavigationBarItem(
-              icon: Text('EN', style: _inactiveTextStyle(context)),
-              activeIcon: Text('EN', style: _activeTextStyle(context)),
-              label: TranslationMode.English.toString().split('.').last,
+            BottomNavyBarItem(
+              icon: Text('EN'),
+              title: Text('English'),
+              activeColor: Theme.of(context).accentColor,
+              inactiveColor: _inactiveTextStyle(context).color,
             ),
           ),
           MapEntry(
             TranslationMode.Spanish,
-            BottomNavigationBarItem(
-              icon: Text('ES', style: _inactiveTextStyle(context)),
-              activeIcon: Text('ES', style: _activeTextStyle(context)),
-              label: TranslationMode.Spanish.toString().split('.').last,
+            BottomNavyBarItem(
+              icon: Text('ES'),
+              title: Text('Español'),
+              activeColor: Theme.of(context).accentColor,
+              inactiveColor: _inactiveTextStyle(context).color,
             ),
           ),
         ],
@@ -177,7 +184,7 @@ class DictionaryPage extends StatelessWidget {
 
   TextStyle _activeTextStyle(BuildContext context) => bold1(context).copyWith(
         color: Colors.black,
-        fontSize: normal1(context).fontSize + 2,
+        fontSize: normal1(context).fontSize + 4,
       );
 
   TextStyle _inactiveTextStyle(BuildContext context) =>
