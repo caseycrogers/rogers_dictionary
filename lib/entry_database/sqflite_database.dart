@@ -25,7 +25,7 @@ class SqfliteDatabase extends EntryDatabase {
     return '''CASE 
     WHEN $index = 0
     THEN $NO_MATCH
-    ELSE INSTR(SUBSTR(" " || $columnName || " ", $index + ${searchString.length + 1}), " ")
+    ELSE 1000*INSTR(SUBSTR(" " || $columnName || " ", $index + ${searchString.length + 1}), " ") + LENGTH($columnName)
     END''';
   }
 
@@ -79,17 +79,21 @@ class SqfliteDatabase extends EntryDatabase {
   Future<Entry> getEntry(
       TranslationMode translationMode, String urlEncodedHeadword) async {
     var db = await _dbFuture;
-    return _rowToEntry(await db
+    var entry = _rowToEntry(await db
         .query(
           translationMode == TranslationMode.English ? ENGLISH : SPANISH,
           where: 'url_encoded_headword = "$urlEncodedHeadword"',
           limit: 1,
         )
         .then((value) => value.isEmpty ? null : value.single));
+    if (entry == null) print('Could not find entry $urlEncodedHeadword!');
+    return entry;
   }
 
   Entry _rowToEntry(Map<String, dynamic> snapshot) {
-    return Entry.fromJson(jsonDecode(snapshot['entry_blob']));
+    return snapshot == null
+        ? null
+        : Entry.fromJson(jsonDecode(snapshot['entry_blob']));
   }
 }
 

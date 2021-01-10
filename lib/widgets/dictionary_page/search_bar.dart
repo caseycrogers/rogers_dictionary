@@ -46,70 +46,46 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(8.0).subtract(EdgeInsets.only(right: 8.0)),
       color: Theme.of(context).primaryColor,
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Flexible(
-                fit: FlexFit.tight,
+          Flexible(
+            fit: FlexFit.tight,
+            child: Container(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(40.0),
                 child: Container(
-                  padding: EdgeInsets.all(8.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40.0),
-                    child: Container(
-                      color: Theme.of(context).backgroundColor,
-                      child: TextField(
-                        focusNode: _focusNode,
-                        style: TextStyle(fontSize: 20.0),
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.search),
-                          suffixIcon: _hasText
-                              ? IconButton(
-                                  onPressed: () {
-                                    _controller.clear();
-                                    _onSearchChanged(newSearchString: '');
-                                  },
-                                  icon: Icon(Icons.clear),
-                                )
-                              : null,
-                          hintText: 'search...',
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (searchString) =>
-                            _onSearchChanged(newSearchString: searchString),
-                      ),
+                  color: Theme.of(context).backgroundColor,
+                  child: TextField(
+                    focusNode: _focusNode,
+                    style: TextStyle(fontSize: 20.0),
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: _hasText
+                          ? IconButton(
+                              onPressed: () {
+                                _controller.clear();
+                                _onSearchChanged(newSearchString: '');
+                              },
+                              icon: Icon(Icons.clear),
+                            )
+                          : null,
+                      hintText: 'search...',
+                      border: InputBorder.none,
                     ),
+                    onChanged: (searchString) =>
+                        _onSearchChanged(newSearchString: searchString),
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(bottom: 12.0, top: 4.0),
-                decoration: BoxDecoration(
-                    color: dictionaryPageModel.expandSearchOptions
-                        ? Theme.of(context).accentColor
-                        : Theme.of(context).primaryColor,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(40.0))),
-                child: IconButton(
-                  visualDensity: VisualDensity.compact,
-                  iconSize: 30.0,
-                  padding: EdgeInsets.zero,
-                  icon: Icon(Icons.more_vert),
-                  color: Colors.white,
-                  onPressed: () => setState(() =>
-                      dictionaryPageModel.expandSearchOptions =
-                          !dictionaryPageModel.expandSearchOptions),
-                ),
-              ),
-            ],
+            ),
           ),
-          if (dictionaryPageModel.expandSearchOptions)
-            SearchOptionsView(
-                onSearchChanged: (newSearchOptions) =>
-                    _onSearchChanged(newSearchOptions: newSearchOptions)),
+          SearchOptionsView(
+              onSearchChanged: (newSearchOptions) =>
+                  _onSearchChanged(newSearchOptions: newSearchOptions)),
         ],
       ),
     );

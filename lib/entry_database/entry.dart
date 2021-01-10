@@ -70,7 +70,7 @@ class Entry {
     return entryId.toString().padLeft(4, '0') + '_' + urlEncode(headword);
   }
 
-  get urlEncodedHeadword => Entry.urlEncode(headword);
+  String get urlEncodedHeadword => Entry.urlEncode(headword);
 
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 

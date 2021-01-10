@@ -22,7 +22,7 @@ class PageRouter {
 Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
   //var newArguments = DictionaryPageModel.fromQueryParams(uri.queryParameters);
   return PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 200),
+      transitionDuration: Duration(milliseconds: 300),
       settings: settings.copyWith(
           name: settings.name,
           arguments: settings.arguments ??

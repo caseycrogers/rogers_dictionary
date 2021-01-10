@@ -15,12 +15,13 @@ class EntryView extends StatelessWidget {
 
   static Widget asPage() => Builder(
         builder: (context) {
-          if (!DictionaryPageModel.of(context).hasSelection)
+          var dictionaryPageModel = DictionaryPageModel.of(context);
+          if (!dictionaryPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
           return Container(
             color: Theme.of(context).cardColor,
             child: FutureBuilder(
-              future: DictionaryPageModel.of(context).selectedEntry,
+              future: dictionaryPageModel.selectedEntry,
               builder: (context, snap) {
                 if (!snap.hasData)
                   // Only display if loading is slow.
@@ -39,7 +40,9 @@ class EntryView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _iconButton(context),
-                          Expanded(child: headwordLine(context, entry, false)),
+                          Expanded(
+                              child: headwordLine(context, entry, false,
+                                  dictionaryPageModel.searchString)),
                         ],
                       ),
                     ),
@@ -71,14 +74,10 @@ class EntryView extends StatelessWidget {
             Icons.arrow_back,
             color: Theme.of(context).accentIconTheme.color,
           ),
-          onPressed: () {
-            if (MediaQuery.of(context).orientation == Orientation.portrait) {
-              return Navigator.of(context).pop();
-            }
-            Navigator.of(context).popUntil((route) =>
-                route.settings.name.endsWith(DictionaryPageModel.route) ||
-                route.isFirst);
-          },
+          onPressed: () =>
+              DictionaryPageModel.of(context).isTransitionFromSelectedHeadword
+                  ? Navigator.of(context).pop()
+                  : DictionaryPageModel.onHeadwordSelected(context, ''),
         ),
       );
 
@@ -87,7 +86,9 @@ class EntryView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_preview) headwordLine(context, _entry, _preview),
+        if (_preview)
+          headwordLine(context, _entry, _preview,
+              DictionaryPageModel.of(context).searchString),
         _buildTable(context, _constructTranslationMap(_entry)),
         if (!_preview) _buildEditorialNotes(context),
         if (!_preview) _buildRelated(context),
@@ -98,7 +99,8 @@ class EntryView extends StatelessWidget {
   Widget _buildRelated(BuildContext context) {
     if (_entry.runOnParents.isEmpty && _entry.runOns.isEmpty)
       return Container();
-    List<String> relatedList = _entry.runOnParents..addAll(_entry.runOns);
+    List<String> relatedList = List.from(_entry.runOnParents)
+      ..addAll(_entry.runOns);
     List<TextSpan> relatedSpans = relatedList.where((s) => s.isNotEmpty).expand(
       (headword) {
         return [
@@ -249,10 +251,13 @@ class EntryView extends StatelessWidget {
           Indent(
             child: Indent(
               child: abbreviationLine(
-                  context, translation.translationAbbreviation),
+                  context,
+                  translation.translationAbbreviation,
+                  _preview,
+                  DictionaryPageModel.of(context).searchString),
             ),
           ),
-          exampleText(context, translation.examplePhrase),
+          examplePhraseText(context, translation.examplePhrase),
           SizedBox(height: 0.0),
         ],
       ),

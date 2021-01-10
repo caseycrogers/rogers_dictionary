@@ -1,32 +1,22 @@
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'package:rogers_dictionary/util/text_utils.dart';
+import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
-import 'dart:collection';
+import 'package:rogers_dictionary/widgets/slide_entrance_exit.dart';
 
 class DictionaryPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
       ListEquality().equals(uri.pathSegments, ['dictionary']);
 
-  TranslationMode _indexToTranslationMode(BuildContext context, int index) =>
-      _navigationItems(context).keys.toList()[index];
-
-  int _translationModeToIndex(
-      BuildContext context, TranslationMode translationMode) {
-    assert(translationMode != null);
-    return _navigationItems(context).keys.toList().indexOf(translationMode);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final dictionaryPage = DictionaryPageModel.of(context);
+    final dictionaryPageModel = DictionaryPageModel.of(context);
     final primaryColor =
-        dictionaryPage.isEnglish ? Colors.indigo : Colors.amber;
-    final secondaryColor = dictionaryPage.isEnglish
+        dictionaryPageModel.isEnglish ? Colors.indigo : Colors.amber;
+    final secondaryColor = dictionaryPageModel.isEnglish
         ? Colors.indigo.shade100
         : Colors.amber.shade100;
 
@@ -42,25 +32,24 @@ class DictionaryPage extends StatelessWidget {
           title: Text('Dictionary'),
         ),
         body: _buildOrientedPage(context, EntrySearch()),
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(primaryColor: Colors.black),
-          child: BottomNavyBar(
-            selectedIndex: _translationModeToIndex(
-                context, dictionaryPage.translationMode),
-            backgroundColor: Theme.of(context).backgroundColor,
-            items: _navigationItems(context).values.toList(),
-            onItemSelected: (index) =>
-                DictionaryPageModel.onTranslationModeChanged(
-                    context, _indexToTranslationMode(context, index)),
-          ),
-        ),
+        bottomNavigationBar: DictionaryBottomNavigationBar(),
       ),
     );
   }
 
+  Animation<double> _getAnimation(BuildContext context, bool isSecondary) {
+    var dictionaryPageModel = DictionaryPageModel.of(context);
+    // Don't display transitions when going between translation modes.
+    if (dictionaryPageModel.isTransitionFromTranslationMode)
+      return isSecondary ? kAlwaysDismissedAnimation : kAlwaysCompleteAnimation;
+    return isSecondary
+        ? ModalRoute.of(context).secondaryAnimation
+        : ModalRoute.of(context).animation;
+  }
+
   Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
-    final animation = ModalRoute.of(context).animation;
-    final exitAnimation = ModalRoute.of(context).secondaryAnimation;
+    final animation = _getAnimation(context, false);
+    final exitAnimation = _getAnimation(context, true);
     final dictionaryPageModel = DictionaryPageModel.of(context);
 
     return LayoutBuilder(
@@ -74,29 +63,32 @@ class DictionaryPage extends StatelessWidget {
                   width: constraints.maxWidth,
                   height: constraints.maxHeight,
                 ),
-                Positioned(
-                  width: constraints.maxWidth,
-                  height: constraints.maxHeight,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                            begin: Offset(1.0, 0.0),
-                            end: dictionaryPageModel.hasSelection
-                                ? Offset(0.0, 0.0)
-                                : Offset(1.0, 0.0))
-                        .animate(animation),
-                    child: EntryView.asPage(),
+                if (dictionaryPageModel.hasSelection)
+                  Positioned(
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                    child: AnimatedBuilder(
+                      animation: exitAnimation,
+                      builder: (context, _) => SlideEntranceExit(
+                        offset: Offset(
+                            dictionaryPageModel.isTransitionToSelectedHeadword
+                                ? -1.0
+                                : 1.0,
+                            0.0),
+                        entranceAnimation: animation,
+                        exitAnimation: exitAnimation,
+                        child: EntryView.asPage(),
+                      ),
+                    ),
                   ),
-                ),
                 if (!dictionaryPageModel.hasSelection)
                   Positioned(
                     width: constraints.maxWidth,
                     height: constraints.maxHeight,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                              begin: Offset(0.0, 0.0), end: Offset(-1.0, 0.0))
-                          .animate(exitAnimation),
-                      // Need to keep entry search in the same position in the widget tree
-                      // to maintain state across screen rotation
+                    child: SlideEntranceExit(
+                      offset: Offset(-1.0, 0.0),
+                      entranceAnimation: animation,
+                      exitAnimation: exitAnimation,
                       child: DecoratedBox(
                         child: Row(
                           children: [
@@ -112,40 +104,50 @@ class DictionaryPage extends StatelessWidget {
           case Orientation.landscape:
             return Stack(
               children: [
-                Container(
-                    width: constraints.maxWidth,
-                    height: constraints.maxHeight,
-                    color: Colors.transparent),
+                AnimatedBuilder(
+                  animation: exitAnimation,
+                  builder: (context, _) => Container(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                      color:
+                          exitAnimation.isCompleted || exitAnimation.isDismissed
+                              ? Colors.transparent
+                              : Theme.of(context).scaffoldBackgroundColor),
+                ),
                 Positioned(
                   left: constraints.maxWidth / 3.0,
                   height: constraints.maxHeight,
                   width: 2.0 * constraints.maxWidth / 3.0,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                            begin: Offset(-1.0, 0.0), end: Offset(-0.0, 0.0))
-                        .animate(animation),
-                    child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                        ),
-                        child: EntryView.asPage()),
+                  child: SlideEntranceExit(
+                    offset: dictionaryPageModel.hasSelection
+                        ? Offset(-1.0, 0.0)
+                        : Offset.zero,
+                    entranceAnimation: CurvedAnimation(
+                        parent: animation, curve: Interval(0.5, 1.0)),
+                    exitAnimation: CurvedAnimation(
+                      parent: exitAnimation,
+                      curve: Interval(0.0, 0.5),
+                    ),
+                    child: EntryView.asPage(),
                   ),
                 ),
                 Positioned(
                   width: constraints.maxWidth / 3.0,
                   height: constraints.maxHeight,
-                  child: SlideTransition(
-                    position: AlwaysStoppedAnimation(Offset.zero),
+                  child: SlideEntranceExit(
+                    offset: Offset.zero,
+                    entranceAnimation: kAlwaysCompleteAnimation,
                     child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(child: entrySearch),
-                            VerticalDivider(width: 0.0),
-                          ],
-                        )),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(child: entrySearch),
+                          VerticalDivider(width: 0.0),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -156,37 +158,4 @@ class DictionaryPage extends StatelessWidget {
       },
     );
   }
-
-  LinkedHashMap<TranslationMode, BottomNavyBarItem> _navigationItems(
-          BuildContext context) =>
-      LinkedHashMap.fromEntries(
-        [
-          MapEntry(
-            TranslationMode.English,
-            BottomNavyBarItem(
-              icon: Text('EN'),
-              title: Text('English'),
-              activeColor: Theme.of(context).accentColor,
-              inactiveColor: _inactiveTextStyle(context).color,
-            ),
-          ),
-          MapEntry(
-            TranslationMode.Spanish,
-            BottomNavyBarItem(
-              icon: Text('ES'),
-              title: Text('Español'),
-              activeColor: Theme.of(context).accentColor,
-              inactiveColor: _inactiveTextStyle(context).color,
-            ),
-          ),
-        ],
-      );
-
-  TextStyle _activeTextStyle(BuildContext context) => bold1(context).copyWith(
-        color: Colors.black,
-        fontSize: normal1(context).fontSize + 4,
-      );
-
-  TextStyle _inactiveTextStyle(BuildContext context) =>
-      bold1(context).copyWith(color: Colors.black54);
 }

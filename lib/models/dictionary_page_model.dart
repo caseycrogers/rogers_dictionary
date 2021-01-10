@@ -14,11 +14,6 @@ enum TranslationMode {
   Spanish,
 }
 
-TranslationMode oppositeTranslationMode(TranslationMode translationMode) =>
-    translationMode == TranslationMode.English
-        ? TranslationMode.Spanish
-        : TranslationMode.English;
-
 const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
 class DictionaryPageModel {
@@ -29,8 +24,12 @@ class DictionaryPageModel {
 
   static DictionaryPageModel _lastEnglishPageModel =
       DictionaryPageModel.empty(translationMode: TranslationMode.English);
-  static DictionaryPageModel _lastSpanishModel =
+  static DictionaryPageModel _lastSpanishPageModel =
       DictionaryPageModel.empty(translationMode: TranslationMode.Spanish);
+
+  // Transition state.
+  final DictionaryPageModel transitionFrom;
+  DictionaryPageModel transitionTo;
 
   // Translation mode state.
   final TranslationMode translationMode;
@@ -69,6 +68,7 @@ class DictionaryPageModel {
   factory DictionaryPageModel.empty(
           {@required TranslationMode translationMode}) =>
       DictionaryPageModel._(
+        transitionFrom: null,
         translationMode: translationMode,
         selectedEntry: null,
         selectedEntryHeadword: '',
@@ -97,25 +97,27 @@ class DictionaryPageModel {
   DictionaryPageModel _copyWithEntry(Entry newEntry) {
     return _copyWith(
         newSelectedEntry: Future.value(newEntry),
-        newEncodedHeadword: newEntry.urlEncodedHeadword);
+        newEncodedHeadword: newEntry?.urlEncodedHeadword);
   }
 
   DictionaryPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
     return _copyWith(
-        newSelectedEntry:
-            MyApp.db.getEntry(translationMode, newEncodedHeadword),
+        newSelectedEntry: newEncodedHeadword.isNotEmpty
+            ? MyApp.db.getEntry(translationMode, newEncodedHeadword)
+            : null,
         newEncodedHeadword: newEncodedHeadword);
   }
 
   DictionaryPageModel _copyWith(
-      {DictionaryPageModel newOppositeModeModel,
+      {DictionaryPageModel overrideTransitionFrom,
       FutureOr<Entry> newSelectedEntry,
       String newEncodedHeadword}) {
-    assert((newSelectedEntry != null && newEncodedHeadword != null) ||
-        (newSelectedEntry == null && newEncodedHeadword == null));
-    assert(newOppositeModeModel == null ||
-        newOppositeModeModel.translationMode != translationMode);
+    assert((newSelectedEntry != null &&
+            newEncodedHeadword != selectedEntryHeadword) ||
+        (newSelectedEntry == null && (newEncodedHeadword ?? '') == '') ||
+        overrideTransitionFrom != null);
     return DictionaryPageModel._(
+      transitionFrom: overrideTransitionFrom ?? this,
       translationMode: translationMode,
       selectedEntry: newSelectedEntry ?? selectedEntry,
       selectedEntryHeadword: newEncodedHeadword ?? selectedEntryHeadword,
@@ -126,6 +128,7 @@ class DictionaryPageModel {
   }
 
   DictionaryPageModel._({
+    @required this.transitionFrom,
     @required this.translationMode,
     @required this.selectedEntry,
     @required this.selectedEntryHeadword,
@@ -134,16 +137,42 @@ class DictionaryPageModel {
     @required this.expandSearchOptions,
   });
 
+  bool get isTransitionFromTranslationMode =>
+      transitionFrom == null ||
+      translationMode != transitionFrom.translationMode;
+
+  bool get isTransitionToSelectedHeadword {
+    print(transitionTo);
+    print(transitionTo != null &&
+        transitionTo.translationMode == translationMode &&
+        transitionTo.hasSelection &&
+        hasSelection);
+    print('==============================');
+    return transitionTo != null &&
+        transitionTo.translationMode == translationMode &&
+        transitionTo.hasSelection &&
+        hasSelection;
+  }
+
+  bool get isTransitionFromSelectedHeadword {
+    return transitionFrom != null &&
+        transitionFrom.translationMode == translationMode &&
+        transitionFrom.hasSelection &&
+        hasSelection;
+  }
+
   static void onTranslationModeChanged(
       BuildContext context, TranslationMode newTranslationMode) {
-    var oldModel = DictionaryPageModel.of(context);
-    if (newTranslationMode == oldModel.translationMode) return;
-    if (oldModel.isEnglish) {
-      _lastEnglishPageModel = oldModel;
-      return _lastSpanishModel._copyWith()._pushPage(context);
-    }
-    _lastSpanishModel = oldModel;
-    return _lastEnglishPageModel._copyWith()._pushPage(context);
+    var currModel = DictionaryPageModel.of(context);
+    if (newTranslationMode == currModel.translationMode) return;
+    var newModel =
+        (currModel.isEnglish ? _lastSpanishPageModel : _lastEnglishPageModel)
+            ._copyWith(overrideTransitionFrom: currModel);
+    currModel.transitionTo = newModel;
+    currModel.isEnglish
+        ? _lastEnglishPageModel = currModel
+        : _lastSpanishPageModel = currModel;
+    newModel._pushPage(context);
   }
 
   static void onSearchChanged(BuildContext context, String newSearchString,
@@ -155,10 +184,13 @@ class DictionaryPageModel {
   }
 
   static void onEntrySelected(BuildContext context, Entry newEntry) {
+    assert(newEntry != null);
     var oldModel = DictionaryPageModel.of(context);
     // Only update if the value has actually changed
     if (newEntry.urlEncodedHeadword == oldModel.selectedEntryHeadword) return;
-    oldModel._copyWithEntry(newEntry)._pushPage(context);
+    var newModel = oldModel._copyWithEntry(newEntry);
+    oldModel.transitionTo = newModel;
+    newModel._pushPage(context);
   }
 
   static void onHeadwordSelected(
@@ -166,7 +198,9 @@ class DictionaryPageModel {
     var oldModel = DictionaryPageModel.of(context);
     // Only update if the value has actually changed
     if (newUrlEncodedHeadword == oldModel.selectedEntryHeadword) return;
-    oldModel._copyWithEncodedHeadword(newUrlEncodedHeadword)._pushPage(context);
+    var newModel = oldModel._copyWithEncodedHeadword(newUrlEncodedHeadword);
+    oldModel.transitionTo = newModel;
+    newModel._pushPage(context);
   }
 
   void _pushQueryParams(BuildContext context) {

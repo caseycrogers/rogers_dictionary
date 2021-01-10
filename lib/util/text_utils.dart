@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'overflow_markdown.dart';
 
@@ -35,35 +36,46 @@ Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16.0))));
 
-Widget headwordText(BuildContext context, String text, bool preview) {
+Widget headwordText(BuildContext context, String text, bool preview,
+    {@required String searchString}) {
   return OverflowMarkdown(
     text,
     defaultStyle: preview ? bold1(context) : headline1(context),
+    overrideStyles: _getOverrideStyle(context, text, preview, searchString),
   );
 }
 
-Widget abbreviationLine(BuildContext context, String text) {
+List<OverrideStyle> _getOverrideStyle(
+    BuildContext context, String text, bool preview, String searchString,
+    {bool ignoreSymbols}) {
+  var overrideStart = text.searchable.indexOf(searchString.searchable);
+  if (!preview || searchString.isEmpty || overrideStart == -1) return [];
+  return [
+    OverrideStyle(
+      style: TextStyle(
+          backgroundColor: Theme.of(context).accentColor.withOpacity(.5)),
+      start: overrideStart,
+      stop: overrideStart + searchString.length,
+      ignoreSymbols: ignoreSymbols,
+    )
+  ];
+}
+
+Widget abbreviationLine(
+    BuildContext context, String text, bool preview, String searchString) {
   if (text.isEmpty) return Container();
-  return RichText(
-      text: TextSpan(
-    style: bold1(context),
-    children: [
-      TextSpan(
-        text: 'abbr ',
-        style: italic1(context),
-      ),
-      TextSpan(
-        text: text,
-      ),
-    ],
-  ));
+  return OverflowMarkdown(
+    '*abbr *$text',
+    overrideStyles: _getOverrideStyle(context, text, preview, searchString),
+  );
 }
 
 Widget alternateHeadwordLine(
     BuildContext context,
     List<String> alternateHeadwords,
     List<String> namingStandards,
-    bool preview) {
+    bool preview,
+    String searchString) {
   if (alternateHeadwords.where((alt) => alt.isNotEmpty).isEmpty)
     return Container();
   return Row(
@@ -76,14 +88,13 @@ Widget alternateHeadwordLine(
           children: alternateHeadwords
               .asMap()
               .keys
-              .map((i) => RichText(
+              .map((i) => OverflowMarkdown(
+                    '**${alternateHeadwords[i]}**${_namingStandard(context, namingStandards[i])}',
+                    defaultStyle: normal1(context),
                     overflow:
                         preview ? TextOverflow.ellipsis : TextOverflow.visible,
-                    text: TextSpan(style: normal1(context), children: [
-                      TextSpan(
-                          text: alternateHeadwords[i], style: bold1(context)),
-                      _namingStandard(context, namingStandards[i]),
-                    ]),
+                    overrideStyles: _getOverrideStyle(context,
+                        '**${alternateHeadwords[i]}**', preview, searchString),
                   ))
               .toList(),
         ),
@@ -92,16 +103,11 @@ Widget alternateHeadwordLine(
   );
 }
 
-TextSpan _namingStandard(BuildContext context, String namingStandard) {
+String _namingStandard(BuildContext context, String namingStandard) {
+  if (namingStandard.isEmpty) return '';
   if (namingStandard == 'i') namingStandard = 'INN';
   if (namingStandard == 'u') namingStandard = 'USAN';
-  if (namingStandard.isNotEmpty)
-    return TextSpan(text: '', children: [
-      TextSpan(text: ' ('),
-      TextSpan(text: namingStandard, style: italic1(context)),
-      TextSpan(text: ')', style: TextStyle(letterSpacing: 5.0)),
-    ]);
-  return TextSpan();
+  return ' ($namingStandard)';
 }
 
 Widget _translationParenthetical(
@@ -144,12 +150,14 @@ Widget previewTranslationLine(
   return OverflowMarkdown(text);
 }
 
+String _addSpace(String text) => text.isEmpty ? text : ' $text';
+
 Widget translationLine(BuildContext context, Translation translation) {
   return Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      OverflowMarkdown(translation.translation, appendSpans: [
-        _genderAndPluralText(context, translation.genderAndPlural),
+      OverflowMarkdown(translation.translation, children: [
+        _addSpace(translation.genderAndPlural),
         _namingStandard(context, translation.translationNamingStandard)
       ]),
       _translationParenthetical(
@@ -167,11 +175,6 @@ Widget parentheticalText(BuildContext context, String text) {
   );
 }
 
-TextSpan _genderAndPluralText(BuildContext context, String text) {
-  if (text.isEmpty) return TextSpan();
-  return TextSpan(text: ' $text', style: italic1(context));
-}
-
 Widget editorialText(BuildContext context, String text) {
   return MarkdownBody(
     data: text,
@@ -179,7 +182,7 @@ Widget editorialText(BuildContext context, String text) {
   );
 }
 
-Widget exampleText(BuildContext context, String exampleText) {
+Widget examplePhraseText(BuildContext context, String exampleText) {
   if (exampleText.isEmpty) return Container();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -199,8 +202,7 @@ Widget exampleText(BuildContext context, String exampleText) {
               Column(
                 children: exampleText
                     .split('...')
-                    .map((example) => OverflowMarkdown(
-                        example.replaceAll('\.\.', ' '),
+                    .map((example) => OverflowMarkdown(example,
                         defaultStyle: normal1(context).copyWith(height: 1.5)))
                     .toList(),
               ),
@@ -212,7 +214,8 @@ Widget exampleText(BuildContext context, String exampleText) {
   );
 }
 
-Widget headwordLine(BuildContext context, Entry entry, bool preview) {
+Widget headwordLine(
+    BuildContext context, Entry entry, bool preview, String searchString) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -221,9 +224,10 @@ Widget headwordLine(BuildContext context, Entry entry, bool preview) {
           entry.headwordAbbreviation.isEmpty
               ? entry.headword
               : '${entry.headword} (${entry.headwordAbbreviation})',
-          preview),
+          preview,
+          searchString: searchString),
       alternateHeadwordLine(context, entry.alternateHeadwords,
-          entry.alternateHeadwordNamingStandards, preview),
+          entry.alternateHeadwordNamingStandards, preview, searchString),
     ],
   );
 }
