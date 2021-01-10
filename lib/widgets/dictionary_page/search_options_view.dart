@@ -12,6 +12,8 @@ class SearchOptionsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dictionaryPageModel = DictionaryPageModel.of(context);
+    return IconButton(
+        onPressed: () {}, icon: Icon(Icons.more_vert), color: Colors.white);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       color: Theme.of(context).accentColor,

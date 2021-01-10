@@ -8,4 +8,6 @@ extension DiacriticsAwareString on String {
       onNonMatch: (char) => char.isNotEmpty && diacritics.contains(char)
           ? nonDiacritics[diacritics.indexOf(char)]
           : char);
+
+  String get searchable => this.toLowerCase().withoutDiacriticalMarks;
 }
