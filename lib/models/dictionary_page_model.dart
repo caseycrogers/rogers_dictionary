@@ -175,31 +175,26 @@ class DictionaryPageModel {
     newModel._pushPage(context);
   }
 
-  static void onSearchChanged(BuildContext context, String newSearchString,
-      SearchOptions newSearchOptions) {
-    var dictionaryPageModel = DictionaryPageModel.of(context);
-    dictionaryPageModel.entrySearchModel
-        .onSearchStringChanged(newSearchString, newSearchOptions);
-    if (kIsWeb) dictionaryPageModel._pushQueryParams(context);
+  void onSearchChanged(
+      {String newSearchString, SearchOptions newSearchOptions}) {
+    entrySearchModel.onSearchStringChanged(
+        newSearchString ?? searchString, newSearchOptions ?? searchOptions);
   }
 
-  static void onEntrySelected(BuildContext context, Entry newEntry) {
+  void onEntrySelected(BuildContext context, Entry newEntry) {
     assert(newEntry != null);
-    var oldModel = DictionaryPageModel.of(context);
     // Only update if the value has actually changed
-    if (newEntry.urlEncodedHeadword == oldModel.selectedEntryHeadword) return;
-    var newModel = oldModel._copyWithEntry(newEntry);
-    oldModel.transitionTo = newModel;
+    if (newEntry.urlEncodedHeadword == selectedEntryHeadword) return;
+    var newModel = _copyWithEntry(newEntry);
+    transitionTo = newModel;
     newModel._pushPage(context);
   }
 
-  static void onHeadwordSelected(
-      BuildContext context, String newUrlEncodedHeadword) {
-    var oldModel = DictionaryPageModel.of(context);
+  void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
     // Only update if the value has actually changed
-    if (newUrlEncodedHeadword == oldModel.selectedEntryHeadword) return;
-    var newModel = oldModel._copyWithEncodedHeadword(newUrlEncodedHeadword);
-    oldModel.transitionTo = newModel;
+    if (newUrlEncodedHeadword == selectedEntryHeadword) return;
+    var newModel = _copyWithEncodedHeadword(newUrlEncodedHeadword);
+    transitionTo = newModel;
     newModel._pushPage(context);
   }
 

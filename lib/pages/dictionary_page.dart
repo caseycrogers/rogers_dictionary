@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
@@ -20,19 +21,26 @@ class DictionaryPage extends StatelessWidget {
         ? Colors.indigo.shade100
         : Colors.amber.shade100;
 
-    return Theme(
-      data: Theme.of(context).copyWith(
-        appBarTheme: AppBarTheme(color: primaryColor, elevation: 0.0),
-        primaryColor: primaryColor,
-        accentColor: secondaryColor,
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: Text('Dictionary'),
+    return ListenableProvider.value(
+      value: dictionaryPageModel.entrySearchModel,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          appBarTheme: AppBarTheme(color: primaryColor, elevation: 0.0),
+          primaryColor: primaryColor,
+          accentColor: secondaryColor,
         ),
-        body: _buildOrientedPage(context, EntrySearch()),
-        bottomNavigationBar: DictionaryBottomNavigationBar(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text('Dictionary'),
+          ),
+          body: Column(
+            children: [
+              Expanded(child: _buildOrientedPage(context, EntrySearch())),
+              DictionaryBottomNavigationBar(),
+            ],
+          ),
+        ),
       ),
     );
   }
