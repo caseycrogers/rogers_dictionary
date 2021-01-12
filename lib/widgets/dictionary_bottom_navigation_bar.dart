@@ -48,7 +48,7 @@ class _DictionaryBottomNavigationBarState
     );
   }
 
-  void _handleTap(BuildContext context, int index) {
+  void _handleTap(BuildContext context, int index) async {
     DictionaryPageModel.onTranslationModeChanged(
         context, _indexToTranslationMode(context, index));
   }

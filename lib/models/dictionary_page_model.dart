@@ -41,7 +41,6 @@ class DictionaryPageModel {
   // Entry search state
   final EntrySearchModel entrySearchModel;
   bool searchBarHasFocus;
-  bool expandSearchOptions;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 
@@ -74,7 +73,6 @@ class DictionaryPageModel {
         selectedEntryHeadword: '',
         entrySearchModel: EntrySearchModel.empty(translationMode),
         searchBarHasFocus: false,
-        expandSearchOptions: false,
       );
 
   factory DictionaryPageModel.fromQueryParams(Map<String, String> queryParams) {
@@ -123,7 +121,6 @@ class DictionaryPageModel {
       selectedEntryHeadword: newEncodedHeadword ?? selectedEntryHeadword,
       entrySearchModel: entrySearchModel.copy(),
       searchBarHasFocus: false,
-      expandSearchOptions: expandSearchOptions,
     );
   }
 
@@ -134,7 +131,6 @@ class DictionaryPageModel {
     @required this.selectedEntryHeadword,
     @required this.entrySearchModel,
     @required this.searchBarHasFocus,
-    @required this.expandSearchOptions,
   });
 
   bool get isTransitionFromTranslationMode =>

@@ -19,11 +19,13 @@ void main() async {
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
   static final EntryDatabase db = SqfliteDatabase();
+  static RenderBox topRenderObject;
 
   @override
   Widget build(BuildContext context) {
-    RouteObserver();
+    topRenderObject = context.findRenderObject();
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       child: MaterialApp(
         navigatorObservers: [StackNavigatorObserver()],
         title: 'Dictionary',
