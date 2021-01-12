@@ -74,10 +74,10 @@ class EntryView extends StatelessWidget {
             Icons.arrow_back,
             color: Theme.of(context).accentIconTheme.color,
           ),
-          onPressed: () =>
-              DictionaryPageModel.of(context).isTransitionFromSelectedHeadword
-                  ? Navigator.of(context).pop()
-                  : DictionaryPageModel.onHeadwordSelected(context, ''),
+          onPressed: () => DictionaryPageModel.of(context)
+                  .isTransitionFromSelectedHeadword
+              ? Navigator.of(context).pop()
+              : DictionaryPageModel.of(context).onHeadwordSelected(context, ''),
         ),
       );
 
@@ -112,8 +112,8 @@ class EntryView extends StatelessWidget {
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                DictionaryPageModel.onHeadwordSelected(
-                    context, Entry.urlEncode(headword));
+                DictionaryPageModel.of(context)
+                    .onHeadwordSelected(context, Entry.urlEncode(headword));
               },
           ),
           if (headword != relatedList.last) TextSpan(text: ', '),

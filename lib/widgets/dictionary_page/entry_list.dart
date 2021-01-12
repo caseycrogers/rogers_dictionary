@@ -6,10 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
-
-import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/dictionary_page/entry_view.dart';
 
 class EntryList extends StatelessWidget {
   @override
@@ -59,6 +58,7 @@ class EntryList extends StatelessWidget {
   Widget Function(BuildContext, AsyncSnapshot<List<Entry>>, int) _buildRow(
       EntrySearchModel entrySearchModel) {
     return (context, snapshot, index) {
+      var dictionaryPageModel = DictionaryPageModel.of(context);
       if (!snapshot.hasData) return LoadingText();
       entrySearchModel.updateEntries(snapshot.data);
       var entry = snapshot.data[index];
@@ -83,7 +83,7 @@ class EntryList extends StatelessWidget {
               ),
               onTap: () {
                 if (isSelected) return;
-                DictionaryPageModel.onEntrySelected(context, entry);
+                dictionaryPageModel.onEntrySelected(context, entry);
               }),
           if (index < snapshot.data.length - 1)
             Divider(

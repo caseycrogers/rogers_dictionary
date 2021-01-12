@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'package:rogers_dictionary/models/search_options.dart';
+import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/search_options_view.dart';
 
 class SearchBar extends StatefulWidget {
@@ -11,7 +12,6 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   FocusNode _focusNode;
-  bool _hasText;
   TextEditingController _controller;
 
   DictionaryPageModel get dictionaryPageModel =>
@@ -34,7 +34,6 @@ class _SearchBarState extends State<SearchBar> {
     }
     _controller = _controller ??
         TextEditingController(text: dictionaryPageModel.searchString);
-    _hasText = _hasText ?? dictionaryPageModel.searchString.isNotEmpty;
   }
 
   @override
@@ -58,47 +57,41 @@ class _SearchBarState extends State<SearchBar> {
                 borderRadius: BorderRadius.circular(40.0),
                 child: Container(
                   color: Theme.of(context).backgroundColor,
-                  child: TextField(
-                    focusNode: _focusNode,
-                    style: TextStyle(fontSize: 20.0),
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      suffixIcon: _hasText
-                          ? IconButton(
-                              onPressed: () {
-                                _controller.clear();
-                                _onSearchChanged(newSearchString: '');
-                              },
-                              icon: Icon(Icons.clear),
-                            )
-                          : null,
-                      hintText: 'search...',
-                      border: InputBorder.none,
+                  child: Selector<EntrySearchModel, String>(
+                    selector: (context, entrySearchModel) =>
+                        entrySearchModel.searchString,
+                    builder: (context, searchString, _) => TextField(
+                      focusNode: _focusNode,
+                      style: TextStyle(fontSize: 20.0),
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        suffixIcon: searchString.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  _controller.clear();
+                                  dictionaryPageModel.onSearchChanged(
+                                      newSearchString: '');
+                                },
+                                icon: Icon(Icons.clear),
+                              )
+                            : null,
+                        hintText: 'search...',
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (searchString) => dictionaryPageModel
+                          .onSearchChanged(newSearchString: searchString),
                     ),
-                    onChanged: (searchString) =>
-                        _onSearchChanged(newSearchString: searchString),
                   ),
                 ),
               ),
             ),
           ),
           SearchOptionsView(
-              onSearchChanged: (newSearchOptions) =>
-                  _onSearchChanged(newSearchOptions: newSearchOptions)),
+              onSearchChanged: (newSearchOptions) => dictionaryPageModel
+                  .onSearchChanged(newSearchOptions: newSearchOptions)),
         ],
       ),
     );
-  }
-
-  void _onSearchChanged(
-      {String newSearchString, SearchOptions newSearchOptions}) {
-    DictionaryPageModel.onSearchChanged(
-        context,
-        newSearchString ?? DictionaryPageModel.of(context).searchString,
-        newSearchOptions ?? DictionaryPageModel.of(context).searchOptions);
-    setState(() {
-      _hasText = newSearchString?.isNotEmpty ?? _hasText;
-    });
   }
 }
