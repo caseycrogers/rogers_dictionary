@@ -13,6 +13,7 @@ class EntrySearchModel with ChangeNotifier {
   Stream<Entry> _entryStream;
   List<Entry> _entries;
   ScrollController _scrollController;
+  bool _expandSearchOptions;
 
   String get searchString => _searchString;
 
@@ -28,13 +29,22 @@ class EntrySearchModel with ChangeNotifier {
 
   bool get isEmpty => _searchString.isEmpty;
 
+  bool get expandSearchOptions => _expandSearchOptions;
+
+  set expandSearchOptions(bool value) {
+    if (value == _expandSearchOptions) return;
+    _expandSearchOptions = value;
+    notifyListeners();
+  }
+
   EntrySearchModel._(
       this._translationMode,
       this._searchString,
       this._searchOptions,
       this._startAfter,
       this._entries,
-      this._scrollController) {
+      this._scrollController,
+      this._expandSearchOptions) {
     _entryStream = MyApp.db.getEntries(_translationMode,
         searchString: searchString,
         startAfter: startAfter,
@@ -44,11 +54,11 @@ class EntrySearchModel with ChangeNotifier {
   EntrySearchModel(TranslationMode translationMode, String searchString,
       SearchOptions searchOptions)
       : this._(translationMode, searchString, searchOptions, '', [],
-            ScrollController());
+            ScrollController(), false);
 
   EntrySearchModel.empty(TranslationMode translationMode)
       : this._(translationMode, '', SearchOptions.empty(), '', [],
-            ScrollController());
+            ScrollController(), false);
 
   EntrySearchModel copy() => EntrySearchModel._(
       _translationMode,
@@ -58,7 +68,8 @@ class EntrySearchModel with ChangeNotifier {
       _entries,
       ScrollController(
           initialScrollOffset:
-              _scrollController.hasClients ? _scrollController.offset : 0.0));
+              _scrollController.hasClients ? _scrollController.offset : 0.0),
+      expandSearchOptions);
 
   void onSearchStringChanged(
       String newSearchString, SearchOptions newSearchOptions) {

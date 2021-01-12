@@ -1,7 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
+import 'package:rogers_dictionary/main.dart';
 
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/search_options_menu.dart';
 
@@ -15,57 +20,72 @@ class SearchOptionsView extends StatefulWidget {
 }
 
 class _SearchOptionsViewState extends State<SearchOptionsView> {
-  bool get _hasFocus => DictionaryPageModel.of(context).expandSearchOptions;
-
-  set _hasFocus(bool value) => setState(
-      () => DictionaryPageModel.of(context).expandSearchOptions = value);
-  List<OverlayEntry> _overlayEntry = [];
+  OverlayEntry _overlayEntry;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    var dictionaryPageModel = DictionaryPageModel.of(context);
+    return Selector<EntrySearchModel, bool>(
+      selector: (context, entrySearchModel) =>
+          entrySearchModel.expandSearchOptions,
+      builder: (context, hasFocus, _) => Container(
         margin: EdgeInsets.symmetric(horizontal: 4.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: _hasFocus ? Colors.black26 : Colors.transparent,
+          color: hasFocus ? Colors.black26 : Colors.transparent,
         ),
         child: IconButton(
           splashColor: Colors.black26,
-          onPressed: () {
-            _toggle();
-          },
+          onPressed: () => _toggle(),
           icon: Icon(Icons.more_vert),
           color: Colors.white,
         ),
-      );
+      ),
+    );
+  }
 
-  List<OverlayEntry> _buildOverlayEntry() {
+  OverlayEntry _buildOverlayEntry() {
     var dictionaryPageModel = DictionaryPageModel.of(context);
     RenderBox renderBox = context.findRenderObject();
     var upperLeft = renderBox.localToGlobal(Offset.zero);
-    return [
-      OverlayEntry(
-        builder: (context) => GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTapDown: (_) => _toggle(),
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        child: Stack(
+          children: [
+            GestureDetector(
+              onTapUp: (tapUpDetails) {
+                _toggle();
+                var result = BoxHitTestResult();
+                MyApp.topRenderObject.hitTest(
+                  result,
+                  position: MyApp.topRenderObject
+                      .globalToLocal(tapUpDetails.globalPosition),
+                );
+                result.path.forEach((entry) =>
+                    entry.target.handleEvent(PointerUpEvent(), entry));
+              },
+            ),
+            Positioned(
+              top: upperLeft.dy + renderBox.size.height + 4.0,
+              right: 0,
+              width: 275,
+              child: SearchOptionsMenu(dictionaryPageModel),
+            ),
+          ],
         ),
       ),
-      OverlayEntry(
-        builder: (context) => Positioned(
-            top: upperLeft.dy + renderBox.size.height + 4.0,
-            right: 0,
-            width: 275,
-            child: SearchOptionsMenu(dictionaryPageModel)),
-      ),
-    ];
+    );
   }
 
   void _toggle() {
-    _hasFocus = !_hasFocus;
-    if (_hasFocus) {
+    var entrySearchModel = DictionaryPageModel.of(context).entrySearchModel;
+    entrySearchModel.expandSearchOptions =
+        !entrySearchModel.expandSearchOptions;
+    if (entrySearchModel.expandSearchOptions) {
       _overlayEntry = _buildOverlayEntry();
-      Overlay.of(context).insertAll(_overlayEntry);
+      Overlay.of(context).insert(_overlayEntry);
       return;
     }
-    _overlayEntry.forEach((e) => e.remove());
+    _overlayEntry?.remove();
   }
 }
