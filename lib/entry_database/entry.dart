@@ -9,12 +9,10 @@ class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
   final int entryId;
-  final String headword;
+  final Headword headword;
   final List<String> runOnParents;
   final List<String> runOns;
-  final String headwordAbbreviation;
-  final List<String> alternateHeadwords;
-  final List<String> alternateHeadwordNamingStandards;
+  final List<Headword> alternateHeadwords;
 
   final List<Translation> translations;
 
@@ -23,9 +21,7 @@ class Entry {
     @required this.headword,
     @required this.runOnParents,
     @required this.runOns,
-    @required this.headwordAbbreviation,
     @required this.alternateHeadwords,
-    @required this.alternateHeadwordNamingStandards,
     @required this.translations,
   });
 
@@ -45,16 +41,27 @@ class Entry {
     'npl': 'plural noun',
     'prep': 'preposition',
     '-': 'phrase',
+    'inf': 'infinitive',
   };
 
   static String longPartOfSpeech(String partOfSpeech) {
-    return partOfSpeech.replaceAll(' ', '').splitMapJoin(
-          RegExp('[&,]'),
-          onNonMatch: (partOfSpeechComponent) =>
-              _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
-              partOfSpeechComponent,
-          onMatch: (separator) => separator.group(0) == '&' ? ' and ' : ', ',
-        );
+    return partOfSpeech.replaceAll(' ', '').splitMapJoin(RegExp('[&,]|phrase'),
+        onNonMatch: (partOfSpeechComponent) =>
+            _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
+            partOfSpeechComponent,
+        onMatch: (separator) {
+          //  == '&' ? ' and ' : ', ',
+          switch (separator.group(0)) {
+            case '&':
+              return ' and ';
+            case ',':
+              return ', ';
+            case 'phrase':
+              return ' phrase';
+            default:
+              return separator.group(0);
+          }
+        });
   }
 
   static String urlDecode(String urlEncodedHeadword) {
@@ -70,8 +77,6 @@ class Entry {
     return entryId.toString().padLeft(4, '0') + '_' + urlEncode(headword);
   }
 
-  String get urlEncodedHeadword => Entry.urlEncode(headword);
-
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
   bool keyWordMatches(String searchTerm) {
@@ -80,13 +85,47 @@ class Entry {
 
   Map<String, dynamic> toJson() => _$EntryToJson(this);
 
-  Set<String> _keywords() =>
-      {headword}..addAll(translations.map((e) => e.translation));
+  Set<String> _keywords() => Set.from(allHeadwords.map((h) => h.headwordText))
+    ..addAll(translations.map((e) => e.translationText));
 
   @override
   String toString() {
     return toJson().toString();
   }
+
+  String get headwordText => headword.headwordText;
+
+  String get urlEncodedHeadword => headword.urlEncodedHeadword;
+
+  List<Headword> get allHeadwords => [headword]..addAll(alternateHeadwords);
+}
+
+@immutable
+@JsonSerializable(fieldRename: FieldRename.snake)
+class Headword {
+  final bool isDominant;
+  final String headwordText;
+  final String abbreviation;
+  final String namingStandard;
+  final String parentheticalQualifier;
+
+  Headword({
+    @required this.headwordText,
+    @required this.abbreviation,
+    @required this.namingStandard,
+    @required this.parentheticalQualifier,
+    @required this.isDominant,
+  });
+
+  factory Headword.fromJson(Map<String, dynamic> json) =>
+      _$HeadwordFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HeadwordToJson(this);
+
+  String get urlEncodedHeadword => Entry.urlEncode(headwordText);
+
+  String urlDecodeHeadword(String urlEncodedHeadword) =>
+      Entry.urlDecode(urlEncodedHeadword);
 }
 
 @immutable
@@ -94,25 +133,25 @@ class Entry {
 class Translation {
   final String partOfSpeech;
   final String irregularInflections;
-  final String headwordParentheticalQualifier;
-  final String translation;
+  final String dominantHeadwordParentheticalQualifier;
+  final String translationText;
   final String genderAndPlural;
   final String translationNamingStandard;
   final String translationAbbreviation;
   final String translationParentheticalQualifier;
-  final String examplePhrase;
+  final List<String> examplePhrases;
   final String editorialNote;
 
   Translation({
     @required this.partOfSpeech,
     @required this.irregularInflections,
-    @required this.headwordParentheticalQualifier,
-    @required this.translation,
+    @required this.dominantHeadwordParentheticalQualifier,
+    @required this.translationText,
     @required this.genderAndPlural,
     @required this.translationNamingStandard,
     @required this.translationAbbreviation,
     @required this.translationParentheticalQualifier,
-    @required this.examplePhrase,
+    @required this.examplePhrases,
     @required this.editorialNote,
   });
 
@@ -128,18 +167,26 @@ class Translation {
 }
 
 class EntryBuilder {
-  String _headword;
+  Headword _headword;
   int _entryId;
+  List<Headword> _alternateHeadwords = [];
   List<String> _runOnParents;
   List<String> _runOns = [];
-  String _headwordAbbreviation;
-  List<String> _alternateHeadwords = [];
-  List<String> _alternateHeadwordNamingStandards = [];
 
   List<Translation> _translations = [];
 
-  EntryBuilder headword(String headword) {
-    _headword = headword;
+  EntryBuilder headword(
+    String headwordText,
+    String abbreviation,
+    String parentheticalQualifier,
+  ) {
+    _headword = Headword(
+      headwordText: headwordText,
+      abbreviation: abbreviation,
+      namingStandard: null,
+      parentheticalQualifier: parentheticalQualifier,
+      isDominant: true,
+    );
     return this;
   }
 
@@ -160,37 +207,34 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder headwordAbbreviation(String headwordAbbreviation) {
-    _headwordAbbreviation = headwordAbbreviation;
-    return this;
-  }
-
-  EntryBuilder alternateHeadwords(List<String> alternateHeadwords) {
-    _alternateHeadwords = alternateHeadwords;
-    return this;
-  }
-
-  EntryBuilder alternateHeadwordNamingStandards(
-      List<String> alternateHeadwordNamingStandards) {
-    assert(
-        _alternateHeadwords.length >= alternateHeadwordNamingStandards.length);
-    _alternateHeadwordNamingStandards = alternateHeadwordNamingStandards;
-    _alternateHeadwordNamingStandards.addAll(List.generate(
-        _alternateHeadwords.length - _alternateHeadwordNamingStandards.length,
-        (_) => ''));
+  EntryBuilder addAlternateHeadword({
+    @required String headwordText,
+    @required String abbreviation,
+    @required String namingStandard,
+    @required String parentheticalQualifier,
+  }) {
+    assert(headwordText != '',
+        "You must specify a non-empty run on. Headword: $_headword");
+    _alternateHeadwords.add(Headword(
+      headwordText: headwordText,
+      abbreviation: abbreviation,
+      namingStandard: namingStandard,
+      parentheticalQualifier: parentheticalQualifier,
+      isDominant: false,
+    ));
     return this;
   }
 
   EntryBuilder addTranslation({
     @required String partOfSpeech,
     @required String irregularInflections,
-    @required String headwordParentheticalQualifier,
+    @required String dominantHeadwordParentheticalQualifier,
     @required String translation,
     @required String genderAndPlural,
     @required String translationNamingStandard,
     @required String translationAbbreviation,
     @required String translationParentheticalQualifier,
-    @required String examplePhrase,
+    @required List<String> examplePhrases,
     @required String editorialNote,
   }) {
     assert(translation != '',
@@ -198,13 +242,14 @@ class EntryBuilder {
     _translations.add(Translation(
         partOfSpeech: partOfSpeech,
         irregularInflections: irregularInflections,
-        headwordParentheticalQualifier: headwordParentheticalQualifier,
-        translation: translation,
+        dominantHeadwordParentheticalQualifier:
+            dominantHeadwordParentheticalQualifier,
+        translationText: translation,
         genderAndPlural: genderAndPlural,
         translationNamingStandard: translationNamingStandard,
         translationAbbreviation: translationAbbreviation,
         translationParentheticalQualifier: translationParentheticalQualifier,
-        examplePhrase: examplePhrase,
+        examplePhrases: examplePhrases,
         editorialNote: editorialNote));
     return this;
   }
@@ -219,9 +264,7 @@ class EntryBuilder {
       headword: _headword,
       runOnParents: _runOnParents,
       runOns: _runOns,
-      headwordAbbreviation: _headwordAbbreviation,
       alternateHeadwords: _alternateHeadwords,
-      alternateHeadwordNamingStandards: _alternateHeadwordNamingStandards,
       translations: _translations,
     );
   }

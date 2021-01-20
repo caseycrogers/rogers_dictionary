@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:rogers_dictionary/main.dart';
 
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
@@ -24,7 +23,6 @@ class _SearchOptionsViewState extends State<SearchOptionsView> {
 
   @override
   Widget build(BuildContext context) {
-    var dictionaryPageModel = DictionaryPageModel.of(context);
     return Selector<EntrySearchModel, bool>(
       selector: (context, entrySearchModel) =>
           entrySearchModel.expandSearchOptions,
@@ -52,18 +50,11 @@ class _SearchOptionsViewState extends State<SearchOptionsView> {
       builder: (context) => Positioned(
         child: Stack(
           children: [
-            GestureDetector(
-              onTapUp: (tapUpDetails) {
-                _toggle();
-                var result = BoxHitTestResult();
-                MyApp.topRenderObject.hitTest(
-                  result,
-                  position: MyApp.topRenderObject
-                      .globalToLocal(tapUpDetails.globalPosition),
-                );
-                result.path.forEach((entry) =>
-                    entry.target.handleEvent(PointerUpEvent(), entry));
-              },
+            Container(
+              color: Colors.black38,
+              child: GestureDetector(
+                onTap: _toggle,
+              ),
             ),
             Positioned(
               top: upperLeft.dy + renderBox.size.height + 4.0,

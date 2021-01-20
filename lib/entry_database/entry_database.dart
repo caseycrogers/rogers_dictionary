@@ -9,7 +9,7 @@ import 'entry.dart';
 abstract class EntryDatabase {
   // Fetch entries from the database.
   Stream<Entry> getEntries(TranslationMode translationMode,
-      {String searchString, String startAfter, SearchOptions searchOptions});
+      {String searchString, int startAfter, SearchOptions searchOptions});
 
   // Get the given entry from the database.
   Future<Entry> getEntry(

@@ -1,4 +1,4 @@
-extension DiacriticsAwareString on String {
+extension NotShittyString on String {
   static const diacritics =
       'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
   static const nonDiacritics =

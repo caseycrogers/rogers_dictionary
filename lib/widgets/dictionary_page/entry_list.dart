@@ -60,7 +60,6 @@ class EntryList extends StatelessWidget {
     return (context, snapshot, index) {
       var dictionaryPageModel = DictionaryPageModel.of(context);
       if (!snapshot.hasData) return LoadingText();
-      entrySearchModel.updateEntries(snapshot.data);
       var entry = snapshot.data[index];
       var isSelected = entry.urlEncodedHeadword ==
           DictionaryPageModel.of(context).selectedEntryHeadword;

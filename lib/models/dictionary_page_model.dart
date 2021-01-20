@@ -138,12 +138,6 @@ class DictionaryPageModel {
       translationMode != transitionFrom.translationMode;
 
   bool get isTransitionToSelectedHeadword {
-    print(transitionTo);
-    print(transitionTo != null &&
-        transitionTo.translationMode == translationMode &&
-        transitionTo.hasSelection &&
-        hasSelection);
-    print('==============================');
     return transitionTo != null &&
         transitionTo.translationMode == translationMode &&
         transitionTo.hasSelection &&

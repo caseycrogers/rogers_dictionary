@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
+import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
 
 import 'overflow_markdown.dart';
 
@@ -28,13 +29,6 @@ class Indent extends StatelessWidget {
   Widget build(BuildContext context) =>
       Padding(child: child, padding: EdgeInsets.only(left: size ?? 20.0));
 }
-
-Widget _chip(BuildContext context, Text text, {Color color}) => Chip(
-    backgroundColor: color ?? Colors.grey.shade300,
-    padding: EdgeInsets.zero.add(EdgeInsets.only(bottom: 2.0)),
-    label: text,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16.0))));
 
 Widget headwordText(BuildContext context, String text, bool preview,
     {@required String searchString}) {
@@ -70,31 +64,39 @@ Widget abbreviationLine(
   );
 }
 
-Widget alternateHeadwordLine(
-    BuildContext context,
-    List<String> alternateHeadwords,
-    List<String> namingStandards,
-    bool preview,
-    String searchString) {
-  if (alternateHeadwords.where((alt) => alt.isNotEmpty).isEmpty)
-    return Container();
+Widget alternateHeadwordLines(BuildContext context,
+    List<Headword> alternateHeadwords, bool preview, String searchString) {
+  if (alternateHeadwords.isEmpty) return Container();
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text('alt. ', style: italic1(context)),
+      Padding(
+        child: Text('alt. ', style: italic1(context)),
+        padding: EdgeInsets.only(
+            top: alternateHeadwords.first.parentheticalQualifier.isEmpty
+                ? 0.0
+                : 7.0),
+      ),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: alternateHeadwords
-              .asMap()
-              .keys
-              .map((i) => OverflowMarkdown(
-                    '**${alternateHeadwords[i]}**${_namingStandard(context, namingStandards[i])}',
-                    defaultStyle: normal1(context),
-                    overflow:
-                        preview ? TextOverflow.ellipsis : TextOverflow.visible,
-                    overrideStyles: _getOverrideStyle(context,
-                        '**${alternateHeadwords[i]}**', preview, searchString),
+              .map((alt) => Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      OverflowMarkdown(
+                        '**${alt.headwordText}${alt.abbreviation.isEmpty ? '' : ' (${alt.abbreviation})'}**${_namingStandard(context, alt.namingStandard)}',
+                        defaultStyle: normal1(context),
+                        overflow: preview
+                            ? TextOverflow.ellipsis
+                            : TextOverflow.visible,
+                        overrideStyles: _getOverrideStyle(context,
+                            '**${alt.headwordText}**', preview, searchString),
+                      ),
+                      if (alt.parentheticalQualifier.isNotEmpty)
+                        Text(' ', style: normal1(context)),
+                      parentheticalText(context, alt.parentheticalQualifier),
+                    ],
                   ))
               .toList(),
         ),
@@ -118,8 +120,9 @@ Widget _translationParenthetical(
       child: Wrap(
         children: translationParenthetical
             .split(';')
-            .map((q) => _chip(context,
-                Text(q, style: italic1(context).copyWith(fontSize: 20.0))))
+            .map((q) => DictionaryChip(
+                child:
+                    Text(q, style: italic1(context).copyWith(fontSize: 20.0))))
             .toList(),
       ),
     );
@@ -131,9 +134,8 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
   if (!preview) pos = Entry.longPartOfSpeech(pos);
   return Container(
     padding: EdgeInsets.only(right: 8.0),
-    child: _chip(
-      context,
-      Text(
+    child: DictionaryChip(
+      child: Text(
         pos,
         style: italic1(context),
       ),
@@ -143,7 +145,7 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
 
 Widget previewTranslationLine(
     BuildContext context, Translation translation, bool addEllipsis) {
-  var text = translation.translation;
+  var text = translation.translationText;
   if (translation.genderAndPlural.isNotEmpty)
     text += ' *${translation.genderAndPlural}*';
   if (addEllipsis) text += '...';
@@ -156,7 +158,7 @@ Widget translationLine(BuildContext context, Translation translation) {
   return Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      OverflowMarkdown(translation.translation, children: [
+      OverflowMarkdown(translation.translationText, children: [
         _addSpace(translation.genderAndPlural),
         _namingStandard(context, translation.translationNamingStandard)
       ]),
@@ -168,10 +170,9 @@ Widget translationLine(BuildContext context, Translation translation) {
 
 Widget parentheticalText(BuildContext context, String text) {
   if (text.isEmpty) return Container();
-  return _chip(
-    context,
-    Text(text, style: italic1(context)),
-    color: Colors.cyan.shade100,
+  return DictionaryChip(
+    child: Text(text, style: italic1(context)),
+    color: Colors.cyan.shade100.withOpacity(.6),
   );
 }
 
@@ -182,8 +183,8 @@ Widget editorialText(BuildContext context, String text) {
   );
 }
 
-Widget examplePhraseText(BuildContext context, String exampleText) {
-  if (exampleText.isEmpty) return Container();
+Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
+  if (examplePhrases.isEmpty) return Container();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
@@ -200,9 +201,10 @@ Widget examplePhraseText(BuildContext context, String exampleText) {
             children: [
               Text('Example Phrases:', style: italic1(context)),
               Column(
-                children: exampleText
-                    .split('...')
-                    .map((example) => OverflowMarkdown(example,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: examplePhrases
+                    .map((example) => OverflowMarkdown(
+                        example.replaceAll('/', ' / '),
                         defaultStyle: normal1(context).copyWith(height: 1.5)))
                     .toList(),
               ),
@@ -214,20 +216,28 @@ Widget examplePhraseText(BuildContext context, String exampleText) {
   );
 }
 
-Widget headwordLine(
-    BuildContext context, Entry entry, bool preview, String searchString) {
+Widget headwordLine(BuildContext context, Headword headword,
+    List<Headword> alternateHeadwords, bool preview, String searchString) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      headwordText(
-          context,
-          entry.headwordAbbreviation.isEmpty
-              ? entry.headword
-              : '${entry.headword} (${entry.headwordAbbreviation})',
-          preview,
-          searchString: searchString),
-      alternateHeadwordLine(context, entry.alternateHeadwords,
-          entry.alternateHeadwordNamingStandards, preview, searchString),
+      Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          headwordText(
+              context,
+              headword.abbreviation.isEmpty
+                  ? headword.headwordText
+                  : '${headword.headwordText} (${headword.abbreviation})',
+              preview,
+              searchString: searchString),
+          if (headword.parentheticalQualifier.isNotEmpty)
+            Text(' ', style: normal1(context)),
+          parentheticalText(context, headword.parentheticalQualifier),
+        ],
+      ),
+      alternateHeadwordLines(
+          context, alternateHeadwords, preview, searchString),
     ],
   );
 }
