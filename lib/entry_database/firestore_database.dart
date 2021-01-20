@@ -35,12 +35,12 @@ class FirestoreDatabase extends EntryDatabase {
   @override
   Stream<Entry> getEntries(TranslationMode translationMode,
       {String searchString: '',
-      String startAfter: '',
+      int startAfter: 0,
       SearchOptions searchOptions}) {
     return _getEntryStream(searchString, startAfter);
   }
 
-  Stream<Entry> _getEntryStream(String searchString, String startAfter) async* {
+  Stream<Entry> _getEntryStream(String searchString, int startAfter) async* {
     await init();
     dynamic lastSeen = startAfter;
     while (true) {

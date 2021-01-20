@@ -9,7 +9,7 @@ class EntrySearchModel with ChangeNotifier {
   final TranslationMode _translationMode;
   String _searchString;
   SearchOptions _searchOptions;
-  String _startAfter;
+  int _startAfter;
   Stream<Entry> _entryStream;
   List<Entry> _entries;
   ScrollController _scrollController;
@@ -18,8 +18,6 @@ class EntrySearchModel with ChangeNotifier {
   String get searchString => _searchString;
 
   SearchOptions get searchOptions => _searchOptions;
-
-  String get startAfter => _startAfter;
 
   Stream<Entry> get entryStream => _entryStream;
 
@@ -41,30 +39,28 @@ class EntrySearchModel with ChangeNotifier {
       this._translationMode,
       this._searchString,
       this._searchOptions,
-      this._startAfter,
       this._entries,
       this._scrollController,
       this._expandSearchOptions) {
     _entryStream = MyApp.db.getEntries(_translationMode,
         searchString: searchString,
-        startAfter: startAfter,
+        startAfter: entries.length,
         searchOptions: searchOptions);
   }
 
   EntrySearchModel(TranslationMode translationMode, String searchString,
       SearchOptions searchOptions)
-      : this._(translationMode, searchString, searchOptions, '', [],
+      : this._(translationMode, searchString, searchOptions, [],
             ScrollController(), false);
 
   EntrySearchModel.empty(TranslationMode translationMode)
-      : this._(translationMode, '', SearchOptions.empty(), '', [],
+      : this._(translationMode, '', SearchOptions.empty(), [],
             ScrollController(), false);
 
   EntrySearchModel copy() => EntrySearchModel._(
       _translationMode,
       _searchString,
       _searchOptions,
-      _startAfter,
       _entries,
       ScrollController(
           initialScrollOffset:
@@ -78,7 +74,7 @@ class EntrySearchModel with ChangeNotifier {
       return;
     _searchString = newSearchString;
     _searchOptions = newSearchOptions;
-    _startAfter = '';
+    _startAfter = 0;
     _entries = [];
     _entryStream = MyApp.db.getEntries(_translationMode,
         searchString: _searchString,
@@ -86,10 +82,5 @@ class EntrySearchModel with ChangeNotifier {
         searchOptions: _searchOptions);
     _scrollController = ScrollController();
     notifyListeners();
-  }
-
-  void updateEntries(newEntries) {
-    _entries = newEntries;
-    _startAfter = _entries.isNotEmpty ? _entries.last.urlEncodedHeadword : '';
   }
 }

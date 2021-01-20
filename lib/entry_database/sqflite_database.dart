@@ -33,10 +33,10 @@ class SqfliteDatabase extends EntryDatabase {
   Stream<Entry> getEntries(
     TranslationMode translationMode, {
     @required String searchString,
-    @required String startAfter,
+    @required int startAfter,
     @required SearchOptions searchOptions,
   }) async* {
-    int offset = 0;
+    int offset = startAfter;
     var db = await _dbFuture;
     String orderByClause;
     final suffix = searchOptions.ignoreAccents ? WITHOUT_DIACRITICAL_MARKS : '';
@@ -45,7 +45,7 @@ class SqfliteDatabase extends EntryDatabase {
     switch (searchOptions.sortBy) {
       case SortOrder.relevance:
         orderByClause = '${_sqlRelevancyScore(searchString, HEADWORD)}, '
-            '${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION)}, '
+            '${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATIONS)}, '
             '${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS)}, '
             'headword';
         break;
@@ -58,7 +58,7 @@ class SqfliteDatabase extends EntryDatabase {
         translationMode == TranslationMode.English ? ENGLISH : SPANISH,
         where:
             '(${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH '
-            'OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATION + suffix)} != $NO_MATCH '
+            'OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATIONS + suffix)} != $NO_MATCH '
             'OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS + suffix)} != $NO_MATCH) '
             'AND url_encoded_headword > "$startAfter"',
         orderBy: orderByClause,

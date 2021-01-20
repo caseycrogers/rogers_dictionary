@@ -3,12 +3,13 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/slide_entrance_exit.dart';
 
-class DictionaryPage extends StatelessWidget {
+class SearchPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
       ListEquality().equals(uri.pathSegments, ['dictionary']);
 
@@ -37,7 +38,15 @@ class DictionaryPage extends StatelessWidget {
           body: Column(
             children: [
               Expanded(child: _buildOrientedPage(context, EntrySearch())),
-              DictionaryBottomNavigationBar(),
+              Delayed(
+                delay: Duration(milliseconds: 1),
+                initialChild: DictionaryBottomNavigationBar(
+                    translationMode:
+                        dictionaryPageModel.transitionFrom?.translationMode ??
+                            dictionaryPageModel.translationMode),
+                child: DictionaryBottomNavigationBar(
+                    translationMode: dictionaryPageModel.translationMode),
+              ),
             ],
           ),
         ),
@@ -45,20 +54,10 @@ class DictionaryPage extends StatelessWidget {
     );
   }
 
-  Animation<double> _getAnimation(BuildContext context, bool isSecondary) {
-    var dictionaryPageModel = DictionaryPageModel.of(context);
-    // Don't display transitions when going between translation modes.
-    if (dictionaryPageModel.isTransitionFromTranslationMode)
-      return isSecondary ? kAlwaysDismissedAnimation : kAlwaysCompleteAnimation;
-    return isSecondary
-        ? ModalRoute.of(context).secondaryAnimation
-        : ModalRoute.of(context).animation;
-  }
-
   Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
-    final animation = _getAnimation(context, false);
-    final exitAnimation = _getAnimation(context, true);
     final dictionaryPageModel = DictionaryPageModel.of(context);
+    final animation = ModalRoute.of(context).animation;
+    final secondaryAnimation = ModalRoute.of(context).secondaryAnimation;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -76,15 +75,21 @@ class DictionaryPage extends StatelessWidget {
                     width: constraints.maxWidth,
                     height: constraints.maxHeight,
                     child: AnimatedBuilder(
-                      animation: exitAnimation,
+                      animation: animation,
                       builder: (context, _) => SlideEntranceExit(
                         offset: Offset(
                             dictionaryPageModel.isTransitionToSelectedHeadword
                                 ? -1.0
                                 : 1.0,
                             0.0),
-                        entranceAnimation: animation,
-                        exitAnimation: exitAnimation,
+                        entranceAnimation:
+                            dictionaryPageModel.isTransitionFromTranslationMode
+                                ? kAlwaysCompleteAnimation
+                                : animation,
+                        exitAnimation:
+                            dictionaryPageModel.isTransitionFromTranslationMode
+                                ? kAlwaysDismissedAnimation
+                                : secondaryAnimation,
                         child: EntryView.asPage(),
                       ),
                     ),
@@ -95,8 +100,14 @@ class DictionaryPage extends StatelessWidget {
                     height: constraints.maxHeight,
                     child: SlideEntranceExit(
                       offset: Offset(-1.0, 0.0),
-                      entranceAnimation: animation,
-                      exitAnimation: exitAnimation,
+                      entranceAnimation:
+                          dictionaryPageModel.isTransitionFromTranslationMode
+                              ? kAlwaysCompleteAnimation
+                              : animation,
+                      exitAnimation:
+                          dictionaryPageModel.isTransitionFromTranslationMode
+                              ? kAlwaysDismissedAnimation
+                              : secondaryAnimation,
                       child: DecoratedBox(
                         child: Row(
                           children: [
@@ -113,14 +124,14 @@ class DictionaryPage extends StatelessWidget {
             return Stack(
               children: [
                 AnimatedBuilder(
-                  animation: exitAnimation,
+                  animation: secondaryAnimation,
                   builder: (context, _) => Container(
                       width: constraints.maxWidth,
                       height: constraints.maxHeight,
-                      color:
-                          exitAnimation.isCompleted || exitAnimation.isDismissed
-                              ? Colors.transparent
-                              : Theme.of(context).scaffoldBackgroundColor),
+                      color: secondaryAnimation.isCompleted ||
+                              secondaryAnimation.isDismissed
+                          ? Colors.transparent
+                          : Theme.of(context).scaffoldBackgroundColor),
                 ),
                 Positioned(
                   left: constraints.maxWidth / 3.0,
@@ -130,12 +141,18 @@ class DictionaryPage extends StatelessWidget {
                     offset: dictionaryPageModel.hasSelection
                         ? Offset(-1.0, 0.0)
                         : Offset.zero,
-                    entranceAnimation: CurvedAnimation(
-                        parent: animation, curve: Interval(0.5, 1.0)),
-                    exitAnimation: CurvedAnimation(
-                      parent: exitAnimation,
-                      curve: Interval(0.0, 0.5),
-                    ),
+                    entranceAnimation:
+                        dictionaryPageModel.isTransitionFromTranslationMode
+                            ? kAlwaysCompleteAnimation
+                            : CurvedAnimation(
+                                parent: animation, curve: Interval(0.5, 1.0)),
+                    exitAnimation:
+                        dictionaryPageModel.isTransitionFromTranslationMode
+                            ? kAlwaysDismissedAnimation
+                            : CurvedAnimation(
+                                parent: secondaryAnimation,
+                                curve: Interval(0.0, 0.5),
+                              ),
                     child: EntryView.asPage(),
                   ),
                 ),

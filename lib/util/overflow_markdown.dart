@@ -18,6 +18,7 @@ class OverflowMarkdown extends StatelessWidget {
     var spans = <TextSpan>[];
     var isBold = false;
     var isItalic = false;
+    var isSubscript = false;
     TextStyle currOverrideStyle;
     var buff = StringBuffer();
     var i = 0;
@@ -29,6 +30,9 @@ class OverflowMarkdown extends StatelessWidget {
             .copyWith(
               fontWeight: isBold ? FontWeight.bold : null,
               fontStyle: isItalic ? FontStyle.italic : null,
+              fontSize: isSubscript
+                  ? Theme.of(context).textTheme.bodyText1.fontSize / 2
+                  : null,
             );
 
     void addSpan() {
@@ -59,24 +63,20 @@ class OverflowMarkdown extends StatelessWidget {
         continue;
       }
       if (i + 1 < fullText.length && fullText.substring(i, i + 2) == '**') {
-        if (!isBold) {
-          addSpan();
-          isBold = true;
-        } else {
-          addSpan();
-          isBold = false;
-        }
+        addSpan();
+        isBold = !isBold;
         i += 2;
         continue;
       }
       if (fullText[i] == '*') {
-        if (!isItalic) {
-          addSpan();
-          isItalic = true;
-        } else {
-          addSpan();
-          isItalic = false;
-        }
+        addSpan();
+        isItalic = !isItalic;
+        i += 1;
+        continue;
+      }
+      if (fullText[i] == '`') {
+        addSpan();
+        isSubscript = !isSubscript;
         i += 1;
         continue;
       }

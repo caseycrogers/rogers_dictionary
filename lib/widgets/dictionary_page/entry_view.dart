@@ -22,7 +22,7 @@ class EntryView extends StatelessWidget {
             color: Theme.of(context).cardColor,
             child: FutureBuilder(
               future: dictionaryPageModel.selectedEntry,
-              builder: (context, snap) {
+              builder: (context, AsyncSnapshot<Entry> snap) {
                 if (!snap.hasData)
                   // Only display if loading is slow.
                   return Delayed(
@@ -41,7 +41,11 @@ class EntryView extends StatelessWidget {
                         children: [
                           _iconButton(context),
                           Expanded(
-                              child: headwordLine(context, entry, false,
+                              child: headwordLine(
+                                  context,
+                                  entry.headword,
+                                  entry.alternateHeadwords,
+                                  false,
                                   dictionaryPageModel.searchString)),
                         ],
                       ),
@@ -87,8 +91,8 @@ class EntryView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (_preview)
-          headwordLine(context, _entry, _preview,
-              DictionaryPageModel.of(context).searchString),
+          headwordLine(context, _entry.headword, _entry.alternateHeadwords,
+              _preview, DictionaryPageModel.of(context).searchString),
         _buildTable(context, _constructTranslationMap(_entry)),
         if (!_preview) _buildEditorialNotes(context),
         if (!_preview) _buildRelated(context),
@@ -191,8 +195,8 @@ class EntryView extends StatelessWidget {
   TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
       List<Translation> translations) {
     String parenthetical = '';
-    final hasParenthetical =
-        translations.any((t) => t.headwordParentheticalQualifier.isNotEmpty);
+    final hasParenthetical = translations
+        .any((t) => t.dominantHeadwordParentheticalQualifier.isNotEmpty);
     if (_preview)
       return TableRow(children: [
         Container(
@@ -218,8 +222,8 @@ class EntryView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: translations.map((t) {
                   var parentheticalChanged =
-                      t.headwordParentheticalQualifier != parenthetical;
-                  parenthetical = t.headwordParentheticalQualifier;
+                      t.dominantHeadwordParentheticalQualifier != parenthetical;
+                  parenthetical = t.dominantHeadwordParentheticalQualifier;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -257,7 +261,7 @@ class EntryView extends StatelessWidget {
                   DictionaryPageModel.of(context).searchString),
             ),
           ),
-          examplePhraseText(context, translation.examplePhrase),
+          examplePhraseText(context, translation.examplePhrases),
           SizedBox(height: 0.0),
         ],
       ),
