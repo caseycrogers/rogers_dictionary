@@ -4,7 +4,7 @@ import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -16,7 +16,7 @@ class EntryList extends StatelessWidget {
     return Container(
       color: Theme.of(context).cardColor,
       child: ChangeNotifierProvider.value(
-        value: DictionaryPageModel.of(context).entrySearchModel,
+        value: SearchPageModel.of(context).entrySearchModel,
         builder: (context, _) {
           var entrySearchModel = context.watch<EntrySearchModel>();
           if (entrySearchModel.isEmpty)
@@ -58,11 +58,11 @@ class EntryList extends StatelessWidget {
   Widget Function(BuildContext, AsyncSnapshot<List<Entry>>, int) _buildRow(
       EntrySearchModel entrySearchModel) {
     return (context, snapshot, index) {
-      var dictionaryPageModel = DictionaryPageModel.of(context);
+      var dictionaryPageModel = SearchPageModel.of(context);
       if (!snapshot.hasData) return LoadingText();
       var entry = snapshot.data[index];
       var isSelected = entry.urlEncodedHeadword ==
-          DictionaryPageModel.of(context).selectedEntryHeadword;
+          SearchPageModel.of(context).selectedEntryHeadword;
       return Column(
         children: [
           InkWell(

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
@@ -15,7 +15,7 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dictionaryPageModel = DictionaryPageModel.of(context);
+    final dictionaryPageModel = SearchPageModel.of(context);
     final primaryColor =
         dictionaryPageModel.isEnglish ? Colors.indigo : Colors.amber;
     final secondaryColor = dictionaryPageModel.isEnglish
@@ -55,7 +55,7 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
-    final dictionaryPageModel = DictionaryPageModel.of(context);
+    final dictionaryPageModel = SearchPageModel.of(context);
     final animation = ModalRoute.of(context).animation;
     final secondaryAnimation = ModalRoute.of(context).secondaryAnimation;
 

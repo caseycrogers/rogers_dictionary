@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 
 class DictionaryBottomNavigationBar extends StatelessWidget {
   final TranslationMode translationMode;
@@ -33,7 +33,7 @@ class DictionaryBottomNavigationBar extends StatelessWidget {
   }
 
   void _handleTap(BuildContext context, int index) async {
-    DictionaryPageModel.onTranslationModeChanged(
+    SearchPageModel.onTranslationModeChanged(
         context, _indexToTranslationMode(context, index));
   }
 
@@ -52,11 +52,12 @@ class DictionaryBottomNavigationBar extends StatelessWidget {
       (mode) => MapEntry(
         mode,
         BottomNavyBarItem(
-          icon: Image.asset(
-            'assets/images/${mode == TranslationMode.English ? 'us' : 'es'}.png',
-            height: mode == translationMode ? 30.0 : 26.0,
+          icon: AnimatedContainer(
+            duration: Duration(milliseconds: 50),
             width: mode == translationMode ? 30.0 : 26.0,
-            fit: BoxFit.fitWidth,
+            child: Image.asset(
+              'assets/images/${mode == TranslationMode.English ? 'us' : 'es'}.png',
+            ),
           ),
           title: Text(mode == TranslationMode.English ? 'English' : 'Español'),
           activeColor: Colors.black,

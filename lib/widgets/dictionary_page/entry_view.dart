@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
@@ -15,7 +15,7 @@ class EntryView extends StatelessWidget {
 
   static Widget asPage() => Builder(
         builder: (context) {
-          var dictionaryPageModel = DictionaryPageModel.of(context);
+          var dictionaryPageModel = SearchPageModel.of(context);
           if (!dictionaryPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
           return Container(
@@ -78,10 +78,10 @@ class EntryView extends StatelessWidget {
             Icons.arrow_back,
             color: Theme.of(context).accentIconTheme.color,
           ),
-          onPressed: () => DictionaryPageModel.of(context)
-                  .isTransitionFromSelectedHeadword
-              ? Navigator.of(context).pop()
-              : DictionaryPageModel.of(context).onHeadwordSelected(context, ''),
+          onPressed: () =>
+              SearchPageModel.of(context).isTransitionFromSelectedHeadword
+                  ? Navigator.of(context).pop()
+                  : SearchPageModel.of(context).onHeadwordSelected(context, ''),
         ),
       );
 
@@ -92,7 +92,7 @@ class EntryView extends StatelessWidget {
       children: [
         if (_preview)
           headwordLine(context, _entry.headword, _entry.alternateHeadwords,
-              _preview, DictionaryPageModel.of(context).searchString),
+              _preview, SearchPageModel.of(context).searchString),
         _buildTable(context, _constructTranslationMap(_entry)),
         if (!_preview) _buildEditorialNotes(context),
         if (!_preview) _buildRelated(context),
@@ -116,7 +116,7 @@ class EntryView extends StatelessWidget {
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                DictionaryPageModel.of(context)
+                SearchPageModel.of(context)
                     .onHeadwordSelected(context, Entry.urlEncode(headword));
               },
           ),
@@ -258,7 +258,7 @@ class EntryView extends StatelessWidget {
                   context,
                   translation.translationAbbreviation,
                   _preview,
-                  DictionaryPageModel.of(context).searchString),
+                  SearchPageModel.of(context).searchString),
             ),
           ),
           examplePhraseText(context, translation.examplePhrases),

@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rogers_dictionary/entry_database/sqflite_database.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 
 import 'entry_database/entry_database.dart';
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         title: 'Dictionary',
         onGenerateRoute: PageRouter.generateRoute,
         // TODO: Initial route breaks '#' navigation, refactor away from initial route?
-        initialRoute: '#/' + DictionaryPageModel.route,
+        initialRoute: '#/' + SearchPageModel.route,
         theme: ThemeData(
             textTheme: TextTheme(
               headline1: TextStyle(

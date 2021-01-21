@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 
 import 'entry.dart';

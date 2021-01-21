@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/pages/search_page.dart';
 
 class PageRouter {
@@ -26,8 +26,7 @@ Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
       settings: settings.copyWith(
           name: settings.name,
           arguments: settings.arguments ??
-              DictionaryPageModel.empty(
-                  translationMode: DEFAULT_TRANSLATION_MODE)),
+              SearchPageModel.empty(translationMode: DEFAULT_TRANSLATION_MODE)),
       pageBuilder: (context, animation, secondaryAnimation) {
         return SearchPage();
       });
