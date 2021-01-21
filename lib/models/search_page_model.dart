@@ -16,20 +16,20 @@ enum TranslationMode {
 
 const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
-class DictionaryPageModel {
-  static const String route = 'dictionary';
+class SearchPageModel {
+  static const String route = 'search';
   static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
   static const String SEARCH_STRING_QUERY_PARAM = 'search';
   static const String SORT_BY_QUERY_PARAM = 'sortBy';
 
-  static DictionaryPageModel _lastEnglishPageModel =
-      DictionaryPageModel.empty(translationMode: TranslationMode.English);
-  static DictionaryPageModel _lastSpanishPageModel =
-      DictionaryPageModel.empty(translationMode: TranslationMode.Spanish);
+  static SearchPageModel _lastEnglishPageModel =
+      SearchPageModel.empty(translationMode: TranslationMode.English);
+  static SearchPageModel _lastSpanishPageModel =
+      SearchPageModel.empty(translationMode: TranslationMode.Spanish);
 
   // Transition state.
-  final DictionaryPageModel transitionFrom;
-  DictionaryPageModel transitionTo;
+  final SearchPageModel transitionFrom;
+  SearchPageModel transitionTo;
 
   // Translation mode state.
   final TranslationMode translationMode;
@@ -61,12 +61,11 @@ class DictionaryPageModel {
     return Uri(path: route, queryParameters: params);
   }
 
-  static DictionaryPageModel of(BuildContext context) =>
+  static SearchPageModel of(BuildContext context) =>
       ModalRoute.of(context).settings.arguments;
 
-  factory DictionaryPageModel.empty(
-          {@required TranslationMode translationMode}) =>
-      DictionaryPageModel._(
+  factory SearchPageModel.empty({@required TranslationMode translationMode}) =>
+      SearchPageModel._(
         transitionFrom: null,
         translationMode: translationMode,
         selectedEntry: null,
@@ -75,7 +74,7 @@ class DictionaryPageModel {
         searchBarHasFocus: false,
       );
 
-  factory DictionaryPageModel.fromQueryParams(Map<String, String> queryParams) {
+  factory SearchPageModel.fromQueryParams(Map<String, String> queryParams) {
     throw UnimplementedError(
         'Query Params is no longer up to date and should not be used.');
     // var encodedHeadword = queryParams[SELECTED_ENTRY_QUERY_PARAM];
@@ -92,13 +91,13 @@ class DictionaryPageModel {
     // );
   }
 
-  DictionaryPageModel _copyWithEntry(Entry newEntry) {
+  SearchPageModel _copyWithEntry(Entry newEntry) {
     return _copyWith(
         newSelectedEntry: Future.value(newEntry),
         newEncodedHeadword: newEntry?.urlEncodedHeadword);
   }
 
-  DictionaryPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
+  SearchPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
     return _copyWith(
         newSelectedEntry: newEncodedHeadword.isNotEmpty
             ? MyApp.db.getEntry(translationMode, newEncodedHeadword)
@@ -106,15 +105,15 @@ class DictionaryPageModel {
         newEncodedHeadword: newEncodedHeadword);
   }
 
-  DictionaryPageModel _copyWith(
-      {DictionaryPageModel overrideTransitionFrom,
+  SearchPageModel _copyWith(
+      {SearchPageModel overrideTransitionFrom,
       FutureOr<Entry> newSelectedEntry,
       String newEncodedHeadword}) {
     assert((newSelectedEntry != null &&
             newEncodedHeadword != selectedEntryHeadword) ||
         (newSelectedEntry == null && (newEncodedHeadword ?? '') == '') ||
         overrideTransitionFrom != null);
-    return DictionaryPageModel._(
+    return SearchPageModel._(
       transitionFrom: overrideTransitionFrom ?? this,
       translationMode: translationMode,
       selectedEntry: newSelectedEntry ?? selectedEntry,
@@ -124,7 +123,7 @@ class DictionaryPageModel {
     );
   }
 
-  DictionaryPageModel._({
+  SearchPageModel._({
     @required this.transitionFrom,
     @required this.translationMode,
     @required this.selectedEntry,
@@ -153,7 +152,7 @@ class DictionaryPageModel {
 
   static void onTranslationModeChanged(
       BuildContext context, TranslationMode newTranslationMode) {
-    var currModel = DictionaryPageModel.of(context);
+    var currModel = SearchPageModel.of(context);
     if (newTranslationMode == currModel.translationMode) return;
     var newModel =
         (currModel.isEnglish ? _lastSpanishPageModel : _lastEnglishPageModel)

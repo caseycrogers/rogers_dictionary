@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/search_options_menu.dart';
@@ -43,7 +43,7 @@ class _SearchOptionsViewState extends State<SearchOptionsView> {
   }
 
   OverlayEntry _buildOverlayEntry() {
-    var dictionaryPageModel = DictionaryPageModel.of(context);
+    var dictionaryPageModel = SearchPageModel.of(context);
     RenderBox renderBox = context.findRenderObject();
     var upperLeft = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(
@@ -69,7 +69,7 @@ class _SearchOptionsViewState extends State<SearchOptionsView> {
   }
 
   void _toggle() {
-    var entrySearchModel = DictionaryPageModel.of(context).entrySearchModel;
+    var entrySearchModel = SearchPageModel.of(context).entrySearchModel;
     entrySearchModel.expandSearchOptions =
         !entrySearchModel.expandSearchOptions;
     if (entrySearchModel.expandSearchOptions) {

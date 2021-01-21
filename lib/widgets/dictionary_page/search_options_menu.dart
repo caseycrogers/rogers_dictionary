@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_options.dart';
 
 class SearchOptionsMenu extends StatelessWidget {
-  final DictionaryPageModel _dictionaryPageModel;
+  final SearchPageModel _dictionaryPageModel;
 
   SearchOptionsMenu(this._dictionaryPageModel);
 
