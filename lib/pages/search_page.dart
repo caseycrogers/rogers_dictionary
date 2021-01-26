@@ -11,7 +11,7 @@ import 'package:rogers_dictionary/widgets/slide_entrance_exit.dart';
 
 class SearchPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
-      ListEquality().equals(uri.pathSegments, ['dictionary']);
+      ListEquality().equals(uri.pathSegments, ['search']);
 
   @override
   Widget build(BuildContext context) {
@@ -30,24 +30,41 @@ class SearchPage extends StatelessWidget {
           primaryColor: primaryColor,
           accentColor: secondaryColor,
         ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: Text('Dictionary'),
-          ),
-          body: Column(
-            children: [
-              Expanded(child: _buildOrientedPage(context, EntrySearch())),
-              Delayed(
-                delay: Duration(milliseconds: 1),
-                initialChild: DictionaryBottomNavigationBar(
-                    translationMode:
-                        dictionaryPageModel.transitionFrom?.translationMode ??
-                            dictionaryPageModel.translationMode),
-                child: DictionaryBottomNavigationBar(
-                    translationMode: dictionaryPageModel.translationMode),
+        child: DefaultTabController(
+          length: 3,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: Row(
+                children: [
+                  Text(dictionaryPageModel.isEnglish
+                      ? 'English to Spanish'
+                      : 'Spanish to English'),
+                  IconButton(
+                    icon: Icon(
+                      Icons.info,
+                      size: 30.0,
+                    ),
+                    onPressed: () {},
+                  ),
+                ],
               ),
-            ],
+            ),
+            body: Column(
+              children: [
+                Expanded(child: _buildOrientedPage(context, EntrySearch())),
+                Delayed(
+                  delay: Duration(milliseconds: 1),
+                  initialChild: DictionaryBottomNavigationBar(
+                      translationMode:
+                          dictionaryPageModel.transitionFrom?.translationMode ??
+                              dictionaryPageModel.translationMode),
+                  child: DictionaryBottomNavigationBar(
+                      translationMode: dictionaryPageModel.translationMode),
+                ),
+              ],
+            ),
           ),
         ),
       ),

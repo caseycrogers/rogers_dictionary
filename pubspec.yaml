@@ -39,9 +39,24 @@ dev_dependencies:
   firedart: ^0.8.3
   df: ^0.3.0
   sqflite_common_ffi:
+  flutter_launcher_icons: ^0.8.1
+  flutter_native_splash: ^0.2.8
 
 flutter:
   uses-material-design: true
   assets:
     - assets/entries.db
     - assets/images/
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path: "assets/images/r_logo_flat_full.png"
+  adaptive_icon_background: "assets/images/r_logo_flat_full.png"
+  adaptive_icon_foreground: "assets/images/r_logo_flat_full.png"
+
+flutter_native_splash:
+  color: "ffffff"
+  android_gravity: fill
+  image: "assets/images/r_splash_screen.png"
+

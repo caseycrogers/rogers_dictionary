@@ -31,6 +31,20 @@ class MyApp extends StatelessWidget {
         // TODO: Initial route breaks '#' navigation, refactor away from initial route?
         initialRoute: '#/' + SearchPageModel.route,
         theme: ThemeData(
+            tabBarTheme: TabBarTheme(
+              labelStyle: TextStyle(
+                      fontSize: 24.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold)
+                  .merge(GoogleFonts.openSans()),
+              unselectedLabelStyle: TextStyle(
+                      fontSize: 22.0,
+                      color: Colors.white54,
+                      fontWeight: FontWeight.bold)
+                  .merge(GoogleFonts.openSans()),
+              indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(width: 2.0, color: Colors.white)),
+            ),
             textTheme: TextTheme(
               headline1: TextStyle(
                       fontSize: 36.0,

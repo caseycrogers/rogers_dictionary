@@ -7,7 +7,7 @@ class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     var uri = Uri.parse(settings.name);
     if (SearchPage.matchesRoute(uri) || uri.pathSegments.isEmpty)
-      return _serveDictionaryPage(settings, uri);
+      return _serveSearchPage(settings, uri);
 
     // Route not recognized, display 404 page
     return PageRouteBuilder(
@@ -19,8 +19,7 @@ class PageRouter {
   }
 }
 
-Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) {
-  //var newArguments = DictionaryPageModel.fromQueryParams(uri.queryParameters);
+Route<dynamic> _serveSearchPage(RouteSettings settings, Uri uri) {
   return PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 300),
       settings: settings.copyWith(
