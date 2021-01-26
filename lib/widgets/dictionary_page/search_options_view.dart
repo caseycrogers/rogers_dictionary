@@ -33,10 +33,9 @@ class _SearchOptionsViewState extends State<SearchOptionsView> {
           color: hasFocus ? Colors.black26 : Colors.transparent,
         ),
         child: IconButton(
-          splashColor: Colors.black26,
-          onPressed: () => _toggle(),
           icon: Icon(Icons.more_vert),
           color: Colors.white,
+          onPressed: () => _toggle(),
         ),
       ),
     );
