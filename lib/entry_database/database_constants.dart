@@ -5,6 +5,7 @@ const String ENTRIES = "entries";
 
 // Column/field names.
 const URL_ENCODED_HEADWORD = 'url_encoded_headword';
+const IS_FAVORITE = 'is_favorite';
 const HEADWORD = 'headword';
 const ENTRY_ID = 'entry_id';
 

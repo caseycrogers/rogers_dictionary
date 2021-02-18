@@ -15,13 +15,13 @@ class EntryView extends StatelessWidget {
 
   static Widget asPage() => Builder(
         builder: (context) {
-          var dictionaryPageModel = SearchPageModel.of(context);
-          if (!dictionaryPageModel.hasSelection)
+          var searchPageModel = SearchPageModel.of(context);
+          if (!searchPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
           return Container(
             color: Theme.of(context).cardColor,
             child: FutureBuilder(
-              future: dictionaryPageModel.selectedEntry,
+              future: searchPageModel.selectedEntry,
               builder: (context, AsyncSnapshot<Entry> snap) {
                 if (!snap.hasData)
                   // Only display if loading is slow.
@@ -46,7 +46,7 @@ class EntryView extends StatelessWidget {
                                   entry.headword,
                                   entry.alternateHeadwords,
                                   false,
-                                  dictionaryPageModel.searchString)),
+                                  searchPageModel.searchString)),
                         ],
                       ),
                     ),
@@ -71,19 +71,22 @@ class EntryView extends StatelessWidget {
 
   static Widget asPreview(Entry entry) => EntryView._instance(entry, true);
 
-  static Widget _iconButton(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).accentIconTheme.color,
-          ),
-          onPressed: () =>
-              SearchPageModel.of(context).isTransitionFromSelectedHeadword
-                  ? Navigator.of(context).pop()
-                  : SearchPageModel.of(context).onHeadwordSelected(context, ''),
+  static Widget _iconButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: Theme.of(context).accentIconTheme.color,
         ),
-      );
+        onPressed: () =>
+            SearchPageModel.readFrom(context).isTransitionFromSelectedHeadword
+                ? Navigator.of(context).pop()
+                : BilingualSearchPageModel.of(context)
+                    .onHeadwordSelected(context, ''),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +119,7 @@ class EntryView extends StatelessWidget {
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                SearchPageModel.of(context)
+                BilingualSearchPageModel.of(context)
                     .onHeadwordSelected(context, Entry.urlEncode(headword));
               },
           ),
