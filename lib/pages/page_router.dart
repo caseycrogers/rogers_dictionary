@@ -24,8 +24,7 @@ Route<dynamic> _serveSearchPage(RouteSettings settings, Uri uri) {
       transitionDuration: Duration(milliseconds: 300),
       settings: settings.copyWith(
           name: settings.name,
-          arguments: settings.arguments ??
-              SearchPageModel.empty(translationMode: DEFAULT_TRANSLATION_MODE)),
+          arguments: settings.arguments ?? BilingualSearchPageModel.empty()),
       pageBuilder: (context, animation, secondaryAnimation) {
         return SearchPage();
       });

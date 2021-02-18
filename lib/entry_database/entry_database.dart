@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/models/search_options.dart';
+import 'package:rogers_dictionary/models/search_settings_model.dart';
 
 import 'entry.dart';
 
@@ -9,9 +9,15 @@ import 'entry.dart';
 abstract class EntryDatabase {
   // Fetch entries from the database.
   Stream<Entry> getEntries(TranslationMode translationMode,
-      {String searchString, int startAfter, SearchOptions searchOptions});
+      {String searchString,
+      int startAfter,
+      SearchSettingsModel searchOptions,
+      bool bookmarksOnly});
 
   // Get the given entry from the database.
   Future<Entry> getEntry(
       TranslationMode translationMode, String urlEncodedHeadword);
+
+  Future<void> setFavorite(TranslationMode translationMode,
+      String urlEncodedHeadword, bool favorite);
 }
