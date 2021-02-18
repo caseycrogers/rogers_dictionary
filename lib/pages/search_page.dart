@@ -2,77 +2,79 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:rogers_dictionary/util/dictionary_page.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/slide_entrance_exit.dart';
+import 'package:rogers_dictionary/main.dart';
 
 class SearchPage extends StatelessWidget {
   static bool matchesRoute(Uri uri) =>
       ListEquality().equals(uri.pathSegments, ['search']);
 
+  final PageController _controller = PageController();
+
   @override
   Widget build(BuildContext context) {
-    final dictionaryPageModel = SearchPageModel.of(context);
-    final primaryColor =
-        dictionaryPageModel.isEnglish ? Colors.indigo : Colors.amber;
-    final secondaryColor = dictionaryPageModel.isEnglish
-        ? Colors.indigo.shade100
-        : Colors.amber.shade100;
+    return ValueListenableBuilder<SearchPageModel>(
+      valueListenable: BilingualSearchPageModel.of(context).currSearchPageModel,
+      child: Material(child: _searchPages(context), elevation: 4.0),
+      builder: (context, currSearchPage, searchPages) {
+        Future.delayed(Duration.zero).then((_) {
+          var targetPage =
+              translationModeToIndex(currSearchPage.translationMode);
+          if (_controller.page.round() == targetPage) return;
+          _controller.animateToPage(
+            translationModeToIndex(currSearchPage.translationMode),
+            curve: Curves.easeIn,
+            duration: Duration(milliseconds: 200),
+          );
+        });
+        return DictionaryPage(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: searchPages),
+              DictionaryBottomNavigationBar(),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-    return ListenableProvider.value(
-      value: dictionaryPageModel.entrySearchModel,
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          appBarTheme: AppBarTheme(color: primaryColor, elevation: 0.0),
-          primaryColor: primaryColor,
-          accentColor: secondaryColor,
-        ),
-        child: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Row(
-                children: [
-                  Text(dictionaryPageModel.isEnglish
-                      ? 'English to Spanish'
-                      : 'Spanish to English'),
-                  IconButton(
-                    icon: Icon(
-                      Icons.info,
-                      size: 30.0,
-                    ),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-            body: Column(
-              children: [
-                Expanded(child: _buildOrientedPage(context, EntrySearch())),
-                Delayed(
-                  delay: Duration(milliseconds: 1),
-                  initialChild: DictionaryBottomNavigationBar(
-                      translationMode:
-                          dictionaryPageModel.transitionFrom?.translationMode ??
-                              dictionaryPageModel.translationMode),
-                  child: DictionaryBottomNavigationBar(
-                      translationMode: dictionaryPageModel.translationMode),
-                ),
-              ],
-            ),
+  Widget _searchPages(BuildContext context) {
+    final bilingualModel = BilingualSearchPageModel.of(context);
+    return PageView(
+      controller: _controller,
+      onPageChanged: (index) => BilingualSearchPageModel.of(context)
+          .onTranslationModeChanged(indexToTranslationMode(index)),
+      children: [
+        Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: primaryColor(TranslationMode.English)),
+          child: Provider<SearchPageModel>.value(
+            value: bilingualModel.englishPageModel,
+            builder: (context, _) => _buildOrientedPage(context, EntrySearch()),
           ),
         ),
-      ),
+        Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
+          child: Provider<SearchPageModel>.value(
+            value: bilingualModel.spanishPageModel,
+            builder: (context, _) => _buildOrientedPage(context, EntrySearch()),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
-    final dictionaryPageModel = SearchPageModel.of(context);
+    final searchPageModel = SearchPageModel.of(context);
     final animation = ModalRoute.of(context).animation;
     final secondaryAnimation = ModalRoute.of(context).secondaryAnimation;
 
@@ -87,42 +89,40 @@ class SearchPage extends StatelessWidget {
                   width: constraints.maxWidth,
                   height: constraints.maxHeight,
                 ),
-                if (dictionaryPageModel.hasSelection)
+                if (searchPageModel.hasSelection)
                   Positioned(
-                    width: constraints.maxWidth,
-                    height: constraints.maxHeight,
                     child: AnimatedBuilder(
                       animation: animation,
                       builder: (context, _) => SlideEntranceExit(
                         offset: Offset(
-                            dictionaryPageModel.isTransitionToSelectedHeadword
+                            searchPageModel.isTransitionToSelectedHeadword
                                 ? -1.0
                                 : 1.0,
                             0.0),
                         entranceAnimation:
-                            dictionaryPageModel.isTransitionFromTranslationMode
+                            searchPageModel.isTransitionFromTranslationMode
                                 ? kAlwaysCompleteAnimation
                                 : animation,
                         exitAnimation:
-                            dictionaryPageModel.isTransitionFromTranslationMode
+                            searchPageModel.isTransitionFromTranslationMode
                                 ? kAlwaysDismissedAnimation
                                 : secondaryAnimation,
                         child: EntryView.asPage(),
                       ),
                     ),
                   ),
-                if (!dictionaryPageModel.hasSelection)
+                if (!searchPageModel.hasSelection)
                   Positioned(
                     width: constraints.maxWidth,
                     height: constraints.maxHeight,
                     child: SlideEntranceExit(
                       offset: Offset(-1.0, 0.0),
                       entranceAnimation:
-                          dictionaryPageModel.isTransitionFromTranslationMode
+                          searchPageModel.isTransitionFromTranslationMode
                               ? kAlwaysCompleteAnimation
                               : animation,
                       exitAnimation:
-                          dictionaryPageModel.isTransitionFromTranslationMode
+                          searchPageModel.isTransitionFromTranslationMode
                               ? kAlwaysDismissedAnimation
                               : secondaryAnimation,
                       child: DecoratedBox(
@@ -155,16 +155,16 @@ class SearchPage extends StatelessWidget {
                   height: constraints.maxHeight,
                   width: 2.0 * constraints.maxWidth / 3.0,
                   child: SlideEntranceExit(
-                    offset: dictionaryPageModel.hasSelection
+                    offset: searchPageModel.hasSelection
                         ? Offset(-1.0, 0.0)
                         : Offset.zero,
                     entranceAnimation:
-                        dictionaryPageModel.isTransitionFromTranslationMode
+                        searchPageModel.isTransitionFromTranslationMode
                             ? kAlwaysCompleteAnimation
                             : CurvedAnimation(
                                 parent: animation, curve: Interval(0.5, 1.0)),
                     exitAnimation:
-                        dictionaryPageModel.isTransitionFromTranslationMode
+                        searchPageModel.isTransitionFromTranslationMode
                             ? kAlwaysDismissedAnimation
                             : CurvedAnimation(
                                 parent: secondaryAnimation,

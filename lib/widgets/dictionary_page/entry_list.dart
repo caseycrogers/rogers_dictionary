@@ -13,7 +13,8 @@ import 'dart:core';
 class EntryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Material(
+      elevation: 0.0,
       color: Theme.of(context).cardColor,
       child: ChangeNotifierProvider.value(
         value: SearchPageModel.of(context).entrySearchModel,
@@ -56,43 +57,46 @@ class EntryList extends StatelessWidget {
 
   // A higher order function because higher order functions are cool.
   Widget Function(BuildContext, AsyncSnapshot<List<Entry>>, int) _buildRow(
-      EntrySearchModel entrySearchModel) {
-    return (context, snapshot, index) {
-      var dictionaryPageModel = SearchPageModel.of(context);
-      if (!snapshot.hasData) return LoadingText();
-      var entry = snapshot.data[index];
-      var isSelected = entry.urlEncodedHeadword ==
-          SearchPageModel.of(context).selectedEntryHeadword;
-      return Column(
-        children: [
-          InkWell(
-              child: Container(
-                decoration: _shadowDecoration(context, isSelected),
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                child: Row(
-                  children: [
-                    Expanded(child: EntryView.asPreview(entry)),
-                    Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Theme.of(context).accentIconTheme.color,
+          EntrySearchModel entrySearchModel) =>
+      (context, snapshot, index) => Builder(
+            builder: (BuildContext context) {
+              final bilingualModel = BilingualSearchPageModel.of(context);
+              var searchPageModel = SearchPageModel.of(context);
+              if (!snapshot.hasData) return LoadingText();
+              var entry = snapshot.data[index];
+              var isSelected = entry.urlEncodedHeadword ==
+                  searchPageModel.selectedEntryHeadword;
+              return Column(
+                children: [
+                  InkWell(
+                      child: Container(
+                        decoration: _shadowDecoration(context, isSelected),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 12.0),
+                        child: Row(
+                          children: [
+                            Expanded(child: EntryView.asPreview(entry)),
+                            Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: Theme.of(context).accentIconTheme.color,
+                            ),
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                      ),
+                      onTap: () {
+                        if (isSelected) return;
+                        bilingualModel.onEntrySelected(context, entry);
+                      }),
+                  if (index < snapshot.data.length - 1)
+                    Divider(
+                      thickness: 1.0,
+                      height: 1.0,
                     ),
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                ),
-              ),
-              onTap: () {
-                if (isSelected) return;
-                dictionaryPageModel.onEntrySelected(context, entry);
-              }),
-          if (index < snapshot.data.length - 1)
-            Divider(
-              thickness: 1.0,
-              height: 1.0,
-            ),
-        ],
-      );
-    };
-  }
+                ],
+              );
+            },
+          );
 
   BoxDecoration _shadowDecoration(BuildContext context, bool isSelected) {
     if (!isSelected) return BoxDecoration(color: Theme.of(context).cardColor);

@@ -9,6 +9,7 @@ class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
   final int entryId;
+  final bool isFavorite;
   final Headword headword;
   final List<String> runOnParents;
   final List<String> runOns;
@@ -18,6 +19,7 @@ class Entry {
 
   Entry({
     @required this.entryId,
+    @required this.isFavorite,
     @required this.headword,
     @required this.runOnParents,
     @required this.runOns,
@@ -261,6 +263,7 @@ class EntryBuilder {
         "You must specify one or more translations.");
     return Entry(
       entryId: _entryId,
+      isFavorite: false,
       headword: _headword,
       runOnParents: _runOnParents,
       runOns: _runOns,

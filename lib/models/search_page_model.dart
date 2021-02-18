@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:rogers_dictionary/models/entry_search_model.dart';
-import 'package:rogers_dictionary/models/search_options.dart';
+import 'package:provider/provider.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/entry_search_model.dart';
+import 'package:rogers_dictionary/models/search_settings_model.dart';
 
 enum TranslationMode {
   English,
@@ -16,16 +17,104 @@ enum TranslationMode {
 
 const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
+TranslationMode indexToTranslationMode(int index) =>
+    TranslationMode.values[index];
+
+int translationModeToIndex(TranslationMode translationMode) {
+  assert(translationMode != null);
+  return TranslationMode.values.indexOf(translationMode);
+}
+
+class BilingualSearchPageModel {
+  final SearchPageModel englishPageModel;
+  final SearchPageModel spanishPageModel;
+  final ValueNotifier<SearchPageModel> currSearchPageModel;
+  final ValueNotifier<SearchSettingsModel> _settingsModel;
+
+  SearchPageModel get _currModel => currSearchPageModel.value;
+
+  SearchPageModel get _oppModel =>
+      _currModel.translationMode == TranslationMode.English
+          ? spanishPageModel
+          : englishPageModel;
+
+  ValueNotifier<SearchSettingsModel> get currSettingsModel => _settingsModel;
+
+  static BilingualSearchPageModel of(BuildContext context) =>
+      ModalRoute.of(context).settings.arguments;
+
+  BilingualSearchPageModel._(this.englishPageModel, this.spanishPageModel,
+      TranslationMode initialTranslationMode, this._settingsModel)
+      : currSearchPageModel = ValueNotifier(
+            initialTranslationMode == TranslationMode.English
+                ? englishPageModel
+                : spanishPageModel);
+
+  static BilingualSearchPageModel empty() => BilingualSearchPageModel._(
+        SearchPageModel.empty(translationMode: TranslationMode.English),
+        SearchPageModel.empty(translationMode: TranslationMode.Spanish),
+        DEFAULT_TRANSLATION_MODE,
+        ValueNotifier(SearchSettingsModel.empty()),
+      );
+
+  BilingualSearchPageModel copy(SearchPageModel newModel) {
+    var newEnglishModel = newModel.isEnglish ? newModel : englishPageModel;
+    var newSpanishModel = newModel.isEnglish ? spanishPageModel : newModel;
+    return BilingualSearchPageModel._(newEnglishModel, newSpanishModel,
+        newModel.translationMode, _settingsModel);
+  }
+
+  SearchPageModel pageModel(TranslationMode translationMode) =>
+      translationMode == TranslationMode.English
+          ? englishPageModel
+          : spanishPageModel;
+
+  void onTranslationModeChanged(TranslationMode newTranslationMode) =>
+      currSearchPageModel.value = pageModel(newTranslationMode);
+
+  void onEntrySelected(BuildContext context, Entry newEntry) {
+    assert(newEntry != null);
+    // Only update if the value has actually changed
+    if (newEntry.urlEncodedHeadword == _currModel.selectedEntryHeadword) return;
+    var newModel = _currModel._copyWithEntry(newEntry);
+    _currModel.transitionTo = newModel;
+    copy(newModel)._pushPage(context);
+  }
+
+  void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
+    // Only update if the value has actually changed
+    if (newUrlEncodedHeadword == _currModel.selectedEntryHeadword) return;
+    var newModel = _currModel._copyWithEncodedHeadword(newUrlEncodedHeadword);
+    _currModel.transitionTo = newModel;
+    copy(newModel)._pushPage(context);
+  }
+
+  void onSearchChanged(
+      {String newSearchString, SearchSettingsModel newSearchSettings}) {
+    _currModel.entrySearchModel.onSearchStringChanged(
+      newSearchString: newSearchString,
+      newSearchSettings: newSearchSettings,
+    );
+    if (newSearchSettings != null)
+      _oppModel.entrySearchModel.onSearchStringChanged(
+        newSearchString: newSearchString,
+        newSearchSettings: newSearchSettings,
+      );
+  }
+
+  void _pushPage(BuildContext context) {
+    Navigator.of(context).pushNamed(
+      _currModel.uri.toString(),
+      arguments: this,
+    );
+  }
+}
+
 class SearchPageModel {
   static const String route = 'search';
   static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
   static const String SEARCH_STRING_QUERY_PARAM = 'search';
   static const String SORT_BY_QUERY_PARAM = 'sortBy';
-
-  static SearchPageModel _lastEnglishPageModel =
-      SearchPageModel.empty(translationMode: TranslationMode.English);
-  static SearchPageModel _lastSpanishPageModel =
-      SearchPageModel.empty(translationMode: TranslationMode.Spanish);
 
   // Transition state.
   final SearchPageModel transitionFrom;
@@ -50,8 +139,6 @@ class SearchPageModel {
 
   bool get hasSearchString => entrySearchModel.searchString.isNotEmpty;
 
-  SearchOptions get searchOptions => entrySearchModel.searchOptions;
-
   get uri {
     var params = <String, String>{};
     if (selectedEntryHeadword != '')
@@ -62,7 +149,10 @@ class SearchPageModel {
   }
 
   static SearchPageModel of(BuildContext context) =>
-      ModalRoute.of(context).settings.arguments;
+      context.select<SearchPageModel, SearchPageModel>((mdl) => mdl);
+
+  static SearchPageModel readFrom(BuildContext context) =>
+      context.read<SearchPageModel>();
 
   factory SearchPageModel.empty({@required TranslationMode translationMode}) =>
       SearchPageModel._(
@@ -150,51 +240,7 @@ class SearchPageModel {
         hasSelection;
   }
 
-  static void onTranslationModeChanged(
-      BuildContext context, TranslationMode newTranslationMode) {
-    var currModel = SearchPageModel.of(context);
-    if (newTranslationMode == currModel.translationMode) return;
-    var newModel =
-        (currModel.isEnglish ? _lastSpanishPageModel : _lastEnglishPageModel)
-            ._copyWith(overrideTransitionFrom: currModel);
-    currModel.transitionTo = newModel;
-    currModel.isEnglish
-        ? _lastEnglishPageModel = currModel
-        : _lastSpanishPageModel = currModel;
-    newModel._pushPage(context);
-  }
-
-  void onSearchChanged(
-      {String newSearchString, SearchOptions newSearchOptions}) {
-    entrySearchModel.onSearchStringChanged(
-        newSearchString ?? searchString, newSearchOptions ?? searchOptions);
-  }
-
-  void onEntrySelected(BuildContext context, Entry newEntry) {
-    assert(newEntry != null);
-    // Only update if the value has actually changed
-    if (newEntry.urlEncodedHeadword == selectedEntryHeadword) return;
-    var newModel = _copyWithEntry(newEntry);
-    transitionTo = newModel;
-    newModel._pushPage(context);
-  }
-
-  void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
-    // Only update if the value has actually changed
-    if (newUrlEncodedHeadword == selectedEntryHeadword) return;
-    var newModel = _copyWithEncodedHeadword(newUrlEncodedHeadword);
-    transitionTo = newModel;
-    newModel._pushPage(context);
-  }
-
   void _pushQueryParams(BuildContext context) {
     html.window.history.replaceState(null, '', uri.toString());
-  }
-
-  void _pushPage(BuildContext context) {
-    Navigator.of(context).pushNamed(
-      uri.toString(),
-      arguments: this,
-    );
   }
 }

@@ -7,7 +7,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="rogers_dictionary"
+        android:label="Rogers Dictionary"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

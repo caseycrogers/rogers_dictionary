@@ -10,6 +10,21 @@ import 'package:rogers_dictionary/util/focus_utils.dart';
 import 'entry_database/entry_database.dart';
 import 'pages/page_router.dart';
 
+final Color englishPrimary = Colors.indigo.shade600;
+final Color spanishPrimary = Colors.orange.shade600;
+final Color englishSecondary = Colors.grey.shade300;
+final Color spanishSecondary = Colors.grey.shade300;
+
+Color primaryColor(TranslationMode translationMode) =>
+    translationMode == TranslationMode.English
+        ? englishPrimary
+        : spanishPrimary;
+
+Color secondaryColor(TranslationMode translationMode) =>
+    translationMode == TranslationMode.English
+        ? englishSecondary
+        : spanishSecondary;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
@@ -25,48 +40,35 @@ class MyApp extends StatelessWidget {
     topRenderObject = context.findRenderObject();
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      child: MaterialApp(
-        title: 'Dictionary',
-        onGenerateRoute: PageRouter.generateRoute,
-        // TODO: Initial route breaks '#' navigation, refactor away from initial route?
-        initialRoute: '#/' + SearchPageModel.route,
-        theme: ThemeData(
-            tabBarTheme: TabBarTheme(
-              labelStyle: TextStyle(
-                      fontSize: 24.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)
-                  .merge(GoogleFonts.openSans()),
-              unselectedLabelStyle: TextStyle(
-                      fontSize: 22.0,
-                      color: Colors.white54,
-                      fontWeight: FontWeight.bold)
-                  .merge(GoogleFonts.openSans()),
-              indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(width: 2.0, color: Colors.white)),
-            ),
-            textTheme: TextTheme(
-              headline1: TextStyle(
-                      fontSize: 36.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold)
-                  .merge(GoogleFonts.openSans()),
-              headline2: TextStyle(
-                      fontSize: 22.0,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold)
-                  .merge(GoogleFonts.openSans()),
-              bodyText1:
-                  TextStyle(fontSize: 24.0, fontWeight: FontWeight.normal)
-                      .merge(GoogleFonts.openSans()),
-              bodyText2:
-                  TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)
-                      .merge(GoogleFonts.openSans()),
-            ),
-            accentIconTheme: IconThemeData(
-              color: Colors.black38,
-            ),
-            backgroundColor: Colors.white),
+      child: DefaultTabController(
+        length: 3,
+        child: MaterialApp(
+          title: 'Dictionary',
+          onGenerateRoute: PageRouter.generateRoute,
+          // TODO: Initial route breaks '#' navigation, refactor away from initial route?
+          initialRoute: '#/' + SearchPageModel.route,
+          theme: ThemeData(
+              textTheme: TextTheme(
+                headline1: GoogleFonts.openSans(
+                    fontSize: 36.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+                headline2: GoogleFonts.openSans(
+                    fontSize: 22.0,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+                bodyText1: GoogleFonts.openSans(
+                    fontSize: 24.0, fontWeight: FontWeight.normal),
+                bodyText2: GoogleFonts.openSans(
+                    fontSize: 20.0, fontWeight: FontWeight.normal),
+              ),
+              iconTheme: IconThemeData(color: Colors.white, size: 28),
+              accentIconTheme: IconThemeData(
+                size: 28,
+                color: Colors.black38,
+              ),
+              backgroundColor: Colors.white),
+        ),
       ),
       onTap: () => unFocus(context),
     );
