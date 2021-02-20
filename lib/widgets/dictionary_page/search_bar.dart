@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/bookmark_button.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/search_options_button.dart';
 
 class SearchBar extends StatefulWidget {
   @override
@@ -40,7 +40,7 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final bilingualModel = BilingualSearchPageModel.of(context);
+    final dictionaryModel = DictionaryPageModel.of(context);
     final searchPageModel = SearchPageModel.of(context);
     return Material(
       color: searchPageModel.isEnglish ? englishPrimary : spanishPrimary,
@@ -66,7 +66,7 @@ class _SearchBarState extends State<SearchBar> {
                             ? IconButton(
                                 onPressed: () {
                                   _controller.clear();
-                                  BilingualSearchPageModel.of(context)
+                                  DictionaryPageModel.of(context)
                                       .onSearchChanged(newSearchString: '');
                                 },
                                 icon: Icon(Icons.clear),
@@ -75,14 +75,14 @@ class _SearchBarState extends State<SearchBar> {
                         hintText: 'search...',
                         border: InputBorder.none,
                       ),
-                      onChanged: (searchString) => bilingualModel
+                      onChanged: (searchString) => dictionaryModel
                           .onSearchChanged(newSearchString: searchString),
                     ),
                   ),
                 ),
               ),
             ),
-            BookmarkButton(),
+            SearchOptionsButton(),
           ],
         ),
       ),

@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
-import 'package:universal_html/html.dart' as html;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
+import 'package:rogers_dictionary/pages/favorites_page.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
+import 'package:rogers_dictionary/pages/search_page.dart';
+import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
 
 enum TranslationMode {
   English,
@@ -25,11 +27,41 @@ int translationModeToIndex(TranslationMode translationMode) {
   return TranslationMode.values.indexOf(translationMode);
 }
 
-class BilingualSearchPageModel {
+class DictionaryPageModel {
+  static const String _SELECTED_ENTRY_QUERY_PARAM = 'entry';
+  static const String _SEARCH_STRING_QUERY_PARAM = 'search';
+  static const String _SORT_BY_QUERY_PARAM = 'sortBy';
+
   final SearchPageModel englishPageModel;
   final SearchPageModel spanishPageModel;
-  final ValueNotifier<SearchPageModel> currSearchPageModel;
-  final ValueNotifier<SearchSettingsModel> _settingsModel;
+  final tabIndex;
+
+  final TranslationMode _initialTranslationMode;
+  LocalHistoryValueNotifier<SearchPageModel> _currSearchPageModel;
+  LocalHistoryValueNotifier<SearchPageModel> get currSearchPageModel {
+    assert(_currSearchPageModel != null,
+        'You must initialize the current model first.');
+    return _currSearchPageModel;
+  }
+
+  void createSearchPageModel(BuildContext context) {
+    _currSearchPageModel ??= LocalHistoryValueNotifier(
+        context: context,
+        initialValue: _initialTranslationMode == TranslationMode.English
+            ? englishPageModel
+            : spanishPageModel);
+  }
+
+  get uri {
+    return Uri(pathSegments: [
+      (_currSearchPageModel?.value?.translationMode ?? _initialTranslationMode)
+          .toString()
+          .split('.')
+          .last
+          .toLowerCase(),
+      _tabToRoute[tabIndex],
+    ]);
+  }
 
   SearchPageModel get _currModel => currSearchPageModel.value;
 
@@ -38,30 +70,29 @@ class BilingualSearchPageModel {
           ? spanishPageModel
           : englishPageModel;
 
-  ValueNotifier<SearchSettingsModel> get currSettingsModel => _settingsModel;
-
-  static BilingualSearchPageModel of(BuildContext context) =>
+  static DictionaryPageModel of(BuildContext context) =>
       ModalRoute.of(context).settings.arguments;
 
-  BilingualSearchPageModel._(this.englishPageModel, this.spanishPageModel,
-      TranslationMode initialTranslationMode, this._settingsModel)
-      : currSearchPageModel = ValueNotifier(
-            initialTranslationMode == TranslationMode.English
-                ? englishPageModel
-                : spanishPageModel);
+  DictionaryPageModel._(this.tabIndex, this.englishPageModel,
+      this.spanishPageModel, this._initialTranslationMode);
 
-  static BilingualSearchPageModel empty() => BilingualSearchPageModel._(
+  static DictionaryPageModel empty() => DictionaryPageModel._(
+        0,
         SearchPageModel.empty(translationMode: TranslationMode.English),
         SearchPageModel.empty(translationMode: TranslationMode.Spanish),
         DEFAULT_TRANSLATION_MODE,
-        ValueNotifier(SearchSettingsModel.empty()),
       );
 
-  BilingualSearchPageModel copy(SearchPageModel newModel) {
+  DictionaryPageModel _copyWithNewIndex(int newIndex) {
+    return DictionaryPageModel._(newIndex, englishPageModel, spanishPageModel,
+        _currModel.translationMode);
+  }
+
+  DictionaryPageModel copyWithNewModel(SearchPageModel newModel) {
     var newEnglishModel = newModel.isEnglish ? newModel : englishPageModel;
     var newSpanishModel = newModel.isEnglish ? spanishPageModel : newModel;
-    return BilingualSearchPageModel._(newEnglishModel, newSpanishModel,
-        newModel.translationMode, _settingsModel);
+    return DictionaryPageModel._(
+        tabIndex, newEnglishModel, newSpanishModel, newModel.translationMode);
   }
 
   SearchPageModel pageModel(TranslationMode translationMode) =>
@@ -78,7 +109,7 @@ class BilingualSearchPageModel {
     if (newEntry.urlEncodedHeadword == _currModel.selectedEntryHeadword) return;
     var newModel = _currModel._copyWithEntry(newEntry);
     _currModel.transitionTo = newModel;
-    copy(newModel)._pushPage(context);
+    copyWithNewModel(newModel)._pushPage(context);
   }
 
   void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
@@ -86,7 +117,7 @@ class BilingualSearchPageModel {
     if (newUrlEncodedHeadword == _currModel.selectedEntryHeadword) return;
     var newModel = _currModel._copyWithEncodedHeadword(newUrlEncodedHeadword);
     _currModel.transitionTo = newModel;
-    copy(newModel)._pushPage(context);
+    copyWithNewModel(newModel)._pushPage(context);
   }
 
   void onSearchChanged(
@@ -95,27 +126,26 @@ class BilingualSearchPageModel {
       newSearchString: newSearchString,
       newSearchSettings: newSearchSettings,
     );
-    if (newSearchSettings != null)
-      _oppModel.entrySearchModel.onSearchStringChanged(
-        newSearchString: newSearchString,
-        newSearchSettings: newSearchSettings,
-      );
   }
+
+  void onTabChanged(BuildContext context, int index) {
+    _copyWithNewIndex(index)._pushPage(context);
+  }
+
+  List<String> _tabToRoute = [
+    SearchPage.route,
+    FavoritesPage.route,
+  ];
 
   void _pushPage(BuildContext context) {
     Navigator.of(context).pushNamed(
-      _currModel.uri.toString(),
+      uri.toString(),
       arguments: this,
     );
   }
 }
 
 class SearchPageModel {
-  static const String route = 'search';
-  static const String SELECTED_ENTRY_QUERY_PARAM = 'entry';
-  static const String SEARCH_STRING_QUERY_PARAM = 'search';
-  static const String SORT_BY_QUERY_PARAM = 'sortBy';
-
   // Transition state.
   final SearchPageModel transitionFrom;
   SearchPageModel transitionTo;
@@ -138,15 +168,6 @@ class SearchPageModel {
   String get searchString => entrySearchModel.searchString;
 
   bool get hasSearchString => entrySearchModel.searchString.isNotEmpty;
-
-  get uri {
-    var params = <String, String>{};
-    if (selectedEntryHeadword != '')
-      params[SELECTED_ENTRY_QUERY_PARAM] = selectedEntryHeadword;
-    if (selectedEntryHeadword != '')
-      params[SEARCH_STRING_QUERY_PARAM] = searchString;
-    return Uri(path: route, queryParameters: params);
-  }
 
   static SearchPageModel of(BuildContext context) =>
       context.select<SearchPageModel, SearchPageModel>((mdl) => mdl);
@@ -240,7 +261,7 @@ class SearchPageModel {
         hasSelection;
   }
 
-  void _pushQueryParams(BuildContext context) {
-    html.window.history.replaceState(null, '', uri.toString());
-  }
+//void _pushQueryParams(BuildContext context) {
+//  html.window.history.replaceState(null, '', uri.toString());
+//}
 }
