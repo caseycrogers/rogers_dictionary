@@ -9,20 +9,16 @@ class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
   final int entryId;
-  final bool isFavorite;
   final Headword headword;
-  final List<String> runOnParents;
-  final List<String> runOns;
+  final List<String> related;
   final List<Headword> alternateHeadwords;
 
   final List<Translation> translations;
 
   Entry({
     @required this.entryId,
-    @required this.isFavorite,
     @required this.headword,
-    @required this.runOnParents,
-    @required this.runOns,
+    @required this.related,
     @required this.alternateHeadwords,
     @required this.translations,
   });
@@ -31,26 +27,29 @@ class Entry {
   static final Map<String, String> _partOfSpeechAbbreviationMap = {
     'adj': 'adjective',
     'adv': 'adverb',
+    'conj': 'conjunction',
+    'deg': 'degree',
     'f': 'feminine noun',
     'fpl': 'feminine plural noun',
+    'inf': 'infinitive',
+    'interj': 'interjection',
     'm': 'masculine noun',
     'mpl': 'masculine plural noun',
+    'n': 'noun',
+    'n pl': 'plural noun',
+    'pref': 'prefix',
+    'prep': 'preposition',
     'vi': 'intransitive verb',
     'vr': 'reflexive verb',
     'vt': 'transitive verb',
-    'interj': 'interjection',
-    'n': 'noun',
-    'npl': 'plural noun',
-    'prep': 'preposition',
     '-': 'phrase',
-    'inf': 'infinitive',
   };
 
   static String longPartOfSpeech(String partOfSpeech) {
     return partOfSpeech.replaceAll(' ', '').splitMapJoin(RegExp('[&,]|phrase'),
         onNonMatch: (partOfSpeechComponent) =>
             _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
-            partOfSpeechComponent,
+            partOfSpeechComponent + '*',
         onMatch: (separator) {
           //  == '&' ? ' and ' : ', ',
           switch (separator.group(0)) {
@@ -172,8 +171,7 @@ class EntryBuilder {
   Headword _headword;
   int _entryId;
   List<Headword> _alternateHeadwords = [];
-  List<String> _runOnParents;
-  List<String> _runOns = [];
+  List<String> _related = [];
 
   List<Translation> _translations = [];
 
@@ -197,15 +195,8 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder runOnParents(List<String> runOnParents) {
-    _runOnParents = runOnParents;
-    return this;
-  }
-
-  EntryBuilder addRunOn(String runOn) {
-    assert(runOn != '',
-        "You must specify a non-empty run on. Headword: $_headword");
-    _runOns.add(runOn);
+  EntryBuilder addRelated(List<String> related) {
+    _related.addAll(related);
     return this;
   }
 
@@ -216,7 +207,7 @@ class EntryBuilder {
     @required String parentheticalQualifier,
   }) {
     assert(headwordText != '',
-        "You must specify a non-empty run on. Headword: $_headword");
+        "You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}");
     _alternateHeadwords.add(Headword(
       headwordText: headwordText,
       abbreviation: abbreviation,
@@ -263,10 +254,8 @@ class EntryBuilder {
         "You must specify one or more translations.");
     return Entry(
       entryId: _entryId,
-      isFavorite: false,
       headword: _headword,
-      runOnParents: _runOnParents,
-      runOns: _runOns,
+      related: _related,
       alternateHeadwords: _alternateHeadwords,
       translations: _translations,
     );

@@ -3,13 +3,13 @@ import 'dart:collection';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 
 class DictionaryBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<SearchPageModel>(
-      valueListenable: BilingualSearchPageModel.of(context).currSearchPageModel,
+      valueListenable: DictionaryPageModel.of(context).currSearchPageModel,
       builder: (context, currSearchPageModel, _) => Theme(
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: GestureDetector(
@@ -63,7 +63,7 @@ class DictionaryBottomNavigationBar extends StatelessWidget {
       BuildContext context, SearchPageModel currSearchPageModel, int index) {
     if (index == translationModeToIndex(currSearchPageModel.translationMode))
       return;
-    BilingualSearchPageModel.of(context)
+    DictionaryPageModel.of(context)
         .onTranslationModeChanged(indexToTranslationMode(index));
   }
 }

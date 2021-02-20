@@ -12,9 +12,7 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
     headword: json['headword'] == null
         ? null
         : Headword.fromJson(json['headword'] as Map<String, dynamic>),
-    runOnParents:
-        (json['run_on_parents'] as List)?.map((e) => e as String)?.toList(),
-    runOns: (json['run_ons'] as List)?.map((e) => e as String)?.toList(),
+    related: (json['related'] as List)?.map((e) => e as String)?.toList(),
     alternateHeadwords: (json['alternate_headwords'] as List)
         ?.map((e) =>
             e == null ? null : Headword.fromJson(e as Map<String, dynamic>))
@@ -29,8 +27,7 @@ Entry _$EntryFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$EntryToJson(Entry instance) => <String, dynamic>{
       'entry_id': instance.entryId,
       'headword': instance.headword?.toJson(),
-      'run_on_parents': instance.runOnParents,
-      'run_ons': instance.runOns,
+      'related': instance.related,
       'alternate_headwords':
           instance.alternateHeadwords?.map((e) => e?.toJson())?.toList(),
       'translations': instance.translations?.map((e) => e?.toJson())?.toList(),

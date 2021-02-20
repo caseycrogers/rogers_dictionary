@@ -33,7 +33,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     Map<String, String> row = rows.elementAt(i);
     if (row[HEADWORD].isNotEmpty) {
       // Only process the test area
-      if (row[HEADWORD][0] != '~') break;
+      // if (row[HEADWORD][0] != '~') break;
       if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENTS].isEmpty) ||
           row[TRANSLATION].isEmpty) {
         print(
@@ -50,7 +50,8 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       if (row[RUN_ON_PARENTS].isNotEmpty) {
         parents = row[RUN_ON_PARENTS].split('|');
         parents.forEach((parent) {
-          entryBuilders[parent]?.addRunOn(row[HEADWORD]) ??
+          if (parent == parents[0] && parent.isEmpty) return;
+          entryBuilders[parent]?.addRelated([row[HEADWORD]]) ??
               print(
                   "Missing run on parent \'$parent\' for entry \'${row[HEADWORD]}\'");
         });
@@ -61,7 +62,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
               row[HEADWORD],
               _split(row[HEADWORD_ABBREVIATIONS]).get(0, orElse: ''),
               _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]).get(0, orElse: ''))
-          .runOnParents(parents);
+          .addRelated(parents);
       _split(row[ALTERNATE_HEADWORDS])
           .asMap()
           .forEach((i, alternateHeadwordText) {
@@ -86,6 +87,9 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       partOfSpeech = row[PART_OF_SPEECH];
       // Reset the qualifier
       dominantHeadwordParentheticalQualifier = '';
+      if (Entry.longPartOfSpeech(partOfSpeech).contains('*'))
+        print(
+            'Unrecognized part of speech $partOfSpeech for headword ${row[HEADWORD]} at line $i');
     }
     if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER].isNotEmpty)
       dominantHeadwordParentheticalQualifier =
@@ -186,7 +190,7 @@ Future<void> _uploadSqlFlite(
       URL_ENCODED_HEADWORD: entry.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headwordText,
-      RUN_ON_PARENTS: entry.runOnParents.join(' | '),
+      RUN_ON_PARENTS: entry.related.join(' | '),
       HEADWORD_ABBREVIATIONS:
           entry.allHeadwords.map((h) => h.abbreviation).join(' | '),
       ALTERNATE_HEADWORDS:
@@ -194,7 +198,7 @@ Future<void> _uploadSqlFlite(
       HEADWORD + WITHOUT_DIACRITICAL_MARKS:
           entry.headwordText.withoutDiacriticalMarks,
       RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS:
-          entry.runOnParents.map((p) => p.withoutDiacriticalMarks).join(' | '),
+          entry.related.map((p) => p.withoutDiacriticalMarks).join(' | '),
       HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
           .map((h) => h.abbreviation.withoutDiacriticalMarks)
           .join(' | '),
