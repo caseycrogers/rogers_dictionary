@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/entry_database/entry_database.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
@@ -95,9 +95,9 @@ class SqfliteDatabase extends EntryDatabase {
   Future<Entry> setFavorite(TranslationMode translationMode,
       String urlEncodedHeadword, bool favorite) async {
     var db = await _dbFuture;
-    var entry = await db.update(
-        translationMode == TranslationMode.English ? ENGLISH : SPANISH,
-        {IS_FAVORITE: favorite});
+    //var entry = await db.update(
+    //    translationMode == TranslationMode.English ? ENGLISH : SPANISH,
+    //    {IS_FAVORITE: favorite});
   }
 
   Entry _rowToEntry(Map<String, dynamic> snapshot) {

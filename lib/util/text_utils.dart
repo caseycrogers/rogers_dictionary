@@ -35,11 +35,11 @@ Widget headwordText(BuildContext context, String text, bool preview,
   return OverflowMarkdown(
     text,
     defaultStyle: preview ? bold1(context) : headline1(context),
-    overrideStyles: _getOverrideStyle(context, text, preview, searchString),
+    overrideStyles: _highlightSearchMatch(context, text, preview, searchString),
   );
 }
 
-List<OverrideStyle> _getOverrideStyle(
+List<OverrideStyle> _highlightSearchMatch(
     BuildContext context, String text, bool preview, String searchString,
     {bool ignoreSymbols}) {
   var overrideStart = text.searchable.indexOf(searchString.searchable);
@@ -47,7 +47,7 @@ List<OverrideStyle> _getOverrideStyle(
   return [
     OverrideStyle(
       style: TextStyle(
-          backgroundColor: Theme.of(context).accentColor.withOpacity(.5)),
+          backgroundColor: Theme.of(context).accentColor.withOpacity(.25)),
       start: overrideStart,
       stop: overrideStart + searchString.length,
       ignoreSymbols: ignoreSymbols,
@@ -60,7 +60,7 @@ Widget abbreviationLine(
   if (text.isEmpty) return Container();
   return OverflowMarkdown(
     '*abbr *$text',
-    overrideStyles: _getOverrideStyle(context, text, preview, searchString),
+    overrideStyles: _highlightSearchMatch(context, text, preview, searchString),
   );
 }
 
@@ -90,7 +90,7 @@ Widget alternateHeadwordLines(BuildContext context,
                         overflow: preview
                             ? TextOverflow.ellipsis
                             : TextOverflow.visible,
-                        overrideStyles: _getOverrideStyle(context,
+                        overrideStyles: _highlightSearchMatch(context,
                             '**${alt.headwordText}**', preview, searchString),
                       ),
                       if (alt.parentheticalQualifier.isNotEmpty)

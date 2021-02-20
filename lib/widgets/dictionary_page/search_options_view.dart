@@ -1,71 +1,82 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/search_options_menu.dart';
 
-class SearchOptionsView extends StatefulWidget {
-  final void Function(SearchSettingsModel) onSearchChanged;
+class SearchOptionsView extends StatelessWidget {
+  final BuildContext _exteriorContext;
+  final EntrySearchModel _entrySearchModel;
 
-  SearchOptionsView({@required this.onSearchChanged});
-
-  @override
-  _SearchOptionsViewState createState() => _SearchOptionsViewState();
-}
-
-class _SearchOptionsViewState extends State<SearchOptionsView> {
-  OverlayEntry _overlayEntry;
+  SearchOptionsView(this._exteriorContext)
+      : _entrySearchModel = DictionaryPageModel.of(_exteriorContext)
+            .currSearchPageModel
+            .value
+            .entrySearchModel;
 
   @override
   Widget build(BuildContext context) {
-    return Container();
-    //return Selector<SearchPageModel, bool>(
-    //  selector: (context, searchPageModel) =>
-    //      searchPageModel.entrySearchModel.expandSearchOptions,
-    //  builder: (context, hasFocus, _) => Container(
-    //    margin: EdgeInsets.symmetric(horizontal: 4.0),
-    //    decoration: BoxDecoration(
-    //      shape: BoxShape.circle,
-    //      color: hasFocus ? Colors.black26 : Colors.transparent,
-    //    ),
-    //    child: IconButton(
-    //      icon: Icon(Icons.more_vert),
-    //      color: Colors.white,
-    //      onPressed: () => _toggle(),
-    //    ),
-    //  ),
-    //);
-  }
-
-  OverlayEntry _buildOverlayEntry() {
-    var bilingualModel = BilingualSearchPageModel.of(context);
-    RenderBox renderBox = context.findRenderObject();
-    var upperLeft = renderBox.localToGlobal(Offset.zero);
-    return OverlayEntry(
-      builder: (context) => Positioned(
-        child: Stack(
-          children: [
-            Container(
-              color: Colors.black38,
-              child: GestureDetector(
-                onTap: _toggle,
+    return ChangeNotifierProvider.value(
+      value: _entrySearchModel,
+      builder: (context, _) => Material(
+        elevation: 4.0,
+        child: Selector<EntrySearchModel, SearchSettingsModel>(
+          selector: (_, entrySearch) => entrySearch.searchSettingsModel,
+          builder: (context, settingsModel, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('sort: '),
+                  ]..addAll(SortOrder.values.map((sortBy) => TextButton(
+                        style: TextButton.styleFrom(
+                            backgroundColor: settingsModel.sortBy == sortBy
+                                ? Colors.black12
+                                : null,
+                            textStyle: TextStyle(fontSize: 18.0),
+                            primary: Colors.black,
+                            animationDuration: settingsModel.sortBy == sortBy
+                                ? Duration.zero
+                                : Duration(milliseconds: 300)),
+                        child: Text(sortBy.toString().split('.').last),
+                        onPressed: () {
+                          if (settingsModel.sortBy == sortBy) return;
+                          _updateOptions(_exteriorContext, newSortBy: sortBy);
+                        },
+                      ))),
+                ),
               ),
-            ),
-            Positioned(
-              top: upperLeft.dy + renderBox.size.height + 4.0,
-              right: 0,
-              width: 275,
-              child: SearchOptionsMenu(bilingualModel.currSettingsModel),
-            ),
-          ],
+              Divider(height: 0.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Text('ignore accents'),
+                    Switch(
+                      value: settingsModel.ignoreAccents,
+                      onChanged: (newIgnoreAccents) => _updateOptions(
+                          _exteriorContext,
+                          newIgnoreAccents: newIgnoreAccents),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _toggle() {}
+  void _updateOptions(BuildContext context,
+      {SortOrder newSortBy, bool newIgnoreAccents}) {
+    DictionaryPageModel.of(context).onSearchChanged(
+        newSearchSettings: _entrySearchModel.searchSettingsModel
+            .copy(newSortBy: newSortBy, newIgnoreAccents: newIgnoreAccents));
+  }
 }

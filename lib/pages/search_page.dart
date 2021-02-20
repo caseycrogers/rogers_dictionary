@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:rogers_dictionary/util/dictionary_page.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
@@ -12,15 +11,16 @@ import 'package:rogers_dictionary/widgets/slide_entrance_exit.dart';
 import 'package:rogers_dictionary/main.dart';
 
 class SearchPage extends StatelessWidget {
-  static bool matchesRoute(Uri uri) =>
-      ListEquality().equals(uri.pathSegments, ['search']);
+  static const String route = 'search';
+
+  static bool matchesUri(Uri uri) => uri.pathSegments.contains(route);
 
   final PageController _controller = PageController();
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<SearchPageModel>(
-      valueListenable: BilingualSearchPageModel.of(context).currSearchPageModel,
+      valueListenable: DictionaryPageModel.of(context).currSearchPageModel,
       child: Material(child: _searchPages(context), elevation: 4.0),
       builder: (context, currSearchPage, searchPages) {
         Future.delayed(Duration.zero).then((_) {
@@ -33,31 +33,29 @@ class SearchPage extends StatelessWidget {
             duration: Duration(milliseconds: 200),
           );
         });
-        return DictionaryPage(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: searchPages),
-              DictionaryBottomNavigationBar(),
-            ],
-          ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: searchPages),
+            DictionaryBottomNavigationBar(),
+          ],
         );
       },
     );
   }
 
   Widget _searchPages(BuildContext context) {
-    final bilingualModel = BilingualSearchPageModel.of(context);
+    final dictionaryModel = DictionaryPageModel.of(context);
     return PageView(
       controller: _controller,
-      onPageChanged: (index) => BilingualSearchPageModel.of(context)
+      onPageChanged: (index) => DictionaryPageModel.of(context)
           .onTranslationModeChanged(indexToTranslationMode(index)),
       children: [
         Theme(
           data: Theme.of(context)
               .copyWith(primaryColor: primaryColor(TranslationMode.English)),
           child: Provider<SearchPageModel>.value(
-            value: bilingualModel.englishPageModel,
+            value: dictionaryModel.englishPageModel,
             builder: (context, _) => _buildOrientedPage(context, EntrySearch()),
           ),
         ),
@@ -65,7 +63,7 @@ class SearchPage extends StatelessWidget {
           data: Theme.of(context)
               .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
           child: Provider<SearchPageModel>.value(
-            value: bilingualModel.spanishPageModel,
+            value: dictionaryModel.spanishPageModel,
             builder: (context, _) => _buildOrientedPage(context, EntrySearch()),
           ),
         ),

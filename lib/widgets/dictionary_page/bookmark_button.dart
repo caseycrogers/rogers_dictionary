@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 
 class BookmarkButton extends StatefulWidget {
   @override

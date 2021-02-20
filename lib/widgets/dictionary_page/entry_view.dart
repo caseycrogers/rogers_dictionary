@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
@@ -79,11 +79,10 @@ class EntryView extends StatelessWidget {
           Icons.arrow_back,
           color: Theme.of(context).accentIconTheme.color,
         ),
-        onPressed: () =>
-            SearchPageModel.readFrom(context).isTransitionFromSelectedHeadword
-                ? Navigator.of(context).pop()
-                : BilingualSearchPageModel.of(context)
-                    .onHeadwordSelected(context, ''),
+        onPressed: () => SearchPageModel.readFrom(context)
+                .isTransitionFromSelectedHeadword
+            ? Navigator.of(context).pop()
+            : DictionaryPageModel.of(context).onHeadwordSelected(context, ''),
       ),
     );
   }
@@ -104,11 +103,9 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildRelated(BuildContext context) {
-    if (_entry.runOnParents.isEmpty && _entry.runOns.isEmpty)
-      return Container();
-    List<String> relatedList = List.from(_entry.runOnParents)
-      ..addAll(_entry.runOns);
-    List<TextSpan> relatedSpans = relatedList.where((s) => s.isNotEmpty).expand(
+    if (_entry.related.isEmpty) return Container();
+    List<TextSpan> relatedSpans =
+        _entry.related.where((r) => r.isNotEmpty).expand(
       (headword) {
         return [
           TextSpan(
@@ -119,19 +116,14 @@ class EntryView extends StatelessWidget {
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                BilingualSearchPageModel.of(context)
+                DictionaryPageModel.of(context)
                     .onHeadwordSelected(context, Entry.urlEncode(headword));
               },
           ),
-          if (headword != relatedList.last) TextSpan(text: ', '),
+          if (headword != _entry.related.last) TextSpan(text: ', '),
         ];
       },
     ).toList();
-    relatedList = relatedList
-        .expand((span) => [
-              span,
-            ])
-        .toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(height: 48.0),
       Text("Related",
