@@ -14,6 +14,8 @@ import 'package:rogers_dictionary/util/list_utils.dart';
 
 const ROGERS_DICTIONARY =
     'C:\\Users\\Waffl\\Documents\\code\\rogers_dictionary';
+const WARNING = '(WARN):';
+const ERROR = '(ERROR):';
 
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   var filePath = join(ROGERS_DICTIONARY, 'lib', 'scripts',
@@ -28,16 +30,28 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
+  while (rows.elementAt(i)[HEADWORD] != 'START') {
+    if (i == 100) {
+      print(
+          "$ERROR Reached row ${i + 2} without finding the start of entries, cancelling");
+      return;
+    }
+    i++;
+  }
+  i++;
   while (i < rows.length) {
-    if (i % 500 == 0) print('$i/${rows.length} complete!');
+    if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
     Map<String, String> row = rows.elementAt(i);
+    if (row.values.every((e) => e == null || e.isEmpty)) {
+      print('$WARNING Skipping empty line at ${i + 2}');
+      i += 1;
+      continue;
+    }
     if (row[HEADWORD].isNotEmpty) {
-      // Only process the test area
-      // if (row[HEADWORD][0] != '~') break;
       if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENTS].isEmpty) ||
           row[TRANSLATION].isEmpty) {
         print(
-            'Invalid empty cells for \'${row[HEADWORD]}\' at row $i, skipping.');
+            '$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row ${i + 2}, skipping.');
         i += 1;
         row = rows.elementAt(i);
         while (row[HEADWORD].isEmpty) {
@@ -53,11 +67,11 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
           if (parent == parents[0] && parent.isEmpty) return;
           entryBuilders[parent]?.addRelated([row[HEADWORD]]) ??
               print(
-                  "Missing run on parent \'$parent\' for entry \'${row[HEADWORD]}\'");
+                  "$WARNING Missing run on parent \'$parent\' for entry \'${row[HEADWORD]}\' at line ${i + 2}");
         });
       }
       builder = EntryBuilder()
-          .entryId(i)
+          .entryId(i + 2)
           .headword(
               row[HEADWORD],
               _split(row[HEADWORD_ABBREVIATIONS]).get(0, orElse: ''),
@@ -78,7 +92,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         );
       });
       if (entryBuilders.keys.contains(row[HEADWORD]))
-        print('Duplicate headword ${row[HEADWORD]} at line $i');
+        print('$WARNING Duplicate headword ${row[HEADWORD]} at line ${i + 2}');
       entryBuilders[row[HEADWORD]] = builder;
       partOfSpeech = '';
       dominantHeadwordParentheticalQualifier = '';
@@ -89,7 +103,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       dominantHeadwordParentheticalQualifier = '';
       if (Entry.longPartOfSpeech(partOfSpeech).contains('*'))
         print(
-            'Unrecognized part of speech $partOfSpeech for headword ${row[HEADWORD]} at line $i');
+            '$WARNING Unrecognized part of speech $partOfSpeech for headword ${row[HEADWORD]} at line ${i + 2}');
     }
     if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER].isNotEmpty)
       dominantHeadwordParentheticalQualifier =
@@ -119,6 +133,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
 }
 
 List<String> _constructSearchList(Entry entry) {
+  return [];
   Set<String> keywordSet = Set()
     ..add(entry.headwordText.toLowerCase())
     ..addAll(entry.translations.map((t) => t.translationText.toLowerCase()));

@@ -34,15 +34,18 @@ class Entry {
     'inf': 'infinitive',
     'interj': 'interjection',
     'm': 'masculine noun',
+    'mf': 'masculine/feminine noun',
     'mpl': 'masculine plural noun',
     'n': 'noun',
-    'n pl': 'plural noun',
+    'npl': 'plural noun',
     'pref': 'prefix',
     'prep': 'preposition',
+    'v': 'verb',
     'vi': 'intransitive verb',
     'vr': 'reflexive verb',
     'vt': 'transitive verb',
     '-': 'phrase',
+    '': '',
   };
 
   static String longPartOfSpeech(String partOfSpeech) {
@@ -207,7 +210,7 @@ class EntryBuilder {
     @required String parentheticalQualifier,
   }) {
     assert(headwordText != '',
-        "You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}");
+        "You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}. Line: ${_entryId + 2}");
     _alternateHeadwords.add(Headword(
       headwordText: headwordText,
       abbreviation: abbreviation,
@@ -231,7 +234,7 @@ class EntryBuilder {
     @required String editorialNote,
   }) {
     assert(translation != '',
-        "You must specify a non-empty translation. Headword: $_headword");
+        "You must specify a non-empty translation. Headword: ${_headword.headwordText} at line $_entryId");
     _translations.add(Translation(
         partOfSpeech: partOfSpeech,
         irregularInflections: irregularInflections,
@@ -248,10 +251,12 @@ class EntryBuilder {
   }
 
   Entry build() {
-    assert(_headword != null, "You must specify a non null headword.");
-    assert(_entryId != null, "You must specify a non null entry id.");
+    assert(_headword != null,
+        "You must specify a non null headword. Line ${_entryId + 2}.");
+    assert(_entryId != null,
+        "You must specify a non null entry id. Line ${_entryId + 2}.");
     assert(_translations.length != 0,
-        "You must specify one or more translations.");
+        "You must specify one or more translations. Line ${_entryId + 2}.");
     return Entry(
       entryId: _entryId,
       headword: _headword,

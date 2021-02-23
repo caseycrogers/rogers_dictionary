@@ -46,10 +46,12 @@ class EntrySearchModel with ChangeNotifier {
       this._entries,
       this._scrollController,
       this._bookmarksOnly) {
-    _entryStream = MyApp.db.getEntries(_translationMode,
-        searchString: searchString,
-        startAfter: entries.length,
-        searchOptions: searchSettingsModel);
+    _entryStream = MyApp.db
+        .getEntries(_translationMode,
+            searchString: searchString,
+            startAfter: entries.length,
+            searchOptions: searchSettingsModel)
+        .asBroadcastStream();
   }
 
   EntrySearchModel(TranslationMode translationMode, String searchString,
@@ -90,7 +92,6 @@ class EntrySearchModel with ChangeNotifier {
         startAfter: _startAfter,
         searchOptions: _searchSettingsModel);
     _scrollController = ScrollController();
-    print('notifying listeners');
     notifyListeners();
   }
 }

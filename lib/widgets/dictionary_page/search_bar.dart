@@ -12,7 +12,6 @@ class SearchBar extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBar> {
-  FocusNode _focusNode;
   TextEditingController _controller;
   bool _isEmpty;
 
@@ -20,12 +19,7 @@ class _SearchBarState extends State<SearchBar> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final searchPageModel = context.read<SearchPageModel>();
-    if (_focusNode == null) {
-      _focusNode = FocusNode();
-      if (searchPageModel.searchBarHasFocus)
-        //_focusNode.requestFocus();
-        _focusNode.addListener(
-            () => searchPageModel.searchBarHasFocus = _focusNode.hasFocus);
+    if (_controller == null) {
       _controller = TextEditingController(text: searchPageModel.searchString);
       _controller.addListener(_updateIsEmpty);
     }
@@ -34,7 +28,6 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void dispose() {
     super.dispose();
-    _focusNode.dispose();
     _controller.dispose();
   }
 
@@ -57,7 +50,6 @@ class _SearchBarState extends State<SearchBar> {
                   child: Container(
                     color: Theme.of(context).backgroundColor,
                     child: TextField(
-                      focusNode: _focusNode,
                       style: TextStyle(fontSize: 20.0),
                       controller: _controller,
                       decoration: InputDecoration(
