@@ -33,7 +33,6 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton> {
   }
 
   OverlayEntry _buildOverlayEntry() {
-    var searchPageModel = SearchPageModel.readFrom(context);
     RenderBox renderBox = context.findRenderObject();
     var upperLeft = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
@@ -24,11 +25,10 @@ Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) =>
 Route<dynamic> _servePage(RouteSettings settings, Uri uri, Widget page) {
   return PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 300),
-      settings: settings.copyWith(
-          name: settings.name,
-          arguments: settings.arguments ?? DictionaryPageModel.empty()),
       pageBuilder: (context, animation, secondaryAnimation) {
-        DictionaryPageModel.of(context).createSearchPageModel(context);
-        return page;
+        return Provider<DictionaryPageModel>(
+          create: (_) => DictionaryPageModel.empty(context),
+          child: page,
+        );
       });
 }

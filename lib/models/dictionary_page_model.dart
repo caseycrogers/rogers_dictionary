@@ -34,32 +34,18 @@ class DictionaryPageModel {
 
   final SearchPageModel englishPageModel;
   final SearchPageModel spanishPageModel;
-  final tabIndex;
 
-  final TranslationMode _initialTranslationMode;
-  LocalHistoryValueNotifier<SearchPageModel> _currSearchPageModel;
-  LocalHistoryValueNotifier<SearchPageModel> get currSearchPageModel {
-    assert(_currSearchPageModel != null,
-        'You must initialize the current model first.');
-    return _currSearchPageModel;
-  }
+  final LocalHistoryValueNotifier<SearchPageModel> currSearchPageModel;
 
-  void createSearchPageModel(BuildContext context) {
-    _currSearchPageModel ??= LocalHistoryValueNotifier(
-        context: context,
-        initialValue: _initialTranslationMode == TranslationMode.English
-            ? englishPageModel
-            : spanishPageModel);
-  }
+  final LocalHistoryValueNotifier<int> currentIndex;
 
   get uri {
     return Uri(pathSegments: [
-      (_currSearchPageModel?.value?.translationMode ?? _initialTranslationMode)
+      (currSearchPageModel.value.translationMode)
           .toString()
           .split('.')
           .last
           .toLowerCase(),
-      _tabToRoute[tabIndex],
     ]);
   }
 
@@ -71,28 +57,36 @@ class DictionaryPageModel {
           : englishPageModel;
 
   static DictionaryPageModel of(BuildContext context) =>
-      ModalRoute.of(context).settings.arguments;
+      context.select<DictionaryPageModel, DictionaryPageModel>((mdl) => mdl);
 
-  DictionaryPageModel._(this.tabIndex, this.englishPageModel,
-      this.spanishPageModel, this._initialTranslationMode);
+  static DictionaryPageModel readFrom(BuildContext context) =>
+      context.read<DictionaryPageModel>();
 
-  static DictionaryPageModel empty() => DictionaryPageModel._(
-        0,
-        SearchPageModel.empty(translationMode: TranslationMode.English),
-        SearchPageModel.empty(translationMode: TranslationMode.Spanish),
-        DEFAULT_TRANSLATION_MODE,
-      );
+  DictionaryPageModel._(this.currentIndex, this.currSearchPageModel,
+      this.englishPageModel, this.spanishPageModel);
 
-  DictionaryPageModel _copyWithNewIndex(int newIndex) {
-    return DictionaryPageModel._(newIndex, englishPageModel, spanishPageModel,
-        _currModel.translationMode);
+  static DictionaryPageModel empty(BuildContext context) {
+    var initialPage =
+        SearchPageModel.empty(translationMode: DEFAULT_TRANSLATION_MODE);
+    return DictionaryPageModel._(
+      LocalHistoryValueNotifier(
+          modalRoute: ModalRoute.of(context), initialValue: 0),
+      LocalHistoryValueNotifier(
+          modalRoute: ModalRoute.of(context), initialValue: initialPage),
+      initialPage,
+      SearchPageModel.empty(translationMode: TranslationMode.Spanish),
+    );
   }
 
   DictionaryPageModel copyWithNewModel(SearchPageModel newModel) {
     var newEnglishModel = newModel.isEnglish ? newModel : englishPageModel;
     var newSpanishModel = newModel.isEnglish ? spanishPageModel : newModel;
     return DictionaryPageModel._(
-        tabIndex, newEnglishModel, newSpanishModel, newModel.translationMode);
+      currentIndex.copy(),
+      currSearchPageModel.copy(),
+      newEnglishModel,
+      newSpanishModel,
+    );
   }
 
   SearchPageModel pageModel(TranslationMode translationMode) =>
@@ -128,10 +122,6 @@ class DictionaryPageModel {
     );
   }
 
-  void onTabChanged(BuildContext context, int index) {
-    _copyWithNewIndex(index)._pushPage(context);
-  }
-
   List<String> _tabToRoute = [
     SearchPage.route,
     FavoritesPage.route,
@@ -159,7 +149,6 @@ class SearchPageModel {
 
   // Entry search state
   final EntrySearchModel entrySearchModel;
-  bool searchBarHasFocus;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 
@@ -182,7 +171,6 @@ class SearchPageModel {
         selectedEntry: null,
         selectedEntryHeadword: '',
         entrySearchModel: EntrySearchModel.empty(translationMode),
-        searchBarHasFocus: false,
       );
 
   factory SearchPageModel.fromQueryParams(Map<String, String> queryParams) {
@@ -203,20 +191,20 @@ class SearchPageModel {
   }
 
   SearchPageModel _copyWithEntry(Entry newEntry) {
-    return _copyWith(
+    return copy(
         newSelectedEntry: Future.value(newEntry),
         newEncodedHeadword: newEntry?.urlEncodedHeadword);
   }
 
   SearchPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
-    return _copyWith(
+    return copy(
         newSelectedEntry: newEncodedHeadword.isNotEmpty
             ? MyApp.db.getEntry(translationMode, newEncodedHeadword)
             : null,
         newEncodedHeadword: newEncodedHeadword);
   }
 
-  SearchPageModel _copyWith(
+  SearchPageModel copy(
       {SearchPageModel overrideTransitionFrom,
       FutureOr<Entry> newSelectedEntry,
       String newEncodedHeadword}) {
@@ -230,7 +218,6 @@ class SearchPageModel {
       selectedEntry: newSelectedEntry ?? selectedEntry,
       selectedEntryHeadword: newEncodedHeadword ?? selectedEntryHeadword,
       entrySearchModel: entrySearchModel.copy(),
-      searchBarHasFocus: false,
     );
   }
 
@@ -240,7 +227,6 @@ class SearchPageModel {
     @required this.selectedEntry,
     @required this.selectedEntryHeadword,
     @required this.entrySearchModel,
-    @required this.searchBarHasFocus,
   });
 
   bool get isTransitionFromTranslationMode =>

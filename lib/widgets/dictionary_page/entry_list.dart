@@ -46,7 +46,7 @@ class EntryList extends StatelessWidget {
               padding: EdgeInsets.all(16.0),
               child: LoadingText(),
             ),
-            itemBuilder: _buildRow(entrySearchModel),
+            itemBuilder: _buildRow,
             controller: entrySearchModel.scrollController,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           );
@@ -55,48 +55,47 @@ class EntryList extends StatelessWidget {
     );
   }
 
-  // A higher order function because higher order functions are cool.
-  Widget Function(BuildContext, AsyncSnapshot<List<Entry>>, int) _buildRow(
-          EntrySearchModel entrySearchModel) =>
-      (context, snapshot, index) => Builder(
-            builder: (BuildContext context) {
-              final dictionaryModel = DictionaryPageModel.of(context);
-              var searchPageModel = SearchPageModel.of(context);
-              if (!snapshot.hasData) return LoadingText();
-              var entry = snapshot.data[index];
-              var isSelected = entry.urlEncodedHeadword ==
-                  searchPageModel.selectedEntryHeadword;
-              return Column(
-                children: [
-                  InkWell(
-                      child: Container(
-                        decoration: _shadowDecoration(context, isSelected),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 12.0),
-                        child: Row(
-                          children: [
-                            Expanded(child: EntryView.asPreview(entry)),
-                            Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              color: Theme.of(context).accentIconTheme.color,
-                            ),
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildRow(BuildContext context, AsyncSnapshot<List<Entry>> snapshot,
+          int index) =>
+      Builder(
+        builder: (BuildContext context) {
+          final dictionaryModel = DictionaryPageModel.of(context);
+          var searchPageModel = SearchPageModel.of(context);
+          if (!snapshot.hasData) return LoadingText();
+          var entry = snapshot.data[index];
+          var isSelected =
+              entry.urlEncodedHeadword == searchPageModel.selectedEntryHeadword;
+          return Column(
+            children: [
+              InkWell(
+                  child: Container(
+                    decoration: _shadowDecoration(context, isSelected),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: EntryView.asPreview(entry)),
+                        Icon(
+                          Icons.arrow_forward_ios_outlined,
+                          color: Theme.of(context).accentIconTheme.color,
                         ),
-                      ),
-                      onTap: () {
-                        if (isSelected) return;
-                        dictionaryModel.onEntrySelected(context, entry);
-                      }),
-                  if (index < snapshot.data.length - 1)
-                    Divider(
-                      thickness: 1.0,
-                      height: 1.0,
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     ),
-                ],
-              );
-            },
+                  ),
+                  onTap: () {
+                    if (isSelected) return;
+                    dictionaryModel.onEntrySelected(context, entry);
+                  }),
+              if (index < snapshot.data.length - 1)
+                Divider(
+                  thickness: 1.0,
+                  height: 1.0,
+                ),
+            ],
           );
+        },
+      );
 
   BoxDecoration _shadowDecoration(BuildContext context, bool isSelected) {
     if (!isSelected) return BoxDecoration(color: Theme.of(context).cardColor);
