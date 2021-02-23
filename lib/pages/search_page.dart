@@ -2,7 +2,6 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
@@ -15,39 +14,39 @@ class SearchPage extends StatelessWidget {
 
   static bool matchesUri(Uri uri) => uri.pathSegments.contains(route);
 
-  final PageController _controller = PageController();
-
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<SearchPageModel>(
-      valueListenable: DictionaryPageModel.of(context).currSearchPageModel,
-      child: Material(child: _searchPages(context), elevation: 4.0),
-      builder: (context, currSearchPage, searchPages) {
-        Future.delayed(Duration.zero).then((_) {
-          var targetPage =
-              translationModeToIndex(currSearchPage.translationMode);
-          if (_controller.page.round() == targetPage) return;
-          _controller.animateToPage(
-            translationModeToIndex(currSearchPage.translationMode),
-            curve: Curves.easeIn,
-            duration: Duration(milliseconds: 200),
-          );
-        });
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(child: searchPages),
-            DictionaryBottomNavigationBar(),
-          ],
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: Material(child: _searchPages(context), elevation: 4.0)),
+        DictionaryBottomNavigationBar(),
+      ],
     );
   }
 
   Widget _searchPages(BuildContext context) {
     final dictionaryModel = DictionaryPageModel.of(context);
+    final PageController controller = PageController(
+      initialPage: translationModeToIndex(
+          dictionaryModel.currSearchPageModel.value.translationMode),
+    );
+    dictionaryModel.currSearchPageModel.addListener(() {
+      var targetPage = translationModeToIndex(
+          dictionaryModel.currSearchPageModel.value.translationMode);
+      // If the controller isn't attached yet then the PageView will be properly
+      // constructed via initialPage.
+      if (!controller.hasClients || controller.page.round() == targetPage)
+        return;
+      controller.animateToPage(
+        targetPage,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeIn,
+      );
+    });
     return PageView(
-      controller: _controller,
+      allowImplicitScrolling: true,
+      controller: controller,
       onPageChanged: (index) => DictionaryPageModel.of(context)
           .onTranslationModeChanged(indexToTranslationMode(index)),
       children: [
