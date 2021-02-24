@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 
 import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
-import 'package:universal_html/prefer_sdk/html.dart';
 
 class DictionaryTabBarView extends StatefulWidget {
   /// Creates a page view with one child per tab.
@@ -111,8 +110,10 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   }
 
   _onIndexChanged() {
-    if (_controller.index != currentIndex.value)
+    DictionaryPageModel.readFrom(context).onTabChanged();
+    if (_controller.index != currentIndex.value) {
       _controller.animateTo(currentIndex.value);
+    }
     setState(() {});
   }
 }

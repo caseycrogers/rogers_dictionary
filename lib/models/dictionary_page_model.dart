@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
-import 'package:rogers_dictionary/pages/favorites_page.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
-import 'package:rogers_dictionary/pages/search_page.dart';
 import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
 
 enum TranslationMode {
@@ -28,10 +26,6 @@ int translationModeToIndex(TranslationMode translationMode) {
 }
 
 class DictionaryPageModel {
-  static const String _SELECTED_ENTRY_QUERY_PARAM = 'entry';
-  static const String _SEARCH_STRING_QUERY_PARAM = 'search';
-  static const String _SORT_BY_QUERY_PARAM = 'sortBy';
-
   final SearchPageModel englishPageModel;
   final SearchPageModel spanishPageModel;
 
@@ -52,7 +46,7 @@ class DictionaryPageModel {
   SearchPageModel get _currModel => currSearchPageModel.value;
 
   SearchPageModel get _oppModel =>
-      _currModel.translationMode == TranslationMode.English
+      currSearchPageModel.value.translationMode == TranslationMode.English
           ? spanishPageModel
           : englishPageModel;
 
@@ -66,15 +60,16 @@ class DictionaryPageModel {
       this.englishPageModel, this.spanishPageModel);
 
   static DictionaryPageModel empty(BuildContext context) {
-    var initialPage =
-        SearchPageModel.empty(translationMode: DEFAULT_TRANSLATION_MODE);
+    var initialPage = SearchPageModel.empty(
+        context: context, translationMode: DEFAULT_TRANSLATION_MODE);
     return DictionaryPageModel._(
       LocalHistoryValueNotifier(
           modalRoute: ModalRoute.of(context), initialValue: 0),
       LocalHistoryValueNotifier(
           modalRoute: ModalRoute.of(context), initialValue: initialPage),
       initialPage,
-      SearchPageModel.empty(translationMode: TranslationMode.Spanish),
+      SearchPageModel.empty(
+          context: context, translationMode: TranslationMode.Spanish),
     );
   }
 
@@ -100,18 +95,23 @@ class DictionaryPageModel {
   void onEntrySelected(BuildContext context, Entry newEntry) {
     assert(newEntry != null);
     // Only update if the value has actually changed
-    if (newEntry.urlEncodedHeadword == _currModel.selectedEntryHeadword) return;
-    var newModel = _currModel._copyWithEntry(newEntry);
-    _currModel.transitionTo = newModel;
-    copyWithNewModel(newModel)._pushPage(context);
+    if (newEntry.urlEncodedHeadword == _currModel.selectedEntryHeadword.value)
+      return;
+    _currModel.selectedEntryHeadword.value = newEntry.urlEncodedHeadword;
+    _currModel.selectedEntry = Future.value(newEntry);
+    _currModel.entrySearchModel.resetStream();
+    _oppModel.entrySearchModel.resetStream();
   }
 
   void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
     // Only update if the value has actually changed
-    if (newUrlEncodedHeadword == _currModel.selectedEntryHeadword) return;
-    var newModel = _currModel._copyWithEncodedHeadword(newUrlEncodedHeadword);
-    _currModel.transitionTo = newModel;
-    copyWithNewModel(newModel)._pushPage(context);
+    if (newUrlEncodedHeadword == _currModel.selectedEntryHeadword.value) return;
+    _currModel.selectedEntryHeadword.value = newUrlEncodedHeadword;
+    _currModel.selectedEntry = newUrlEncodedHeadword.isNotEmpty
+        ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
+        : null;
+    _currModel.entrySearchModel.resetStream();
+    _oppModel.entrySearchModel.resetStream();
   }
 
   void onSearchChanged(
@@ -122,37 +122,28 @@ class DictionaryPageModel {
     );
   }
 
-  List<String> _tabToRoute = [
-    SearchPage.route,
-    FavoritesPage.route,
-  ];
-
-  void _pushPage(BuildContext context) {
-    Navigator.of(context).pushNamed(
-      uri.toString(),
-      arguments: this,
-    );
+  void onTabChanged() {
+    if (currentIndex.value == 0) {
+      _currModel.entrySearchModel.resetStream();
+      _oppModel.entrySearchModel.resetStream();
+    }
   }
 }
 
 class SearchPageModel {
-  // Transition state.
-  final SearchPageModel transitionFrom;
-  SearchPageModel transitionTo;
-
   // Translation mode state.
   final TranslationMode translationMode;
 
   // Selected entry state.
-  final Future<Entry> selectedEntry;
-  final String selectedEntryHeadword;
+  Future<Entry> selectedEntry;
+  final LocalHistoryValueNotifier<String> selectedEntryHeadword;
 
   // Entry search state
   final EntrySearchModel entrySearchModel;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 
-  bool get hasSelection => selectedEntryHeadword.isNotEmpty;
+  bool get hasSelection => selectedEntryHeadword.value.isNotEmpty;
 
   String get searchString => entrySearchModel.searchString;
 
@@ -164,12 +155,14 @@ class SearchPageModel {
   static SearchPageModel readFrom(BuildContext context) =>
       context.read<SearchPageModel>();
 
-  factory SearchPageModel.empty({@required TranslationMode translationMode}) =>
+  factory SearchPageModel.empty(
+          {@required BuildContext context,
+          @required TranslationMode translationMode}) =>
       SearchPageModel._(
-        transitionFrom: null,
         translationMode: translationMode,
         selectedEntry: null,
-        selectedEntryHeadword: '',
+        selectedEntryHeadword: LocalHistoryValueNotifier(
+            modalRoute: ModalRoute.of(context), initialValue: ''),
         entrySearchModel: EntrySearchModel.empty(translationMode),
       );
 
@@ -190,64 +183,10 @@ class SearchPageModel {
     // );
   }
 
-  SearchPageModel _copyWithEntry(Entry newEntry) {
-    return copy(
-        newSelectedEntry: Future.value(newEntry),
-        newEncodedHeadword: newEntry?.urlEncodedHeadword);
-  }
-
-  SearchPageModel _copyWithEncodedHeadword(String newEncodedHeadword) {
-    return copy(
-        newSelectedEntry: newEncodedHeadword.isNotEmpty
-            ? MyApp.db.getEntry(translationMode, newEncodedHeadword)
-            : null,
-        newEncodedHeadword: newEncodedHeadword);
-  }
-
-  SearchPageModel copy(
-      {SearchPageModel overrideTransitionFrom,
-      FutureOr<Entry> newSelectedEntry,
-      String newEncodedHeadword}) {
-    assert((newSelectedEntry != null &&
-            newEncodedHeadword != selectedEntryHeadword) ||
-        (newSelectedEntry == null && (newEncodedHeadword ?? '') == '') ||
-        overrideTransitionFrom != null);
-    return SearchPageModel._(
-      transitionFrom: overrideTransitionFrom ?? this,
-      translationMode: translationMode,
-      selectedEntry: newSelectedEntry ?? selectedEntry,
-      selectedEntryHeadword: newEncodedHeadword ?? selectedEntryHeadword,
-      entrySearchModel: entrySearchModel.copy(),
-    );
-  }
-
   SearchPageModel._({
-    @required this.transitionFrom,
     @required this.translationMode,
     @required this.selectedEntry,
     @required this.selectedEntryHeadword,
     @required this.entrySearchModel,
   });
-
-  bool get isTransitionFromTranslationMode =>
-      transitionFrom == null ||
-      translationMode != transitionFrom.translationMode;
-
-  bool get isTransitionToSelectedHeadword {
-    return transitionTo != null &&
-        transitionTo.translationMode == translationMode &&
-        transitionTo.hasSelection &&
-        hasSelection;
-  }
-
-  bool get isTransitionFromSelectedHeadword {
-    return transitionFrom != null &&
-        transitionFrom.translationMode == translationMode &&
-        transitionFrom.hasSelection &&
-        hasSelection;
-  }
-
-//void _pushQueryParams(BuildContext context) {
-//  html.window.history.replaceState(null, '', uri.toString());
-//}
 }

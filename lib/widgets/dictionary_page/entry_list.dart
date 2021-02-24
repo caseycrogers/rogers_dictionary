@@ -63,8 +63,8 @@ class EntryList extends StatelessWidget {
           var searchPageModel = SearchPageModel.of(context);
           if (!snapshot.hasData) return LoadingText();
           var entry = snapshot.data[index];
-          var isSelected =
-              entry.urlEncodedHeadword == searchPageModel.selectedEntryHeadword;
+          var isSelected = entry.urlEncodedHeadword ==
+              searchPageModel.selectedEntryHeadword.value;
           return Column(
             children: [
               InkWell(
