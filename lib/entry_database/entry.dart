@@ -102,6 +102,12 @@ class Entry {
   String get urlEncodedHeadword => headword.urlEncodedHeadword;
 
   List<Headword> get allHeadwords => [headword]..addAll(alternateHeadwords);
+
+  @override
+  bool operator ==(o) => o is Entry && o.hashCode == hashCode;
+
+  @override
+  int get hashCode => urlEncodedHeadword.hashCode;
 }
 
 @immutable

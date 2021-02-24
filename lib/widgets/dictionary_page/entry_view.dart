@@ -79,10 +79,7 @@ class EntryView extends StatelessWidget {
           Icons.arrow_back,
           color: Theme.of(context).accentIconTheme.color,
         ),
-        onPressed: () => SearchPageModel.readFrom(context)
-                .isTransitionFromSelectedHeadword
-            ? Navigator.of(context).pop()
-            : DictionaryPageModel.of(context).onHeadwordSelected(context, ''),
+        onPressed: () => Navigator.of(context).pop(),
       ),
     );
   }
