@@ -10,7 +10,7 @@ class SearchOptionsView extends StatelessWidget {
   final EntrySearchModel _entrySearchModel;
 
   SearchOptionsView(this._exteriorContext)
-      : _entrySearchModel = DictionaryPageModel.of(_exteriorContext)
+      : _entrySearchModel = DictionaryPageModel.readFrom(_exteriorContext)
             .currSearchPageModel
             .value
             .entrySearchModel;
