@@ -1,14 +1,7 @@
-import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'package:rogers_dictionary/widgets/dictionary_bottom_navigation_bar.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/entry_list.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/entry_search.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
-import 'package:rogers_dictionary/widgets/slide_entrance_exit.dart';
-import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/pages/entry_search_page.dart';
 
 class SearchPage extends StatelessWidget {
   static const String route = 'search';
@@ -17,88 +10,6 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(child: Material(child: _searchPages(context), elevation: 4.0)),
-        DictionaryBottomNavigationBar(),
-      ],
-    );
-  }
-
-  Widget _searchPages(BuildContext context) {
-    final dictionaryModel = DictionaryPageModel.of(context);
-    final PageController controller = PageController(
-      initialPage: translationModeToIndex(
-          dictionaryModel.currSearchPageModel.value.translationMode),
-    );
-    dictionaryModel.currSearchPageModel.addListener(() {
-      var targetPage = translationModeToIndex(
-          dictionaryModel.currSearchPageModel.value.translationMode);
-      // If the controller isn't attached yet then the PageView will be properly
-      // constructed via initialPage.
-      if (!controller.hasClients || controller.page.round() == targetPage)
-        return;
-      controller.animateToPage(
-        targetPage,
-        duration: Duration(milliseconds: 200),
-        curve: Curves.easeIn,
-      );
-    });
-    return PageView(
-      allowImplicitScrolling: true,
-      controller: controller,
-      onPageChanged: (index) => DictionaryPageModel.of(context)
-          .onTranslationModeChanged(indexToTranslationMode(index)),
-      children: [
-        Theme(
-          data: Theme.of(context)
-              .copyWith(primaryColor: primaryColor(TranslationMode.English)),
-          child: Provider<SearchPageModel>.value(
-            value: dictionaryModel.englishPageModel,
-            builder: (context, _) => _buildOrientedPage(context, EntrySearch()),
-          ),
-        ),
-        Theme(
-          data: Theme.of(context)
-              .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
-          child: Provider<SearchPageModel>.value(
-            value: dictionaryModel.spanishPageModel,
-            builder: (context, _) => _buildOrientedPage(context, EntrySearch()),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrientedPage(BuildContext context, EntrySearch entrySearch) {
-    final searchPageModel = SearchPageModel.of(context);
-
-    Animation<Offset> _slideFromLeft(Animation<double> animation) =>
-        Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero)
-            .animate(animation);
-
-    Animation<Offset> _slideFromRight(Animation<double> animation) =>
-        Tween<Offset>(begin: Offset(1, 0), end: Offset.zero).animate(animation);
-
-    Widget _getTransition(Widget child, Animation<double> animation) =>
-        SlideTransition(
-            child: child,
-            position: searchPageModel.selectedEntryHeadword.value.isEmpty
-                ? _slideFromLeft(animation)
-                : _slideFromRight(animation));
-
-    return LayoutBuilder(
-      builder: (context, constraints) => ValueListenableBuilder<String>(
-        valueListenable: searchPageModel.selectedEntryHeadword,
-        builder: (context, urlEncodedHeadword, _) => AnimatedSwitcher(
-          transitionBuilder: _getTransition,
-          duration: Duration(milliseconds: 200),
-          child: urlEncodedHeadword.isNotEmpty
-              ? EntryView.asPage()
-              : EntrySearch(),
-        ),
-      ),
-    );
+    return EntrySearchPage();
   }
 }

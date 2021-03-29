@@ -2,10 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
 
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/search_options_view.dart';
 
 class SearchOptionsButton extends StatefulWidget {
@@ -13,21 +10,46 @@ class SearchOptionsButton extends StatefulWidget {
   _SearchOptionsButtonState createState() => _SearchOptionsButtonState();
 }
 
-class _SearchOptionsButtonState extends State<SearchOptionsButton> {
+class _SearchOptionsButtonState extends State<SearchOptionsButton>
+    with SingleTickerProviderStateMixin {
   OverlayEntry _overlayEntry;
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 200),
+      reverseDuration: Duration(milliseconds: 100),
+      vsync: this,
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.0),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: _isMounted ? Colors.white10 : Colors.transparent,
-      ),
-      child: IconButton(
-        icon: Icon(Icons.more_vert),
-        color: Colors.white,
-        onPressed: () => _toggle(),
+    return WillPopScope(
+      onWillPop: () async {
+        if (!_isMounted) return true;
+        _toggle();
+        return false;
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 4.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: _isMounted ? Colors.white10 : Colors.transparent,
+        ),
+        child: IconButton(
+          icon: Icon(Icons.more_vert),
+          color: Colors.white,
+          onPressed: () => _toggle(),
+        ),
       ),
     );
   }
@@ -39,17 +61,24 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton> {
       builder: (_) => Positioned(
         child: Stack(
           children: [
-            Container(
-              color: Colors.black38,
-              child: GestureDetector(
-                onTap: _toggle,
+            FadeTransition(
+              opacity: _curve,
+              child: Container(
+                color: Colors.black38,
+                child: GestureDetector(
+                  onTap: _toggle,
+                ),
               ),
             ),
             Positioned(
               top: upperLeft.dy + renderBox.size.height + 4.0,
               right: 0,
               width: 275,
-              child: SearchOptionsView(context),
+              child: ScaleTransition(
+                alignment: Alignment.topRight,
+                scale: _curve,
+                child: SearchOptionsView(context),
+              ),
             ),
           ],
         ),
@@ -58,16 +87,26 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton> {
   }
 
   void _toggle() {
+    if (_isMounted) {
+      _controller.reverse().then((_) {
+        setState(() {
+          _overlayEntry.remove();
+          _overlayEntry = null;
+        });
+      });
+      return;
+    }
     setState(() {
-      if (_isMounted) {
-        _overlayEntry.remove();
-        _overlayEntry = null;
-        return;
-      }
       _overlayEntry = _buildOverlayEntry();
       Overlay.of(context).insert(_overlayEntry);
+      _controller.forward();
     });
   }
 
   bool get _isMounted => _overlayEntry != null;
+
+  Animation<double> get _curve => CurvedAnimation(
+        parent: _controller,
+        curve: Curves.fastOutSlowIn,
+      );
 }

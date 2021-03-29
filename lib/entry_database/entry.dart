@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 
 part 'entry.g.dart';
 
-@immutable
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class Entry {
   // Run the following to rebuild generated files:
@@ -31,13 +30,16 @@ class Entry {
     'deg': 'degree',
     'f': 'feminine noun',
     'fpl': 'feminine plural noun',
+    'f(pl)': 'feminine plural noun',
     'inf': 'infinitive',
     'interj': 'interjection',
     'm': 'masculine noun',
     'mf': 'masculine/feminine noun',
     'mpl': 'masculine plural noun',
+    'm(pl)': 'masculine plural noun',
     'n': 'noun',
     'npl': 'plural noun',
+    'n(pl)': 'plural noun',
     'pref': 'prefix',
     'prep': 'preposition',
     'v': 'verb',

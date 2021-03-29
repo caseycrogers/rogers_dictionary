@@ -13,15 +13,16 @@ class EntryView extends StatelessWidget {
 
   EntryView._instance(this._entry, this._preview);
 
-  static Widget asPage() => Builder(
+  static Widget asPage(BuildContext context) => Builder(
+        key: ValueKey(SearchPageModel.of(context).currSelectedHeadword),
         builder: (context) {
           var searchPageModel = SearchPageModel.of(context);
           if (!searchPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
-          return Container(
+          return Material(
             color: Theme.of(context).cardColor,
             child: FutureBuilder(
-              future: searchPageModel.selectedEntry,
+              future: searchPageModel.currSelectedEntry.value.entry,
               builder: (context, AsyncSnapshot<Entry> snap) {
                 if (!snap.hasData)
                   // Only display if loading is slow.
@@ -41,11 +42,7 @@ class EntryView extends StatelessWidget {
                         children: [
                           _iconButton(context),
                           Expanded(
-                              child: headwordLine(
-                                  context,
-                                  entry.headword,
-                                  entry.alternateHeadwords,
-                                  false,
+                              child: headwordLine(context, entry, false,
                                   searchPageModel.searchString)),
                         ],
                       ),
@@ -76,10 +73,11 @@ class EntryView extends StatelessWidget {
       padding: const EdgeInsets.all(4.0),
       child: IconButton(
         icon: Icon(
-          Icons.arrow_back,
+          Icons.close,
           color: Theme.of(context).accentIconTheme.color,
         ),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () => DictionaryPageModel.readFrom(context)
+            .onHeadwordSelected(context, ''),
       ),
     );
   }
@@ -90,8 +88,8 @@ class EntryView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (_preview)
-          headwordLine(context, _entry.headword, _entry.alternateHeadwords,
-              _preview, SearchPageModel.of(context).searchString),
+          headwordLine(context, _entry, _preview,
+              SearchPageModel.of(context).searchString),
         _buildTable(context, _constructTranslationMap(_entry)),
         if (!_preview) _buildEditorialNotes(context),
         if (!_preview) _buildRelated(context),
@@ -113,7 +111,7 @@ class EntryView extends StatelessWidget {
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                DictionaryPageModel.of(context)
+                DictionaryPageModel.readFrom(context)
                     .onHeadwordSelected(context, Entry.urlEncode(headword));
               },
           ),

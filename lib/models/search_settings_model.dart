@@ -14,15 +14,15 @@ class SearchSettingsModel {
 
   bool get ignoreAccents => _ignoreAccents;
 
-  SearchSettingsModel._(this._sortBy, this._ignoreAccents);
+  SearchSettingsModel(this._sortBy, this._ignoreAccents);
 
   SearchSettingsModel copy({SortOrder newSortBy, bool newIgnoreAccents}) {
-    return SearchSettingsModel._(
+    return SearchSettingsModel(
         newSortBy ?? _sortBy, newIgnoreAccents ?? _ignoreAccents);
   }
 
   static SearchSettingsModel empty() =>
-      SearchSettingsModel._(_DEFAULT_SORT_ORDER, _DEFAULT_IGNORE_ACCENTS);
+      SearchSettingsModel(_DEFAULT_SORT_ORDER, _DEFAULT_IGNORE_ACCENTS);
 
   @override
   int get hashCode => _sortBy.toString().hashCode ^ _ignoreAccents.hashCode;

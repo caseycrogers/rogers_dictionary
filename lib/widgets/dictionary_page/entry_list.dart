@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'dart:core';
@@ -20,7 +21,9 @@ class EntryList extends StatelessWidget {
         value: SearchPageModel.of(context).entrySearchModel,
         builder: (context, _) {
           var entrySearchModel = context.watch<EntrySearchModel>();
-          if (entrySearchModel.isEmpty)
+          if (entrySearchModel.isEmpty &&
+              DictionaryPageModel.of(context).currentTab.value ==
+                  DictionaryTab.search)
             return Padding(
               padding: EdgeInsets.all(30.0),
               child: Text('Enter text above to search for a translation!',
@@ -33,7 +36,10 @@ class EntryList extends StatelessWidget {
             noResultsWidgetBuilder: (context) => Container(
               child: Padding(
                 padding: EdgeInsets.all(30.0),
-                child: Text('No results! Check for typos.',
+                child: Text(
+                    entrySearchModel.favoritesOnly
+                        ? 'No results! Try favoriting an entry first.'
+                        : 'No results! Check for typos.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey,
@@ -61,15 +67,15 @@ class EntryList extends StatelessWidget {
         builder: (BuildContext context) {
           final dictionaryModel = DictionaryPageModel.of(context);
           var searchPageModel = SearchPageModel.of(context);
+          if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return LoadingText();
           var entry = snapshot.data[index];
-          var isSelected = entry.urlEncodedHeadword ==
-              searchPageModel.selectedEntryHeadword.value;
+          var isSelected =
+              entry.urlEncodedHeadword == searchPageModel.currSelectedHeadword;
           return Column(
             children: [
               InkWell(
-                  child: Container(
-                    decoration: _shadowDecoration(context, isSelected),
+                  child: Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                     child: Row(

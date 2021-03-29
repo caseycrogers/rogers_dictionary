@@ -59,7 +59,8 @@ class _SearchBarState extends State<SearchBar> {
                                 onPressed: () {
                                   _controller.clear();
                                   DictionaryPageModel.readFrom(context)
-                                      .onSearchChanged(newSearchString: '');
+                                      .onSearchChanged(context,
+                                          newSearchString: '');
                                 },
                                 icon: Icon(Icons.clear),
                               )
@@ -67,8 +68,9 @@ class _SearchBarState extends State<SearchBar> {
                         hintText: 'search...',
                         border: InputBorder.none,
                       ),
-                      onChanged: (searchString) => dictionaryModel
-                          .onSearchChanged(newSearchString: searchString),
+                      onChanged: (searchString) =>
+                          dictionaryModel.onSearchChanged(context,
+                              newSearchString: searchString),
                     ),
                   ),
                 ),
