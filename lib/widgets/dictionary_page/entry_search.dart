@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 import 'entry_list.dart';
 import 'search_bar.dart';
@@ -17,11 +18,13 @@ class EntrySearch extends StatelessWidget {
         Expanded(
           child: EntryList(),
         ),
-        Material(
-          elevation: 4.0,
-          color: primaryColor(SearchPageModel.of(context).translationMode),
-          child: SearchBar(),
-        ),
+        if (DictionaryPageModel.of(context).currentTab.value ==
+            DictionaryTab.search)
+          Material(
+            elevation: 4.0,
+            color: primaryColor(SearchPageModel.of(context).translationMode),
+            child: SearchBar(),
+          ),
       ],
     );
   }

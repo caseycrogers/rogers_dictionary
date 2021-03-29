@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class DictionaryTab extends StatefulWidget {
-  DictionaryTab({
+class DictionaryTabEntry extends StatefulWidget {
+  DictionaryTabEntry({
     @required this.selected,
     @required this.unselected,
     @required this.index,
@@ -13,10 +13,10 @@ class DictionaryTab extends StatefulWidget {
   final int index;
 
   @override
-  _DictionaryTabState createState() => _DictionaryTabState();
+  _DictionaryTabEntryState createState() => _DictionaryTabEntryState();
 }
 
-class _DictionaryTabState extends State<DictionaryTab> {
+class _DictionaryTabEntryState extends State<DictionaryTabEntry> {
   TabController _controller;
 
   @override

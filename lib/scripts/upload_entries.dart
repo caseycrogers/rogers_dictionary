@@ -6,7 +6,6 @@ import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'package:args/args.dart';
-import 'package:firedart/firedart.dart';
 import 'package:df/df.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -19,7 +18,7 @@ const ERROR = '(ERROR):';
 
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   var filePath = join(ROGERS_DICTIONARY, 'lib', 'scripts',
-      'dictionary_database-${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv');
+      'entry_database-${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv');
   print('Uploading: $filePath.');
   var df = await DataFrame.fromCsv(filePath);
 
@@ -33,13 +32,13 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   while (rows.elementAt(i)[HEADWORD] != 'START') {
     if (i == 100) {
       print(
-          "$ERROR Reached row ${i + 2} without finding the start of entries, cancelling");
+          "$ERROR Reached row ${i + 2} without finding the start of entries, cancelling.");
       return;
     }
     i++;
   }
   i++;
-  while (i < rows.length) {
+  while (i < 100) {
     if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
     Map<String, String> row = rows.elementAt(i);
     if (row.values.every((e) => e == null || e.isEmpty)) {
@@ -132,61 +131,22 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   );
 }
 
-List<String> _constructSearchList(Entry entry) {
-  return [];
-  Set<String> keywordSet = Set()
-    ..add(entry.headwordText.toLowerCase())
-    ..addAll(entry.translations.map((t) => t.translationText.toLowerCase()));
-  return keywordSet.expand((k) {
-    Set<String> ret = Set();
-    for (int i = 0; i < k.length; i++) {
-      // Only start substrings at the start of words.
-      if (!(i == 0 || [' ', '-', '.'].contains(k.substring(i - 1, i))))
-        continue;
-      for (int j = i; j <= k.length; j++) {
-        ret.add(k.substring(i, j));
-      }
-    }
-    ret.add("");
-    return ret.toList();
-  }).toList();
-}
-
-Future<void> _uploadFirestore(List<Entry> entries, bool debug, bool verbose) {
-  Firestore.initialize('rogers-dicitionary');
-  return Future.wait(
-    entries.map((entry) {
-      var entryMap = entry.toJson()
-        ..addEntries([MapEntry(KEYWORD_LIST, _constructSearchList(entry))]);
-      if (verbose) {
-        print('Entry:\n${entry.toJson()}');
-        print('Keywords:\n${entryMap[KEYWORD_LIST]}');
-      }
-      if (debug) {
-        return (Completer()..complete()).future;
-      }
-      return Firestore.instance
-          .collection(ENTRIES_DB)
-          .document(ENGLISH)
-          .collection(ENTRIES)
-          .document(entry.urlEncodedHeadword)
-          .set(entryMap);
-    }),
-  );
-}
-
 Future<void> _uploadSqlFlite(
   String tableName,
   List<Entry> entries,
   bool debug,
   bool verbose,
 ) async {
-  final path = join(ROGERS_DICTIONARY, 'assets', 'entries.db');
+  final path = join(ROGERS_DICTIONARY, 'assets', ENTRIES_DB);
   print('Writing to: $path.');
   sqfliteFfiInit();
   var db = await databaseFactoryFfi.openDatabase(path);
-  await db.execute('''DROP TABLE $tableName''');
-  await db.execute('''CREATE TABLE $tableName (
+  try {
+    await db.execute('''DROP TABLE $tableName''');
+  } on Exception catch (e) {
+    print(e.toString());
+  }
+  await db.execute('''CREATE TABLE $tableName(
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
     $HEADWORD STRING NOT NULL,
@@ -197,7 +157,15 @@ Future<void> _uploadSqlFlite(
     $RUN_ON_PARENTS$WITHOUT_DIACRITICAL_MARKS STRING,
     $HEADWORD_ABBREVIATIONS$WITHOUT_DIACRITICAL_MARKS STRING,
     $ALTERNATE_HEADWORDS$WITHOUT_DIACRITICAL_MARKS String,
-    entry_blob STRING NOT NULL
+    $ENTRY_BLOB STRING NOT NULL
+  )''');
+  try {
+    await db.execute('''DROP TABLE ${tableName}_favorites''');
+  } on Exception catch (e) {
+    print(e.toString());
+  }
+  await db.execute('''CREATE TABLE ${tableName}_favorites(
+    $URL_ENCODED_HEADWORD STRING NOT NULL
   )''');
   var batch = db.batch();
   for (var entry in entries) {
@@ -220,7 +188,7 @@ Future<void> _uploadSqlFlite(
       ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS: entry.alternateHeadwords
           .map((alt) => alt.headwordText.withoutDiacriticalMarks)
           .join(' | '),
-      'entry_blob': jsonEncode(entry.toJson()),
+      ENTRY_BLOB: jsonEncode(entry.toJson()),
     };
     if (verbose) print(entryRecord);
     batch.insert(tableName, entryRecord);

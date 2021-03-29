@@ -8,14 +8,6 @@ class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     var uri = Uri.parse(settings.name);
     return _serveDictionaryPage(settings, uri);
-
-    // Route not recognized, display 404 page
-    return PageRouteBuilder(
-      settings: settings,
-      pageBuilder: (context, animation, _) => Scaffold(
-        body: Center(child: Text('No route defined for ${settings.name}')),
-      ),
-    );
   }
 }
 

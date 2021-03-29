@@ -11,11 +11,10 @@ class EntrySearchModel with ChangeNotifier {
   final TranslationMode _translationMode;
   String _searchString;
   SearchSettingsModel _searchSettingsModel;
-  int _startAfter;
   Stream<Entry> _entryStream;
   LinkedHashSet<Entry> _entries;
   ScrollController _scrollController;
-  bool _bookmarksOnly;
+  bool _favoritesOnly;
 
   String get searchString => _searchString;
 
@@ -29,17 +28,7 @@ class EntrySearchModel with ChangeNotifier {
 
   bool get isEmpty => _searchString.isEmpty;
 
-  bool get bookmarksOnly => _bookmarksOnly;
-
-  set bookmarksOnly(bool value) {
-    onSearchStringChanged(newBookmarksOnly: value);
-  }
-
-  set expandSearchOptions(bool value) {
-    if (_bookmarksOnly == value) return;
-    _bookmarksOnly = value;
-    notifyListeners();
-  }
+  bool get favoritesOnly => _favoritesOnly;
 
   EntrySearchModel._(
       this._translationMode,
@@ -47,17 +36,23 @@ class EntrySearchModel with ChangeNotifier {
       this._searchSettingsModel,
       this._entries,
       this._scrollController,
-      this._bookmarksOnly) {
+      this._favoritesOnly) {
     _initializeStream();
   }
 
   void _initializeStream() {
-    _entryStream = MyApp.db
-        .getEntries(_translationMode,
-            searchString: searchString,
-            startAfter: entries.length,
-            searchOptions: searchSettingsModel)
-        .map((entry) {
+    Stream<Entry> stream;
+    if (_favoritesOnly) {
+      _entries = LinkedHashSet();
+      stream =
+          MyApp.db.getFavorites(_translationMode, startAfter: entries.length);
+    } else {
+      stream = MyApp.db.getEntries(_translationMode,
+          searchString: searchString,
+          startAfter: entries.length,
+          searchOptions: searchSettingsModel);
+    }
+    _entryStream = stream.map((entry) {
       if (!_entries.add(entry))
         print('WARNING: added duplicate entry ${entry.urlEncodedHeadword}. '
             'Set:\n${_entries.toList()}');
@@ -68,24 +63,9 @@ class EntrySearchModel with ChangeNotifier {
             _scrollController.hasClients ? _scrollController.offset : 0.0);
   }
 
-  EntrySearchModel(TranslationMode translationMode, String searchString,
-      SearchSettingsModel searchOptions)
-      : this._(translationMode, searchString, searchOptions, LinkedHashSet(),
-            ScrollController(), false);
-
-  EntrySearchModel.empty(TranslationMode translationMode)
+  EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
       : this._(translationMode, '', SearchSettingsModel.empty(),
-            LinkedHashSet(), ScrollController(), false);
-
-  EntrySearchModel copy() => EntrySearchModel._(
-      _translationMode,
-      _searchString,
-      _searchSettingsModel,
-      _entries,
-      ScrollController(
-          initialScrollOffset:
-              _scrollController.hasClients ? _scrollController.offset : 0.0),
-      _bookmarksOnly);
+            LinkedHashSet(), ScrollController(), favoritesOnly);
 
   void onSearchStringChanged({
     String newSearchString,
@@ -95,11 +75,10 @@ class EntrySearchModel with ChangeNotifier {
     // Do nothing if nothing has changed
     if ((newSearchString ?? _searchString) == _searchString &&
         (newSearchSettings ?? _searchSettingsModel) == _searchSettingsModel &&
-        (newBookmarksOnly ?? _bookmarksOnly) == _bookmarksOnly) return;
+        (newBookmarksOnly ?? _favoritesOnly) == _favoritesOnly) return;
     _searchString = newSearchString ?? _searchString;
     _searchSettingsModel = newSearchSettings ?? _searchSettingsModel;
-    _bookmarksOnly = newBookmarksOnly ?? _bookmarksOnly;
-    _startAfter = 0;
+    _favoritesOnly = newBookmarksOnly ?? _favoritesOnly;
     _entries = LinkedHashSet();
     _initializeStream();
     _scrollController = ScrollController();

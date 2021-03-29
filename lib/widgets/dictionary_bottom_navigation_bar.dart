@@ -8,8 +8,8 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 class DictionaryBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<SearchPageModel>(
-      valueListenable: DictionaryPageModel.of(context).currSearchPageModel,
+    return ValueListenableBuilder<TranslationPageModel>(
+      valueListenable: DictionaryPageModel.of(context).currTranslationPageModel,
       builder: (context, currSearchPageModel, _) => Theme(
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: GestureDetector(
@@ -59,11 +59,11 @@ class DictionaryBottomNavigationBar extends StatelessWidget {
     ));
   }
 
-  void _handleTap(
-      BuildContext context, SearchPageModel currSearchPageModel, int index) {
+  void _handleTap(BuildContext context,
+      TranslationPageModel currSearchPageModel, int index) {
     if (index == translationModeToIndex(currSearchPageModel.translationMode))
       return;
-    DictionaryPageModel.of(context)
+    DictionaryPageModel.readFrom(context)
         .onTranslationModeChanged(indexToTranslationMode(index));
   }
 }

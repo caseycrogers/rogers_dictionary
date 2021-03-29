@@ -9,6 +9,7 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 enum TranslationMode {
   English,
@@ -26,16 +27,17 @@ int translationModeToIndex(TranslationMode translationMode) {
 }
 
 class DictionaryPageModel {
-  final SearchPageModel englishPageModel;
-  final SearchPageModel spanishPageModel;
+  final TranslationPageModel englishPageModel;
+  final TranslationPageModel spanishPageModel;
 
-  final LocalHistoryValueNotifier<SearchPageModel> currSearchPageModel;
+  final LocalHistoryValueNotifier<TranslationPageModel>
+      currTranslationPageModel;
 
-  final LocalHistoryValueNotifier<int> currentIndex;
+  final LocalHistoryValueNotifier<DictionaryTab> currentTab;
 
   get uri {
     return Uri(pathSegments: [
-      (currSearchPageModel.value.translationMode)
+      (currTranslationPageModel.value.translationMode)
           .toString()
           .split('.')
           .last
@@ -43,10 +45,10 @@ class DictionaryPageModel {
     ]);
   }
 
-  SearchPageModel get _currModel => currSearchPageModel.value;
+  TranslationPageModel get _currModel => currTranslationPageModel.value;
 
-  SearchPageModel get _oppModel =>
-      currSearchPageModel.value.translationMode == TranslationMode.English
+  TranslationPageModel get _oppModel =>
+      currTranslationPageModel.value.translationMode == TranslationMode.English
           ? spanishPageModel
           : englishPageModel;
 
@@ -56,78 +58,126 @@ class DictionaryPageModel {
   static DictionaryPageModel readFrom(BuildContext context) =>
       context.read<DictionaryPageModel>();
 
-  DictionaryPageModel._(this.currentIndex, this.currSearchPageModel,
+  DictionaryPageModel._(this.currentTab, this.currTranslationPageModel,
       this.englishPageModel, this.spanishPageModel);
 
   static DictionaryPageModel empty(BuildContext context) {
-    var initialPage = SearchPageModel.empty(
+    var englishPage = TranslationPageModel.empty(
         context: context, translationMode: DEFAULT_TRANSLATION_MODE);
+    var spanishPage = TranslationPageModel.empty(
+        context: context, translationMode: TranslationMode.Spanish);
     return DictionaryPageModel._(
       LocalHistoryValueNotifier(
-          modalRoute: ModalRoute.of(context), initialValue: 0),
+          modalRoute: ModalRoute.of(context),
+          initialValue: DictionaryTab.search),
       LocalHistoryValueNotifier(
-          modalRoute: ModalRoute.of(context), initialValue: initialPage),
-      initialPage,
-      SearchPageModel.empty(
-          context: context, translationMode: TranslationMode.Spanish),
+          modalRoute: ModalRoute.of(context), initialValue: englishPage),
+      englishPage,
+      spanishPage,
     );
   }
 
-  DictionaryPageModel copyWithNewModel(SearchPageModel newModel) {
-    var newEnglishModel = newModel.isEnglish ? newModel : englishPageModel;
-    var newSpanishModel = newModel.isEnglish ? spanishPageModel : newModel;
-    return DictionaryPageModel._(
-      currentIndex.copy(),
-      currSearchPageModel.copy(),
-      newEnglishModel,
-      newSpanishModel,
-    );
-  }
-
-  SearchPageModel pageModel(TranslationMode translationMode) =>
+  TranslationPageModel pageModel(TranslationMode translationMode) =>
       translationMode == TranslationMode.English
           ? englishPageModel
           : spanishPageModel;
 
   void onTranslationModeChanged(TranslationMode newTranslationMode) =>
-      currSearchPageModel.value = pageModel(newTranslationMode);
+      currTranslationPageModel.value = pageModel(newTranslationMode);
 
   void onEntrySelected(BuildContext context, Entry newEntry) {
     assert(newEntry != null);
+    bool isFavoritesModel = isFavoritesOnly(context);
     // Only update if the value has actually changed
-    if (newEntry.urlEncodedHeadword == _currModel.selectedEntryHeadword.value)
+    if (newEntry.urlEncodedHeadword ==
+        _getPageModel(_currModel, isFavoritesModel).currSelectedHeadword)
       return;
-    _currModel.selectedEntryHeadword.value = newEntry.urlEncodedHeadword;
-    _currModel.selectedEntry = Future.value(newEntry);
-    _currModel.entrySearchModel.resetStream();
-    _oppModel.entrySearchModel.resetStream();
+    _getPageModel(_currModel, isFavoritesModel).currSelectedEntry.value =
+        SelectedEntry(
+      urlEncodedHeadword: newEntry.urlEncodedHeadword,
+      entry: Future.value(newEntry),
+    );
+    _getPageModel(_currModel, isFavoritesModel).entrySearchModel.resetStream();
+    _getPageModel(_oppModel, isFavoritesModel).entrySearchModel.resetStream();
   }
 
+  SearchPageModel _getPageModel(
+          TranslationPageModel translationPageModel, bool isFavoritesModel) =>
+      isFavoritesModel
+          ? translationPageModel.favoritesPageModel
+          : translationPageModel.searchPageModel;
+
   void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
+    bool isFavoritesModel = isFavoritesOnly(context);
     // Only update if the value has actually changed
-    if (newUrlEncodedHeadword == _currModel.selectedEntryHeadword.value) return;
-    _currModel.selectedEntryHeadword.value = newUrlEncodedHeadword;
-    _currModel.selectedEntry = newUrlEncodedHeadword.isNotEmpty
-        ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
-        : null;
-    _currModel.entrySearchModel.resetStream();
-    _oppModel.entrySearchModel.resetStream();
+    if (newUrlEncodedHeadword ==
+        _getPageModel(_currModel, isFavoritesModel).currSelectedHeadword)
+      return;
+    _getPageModel(_currModel, isFavoritesModel).currSelectedEntry.value =
+        SelectedEntry(
+      urlEncodedHeadword: newUrlEncodedHeadword,
+      entry: newUrlEncodedHeadword.isNotEmpty
+          ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
+          : null,
+    );
+    _getPageModel(_currModel, isFavoritesModel).entrySearchModel.resetStream();
+    _getPageModel(_oppModel, isFavoritesModel).entrySearchModel.resetStream();
   }
 
   void onSearchChanged(
-      {String newSearchString, SearchSettingsModel newSearchSettings}) {
-    _currModel.entrySearchModel.onSearchStringChanged(
-      newSearchString: newSearchString,
-      newSearchSettings: newSearchSettings,
-    );
+    BuildContext context, {
+    String newSearchString,
+    SearchSettingsModel newSearchSettings,
+  }) {
+    _getPageModel(_currModel, isFavoritesOnly(context))
+        .entrySearchModel
+        .onSearchStringChanged(
+          newSearchString: newSearchString,
+          newSearchSettings: newSearchSettings,
+        );
   }
 
   void onTabChanged() {
-    if (currentIndex.value == 0) {
-      _currModel.entrySearchModel.resetStream();
-      _oppModel.entrySearchModel.resetStream();
+    if (currentTab.previousValue == DictionaryTab.search) {
+      _currModel.searchPageModel.entrySearchModel.resetStream();
+      _oppModel.searchPageModel.entrySearchModel.resetStream();
+    }
+    if (currentTab.previousValue == DictionaryTab.favorites) {
+      _currModel.favoritesPageModel.entrySearchModel.resetStream();
+      _oppModel.favoritesPageModel.entrySearchModel.resetStream();
     }
   }
+}
+
+class TranslationPageModel {
+  // Translation mode state.
+  final TranslationMode translationMode;
+
+  final SearchPageModel searchPageModel;
+
+  final SearchPageModel favoritesPageModel;
+
+  bool get isEnglish => translationMode == TranslationMode.English;
+
+  factory TranslationPageModel.empty(
+          {@required BuildContext context,
+          @required TranslationMode translationMode}) =>
+      TranslationPageModel._(
+          context: context, translationMode: translationMode);
+
+  TranslationPageModel._({
+    @required BuildContext context,
+    @required this.translationMode,
+  })  : searchPageModel = SearchPageModel.empty(
+          context: context,
+          translationMode: translationMode,
+          isFavoritesOnly: false,
+        ),
+        favoritesPageModel = SearchPageModel.empty(
+          context: context,
+          translationMode: translationMode,
+          isFavoritesOnly: true,
+        );
 }
 
 class SearchPageModel {
@@ -135,19 +185,20 @@ class SearchPageModel {
   final TranslationMode translationMode;
 
   // Selected entry state.
-  Future<Entry> selectedEntry;
-  final LocalHistoryValueNotifier<String> selectedEntryHeadword;
+  final LocalHistoryValueNotifier<SelectedEntry> currSelectedEntry;
 
   // Entry search state
   final EntrySearchModel entrySearchModel;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 
-  bool get hasSelection => selectedEntryHeadword.value.isNotEmpty;
+  bool get hasSelection => currSelectedEntry.value.hasSelection;
 
   String get searchString => entrySearchModel.searchString;
 
   bool get hasSearchString => entrySearchModel.searchString.isNotEmpty;
+
+  String get currSelectedHeadword => currSelectedEntry.value.urlEncodedHeadword;
 
   static SearchPageModel of(BuildContext context) =>
       context.select<SearchPageModel, SearchPageModel>((mdl) => mdl);
@@ -155,38 +206,42 @@ class SearchPageModel {
   static SearchPageModel readFrom(BuildContext context) =>
       context.read<SearchPageModel>();
 
-  factory SearchPageModel.empty(
-          {@required BuildContext context,
-          @required TranslationMode translationMode}) =>
+  factory SearchPageModel.empty({
+    @required BuildContext context,
+    @required TranslationMode translationMode,
+    @required bool isFavoritesOnly,
+  }) =>
       SearchPageModel._(
         translationMode: translationMode,
-        selectedEntry: null,
-        selectedEntryHeadword: LocalHistoryValueNotifier(
-            modalRoute: ModalRoute.of(context), initialValue: ''),
-        entrySearchModel: EntrySearchModel.empty(translationMode),
+        currSelectedEntry: LocalHistoryValueNotifier(
+          modalRoute: ModalRoute.of(context),
+          initialValue: SelectedEntry.empty(),
+        ),
+        entrySearchModel:
+            EntrySearchModel.empty(translationMode, isFavoritesOnly),
       );
-
-  factory SearchPageModel.fromQueryParams(Map<String, String> queryParams) {
-    throw UnimplementedError(
-        'Query Params is no longer up to date and should not be used.');
-    // var encodedHeadword = queryParams[SELECTED_ENTRY_QUERY_PARAM];
-    // var searchString = queryParams[SEARCH_STRING_QUERY_PARAM];
-    // return DictionaryPageModel._(
-    //   translationMode: DEFAULT_TRANSLATION_MODE,
-    //   selectedEntry:
-    //       encodedHeadword != null ? MyApp.db.getEntry(encodedHeadword) : null,
-    //   selectedEntryHeadword: encodedHeadword ?? '',
-    //   entrySearchModel:
-    //       EntrySearchModel(searchString ?? '', SearchOptions.empty()),
-    //   searchBarHasFocus: false,
-    //   expandSearchOptions: false,
-    // );
-  }
 
   SearchPageModel._({
     @required this.translationMode,
-    @required this.selectedEntry,
-    @required this.selectedEntryHeadword,
+    @required this.currSelectedEntry,
     @required this.entrySearchModel,
   });
 }
+
+class SelectedEntry {
+  final String urlEncodedHeadword;
+  final Future<Entry> entry;
+
+  SelectedEntry({@required this.urlEncodedHeadword, @required this.entry});
+
+  static SelectedEntry empty() => SelectedEntry(
+        urlEncodedHeadword: '',
+        entry: null,
+      );
+
+  bool get hasSelection => urlEncodedHeadword.isNotEmpty;
+}
+
+bool isFavoritesOnly(BuildContext context) =>
+    DictionaryPageModel.readFrom(context).currentTab.value ==
+    DictionaryTab.favorites;

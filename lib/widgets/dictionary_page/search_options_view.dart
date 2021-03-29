@@ -11,8 +11,9 @@ class SearchOptionsView extends StatelessWidget {
 
   SearchOptionsView(this._exteriorContext)
       : _entrySearchModel = DictionaryPageModel.readFrom(_exteriorContext)
-            .currSearchPageModel
+            .currTranslationPageModel
             .value
+            .searchPageModel
             .entrySearchModel;
 
   @override
@@ -75,8 +76,10 @@ class SearchOptionsView extends StatelessWidget {
 
   void _updateOptions(BuildContext context,
       {SortOrder newSortBy, bool newIgnoreAccents}) {
-    DictionaryPageModel.of(context).onSearchChanged(
-        newSearchSettings: _entrySearchModel.searchSettingsModel
-            .copy(newSortBy: newSortBy, newIgnoreAccents: newIgnoreAccents));
+    DictionaryPageModel.readFrom(context).onSearchChanged(
+      _exteriorContext,
+      newSearchSettings: _entrySearchModel.searchSettingsModel
+          .copy(newSortBy: newSortBy, newIgnoreAccents: newIgnoreAccents),
+    );
   }
 }
