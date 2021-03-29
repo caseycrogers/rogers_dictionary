@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
+import 'package:rogers_dictionary/widgets/favorites_button.dart';
 
 import 'overflow_markdown.dart';
 
@@ -159,7 +159,8 @@ Widget translationLine(BuildContext context, Translation translation) {
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
       OverflowMarkdown(translation.translationText, children: [
-        _addSpace(translation.genderAndPlural),
+        if (translation.genderAndPlural.isNotEmpty)
+          ' *${translation.genderAndPlural}*',
         _namingStandard(context, translation.translationNamingStandard)
       ]),
       _translationParenthetical(
@@ -177,10 +178,7 @@ Widget parentheticalText(BuildContext context, String text) {
 }
 
 Widget editorialText(BuildContext context, String text) {
-  return MarkdownBody(
-    data: text,
-    shrinkWrap: true,
-  );
+  return OverflowMarkdown(text);
 }
 
 Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
@@ -216,28 +214,29 @@ Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
   );
 }
 
-Widget headwordLine(BuildContext context, Headword headword,
-    List<Headword> alternateHeadwords, bool preview, String searchString) {
+Widget headwordLine(
+    BuildContext context, Entry entry, bool preview, String searchString) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
+          FavoritesButton(entry: entry),
           headwordText(
               context,
-              headword.abbreviation.isEmpty
-                  ? headword.headwordText
-                  : '${headword.headwordText} (${headword.abbreviation})',
+              entry.headword.abbreviation.isEmpty
+                  ? entry.headword.headwordText
+                  : '${entry.headword.headwordText} (${entry.headword.abbreviation})',
               preview,
               searchString: searchString),
-          if (headword.parentheticalQualifier.isNotEmpty)
+          if (entry.headword.parentheticalQualifier.isNotEmpty)
             Text(' ', style: normal1(context)),
-          parentheticalText(context, headword.parentheticalQualifier),
+          parentheticalText(context, entry.headword.parentheticalQualifier),
         ],
       ),
       alternateHeadwordLines(
-          context, alternateHeadwords, preview, searchString),
+          context, entry.alternateHeadwords, preview, searchString),
     ],
   );
 }

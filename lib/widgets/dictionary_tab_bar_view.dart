@@ -1,6 +1,9 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
 
@@ -12,7 +15,7 @@ class DictionaryTabBarView extends StatefulWidget {
     @required this.children,
   }) : assert(children != null);
 
-  final List<Widget> children;
+  final LinkedHashMap<DictionaryTab, Widget> children;
 
   @override
   _DictionaryTabBarViewState createState() => _DictionaryTabBarViewState();
@@ -20,15 +23,15 @@ class DictionaryTabBarView extends StatefulWidget {
 
 class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   TabController _controller;
-  List<Widget> _childrenWithKey;
+  LinkedHashMap<DictionaryTab, Widget> _childrenWithKey;
 
   // If the TabBarView is rebuilt with a new tab controller, the caller should
   // dispose the old one. In that case the old controller's animation will be
   // null and should not be accessed.
   bool get _controllerIsValid => _controller?.animation != null;
 
-  LocalHistoryValueNotifier get currentIndex =>
-      DictionaryPageModel.readFrom(context).currentIndex;
+  LocalHistoryValueNotifier get currentTab =>
+      DictionaryPageModel.readFrom(context).currentTab;
 
   void _updateTabController() {
     final TabController newController = DefaultTabController.of(context);
@@ -72,7 +75,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     super.didChangeDependencies();
     _updateTabController();
     if (shouldInit) {
-      currentIndex.addListener(_onIndexChanged);
+      currentTab.addListener(_onIndexChanged);
     }
   }
 
@@ -81,16 +84,21 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     if (_controllerIsValid)
       _controller.animation.removeListener(_handleTabControllerAnimationTick);
     _controller = null;
-    currentIndex.removeListener(_onIndexChanged);
+    currentTab.removeListener(_onIndexChanged);
     super.dispose();
   }
 
   void _updateChildren() {
-    _childrenWithKey = KeyedSubtree.ensureUniqueKeysForList(widget.children);
+    _childrenWithKey = LinkedHashMap.fromEntries(widget.children.entries.map(
+      (entry) => MapEntry(
+        entry.key,
+        KeyedSubtree(key: ValueKey(entry.key), child: entry.value),
+      ),
+    ));
   }
 
   void _handleTabControllerAnimationTick() {
-    currentIndex.value = _controller.index;
+    currentTab.value = widget.children.keys.toList()[_controller.index];
   }
 
   @override
@@ -105,15 +113,28 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     }());
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 200),
-      child: _childrenWithKey[currentIndex.value],
+      reverseDuration: Duration(milliseconds: 1000),
+      transitionBuilder: _getTransition,
+      child: _childrenWithKey[currentTab.value],
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Interval(0.0, 0.1),
     );
   }
 
   _onIndexChanged() {
     DictionaryPageModel.readFrom(context).onTabChanged();
-    if (_controller.index != currentIndex.value) {
-      _controller.animateTo(currentIndex.value);
+    if (_controller.index != currentTab.value) {
+      _controller.animateTo(DictionaryTab.values.indexOf(currentTab.value));
     }
     setState(() {});
   }
+
+  Widget _getTransition(Widget child, Animation<double> animation) =>
+      SlideTransition(
+        position: Tween(
+          begin: Offset(0, -1.0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      );
 }

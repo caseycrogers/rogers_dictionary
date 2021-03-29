@@ -1,12 +1,14 @@
-const String ENTRIES_DB = "entriesDB";
 const String ENGLISH = "English";
 const String SPANISH = "Spanish";
-const String ENTRIES = "entries";
+const String ENTRIES_DB = "entriesV0_1_0";
 
 // Column/field names.
 const URL_ENCODED_HEADWORD = 'url_encoded_headword';
 const HEADWORD = 'headword';
 const ENTRY_ID = 'entry_id';
+const ENTRY_BLOB = 'entry_blob';
+
+const IS_FAVORITE = 'is_favorite';
 
 const RUN_ON_PARENTS = 'run_on_parents';
 const RUN_ON_TEXT = 'run_on_text';
@@ -33,6 +35,19 @@ const EDITORIAL_NOTE = 'editorial_note';
 
 const KEYWORD_LIST = 'keyword_list';
 const ORDER_BY_FIELD = 'order_by_field';
+
+// Dialogue constants.
+const String DIALOGUES_DB = "dialoguesV0_1_0";
+const String DIALOGUES_TABLE = "dialogues";
+const DIALOGUE_BLOB = 'dialogue_blob';
+
+const DIALOGUE_ID = 'dialogue_id';
+const ENGLISH_CHAPTER = 'english_chapter';
+const SPANISH_CHAPTER = 'spanish_chapter';
+const ENGLISH_SUBCHAPTER = 'english_subchapter';
+const SPANISH_SUBCHAPTER = 'spanish_subchapter';
+const ENGLISH_CONTENT = 'english_content';
+const SPANISH_CONTENT = 'spanish_content';
 
 // Misc.
 const WITHOUT_DIACRITICAL_MARKS = '_without_diacritical_marks';
