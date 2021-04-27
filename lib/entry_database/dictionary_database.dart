@@ -1,17 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:rogers_dictionary/entry_database/dialogue.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 
 import 'entry.dart';
 
 // A database interface for fetching dictionary entries.
-abstract class EntryDatabase {
+abstract class DictionaryDatabase {
   Map<String, bool> _englishFavoritesCache;
   Map<String, bool> _spanishFavoritesCache;
 
-  EntryDatabase()
+  DictionaryDatabase()
       : _englishFavoritesCache = {},
         _spanishFavoritesCache = {};
 
@@ -37,6 +38,12 @@ abstract class EntryDatabase {
   bool isFavorite(TranslationMode translationMode, String urlEncodedHeadword) {
     return _getCache(translationMode)[urlEncodedHeadword];
   }
+
+  Stream<Dialogue> getDialogues({
+    @required int startAfter,
+    String englishChapter,
+    String englishSubChapter,
+  });
 
   Map<String, bool> _getCache(TranslationMode translationMode) =>
       translationMode == TranslationMode.English

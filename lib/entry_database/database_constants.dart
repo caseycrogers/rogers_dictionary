@@ -1,6 +1,6 @@
 const String ENGLISH = "English";
 const String SPANISH = "Spanish";
-const String ENTRIES_DB = "entriesV0_1_0";
+const String DICTIONARY_DB = "dictionaryV0_1_0";
 
 // Column/field names.
 const URL_ENCODED_HEADWORD = 'url_encoded_headword';
@@ -37,7 +37,6 @@ const KEYWORD_LIST = 'keyword_list';
 const ORDER_BY_FIELD = 'order_by_field';
 
 // Dialogue constants.
-const String DIALOGUES_DB = "dialoguesV0_1_0";
 const String DIALOGUES_TABLE = "dialogues";
 const DIALOGUE_BLOB = 'dialogue_blob';
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/about_page.dart';
+import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_tab_entry.dart';
 import 'favorites_page.dart';
@@ -13,7 +14,7 @@ import 'search_page.dart';
 enum DictionaryTab {
   search,
   favorites,
-  dialogue,
+  dialogues,
   about,
   settings,
 }
@@ -31,7 +32,7 @@ class DictionaryPage extends StatelessWidget {
         children: LinkedHashMap.from({
           DictionaryTab.search: SearchPage(),
           DictionaryTab.favorites: FavoritesPage(),
-          DictionaryTab.dialogue: Container(color: Colors.orange),
+          DictionaryTab.dialogues: DialoguesPage(),
           DictionaryTab.about: AboutPage(),
           DictionaryTab.settings: Container(color: Colors.green),
         }),
