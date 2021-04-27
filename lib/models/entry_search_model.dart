@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
@@ -13,7 +13,7 @@ class EntrySearchModel with ChangeNotifier {
   SearchSettingsModel _searchSettingsModel;
   Stream<Entry> _entryStream;
   LinkedHashSet<Entry> _entries;
-  ScrollController _scrollController;
+  double initialScrollOffset;
   bool _favoritesOnly;
 
   String get searchString => _searchString;
@@ -24,8 +24,6 @@ class EntrySearchModel with ChangeNotifier {
 
   List<Entry> get entries => _entries.toList();
 
-  ScrollController get scrollController => _scrollController;
-
   bool get isEmpty => _searchString.isEmpty;
 
   bool get favoritesOnly => _favoritesOnly;
@@ -35,10 +33,12 @@ class EntrySearchModel with ChangeNotifier {
       this._searchString,
       this._searchSettingsModel,
       this._entries,
-      this._scrollController,
+      this.initialScrollOffset,
       this._favoritesOnly) {
     _initializeStream();
   }
+
+  void resetStream() => _initializeStream();
 
   void _initializeStream() {
     Stream<Entry> stream;
@@ -57,15 +57,12 @@ class EntrySearchModel with ChangeNotifier {
         print('WARNING: added duplicate entry ${entry.urlEncodedHeadword}. '
             'Set:\n${_entries.toList()}');
       return entry;
-    });
-    _scrollController = ScrollController(
-        initialScrollOffset:
-            _scrollController.hasClients ? _scrollController.offset : 0.0);
+    }).asBroadcastStream();
   }
 
   EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
       : this._(translationMode, '', SearchSettingsModel.empty(),
-            LinkedHashSet(), ScrollController(), favoritesOnly);
+            LinkedHashSet(), 0.0, favoritesOnly);
 
   void onSearchStringChanged({
     String newSearchString,
@@ -81,9 +78,7 @@ class EntrySearchModel with ChangeNotifier {
     _favoritesOnly = newBookmarksOnly ?? _favoritesOnly;
     _entries = LinkedHashSet();
     _initializeStream();
-    _scrollController = ScrollController();
+    initialScrollOffset = 0.0;
     notifyListeners();
   }
-
-  void resetStream() => _initializeStream();
 }

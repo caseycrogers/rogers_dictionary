@@ -6,14 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
+import 'package:rogers_dictionary/entry_database/dialogue.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
-import 'package:rogers_dictionary/entry_database/entry_database.dart';
+import 'package:rogers_dictionary/entry_database/dictionary_database.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqfliteDatabase extends EntryDatabase {
+class SqfliteDatabase extends DictionaryDatabase {
   Future<Database> _dbFuture = _getDatabase();
 
   // We need an int that represents no string match and is larger than any
@@ -109,6 +110,38 @@ class SqfliteDatabase extends EntryDatabase {
     return entry;
   }
 
+  Dialogue _rowToDialogue(Map<String, dynamic> snapshot) {
+    if (snapshot == null) return null;
+    return Dialogue.fromJson(snapshot[DIALOGUE_BLOB]);
+  }
+
+  @override
+  Stream<Dialogue> getDialogues({
+    @required int startAfter,
+    String englishChapter,
+    String englishSubChapter,
+  }) async* {
+    var db = await _dbFuture;
+    int offset = startAfter;
+    while (true) {
+      var query = '''
+    SELECT *
+    FROM $DIALOGUES_TABLE
+    ORDER BY $DIALOGUE_ID ASC
+    LIMIT 20
+    OFFSET $offset;
+      ''';
+      var snapshot = await db.rawQuery(query);
+      if (snapshot.isEmpty) {
+        return;
+      }
+      for (final dialogue in snapshot.map((snap) => _rowToDialogue(snap))) {
+        yield dialogue;
+        offset++;
+      }
+    }
+  }
+
   Stream<Entry> _getEntries(
     TranslationMode translationMode, {
     @required String searchString,
@@ -116,8 +149,8 @@ class SqfliteDatabase extends EntryDatabase {
     @required SearchSettingsModel searchOptions,
     @required bool favoritesOnly,
   }) async* {
-    int offset = startAfter;
     var db = await _dbFuture;
+    int offset = startAfter;
     String orderByClause;
     final suffix = searchOptions.ignoreAccents ? WITHOUT_DIACRITICAL_MARKS : '';
     if (searchOptions.ignoreAccents)
@@ -167,7 +200,7 @@ AND url_encoded_headword > "$startAfter"''';
 
 Future<Database> _getDatabase() async {
   var databasesPath = await getDatabasesPath();
-  var path = join(databasesPath, "$ENTRIES_DB.db");
+  var path = join(databasesPath, "$DICTIONARY_DB.db");
 
   // Check if the database exists
   var exists = await databaseExists(path);
@@ -184,7 +217,7 @@ Future<Database> _getDatabase() async {
     }
 
     // Copy from asset
-    ByteData data = await rootBundle.load(join("assets", "$ENTRIES_DB.db"));
+    ByteData data = await rootBundle.load(join("assets", "$DICTIONARY_DB.db"));
     List<int> bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 

@@ -122,7 +122,6 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   }
 
   _onIndexChanged() {
-    DictionaryPageModel.readFrom(context).onTabChanged();
     if (_controller.index != currentTab.value) {
       _controller.animateTo(DictionaryTab.values.indexOf(currentTab.value));
     }

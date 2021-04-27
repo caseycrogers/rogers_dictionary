@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
@@ -11,14 +12,15 @@ import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:rogers_dictionary/util/list_utils.dart';
 
-const ROGERS_DICTIONARY =
-    'C:\\Users\\Waffl\\Documents\\code\\rogers_dictionary';
 const WARNING = '(WARN):';
 const ERROR = '(ERROR):';
 
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
-  var filePath = join(ROGERS_DICTIONARY, 'lib', 'scripts',
-      'entry_database-${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv');
+  var filePath = join(
+    'lib',
+    'scripts',
+    'entry_database-${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv',
+  );
   print('Uploading: $filePath.');
   var df = await DataFrame.fromCsv(filePath);
 
@@ -137,7 +139,7 @@ Future<void> _uploadSqlFlite(
   bool debug,
   bool verbose,
 ) async {
-  final path = join(ROGERS_DICTIONARY, 'assets', ENTRIES_DB);
+  final path = join(Directory.current.path, 'assets', '$DICTIONARY_DB.db');
   print('Writing to: $path.');
   sqfliteFfiInit();
   var db = await databaseFactoryFfi.openDatabase(path);
