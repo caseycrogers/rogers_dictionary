@@ -32,6 +32,10 @@ class EntryList extends StatelessWidget {
                     color: Colors.grey,
                   )),
             );
+          final controller = ScrollController(
+              initialScrollOffset: entrySearchModel.initialScrollOffset);
+          controller.addListener(
+              () => entrySearchModel.initialScrollOffset = controller.offset);
           return AsyncListView<Entry>(
             noResultsWidgetBuilder: (context) => Container(
               child: Padding(
@@ -53,7 +57,7 @@ class EntryList extends StatelessWidget {
               child: LoadingText(),
             ),
             itemBuilder: _buildRow,
-            controller: entrySearchModel.scrollController,
+            controller: controller,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           );
         },

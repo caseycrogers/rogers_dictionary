@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
@@ -29,6 +30,8 @@ int translationModeToIndex(TranslationMode translationMode) {
 class DictionaryPageModel {
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
+
+  final DialoguesPageModel dialoguesPageModel;
 
   final LocalHistoryValueNotifier<TranslationPageModel>
       currTranslationPageModel;
@@ -59,7 +62,8 @@ class DictionaryPageModel {
       context.read<DictionaryPageModel>();
 
   DictionaryPageModel._(this.currentTab, this.currTranslationPageModel,
-      this.englishPageModel, this.spanishPageModel);
+      this.englishPageModel, this.spanishPageModel)
+      : dialoguesPageModel = DialoguesPageModel.empty();
 
   static DictionaryPageModel empty(BuildContext context) {
     var englishPage = TranslationPageModel.empty(
@@ -97,8 +101,6 @@ class DictionaryPageModel {
       urlEncodedHeadword: newEntry.urlEncodedHeadword,
       entry: Future.value(newEntry),
     );
-    _getPageModel(_currModel, isFavoritesModel).entrySearchModel.resetStream();
-    _getPageModel(_oppModel, isFavoritesModel).entrySearchModel.resetStream();
   }
 
   SearchPageModel _getPageModel(
@@ -120,8 +122,6 @@ class DictionaryPageModel {
           ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
           : null,
     );
-    _getPageModel(_currModel, isFavoritesModel).entrySearchModel.resetStream();
-    _getPageModel(_oppModel, isFavoritesModel).entrySearchModel.resetStream();
   }
 
   void onSearchChanged(
@@ -135,17 +135,6 @@ class DictionaryPageModel {
           newSearchString: newSearchString,
           newSearchSettings: newSearchSettings,
         );
-  }
-
-  void onTabChanged() {
-    if (currentTab.previousValue == DictionaryTab.search) {
-      _currModel.searchPageModel.entrySearchModel.resetStream();
-      _oppModel.searchPageModel.entrySearchModel.resetStream();
-    }
-    if (currentTab.previousValue == DictionaryTab.favorites) {
-      _currModel.favoritesPageModel.entrySearchModel.resetStream();
-      _oppModel.favoritesPageModel.entrySearchModel.resetStream();
-    }
   }
 }
 

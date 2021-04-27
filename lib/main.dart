@@ -7,7 +7,7 @@ import 'package:rogers_dictionary/entry_database/sqflite_database.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/search_page.dart';
 
-import 'entry_database/entry_database.dart';
+import 'entry_database/dictionary_database.dart';
 import 'pages/page_router.dart';
 
 final Color englishPrimary = Colors.indigo.shade600;
@@ -32,7 +32,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
-  static final EntryDatabase db = SqfliteDatabase();
+  static final DictionaryDatabase db = SqfliteDatabase();
   static RenderBox topRenderObject;
 
   @override
