@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
-import 'package:rogers_dictionary/entry_database/dialogue.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/entry_database/dictionary_database.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
@@ -110,13 +110,13 @@ class SqfliteDatabase extends DictionaryDatabase {
     return entry;
   }
 
-  Dialogue _rowToDialogue(Map<String, dynamic> snapshot) {
+  DialogueChapter _rowToDialogue(Map<String, dynamic> snapshot) {
     if (snapshot == null) return null;
-    return Dialogue.fromJson(snapshot[DIALOGUE_BLOB]);
+    return DialogueChapter.fromJson(jsonDecode(snapshot[DIALOGUE_BLOB]));
   }
 
   @override
-  Stream<Dialogue> getDialogues({
+  Stream<DialogueChapter> getDialogues({
     @required int startAfter,
     String englishChapter,
     String englishSubChapter,

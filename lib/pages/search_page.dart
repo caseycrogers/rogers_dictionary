@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/entry_search_page.dart';
+import 'package:rogers_dictionary/widgets/entry_search_page.dart';
+import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
 class SearchPage extends StatelessWidget {
   static const String route = 'search';
@@ -10,6 +11,6 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EntrySearchPage();
+    return TranslationModeSwitcher(child: EntrySearchPage());
   }
 }

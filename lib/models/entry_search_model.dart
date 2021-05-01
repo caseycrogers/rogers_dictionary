@@ -13,7 +13,6 @@ class EntrySearchModel with ChangeNotifier {
   SearchSettingsModel _searchSettingsModel;
   Stream<Entry> _entryStream;
   LinkedHashSet<Entry> _entries;
-  double initialScrollOffset;
   bool _favoritesOnly;
 
   String get searchString => _searchString;
@@ -28,13 +27,8 @@ class EntrySearchModel with ChangeNotifier {
 
   bool get favoritesOnly => _favoritesOnly;
 
-  EntrySearchModel._(
-      this._translationMode,
-      this._searchString,
-      this._searchSettingsModel,
-      this._entries,
-      this.initialScrollOffset,
-      this._favoritesOnly) {
+  EntrySearchModel._(this._translationMode, this._searchString,
+      this._searchSettingsModel, this._entries, this._favoritesOnly) {
     _initializeStream();
   }
 
@@ -43,7 +37,6 @@ class EntrySearchModel with ChangeNotifier {
   void _initializeStream() {
     Stream<Entry> stream;
     if (_favoritesOnly) {
-      _entries = LinkedHashSet();
       stream =
           MyApp.db.getFavorites(_translationMode, startAfter: entries.length);
     } else {
@@ -52,7 +45,9 @@ class EntrySearchModel with ChangeNotifier {
           startAfter: entries.length,
           searchOptions: searchSettingsModel);
     }
-    _entryStream = stream.map((entry) {
+    _entryStream = stream
+        .handleError((error) => print('ERROR (entry stream): $error'))
+        .map((entry) {
       if (!_entries.add(entry))
         print('WARNING: added duplicate entry ${entry.urlEncodedHeadword}. '
             'Set:\n${_entries.toList()}');
@@ -62,7 +57,7 @@ class EntrySearchModel with ChangeNotifier {
 
   EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
       : this._(translationMode, '', SearchSettingsModel.empty(),
-            LinkedHashSet(), 0.0, favoritesOnly);
+            LinkedHashSet(), favoritesOnly);
 
   void onSearchStringChanged({
     String newSearchString,
@@ -78,7 +73,6 @@ class EntrySearchModel with ChangeNotifier {
     _favoritesOnly = newBookmarksOnly ?? _favoritesOnly;
     _entries = LinkedHashSet();
     _initializeStream();
-    initialScrollOffset = 0.0;
     notifyListeners();
   }
 }

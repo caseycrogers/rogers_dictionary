@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
-import 'package:rogers_dictionary/entry_database/dialogue.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 
 import 'package:args/args.dart';
 import 'package:df/df.dart';
@@ -23,12 +23,11 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
   var df = await DataFrame.fromCsv(filePath);
 
   var rows = df.rows.map((row) => row.map(_parseCell));
-  String englishChapter;
-  String spanishChapter;
-  String englishSubchapter;
-  String spanishSubchapter;
+  String englishSubChapter;
+  String spanishSubChapter;
+  DialogueChapterBuilder builder;
 
-  List<Dialogue> dialogues = [];
+  List<DialogueChapterBuilder> builders = [];
   var i = 0;
 
   while (rows.elementAt(i)[ENGLISH_CHAPTER] != 'START') {
@@ -40,6 +39,7 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
     i++;
   }
   i++;
+  var builderCount = 0;
   while (i < rows.length) {
     if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
     Map<String, String> row = rows.elementAt(i);
@@ -49,45 +49,49 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
       continue;
     }
     if (row[ENGLISH_CHAPTER].isNotEmpty) {
-      if (row[SPANISH_CHAPTER].isEmpty ||
-          row[ENGLISH_SUBCHAPTER].isEmpty ||
-          row[SPANISH_SUBCHAPTER].isEmpty) {
+      if (row[SPANISH_CHAPTER].isEmpty) {
         print(
             '$ERROR Invalid empty cells for \'${row[ENGLISH_CHAPTER]}\' at row ${i + 2}, skipping.');
         i += 1;
         row = rows.elementAt(i);
-        while (row[ENGLISH_CHAPTER].isEmpty) {
+        while (row[ENGLISH_CHAPTER].isEmpty && i + 1 < rows.length) {
           i += 1;
           row = rows.elementAt(i);
         }
         continue;
       }
-      englishChapter = row[ENGLISH_CHAPTER];
-      spanishChapter = row[SPANISH_CHAPTER];
-      englishSubchapter = row[ENGLISH_SUBCHAPTER];
-      spanishSubchapter = row[SPANISH_SUBCHAPTER];
+      builder = DialogueChapterBuilder(
+        chapterId: builderCount++,
+        englishTitle: row[ENGLISH_CHAPTER],
+        spanishTitle: row[SPANISH_CHAPTER],
+      );
+      builders.add(builder);
+      englishSubChapter = row[ENGLISH_SUBCHAPTER];
+      spanishSubChapter = row[SPANISH_SUBCHAPTER];
+    } else {
+      if (row[ENGLISH_SUBCHAPTER].isNotEmpty) {
+        englishSubChapter = row[ENGLISH_SUBCHAPTER];
+        spanishSubChapter = row[SPANISH_SUBCHAPTER];
+      }
+      builder.addDialogue(
+        englishSubChapter,
+        spanishSubChapter,
+        row[ENGLISH_CONTENT],
+        row[SPANISH_CONTENT],
+      );
     }
-    dialogues.add(Dialogue(
-      dialogueId: i + 2,
-      englishChapter: englishChapter,
-      spanishChapter: spanishChapter,
-      englishSubChapter: englishSubchapter,
-      spanishSubChapter: spanishSubchapter,
-      englishContent: row[ENGLISH_CONTENT],
-      spanishContent: row[SPANISH_CONTENT],
-    ));
     i++;
   }
-  assert(dialogues.isNotEmpty, "Did not generate any dialogues!");
+  assert(builders.isNotEmpty, "Did not generate any dialogues!");
   return _uploadSqlFlite(
-    dialogues,
+    builders.map((b) => b.build()).toList(),
     debug,
     verbose,
   );
 }
 
 Future<void> _uploadSqlFlite(
-  List<Dialogue> dialogues,
+  List<DialogueChapter> dialogueChapters,
   bool debug,
   bool verbose,
 ) async {
@@ -105,10 +109,10 @@ Future<void> _uploadSqlFlite(
     $DIALOGUE_BLOB STRING NOT NULL
   )''');
   var batch = db.batch();
-  for (final dialogue in dialogues) {
+  for (final chapter in dialogueChapters) {
     var dialogueRecord = {
-      DIALOGUE_ID: dialogue.dialogueId,
-      DIALOGUE_BLOB: jsonEncode(dialogue.toJson()),
+      DIALOGUE_ID: chapter.chapterId,
+      DIALOGUE_BLOB: jsonEncode(chapter.toJson()),
     };
     if (verbose) print(dialogueRecord);
     batch.insert(DIALOGUES_TABLE, dialogueRecord);

@@ -55,7 +55,7 @@ class DictionaryPage extends StatelessWidget {
                   unselected: Icon(Icons.star, size: 26.0),
                   index: 1),
               DictionaryTabEntry(
-                  selected: Text('Dialogue', style: TextStyle(fontSize: 24.0)),
+                  selected: Text('Dialogues', style: TextStyle(fontSize: 24.0)),
                   unselected: Icon(Icons.message, size: 26.0),
                   index: 2),
               DictionaryTabEntry(

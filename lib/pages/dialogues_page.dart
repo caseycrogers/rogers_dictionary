@@ -1,23 +1,19 @@
-import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/entry_database/dialogue.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/widgets/dialogues_page/selected_dialogue_switcher.dart';
+import 'package:rogers_dictionary/widgets/top_shadow.dart';
+import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
 class DialoguesPage extends StatelessWidget {
+  static const route = 'dialogues';
+
+  static bool matchesUri(Uri uri) => uri.pathSegments.contains(route);
+
   @override
   Widget build(BuildContext context) {
-    var dialoguesPageModel = DictionaryPageModel.of(context).dialoguesPageModel;
-    return Material(
-      elevation: 0.0,
-      color: Theme.of(context).cardColor,
-      child: AsyncListView<Dialogue>(
-        stream: dialoguesPageModel.dialogueStream,
-        itemBuilder: (context, dialogues, index) {
-          return Text(dialogues.data[index].englishContent);
-        },
-      ),
+    return TranslationModeSwitcher(
+      child: TopShadow(child: SelectedDialogueSwitcher()),
     );
   }
 }

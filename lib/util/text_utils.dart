@@ -3,12 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
-import 'package:rogers_dictionary/widgets/favorites_button.dart';
+import 'package:rogers_dictionary/widgets/buttons/favorites_button.dart';
 
 import 'overflow_markdown.dart';
 
 TextStyle headline1(BuildContext context) =>
     Theme.of(context).textTheme.headline1.copyWith(fontWeight: FontWeight.bold);
+
+TextStyle headline2(BuildContext context) =>
+    Theme.of(context).textTheme.headline2;
 
 TextStyle normal1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1;
@@ -18,6 +21,26 @@ TextStyle bold1(BuildContext context) =>
 
 TextStyle italic1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1.copyWith(fontStyle: FontStyle.italic);
+
+Widget headline1Text(BuildContext context, String text) => Text(
+      text,
+      style: headline1(context),
+    );
+
+Widget headline2Text(BuildContext context, String text) => Text(
+      text,
+      style: headline2(context),
+    );
+
+Widget normal1Text(BuildContext context, String text) => Text(
+      text,
+      style: normal1(context),
+    );
+
+Widget bold1Text(BuildContext context, String text) => Text(
+      text,
+      style: bold1(context),
+    );
 
 class Indent extends StatelessWidget {
   final Widget child;

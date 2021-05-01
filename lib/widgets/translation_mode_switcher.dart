@@ -1,16 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 
 import 'dictionary_bottom_navigation_bar.dart';
 
 class TranslationModeSwitcher extends StatelessWidget {
-  final Widget englishChild;
-  final Widget spanishChild;
+  final Widget child;
 
-  TranslationModeSwitcher(
-      {@required this.englishChild, @required this.spanishChild});
+  TranslationModeSwitcher({@required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -48,15 +47,21 @@ class TranslationModeSwitcher extends StatelessWidget {
       onPageChanged: (index) => DictionaryPageModel.readFrom(context)
           .onTranslationModeChanged(indexToTranslationMode(index)),
       children: [
-        Theme(
-          data: Theme.of(context)
-              .copyWith(primaryColor: primaryColor(TranslationMode.English)),
-          child: englishChild,
+        Provider<TranslationPageModel>.value(
+          value: dictionaryModel.englishPageModel,
+          builder: (context, _) => Theme(
+            data: Theme.of(context)
+                .copyWith(primaryColor: primaryColor(TranslationMode.English)),
+            child: child,
+          ),
         ),
-        Theme(
-          data: Theme.of(context)
-              .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
-          child: spanishChild,
+        Provider<TranslationPageModel>.value(
+          value: dictionaryModel.spanishPageModel,
+          builder: (context, _) => Theme(
+            data: Theme.of(context)
+                .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
+            child: child,
+          ),
         ),
       ],
     );

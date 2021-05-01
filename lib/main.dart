@@ -52,8 +52,8 @@ class MyApp extends StatelessWidget {
                   color: Colors.black,
                   fontWeight: FontWeight.bold),
               headline2: GoogleFonts.openSans(
-                  fontSize: 22.0,
-                  color: Colors.black54,
+                  color: Colors.black,
+                  fontSize: 28.0,
                   fontWeight: FontWeight.bold),
               bodyText1: GoogleFonts.openSans(
                   fontSize: 24.0, fontWeight: FontWeight.normal),
