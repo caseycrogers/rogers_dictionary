@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
-import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
+import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 enum TranslationMode {
@@ -30,8 +30,6 @@ int translationModeToIndex(TranslationMode translationMode) {
 class DictionaryPageModel {
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
-
-  final DialoguesPageModel dialoguesPageModel;
 
   final LocalHistoryValueNotifier<TranslationPageModel>
       currTranslationPageModel;
@@ -55,6 +53,8 @@ class DictionaryPageModel {
           ? spanishPageModel
           : englishPageModel;
 
+  bool get isEnglish => currTranslationPageModel.value.isEnglish;
+
   static DictionaryPageModel of(BuildContext context) =>
       context.select<DictionaryPageModel, DictionaryPageModel>((mdl) => mdl);
 
@@ -62,8 +62,7 @@ class DictionaryPageModel {
       context.read<DictionaryPageModel>();
 
   DictionaryPageModel._(this.currentTab, this.currTranslationPageModel,
-      this.englishPageModel, this.spanishPageModel)
-      : dialoguesPageModel = DialoguesPageModel.empty();
+      this.englishPageModel, this.spanishPageModel);
 
   static DictionaryPageModel empty(BuildContext context) {
     var englishPage = TranslationPageModel.empty(
@@ -146,6 +145,8 @@ class TranslationPageModel {
 
   final SearchPageModel favoritesPageModel;
 
+  final DialoguesPageModel dialoguesPageModel;
+
   bool get isEnglish => translationMode == TranslationMode.English;
 
   factory TranslationPageModel.empty(
@@ -166,7 +167,11 @@ class TranslationPageModel {
           context: context,
           translationMode: translationMode,
           isFavoritesOnly: true,
-        );
+        ),
+        dialoguesPageModel = DialoguesPageModel.empty(context);
+
+  static TranslationPageModel of(BuildContext context) =>
+      context.select<TranslationPageModel, TranslationPageModel>((mdl) => mdl);
 }
 
 class SearchPageModel {

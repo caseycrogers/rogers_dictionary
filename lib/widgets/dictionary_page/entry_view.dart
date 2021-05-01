@@ -1,11 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
+import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/page_header.dart';
 
 class EntryView extends StatelessWidget {
   final Entry _entry;
@@ -32,33 +36,12 @@ class EntryView extends StatelessWidget {
                     delay: Duration(milliseconds: 50),
                   );
                 var entry = snap.data;
-                const pad = 24.0;
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4.0, left: 4.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _iconButton(context),
-                          Expanded(
-                              child: headwordLine(context, entry, false,
-                                  searchPageModel.searchString)),
-                        ],
-                      ),
-                    ),
-                    Divider(indent: pad, endIndent: pad, height: 0.0),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: pad, right: pad, bottom: pad),
-                          child: EntryView._instance(entry, false),
-                        ),
-                      ),
-                    ),
-                  ],
+                return PageHeader(
+                  header: headwordLine(
+                      context, entry, false, searchPageModel.searchString),
+                  child: EntryView._instance(entry, false),
+                  onClose: () => DictionaryPageModel.readFrom(context)
+                      .onHeadwordSelected(context, ''),
                 );
               },
             ),
@@ -67,20 +50,6 @@ class EntryView extends StatelessWidget {
       );
 
   static Widget asPreview(Entry entry) => EntryView._instance(entry, true);
-
-  static Widget _iconButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: IconButton(
-        icon: Icon(
-          Icons.close,
-          color: Theme.of(context).accentIconTheme.color,
-        ),
-        onPressed: () => DictionaryPageModel.readFrom(context)
-            .onHeadwordSelected(context, ''),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

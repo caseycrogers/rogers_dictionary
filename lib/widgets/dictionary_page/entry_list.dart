@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:core';
 
 import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
-import 'dart:core';
+import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 
 class EntryList extends StatelessWidget {
   @override
@@ -32,11 +33,10 @@ class EntryList extends StatelessWidget {
                     color: Colors.grey,
                   )),
             );
-          final controller = ScrollController(
-              initialScrollOffset: entrySearchModel.initialScrollOffset);
-          controller.addListener(
-              () => entrySearchModel.initialScrollOffset = controller.offset);
           return AsyncListView<Entry>(
+            // Maintains scroll state
+            key: PageStorageKey(
+                'entry_list-tab${DictionaryPageModel.of(context).currentTab.value.index}'),
             noResultsWidgetBuilder: (context) => Container(
               child: Padding(
                 padding: EdgeInsets.all(30.0),
@@ -57,7 +57,6 @@ class EntryList extends StatelessWidget {
               child: LoadingText(),
             ),
             itemBuilder: _buildRow,
-            controller: controller,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           );
         },
@@ -85,10 +84,7 @@ class EntryList extends StatelessWidget {
                     child: Row(
                       children: [
                         Expanded(child: EntryView.asPreview(entry)),
-                        Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          color: Theme.of(context).accentIconTheme.color,
-                        ),
+                        OpenPage(),
                       ],
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     ),
@@ -106,13 +102,4 @@ class EntryList extends StatelessWidget {
           );
         },
       );
-
-  BoxDecoration _shadowDecoration(BuildContext context, bool isSelected) {
-    if (!isSelected) return BoxDecoration(color: Theme.of(context).cardColor);
-    return BoxDecoration(boxShadow: [
-      BoxShadow(
-        color: Theme.of(context).selectedRowColor,
-      ),
-    ]);
-  }
 }

@@ -1,36 +1,50 @@
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/entry_database/dialogue.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 
 class DialoguesPageModel {
-  final LinkedHashSet<Dialogue> _dialogues;
-  ScrollController _scrollController = ScrollController();
-  Stream<Dialogue> dialogueStream;
+  // All static because these can be shared across both translation modes.
+  static final LinkedHashSet<DialogueChapter> _dialogues = LinkedHashSet();
+  static Stream<DialogueChapter> _dialogueStream;
 
-  ScrollController get scrollController => _scrollController;
+  final LocalHistoryValueNotifier<DialogueChapter> selectedChapter;
 
-  List<Dialogue> get dialogues => _dialogues.toList();
+  DialogueSubChapter selectedSubChapter;
 
-  DialoguesPageModel._() : this._dialogues = LinkedHashSet() {
+  List<DialogueChapter> get dialogues => _dialogues.toList();
+
+  Stream<DialogueChapter> get dialogueStream => _dialogueStream;
+
+  DialoguesPageModel._(this.selectedChapter) {
     _initializeStream();
   }
 
-  static DialoguesPageModel empty() => DialoguesPageModel._();
+  static DialoguesPageModel empty(BuildContext context) =>
+      DialoguesPageModel._(LocalHistoryValueNotifier(
+        modalRoute: ModalRoute.of(context),
+        initialValue: null,
+      ));
 
-  void _initializeStream() {
-    Stream<Dialogue> stream;
-    stream = MyApp.db.getDialogues(startAfter: 0);
-    _dialogues.clear();
-    dialogueStream = stream.map((dialogue) {
+  static void _initializeStream() {
+    if (_dialogueStream != null) return;
+    Stream<DialogueChapter> stream;
+    stream = MyApp.db.getDialogues(startAfter: _dialogues.length);
+    _dialogueStream = stream.handleError((error, StackTrace stackTrace) {
+      print('ERROR (dialogue stream): $error\n$stackTrace');
+    }).map((dialogue) {
       if (!_dialogues.add(dialogue))
-        print('WARNING: added duplicate dialogue ${dialogue.englishContent}. '
+        print('WARNING: added duplicate dialogue ${dialogue.englishTitle}. '
             'Set:\n${_dialogues.toList()}');
       return dialogue;
     }).asBroadcastStream();
-    _scrollController = ScrollController(
-        initialScrollOffset:
-            _scrollController.hasClients ? _scrollController.offset : 0.0);
+  }
+
+  void onChapterSelected(
+      DialogueChapter newChapter, DialogueSubChapter newSubChapter) {
+    selectedChapter.value = newChapter;
+    selectedSubChapter = newSubChapter;
   }
 }

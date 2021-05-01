@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
-import 'package:rogers_dictionary/util/local_history_value_notifier.dart';
+import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 
 class DictionaryTabBarView extends StatefulWidget {
   /// Creates a page view with one child per tab.

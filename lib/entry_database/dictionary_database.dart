@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:rogers_dictionary/entry_database/dialogue.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 
@@ -39,7 +39,7 @@ abstract class DictionaryDatabase {
     return _getCache(translationMode)[urlEncodedHeadword];
   }
 
-  Stream<Dialogue> getDialogues({
+  Stream<DialogueChapter> getDialogues({
     @required int startAfter,
     String englishChapter,
     String englishSubChapter,

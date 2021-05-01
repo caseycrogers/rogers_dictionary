@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/entry_search_page.dart';
 import 'package:rogers_dictionary/widgets/top_shadow.dart';
+import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
 class FavoritesPage extends StatelessWidget {
   static const route = 'favorites';
@@ -22,6 +23,10 @@ class FavoritesPage extends StatelessWidget {
         .favoritesPageModel
         .entrySearchModel
         .resetStream();
-    return Builder(builder: (context) => TopShadow(child: EntrySearchPage()));
+    return TranslationModeSwitcher(
+      child: TopShadow(
+        child: EntrySearchPage(),
+      ),
+    );
   }
 }
