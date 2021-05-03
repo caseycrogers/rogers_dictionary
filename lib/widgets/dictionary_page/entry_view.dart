@@ -4,11 +4,10 @@ import 'package:flutter/rendering.dart';
 
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
-import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/page_header.dart';
 
 class EntryView extends StatelessWidget {

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 
 import 'entry.dart';
 

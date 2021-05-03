@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/dictionary_navigator/animated_listenable_switcher.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
 
