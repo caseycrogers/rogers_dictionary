@@ -6,7 +6,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 import 'package:rogers_dictionary/models/dialogues_page_model.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/page_header.dart';
@@ -60,8 +60,10 @@ class _ChapterViewState extends State<ChapterView> {
             Padding(
                 child: _dialoguesList(dialoguesModel),
                 padding: EdgeInsets.symmetric(horizontal: PAD)),
-            IgnorePointer(
-              ignoring: !_isExpanded,
+            GestureDetector(
+              onTap: () => setState(() {
+                _isExpanded = false;
+              }),
               child: AnimatedContainer(
                 color: _isExpanded ? Colors.black38 : Colors.transparent,
                 duration: Duration(milliseconds: 50),
@@ -88,37 +90,39 @@ class _ChapterViewState extends State<ChapterView> {
             .keys
             .map((i) => MapEntry(subChapter, i)))
         .toList();
+    print(
+        '${widget.chapter.title(context)}_${widget.initialSubChapter?.title(context) ?? ''}');
     return ScrollablePositionedList.builder(
+      key: PageStorageKey(widget.chapter.title(context) +
+          (widget.initialSubChapter?.title(context) ?? '')),
       initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
       itemPositionsListener: _itemPositionsListener,
       itemScrollController: _itemScrollController,
       itemCount: widget.chapter.subChapters.fold<int>(
           0, (sum, subChapter) => sum += subChapter.dialogues.length),
-      itemBuilder: (context, index) {
-        return Builder(
-          builder: (BuildContext context) {
-            var subChapter = subChapterAndDialogue[index].key;
-            var dialogueIndex = subChapterAndDialogue[index].value;
-            var dialogue =
-                subChapterAndDialogue[index].key.dialogues[dialogueIndex];
-            var dialogueTile = ListTile(
-              title: bold1Text(context, dialogue.content(context)),
-              subtitle: Text(dialogue.oppositeContent(context)),
-              tileColor: dialogueIndex % 2 == 0
-                  ? Colors.grey.shade200
-                  : Colors.transparent,
+      itemBuilder: (context, index) => Builder(
+        builder: (BuildContext context) {
+          var subChapter = subChapterAndDialogue[index].key;
+          var dialogueIndex = subChapterAndDialogue[index].value;
+          var dialogue =
+              subChapterAndDialogue[index].key.dialogues[dialogueIndex];
+          var dialogueTile = ListTile(
+            title: bold1Text(context, dialogue.content(context)),
+            subtitle: Text(dialogue.oppositeContent(context)),
+            tileColor: dialogueIndex % 2 == 0
+                ? Colors.grey.shade200
+                : Colors.transparent,
+          );
+          if (dialogueIndex == 0 && widget.chapter.hasSubChapters)
+            return Column(
+              children: [
+                _subchapterTile(context, subChapter, padding: 0.0),
+                dialogueTile,
+              ],
             );
-            if (dialogueIndex == 0 && widget.chapter.hasSubChapters)
-              return Column(
-                children: [
-                  _subchapterTile(context, subChapter, padding: 0.0),
-                  dialogueTile,
-                ],
-              );
-            return dialogueTile;
-          },
-        );
-      },
+          return dialogueTile;
+        },
+      ),
     );
   }
 

@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:rogers_dictionary/dictionary_navigator/animated_listenable_switcher.dart';
 import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/widgets/dialogues_page/chapter_view.dart';
 import 'package:rogers_dictionary/widgets/dialogues_page/chapter_list.dart';
 

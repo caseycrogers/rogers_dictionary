@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 
 extension TranslatableChapter on DialogueChapter {
   String title(BuildContext context) =>

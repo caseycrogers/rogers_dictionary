@@ -1,21 +1,16 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dialogues_page_model.dart';
-import 'package:rogers_dictionary/models/entry_search_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
-
-enum TranslationMode {
-  English,
-  Spanish,
-}
 
 const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
@@ -135,105 +130,6 @@ class DictionaryPageModel {
           newSearchSettings: newSearchSettings,
         );
   }
-}
-
-class TranslationPageModel {
-  // Translation mode state.
-  final TranslationMode translationMode;
-
-  final SearchPageModel searchPageModel;
-
-  final SearchPageModel favoritesPageModel;
-
-  final DialoguesPageModel dialoguesPageModel;
-
-  bool get isEnglish => translationMode == TranslationMode.English;
-
-  factory TranslationPageModel.empty(
-          {@required BuildContext context,
-          @required TranslationMode translationMode}) =>
-      TranslationPageModel._(
-          context: context, translationMode: translationMode);
-
-  TranslationPageModel._({
-    @required BuildContext context,
-    @required this.translationMode,
-  })  : searchPageModel = SearchPageModel.empty(
-          context: context,
-          translationMode: translationMode,
-          isFavoritesOnly: false,
-        ),
-        favoritesPageModel = SearchPageModel.empty(
-          context: context,
-          translationMode: translationMode,
-          isFavoritesOnly: true,
-        ),
-        dialoguesPageModel = DialoguesPageModel.empty(context);
-
-  static TranslationPageModel of(BuildContext context) =>
-      context.select<TranslationPageModel, TranslationPageModel>((mdl) => mdl);
-}
-
-class SearchPageModel {
-  // Translation mode state.
-  final TranslationMode translationMode;
-
-  // Selected entry state.
-  final LocalHistoryValueNotifier<SelectedEntry> currSelectedEntry;
-
-  // Entry search state
-  final EntrySearchModel entrySearchModel;
-
-  bool get isEnglish => translationMode == TranslationMode.English;
-
-  bool get hasSelection => currSelectedEntry.value.hasSelection;
-
-  String get searchString => entrySearchModel.searchString;
-
-  bool get hasSearchString => entrySearchModel.searchString.isNotEmpty;
-
-  String get currSelectedHeadword => currSelectedEntry.value.urlEncodedHeadword;
-
-  static SearchPageModel of(BuildContext context) =>
-      context.select<SearchPageModel, SearchPageModel>((mdl) => mdl);
-
-  static SearchPageModel readFrom(BuildContext context) =>
-      context.read<SearchPageModel>();
-
-  factory SearchPageModel.empty({
-    @required BuildContext context,
-    @required TranslationMode translationMode,
-    @required bool isFavoritesOnly,
-  }) =>
-      SearchPageModel._(
-        translationMode: translationMode,
-        currSelectedEntry: LocalHistoryValueNotifier(
-          modalRoute: ModalRoute.of(context),
-          initialValue: SelectedEntry.empty(),
-        ),
-        entrySearchModel:
-            EntrySearchModel.empty(translationMode, isFavoritesOnly),
-      );
-
-  SearchPageModel._({
-    @required this.translationMode,
-    @required this.currSelectedEntry,
-    @required this.entrySearchModel,
-  });
-}
-
-class SelectedEntry {
-  final String urlEncodedHeadword;
-  final Future<Entry> entry;
-
-  SelectedEntry({@required this.urlEncodedHeadword, @required this.entry});
-
-  static SelectedEntry empty() => SelectedEntry(
-        urlEncodedHeadword: '',
-        entry: null,
-      );
-
-  bool get hasSelection => urlEncodedHeadword.isNotEmpty;
 }
 
 bool isFavoritesOnly(BuildContext context) =>
