@@ -20,7 +20,9 @@ class TranslationPageModel {
 
   final SearchPageModel favoritesPageModel;
 
-  final DialoguesPageModel dialoguesPageModel;
+  static DialoguesPageModel _dialoguesPageModel;
+
+  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 
@@ -42,8 +44,11 @@ class TranslationPageModel {
           context: context,
           translationMode: translationMode,
           isFavoritesOnly: true,
-        ),
-        dialoguesPageModel = DialoguesPageModel.empty(context);
+        ) {
+    if (TranslationPageModel._dialoguesPageModel == null)
+      TranslationPageModel._dialoguesPageModel =
+          DialoguesPageModel.empty(context);
+  }
 
   static TranslationPageModel of(BuildContext context) =>
       context.select<TranslationPageModel, TranslationPageModel>((mdl) => mdl);

@@ -9,8 +9,9 @@ import 'dictionary_bottom_navigation_bar.dart';
 
 class TranslationModeSwitcher extends StatelessWidget {
   final Widget child;
+  final bool maintainState;
 
-  TranslationModeSwitcher({@required this.child});
+  TranslationModeSwitcher({@required this.child, this.maintainState = true});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class TranslationModeSwitcher extends StatelessWidget {
       );
     });
     return PageView(
-      allowImplicitScrolling: true,
+      allowImplicitScrolling: maintainState,
       controller: controller,
       onPageChanged: (index) => DictionaryPageModel.readFrom(context)
           .onTranslationModeChanged(indexToTranslationMode(index)),
