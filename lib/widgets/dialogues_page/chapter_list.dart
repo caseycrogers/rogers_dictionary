@@ -8,7 +8,6 @@ import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
-import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
 class ChapterList extends StatelessWidget {
@@ -59,7 +58,7 @@ class ChapterList extends StatelessWidget {
       );
 
   PageStorageKey _getKey(BuildContext context, DialogueChapter dialogue) =>
-      PageStorageKey(dialogue.title(context));
+      PageStorageKey(dialogue.englishTitle);
 
   Widget _clickableHeader(
     BuildContext context,
@@ -70,23 +69,10 @@ class ChapterList extends StatelessWidget {
     var dialoguesModel = TranslationPageModel.of(context).dialoguesPageModel;
     return ListTile(
       minLeadingWidth: 0.0,
-      leading: isSubHeader
-          ? Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationY(pi),
-              child: Icon(Icons.keyboard_return),
-            )
-          : null,
-      title: Row(
-        children: [
-          Expanded(
-            child: bold1Text(
-              context,
-              subChapter?.title(context) ?? chapter.title(context),
-            ),
-          ),
-          OpenPage(),
-        ],
+      leading: isSubHeader ? indentIcon() : null,
+      title: bold1Text(
+        context,
+        subChapter?.title(context) ?? chapter.title(context),
       ),
       subtitle: Text(
           subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context)),
@@ -94,3 +80,9 @@ class ChapterList extends StatelessWidget {
     );
   }
 }
+
+Widget indentIcon() => Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.rotationY(pi),
+      child: Icon(Icons.keyboard_return),
+    );

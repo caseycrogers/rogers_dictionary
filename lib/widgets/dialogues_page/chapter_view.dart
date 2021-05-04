@@ -15,30 +15,60 @@ class ChapterView extends StatefulWidget {
   final DialogueChapter chapter;
   final DialogueSubChapter initialSubChapter;
 
-  ChapterView({@required this.chapter, this.initialSubChapter});
+  ChapterView({@required this.chapter, this.initialSubChapter})
+      : super(key: PageStorageKey(chapter.englishTitle));
 
   @override
   _ChapterViewState createState() => _ChapterViewState();
 }
 
 class _ChapterViewState extends State<ChapterView> {
-  ValueNotifier<DialogueSubChapter> currentSubChapter;
+  static const String _kExpandedStateString = 'is_expanded';
+  bool _internalIsExpanded;
+  bool _inProgrammaticScroll = false;
 
-  bool _isExpanded = false;
+  bool get _isExpanded => _internalIsExpanded;
 
-  ItemScrollController _itemScrollController = ItemScrollController();
-  ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
+  set _isExpanded(bool value) {
+    _internalIsExpanded = value;
+    PageStorage.of(context).writeState(context, _internalIsExpanded,
+        identifier: _kExpandedStateString);
+  }
+
+  ItemScrollController _scrollController = ItemScrollController();
+  ItemPositionsListener _scrollListener = ItemPositionsListener.create();
+
+  ValueNotifier<DialogueSubChapter> _currentSubChapter;
+  final ValueNotifier<double> _subChapterProgress = ValueNotifier(0.0);
+
+  List<MapEntry<DialogueSubChapter, int>> _subChapterAndDialogueIndex;
 
   @override
   void initState() {
-    currentSubChapter = ValueNotifier(widget.initialSubChapter);
-    _itemPositionsListener.itemPositions.addListener(() {
-      // We cannot scroll while the menu is expanded so this means the scrolling
-      // is driven by menu selection.
-      if (_isExpanded) return;
-      currentSubChapter.value = _indexToSubChapter(
-          _itemPositionsListener.itemPositions.value.first.index);
+    _internalIsExpanded = (PageStorage.of(context).readState(
+          context,
+          identifier: _kExpandedStateString,
+        ) as bool) ??
+        false;
+    _currentSubChapter = ValueNotifier(widget.initialSubChapter);
+    _scrollListener.itemPositions.addListener(() {
+      // Don't update during programmatic scrolling.
+      if (_inProgrammaticScroll) return;
+      var position = _scrollListener.itemPositions.value
+          .reduce((a, b) => a.index < b.index ? a : b);
+      var lastPosition = _scrollListener.itemPositions.value
+          .reduce((a, b) => a.index > b.index ? a : b);
+      var subChapterAndProgress =
+          _subChapterAndProgress(position, lastPosition);
+      _currentSubChapter.value = subChapterAndProgress.key;
+      _subChapterProgress.value = subChapterAndProgress.value;
     });
+    _subChapterAndDialogueIndex = widget.chapter.subChapters
+        .expand((subChapter) => subChapter.dialogues
+            .asMap()
+            .keys
+            .map((i) => MapEntry(subChapter, i)))
+        .toList();
     super.initState();
   }
 
@@ -57,19 +87,34 @@ class _ChapterViewState extends State<ChapterView> {
         ),
         child: Stack(
           children: [
-            Padding(
-                child: _dialoguesList(dialoguesModel),
-                padding: EdgeInsets.symmetric(horizontal: PAD)),
-            GestureDetector(
-              onTap: () => setState(() {
-                _isExpanded = false;
-              }),
-              child: AnimatedContainer(
-                color: _isExpanded ? Colors.black38 : Colors.transparent,
-                duration: Duration(milliseconds: 50),
+            Column(
+              children: [
+                // Ghost tile to push down the scrolling view.
+                if (widget.chapter.hasSubChapters)
+                  _subchapterTile(context, widget.chapter.subChapters.first),
+                if (widget.chapter.hasSubChapters) _progressIndicator(),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: PAD),
+                    child: _dialoguesList(dialoguesModel),
+                  ),
+                ),
+              ],
+            ),
+            IgnorePointer(
+              ignoring: _isExpanded ? false : true,
+              child: GestureDetector(
+                onTap: () => setState(() {
+                  _isExpanded = false;
+                }),
+                child: AnimatedContainer(
+                  color: _isExpanded ? Colors.black38 : Colors.transparent,
+                  duration: Duration(milliseconds: 50),
+                ),
               ),
             ),
             if (widget.chapter.hasSubChapters) _subChapterSelector(),
+            if (!widget.chapter.hasSubChapters) _progressIndicator(),
             if (widget.chapter.hasSubChapters)
               Container(
                 width: double.infinity,
@@ -83,54 +128,10 @@ class _ChapterViewState extends State<ChapterView> {
     );
   }
 
-  Widget _dialoguesList(DialoguesPageModel dialoguesModel) {
-    var subChapterAndDialogue = widget.chapter.subChapters
-        .expand((subChapter) => subChapter.dialogues
-            .asMap()
-            .keys
-            .map((i) => MapEntry(subChapter, i)))
-        .toList();
-    print(
-        '${widget.chapter.title(context)}_${widget.initialSubChapter?.title(context) ?? ''}');
-    return ScrollablePositionedList.builder(
-      key: PageStorageKey(widget.chapter.title(context) +
-          (widget.initialSubChapter?.title(context) ?? '')),
-      initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
-      itemPositionsListener: _itemPositionsListener,
-      itemScrollController: _itemScrollController,
-      itemCount: widget.chapter.subChapters.fold<int>(
-          0, (sum, subChapter) => sum += subChapter.dialogues.length),
-      itemBuilder: (context, index) => Builder(
-        builder: (BuildContext context) {
-          var subChapter = subChapterAndDialogue[index].key;
-          var dialogueIndex = subChapterAndDialogue[index].value;
-          var dialogue =
-              subChapterAndDialogue[index].key.dialogues[dialogueIndex];
-          var dialogueTile = ListTile(
-            title: bold1Text(context, dialogue.content(context)),
-            subtitle: Text(dialogue.oppositeContent(context)),
-            tileColor: dialogueIndex % 2 == 0
-                ? Colors.grey.shade200
-                : Colors.transparent,
-          );
-          if (dialogueIndex == 0 && widget.chapter.hasSubChapters)
-            return Column(
-              children: [
-                _subchapterTile(context, subChapter, padding: 0.0),
-                dialogueTile,
-              ],
-            );
-          return dialogueTile;
-        },
-      ),
-    );
-  }
-
-  Widget _subChapterSelector() => SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: ValueListenableBuilder(
-          valueListenable: currentSubChapter,
-          builder: (context, _, child) => ExpansionPanelList(
+  Widget _subChapterSelector() => ValueListenableBuilder(
+        valueListenable: _currentSubChapter,
+        builder: (context, _, child) => SingleChildScrollView(
+          child: ExpansionPanelList(
             expansionCallback: (index, _) {
               assert(index == 0,
                   'There should only ever be a single element in this list');
@@ -148,10 +149,10 @@ class _ChapterViewState extends State<ChapterView> {
                   title: _isExpanded
                       ? Container()
                       : headline2Text(
-                          context, currentSubChapter.value.title(context)),
+                          context, _currentSubChapter.value.title(context)),
                   subtitle: _isExpanded
                       ? Container()
-                      : Text(currentSubChapter.value.oppositeTitle(context)),
+                      : Text(_currentSubChapter.value.oppositeTitle(context)),
                 ),
                 body: Column(
                   children: widget.chapter.subChapters
@@ -159,18 +160,23 @@ class _ChapterViewState extends State<ChapterView> {
                         (subChapter) => _subchapterTile(
                           context,
                           subChapter,
-                          isSelected: subChapter == currentSubChapter.value,
-                          onTap: () =>
-                              Future.delayed(Duration(milliseconds: 50))
-                                  .then((_) {
-                            currentSubChapter.value = subChapter;
-                            setState(() {
-                              _isExpanded = false;
+                          isSelected: subChapter == _currentSubChapter.value,
+                          onTap: () {
+                            _inProgrammaticScroll = true;
+                            _scrollController
+                                .scrollTo(
+                                  index: _subChapterToIndex(subChapter),
+                                  duration: Duration(milliseconds: 100),
+                                )
+                                .then((_) => _inProgrammaticScroll = false);
+                            return Future.delayed(Duration(milliseconds: 50))
+                                .then((_) {
+                              _currentSubChapter.value = subChapter;
+                              setState(() {
+                                _isExpanded = false;
+                              });
                             });
-                            return _itemScrollController.jumpTo(
-                              index: _subChapterToIndex(subChapter),
-                            );
-                          }),
+                          },
                         ),
                       )
                       .toList(),
@@ -178,6 +184,56 @@ class _ChapterViewState extends State<ChapterView> {
               ),
             ],
           ),
+        ),
+      );
+
+  Widget _dialoguesList(DialoguesPageModel dialoguesModel) {
+    return Builder(
+      builder: (BuildContext context) {
+        return ScrollablePositionedList.builder(
+          key: PageStorageKey(widget.chapter.englishTitle +
+              (widget.initialSubChapter?.englishTitle ?? '')),
+          initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
+          itemPositionsListener: _scrollListener,
+          itemScrollController: _scrollController,
+          itemCount: widget.chapter.subChapters.fold<int>(
+              0, (sum, subChapter) => sum += subChapter.dialogues.length),
+          itemBuilder: (context, index) => Builder(
+            builder: (context) {
+              var subChapter = _subChapterAndDialogueIndex[index].key;
+              var dialogueIndex = _subChapterAndDialogueIndex[index].value;
+              var dialogue = _subChapterAndDialogueIndex[index]
+                  .key
+                  .dialogues[dialogueIndex];
+              var dialogueTile = ListTile(
+                title: bold1Text(context, dialogue.content(context)),
+                subtitle: Text(dialogue.oppositeContent(context)),
+                tileColor: dialogueIndex % 2 == 0
+                    ? Colors.grey.shade200
+                    : Colors.transparent,
+              );
+              if (dialogueIndex + 1 == subChapter.dialogues.length &&
+                  widget.chapter.hasSubChapters &&
+                  subChapter != widget.chapter.subChapters.last)
+                return Column(
+                  children: [
+                    dialogueTile,
+                    _subchapterTile(context, _nextSubChapter(subChapter),
+                        padding: 0.0),
+                  ],
+                );
+              return dialogueTile;
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _progressIndicator() => ValueListenableBuilder(
+        valueListenable: _subChapterProgress,
+        builder: (context, progress, _) => LinearProgressIndicator(
+          value: progress,
         ),
       );
 
@@ -198,17 +254,50 @@ class _ChapterViewState extends State<ChapterView> {
         onTap: onTap,
       );
 
-  DialogueSubChapter _indexToSubChapter(int index) {
-    int leftOver = index;
-    return widget.chapter.subChapters.firstWhere((subChapter) {
-      leftOver -= subChapter.dialogues.length;
-      return leftOver < 0;
+  MapEntry<DialogueSubChapter, double> _subChapterAndProgress(
+      ItemPosition first, ItemPosition last) {
+    var dialogueIndex = first.index;
+    var subChapter = widget.chapter.subChapters.firstWhere((subChapter) {
+      dialogueIndex -= subChapter.dialogues.length;
+      return dialogueIndex < 0;
     });
+    dialogueIndex += subChapter.dialogues.length;
+    var lastDialogueIndex = dialogueIndex + (last.index - first.index);
+    var isLast = subChapter == widget.chapter.subChapters.last;
+    var dialoguePercent = -first.itemLeadingEdge /
+        (first.itemTrailingEdge - first.itemLeadingEdge);
+    var lastDialoguePercent = 1 -
+        ((last.itemTrailingEdge - 1) /
+            (last.itemTrailingEdge - last.itemLeadingEdge));
+    var progress =
+        (dialogueIndex + dialoguePercent) / subChapter.dialogues.length;
+    var lastProgress =
+        (lastDialogueIndex + lastDialoguePercent) / subChapter.dialogues.length;
+    if (!isLast) return MapEntry(subChapter, progress);
+    return MapEntry(
+      subChapter,
+      _weightedAvg(
+        progress,
+        lastProgress,
+        lastProgress *
+            (dialogueIndex < 3 ? (dialogueIndex + dialoguePercent) / 3 : 1),
+      ),
+    );
   }
 
+  double _weightedAvg(double a, double b, double weight) =>
+      (1 - weight) * a + weight * b;
+
   int _subChapterToIndex(DialogueSubChapter subChapter) {
+    if (subChapter == null) return 0;
     return widget.chapter.subChapters
         .takeWhile((s) => s != subChapter)
         .fold(0, (sum, subChapter) => sum += subChapter.dialogues.length);
+  }
+
+  DialogueSubChapter _nextSubChapter(DialogueSubChapter subChapter) {
+    assert(subChapter != widget.chapter.subChapters.last);
+    return widget.chapter
+        .subChapters[widget.chapter.subChapters.indexOf(subChapter) + 1];
   }
 }

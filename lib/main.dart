@@ -33,11 +33,9 @@ void main() async {
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
   static final DictionaryDatabase db = SqfliteDatabase();
-  static RenderBox topRenderObject;
 
   @override
   Widget build(BuildContext context) {
-    topRenderObject = context.findRenderObject();
     return DefaultTabController(
       length: 5,
       child: MaterialApp(

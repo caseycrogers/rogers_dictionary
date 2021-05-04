@@ -4,9 +4,10 @@ import 'package:flutter/cupertino.dart';
 class OpenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: Theme.of(context).iconTheme.size,
-      height: Theme.of(context).iconTheme.size,
+    return Icon(
+      Icons.arrow_forward_ios_outlined,
+      color: Theme.of(context).accentIconTheme.color,
+      size: Theme.of(context).accentIconTheme.size,
     );
   }
 }
