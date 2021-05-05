@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,32 +39,35 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: MaterialApp(
-        title: 'Dictionary',
-        onGenerateRoute: PageRouter.generateRoute,
-        // TODO: Initial route breaks '#' navigation, refactor away from initial route?
-        initialRoute: '#/' + SearchPage.route,
-        theme: ThemeData(
-            textTheme: TextTheme(
-              headline1: GoogleFonts.openSans(
-                  fontSize: 36.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold),
-              headline2: GoogleFonts.openSans(
-                  color: Colors.black,
-                  fontSize: 28.0,
-                  fontWeight: FontWeight.bold),
-              bodyText1: GoogleFonts.openSans(
-                  fontSize: 24.0, fontWeight: FontWeight.normal),
-              bodyText2: GoogleFonts.openSans(
-                  fontSize: 20.0, fontWeight: FontWeight.normal),
-            ),
-            iconTheme: IconThemeData(color: Colors.white, size: 28),
-            accentIconTheme: IconThemeData(
-              size: 28,
-              color: Colors.black38,
-            ),
-            backgroundColor: Colors.white),
+      child: BetterFeedback(
+        onFeedback: (context, feedback, feedbackScreenshot) {},
+        child: MaterialApp(
+          title: 'Dictionary',
+          onGenerateRoute: PageRouter.generateRoute,
+          // TODO: Initial route breaks '#' navigation, refactor away from initial route?
+          initialRoute: '#/' + SearchPage.route,
+          theme: ThemeData(
+              textTheme: TextTheme(
+                headline1: GoogleFonts.openSans(
+                    fontSize: 36.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+                headline2: GoogleFonts.openSans(
+                    color: Colors.black,
+                    fontSize: 28.0,
+                    fontWeight: FontWeight.bold),
+                bodyText1: GoogleFonts.openSans(
+                    fontSize: 24.0, fontWeight: FontWeight.normal),
+                bodyText2: GoogleFonts.openSans(
+                    fontSize: 20.0, fontWeight: FontWeight.normal),
+              ),
+              iconTheme: IconThemeData(color: Colors.white, size: 28),
+              accentIconTheme: IconThemeData(
+                size: 28,
+                color: Colors.black38,
+              ),
+              backgroundColor: Colors.white),
+        ),
       ),
     );
   }
