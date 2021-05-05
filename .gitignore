@@ -9,6 +9,8 @@
 .history
 .svn/
 *.key
+*.db
+bfg-1.14.0.jar
 
 # IntelliJ related
 *.iml

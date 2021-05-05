@@ -49,13 +49,13 @@ class DictionaryPage extends StatelessWidget {
               elevation: kGroundElevation,
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: kPad / 2),
+                padding: EdgeInsets.symmetric(horizontal: kPad),
                 child: Column(
                   children: [
                     TabBar(
-                      labelPadding: EdgeInsets.all(kPad / 2)
-                          .add(EdgeInsets.only(bottom: kPad / 2)),
-                      indicatorPadding: EdgeInsets.only(bottom: kPad - 4),
+                      labelPadding: EdgeInsets.all(kPad)
+                          .add(EdgeInsets.only(bottom: kPad)),
+                      indicatorPadding: EdgeInsets.only(bottom: 2 * kPad - 4),
                       tabs: [
                         DictionaryTabEntry(
                             selected: Text('Dictionary',

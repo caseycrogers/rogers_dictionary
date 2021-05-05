@@ -16,7 +16,7 @@ class PageHeader extends StatelessWidget {
       @required this.child,
       @required this.onClose,
       this.scrollable = true,
-      this.padding = kPad});
+      this.padding = 2 * kPad});
 
   @override
   Widget build(BuildContext context) {

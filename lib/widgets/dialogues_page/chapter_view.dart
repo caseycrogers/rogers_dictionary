@@ -93,7 +93,7 @@ class _ChapterViewState extends State<ChapterView> {
               if (widget.chapter.hasSubChapters) _progressIndicator(),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: kPad),
+                  padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
                   child: _dialoguesList(dialoguesModel),
                 ),
               ),
@@ -234,7 +234,7 @@ class _ChapterViewState extends State<ChapterView> {
 
   Widget _subchapterTile(BuildContext context, DialogueSubChapter subChapter,
           {bool isSelected = false,
-          double padding = kPad,
+          double padding = 2 * kPad,
           VoidCallback onTap}) =>
       ListTile(
         tileColor: isSelected ? Theme.of(context).selectedRowColor : null,

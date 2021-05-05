@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
+import 'package:rogers_dictionary/widgets/buttons/feedback_button.dart';
 
 class DictionaryTopBar extends StatelessWidget {
   const DictionaryTopBar({Key key}) : super(key: key);
@@ -27,11 +29,7 @@ class DictionaryTopBar extends StatelessWidget {
                         fontSize: Theme.of(context).iconTheme.size),
                   ),
                 ),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(Icons.bug_report),
-                  onPressed: () {},
-                ),
+                FeedbackButton(),
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   icon: Icon(Icons.help),
