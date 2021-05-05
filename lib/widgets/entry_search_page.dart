@@ -6,9 +6,8 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/entry_view.dart';
-
-import 'dictionary_page/entry_search.dart';
+import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
+import 'package:rogers_dictionary/widgets/search_page/entry_search.dart';
 
 class EntrySearchPage extends StatelessWidget {
   @override

@@ -131,7 +131,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   Widget _getTransition(Widget child, Animation<double> animation) =>
       SlideTransition(
         position: Tween(
-          begin: Offset(0, -1.0),
+          begin: Offset(0, 1.0),
           end: Offset.zero,
         ).animate(animation),
         child: child,

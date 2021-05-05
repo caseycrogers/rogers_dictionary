@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 
 class SearchOptionsView extends StatelessWidget {
   final BuildContext _exteriorContext;
@@ -21,7 +22,7 @@ class SearchOptionsView extends StatelessWidget {
     return ChangeNotifierProvider.value(
       value: _entrySearchModel,
       builder: (context, _) => Material(
-        elevation: 4.0,
+        elevation: kHighElevation,
         child: Selector<EntrySearchModel, SearchSettingsModel>(
           selector: (_, entrySearch) => entrySearch.searchSettingsModel,
           builder: (context, settingsModel, _) => Column(

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/transitions.dart';
+import 'package:rogers_dictionary/widgets/search_page/transitions.dart';
 
 class AnimatedListenableSwitcher<T> extends StatelessWidget {
   final ValueListenable<T> valueListenable;

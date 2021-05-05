@@ -8,7 +8,7 @@ import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/page_header.dart';
+import 'package:rogers_dictionary/widgets/search_page/page_header.dart';
 
 class EntryView extends StatelessWidget {
   final Entry _entry;
