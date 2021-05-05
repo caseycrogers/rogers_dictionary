@@ -14,7 +14,11 @@ class TranslationModeSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(child: pages(context), elevation: kHighElevation);
+    return Material(
+      color: Theme.of(context).cardColor,
+      child: pages(context),
+      elevation: kHighElevation,
+    );
   }
 
   Widget pages(BuildContext context) {

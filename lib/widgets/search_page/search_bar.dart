@@ -37,7 +37,7 @@ class _SearchBarState extends State<SearchBar> {
     final dictionaryModel = DictionaryPageModel.of(context);
     final searchPageModel = SearchPageModel.of(context);
     return Material(
-      color: searchPageModel.isEnglish ? englishPrimary : spanishPrimary,
+      color: primaryColor(searchPageModel.translationMode),
       child: Padding(
         padding: EdgeInsets.all(8.0).subtract(EdgeInsets.only(right: 8.0)),
         child: Row(

@@ -22,28 +22,25 @@ class EntryView extends StatelessWidget {
           var searchPageModel = SearchPageModel.of(context);
           if (!searchPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
-          return Material(
-            color: Theme.of(context).cardColor,
-            child: FutureBuilder(
-              future: searchPageModel.currSelectedEntry.value.entry,
-              builder: (context, AsyncSnapshot<Entry> snap) {
-                if (!snap.hasData)
-                  // Only display if loading is slow.
-                  return Delayed(
-                    initialChild: Container(),
-                    child: Container(),
-                    delay: Duration(milliseconds: 50),
-                  );
-                var entry = snap.data;
-                return PageHeader(
-                  header: headwordLine(
-                      context, entry, false, searchPageModel.searchString),
-                  child: EntryView._instance(entry, false),
-                  onClose: () => DictionaryPageModel.readFrom(context)
-                      .onHeadwordSelected(context, ''),
+          return FutureBuilder(
+            future: searchPageModel.currSelectedEntry.value.entry,
+            builder: (context, AsyncSnapshot<Entry> snap) {
+              if (!snap.hasData)
+                // Only display if loading is slow.
+                return Delayed(
+                  initialChild: Container(),
+                  child: Container(),
+                  delay: Duration(milliseconds: 50),
                 );
-              },
-            ),
+              var entry = snap.data;
+              return PageHeader(
+                header: headwordLine(
+                    context, entry, false, searchPageModel.searchString),
+                child: EntryView._instance(entry, false),
+                onClose: () => DictionaryPageModel.readFrom(context)
+                    .onHeadwordSelected(context, ''),
+              );
+            },
           );
         },
       );
