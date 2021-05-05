@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -15,16 +14,12 @@ class ChapterList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var dialoguesModel = TranslationPageModel.of(context);
-    return Material(
-      elevation: kGroundElevation,
-      color: Theme.of(context).backgroundColor,
-      child: AsyncListView<DialogueChapter>(
-        key: PageStorageKey('dialogues'),
-        padding: EdgeInsets.zero,
-        initialData: dialoguesModel.dialoguesPageModel.dialogues,
-        stream: dialoguesModel.dialoguesPageModel.dialogueStream,
-        itemBuilder: _buildTopic,
-      ),
+    return AsyncListView<DialogueChapter>(
+      key: PageStorageKey('dialogues'),
+      padding: EdgeInsets.zero,
+      initialData: dialoguesModel.dialoguesPageModel.dialogues,
+      stream: dialoguesModel.dialoguesPageModel.dialogueStream,
+      itemBuilder: _buildTopic,
     );
   }
 
