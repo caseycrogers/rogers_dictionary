@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 3,
       child: MaterialApp(
         title: 'Dictionary',
         onGenerateRoute: PageRouter.generateRoute,

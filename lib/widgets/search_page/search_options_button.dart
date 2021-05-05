@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:rogers_dictionary/widgets/dictionary_page/search_options_view.dart';
+import 'package:rogers_dictionary/widgets/search_page/search_options_view.dart';
 
 class SearchOptionsButton extends StatefulWidget {
   @override

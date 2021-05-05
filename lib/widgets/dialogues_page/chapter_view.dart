@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/page_header.dart';
+import 'package:rogers_dictionary/widgets/search_page/page_header.dart';
 
 class ChapterView extends StatefulWidget {
   final DialogueChapter chapter;
@@ -95,7 +95,7 @@ class _ChapterViewState extends State<ChapterView> {
                 if (widget.chapter.hasSubChapters) _progressIndicator(),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: PAD),
+                    padding: const EdgeInsets.symmetric(horizontal: kPad),
                     child: _dialoguesList(dialoguesModel),
                   ),
                 ),
@@ -118,7 +118,7 @@ class _ChapterViewState extends State<ChapterView> {
             if (widget.chapter.hasSubChapters)
               Container(
                 width: double.infinity,
-                height: PAD / 2,
+                height: kPad / 2,
                 color: Theme.of(context).backgroundColor,
               ),
           ],
@@ -139,7 +139,7 @@ class _ChapterViewState extends State<ChapterView> {
                 _isExpanded = !_isExpanded;
               });
             },
-            elevation: 0,
+            elevation: kGroundElevation.toInt(),
             expandedHeaderPadding: EdgeInsets.zero,
             children: [
               ExpansionPanel(
@@ -239,7 +239,7 @@ class _ChapterViewState extends State<ChapterView> {
 
   Widget _subchapterTile(BuildContext context, DialogueSubChapter subChapter,
           {bool isSelected = false,
-          double padding = PAD,
+          double padding = kPad,
           VoidCallback onTap}) =>
       ListTile(
         tileColor: isSelected ? Theme.of(context).selectedRowColor : null,

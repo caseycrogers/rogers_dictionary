@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-
-import 'dictionary_bottom_navigation_bar.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 
 class TranslationModeSwitcher extends StatelessWidget {
   final Widget child;
@@ -15,13 +14,7 @@ class TranslationModeSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(child: Material(child: pages(context), elevation: 4.0)),
-        DictionaryBottomNavigationBar(),
-      ],
-    );
+    return Material(child: pages(context), elevation: kHighElevation);
   }
 
   Widget pages(BuildContext context) {

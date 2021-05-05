@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
-import 'file:///C:/Users/Waffl/Documents/code/rogers_dictionary/lib/widgets/entry_search_page.dart';
-import 'package:rogers_dictionary/widgets/top_shadow.dart';
+import 'package:rogers_dictionary/widgets/entry_search_page.dart';
 import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
 class FavoritesPage extends StatelessWidget {
@@ -24,9 +23,7 @@ class FavoritesPage extends StatelessWidget {
         .entrySearchModel
         .resetStream();
     return TranslationModeSwitcher(
-      child: TopShadow(
-        child: EntrySearchPage(),
-      ),
+      child: EntrySearchPage(),
     );
   }
 }

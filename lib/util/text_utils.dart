@@ -22,24 +22,24 @@ TextStyle bold1(BuildContext context) =>
 TextStyle italic1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText1.copyWith(fontStyle: FontStyle.italic);
 
-Widget headline1Text(BuildContext context, String text) => Text(
+Text headline1Text(BuildContext context, String text, {Color color}) => Text(
       text,
-      style: headline1(context),
+      style: headline1(context).copyWith(color: color),
     );
 
-Widget headline2Text(BuildContext context, String text) => Text(
+Text headline2Text(BuildContext context, String text, {Color color}) => Text(
       text,
-      style: headline2(context),
+      style: headline2(context).copyWith(color: color),
     );
 
-Widget normal1Text(BuildContext context, String text) => Text(
+Text normal1Text(BuildContext context, String text, {Color color}) => Text(
       text,
-      style: normal1(context),
+      style: normal1(context).copyWith(color: color),
     );
 
-Widget bold1Text(BuildContext context, String text) => Text(
+Text bold1Text(BuildContext context, String text, {Color color}) => Text(
       text,
-      style: bold1(context),
+      style: bold1(context).copyWith(color: color),
     );
 
 class Indent extends StatelessWidget {
