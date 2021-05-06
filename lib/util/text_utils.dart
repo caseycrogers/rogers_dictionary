@@ -7,46 +7,52 @@ import 'package:rogers_dictionary/widgets/buttons/favorites_button.dart';
 
 import 'overflow_markdown.dart';
 
-TextStyle headline1(BuildContext context) =>
-    Theme.of(context).textTheme.headline1.copyWith(fontWeight: FontWeight.bold);
+TextStyle headline1(BuildContext context) => Theme.of(context)
+    .textTheme
+    .headline1!
+    .copyWith(fontWeight: FontWeight.bold);
 
 TextStyle headline2(BuildContext context) =>
-    Theme.of(context).textTheme.headline2;
+    Theme.of(context).textTheme.headline2!;
 
 TextStyle normal1(BuildContext context) =>
-    Theme.of(context).textTheme.bodyText1;
+    Theme.of(context).textTheme.bodyText1!;
 
-TextStyle bold1(BuildContext context) =>
-    Theme.of(context).textTheme.bodyText1.copyWith(fontWeight: FontWeight.bold);
+TextStyle bold1(BuildContext context) => Theme.of(context)
+    .textTheme
+    .bodyText1!
+    .copyWith(fontWeight: FontWeight.bold);
 
-TextStyle italic1(BuildContext context) =>
-    Theme.of(context).textTheme.bodyText1.copyWith(fontStyle: FontStyle.italic);
+TextStyle italic1(BuildContext context) => Theme.of(context)
+    .textTheme
+    .bodyText1!
+    .copyWith(fontStyle: FontStyle.italic);
 
-Text headline1Text(BuildContext context, String text, {Color color}) => Text(
+Text headline1Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: headline1(context).copyWith(color: color),
     );
 
-Text headline2Text(BuildContext context, String text, {Color color}) => Text(
+Text headline2Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: headline2(context).copyWith(color: color),
     );
 
-Text normal1Text(BuildContext context, String text, {Color color}) => Text(
+Text normal1Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: normal1(context).copyWith(color: color),
     );
 
-Text bold1Text(BuildContext context, String text, {Color color}) => Text(
+Text bold1Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: bold1(context).copyWith(color: color),
     );
 
 class Indent extends StatelessWidget {
   final Widget child;
-  final double size;
+  final double? size;
 
-  Indent({@required this.child, this.size});
+  Indent({required this.child, this.size});
 
   @override
   Widget build(BuildContext context) =>
@@ -54,7 +60,7 @@ class Indent extends StatelessWidget {
 }
 
 Widget headwordText(BuildContext context, String text, bool preview,
-    {@required String searchString}) {
+    {required String searchString}) {
   return OverflowMarkdown(
     text,
     defaultStyle: preview ? bold1(context) : headline1(context),
@@ -63,8 +69,7 @@ Widget headwordText(BuildContext context, String text, bool preview,
 }
 
 List<OverrideStyle> _highlightSearchMatch(
-    BuildContext context, String text, bool preview, String searchString,
-    {bool ignoreSymbols}) {
+    BuildContext context, String text, bool preview, String searchString) {
   var overrideStart = text.searchable.indexOf(searchString.searchable);
   if (!preview || searchString.isEmpty || overrideStart == -1) return [];
   return [
@@ -73,14 +78,13 @@ List<OverrideStyle> _highlightSearchMatch(
           backgroundColor: Theme.of(context).accentColor.withOpacity(.25)),
       start: overrideStart,
       stop: overrideStart + searchString.length,
-      ignoreSymbols: ignoreSymbols,
     )
   ];
 }
 
 Widget abbreviationLine(
-    BuildContext context, String text, bool preview, String searchString) {
-  if (text.isEmpty) return Container();
+    BuildContext context, String? text, bool preview, String searchString) {
+  if (text == null) return Container();
   return OverflowMarkdown(
     '*abbr *$text',
     overrideStyles: _highlightSearchMatch(context, text, preview, searchString),
@@ -96,7 +100,7 @@ Widget alternateHeadwordLines(BuildContext context,
       Padding(
         child: Text('alt. ', style: italic1(context)),
         padding: EdgeInsets.only(
-            top: alternateHeadwords.first.parentheticalQualifier.isEmpty
+            top: alternateHeadwords.first.parentheticalQualifier == null
                 ? 0.0
                 : 7.0),
       ),
@@ -108,7 +112,7 @@ Widget alternateHeadwordLines(BuildContext context,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       OverflowMarkdown(
-                        '**${alt.headwordText}${alt.abbreviation.isEmpty ? '' : ' (${alt.abbreviation})'}**${_namingStandard(context, alt.namingStandard)}',
+                        '**${alt.headwordText}${alt.abbreviation == null ? '' : ' (${alt.abbreviation})'}**${_namingStandard(context, alt.namingStandard)}',
                         defaultStyle: normal1(context),
                         overflow: preview
                             ? TextOverflow.ellipsis
@@ -116,7 +120,7 @@ Widget alternateHeadwordLines(BuildContext context,
                         overrideStyles: _highlightSearchMatch(context,
                             '**${alt.headwordText}**', preview, searchString),
                       ),
-                      if (alt.parentheticalQualifier.isNotEmpty)
+                      if (alt.parentheticalQualifier == null)
                         Text(' ', style: normal1(context)),
                       parentheticalText(context, alt.parentheticalQualifier),
                     ],
@@ -128,16 +132,16 @@ Widget alternateHeadwordLines(BuildContext context,
   );
 }
 
-String _namingStandard(BuildContext context, String namingStandard) {
-  if (namingStandard.isEmpty) return '';
+String _namingStandard(BuildContext context, String? namingStandard) {
+  if (namingStandard == null) return '';
   if (namingStandard == 'i') namingStandard = 'INN';
   if (namingStandard == 'u') namingStandard = 'USAN';
   return ' ($namingStandard)';
 }
 
 Widget _translationParenthetical(
-    BuildContext context, String translationParenthetical) {
-  if (translationParenthetical.isNotEmpty)
+    BuildContext context, String? translationParenthetical) {
+  if (translationParenthetical != null)
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: Wrap(
@@ -169,20 +173,18 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
 Widget previewTranslationLine(
     BuildContext context, Translation translation, bool addEllipsis) {
   var text = translation.translationText;
-  if (translation.genderAndPlural.isNotEmpty)
+  if (translation.genderAndPlural != null)
     text += ' *${translation.genderAndPlural}*';
   if (addEllipsis) text += '...';
   return OverflowMarkdown(text);
 }
-
-String _addSpace(String text) => text.isEmpty ? text : ' $text';
 
 Widget translationLine(BuildContext context, Translation translation) {
   return Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
       OverflowMarkdown(translation.translationText, children: [
-        if (translation.genderAndPlural.isNotEmpty)
+        if (translation.genderAndPlural != null)
           ' *${translation.genderAndPlural}*',
         _namingStandard(context, translation.translationNamingStandard)
       ]),
@@ -192,8 +194,8 @@ Widget translationLine(BuildContext context, Translation translation) {
   );
 }
 
-Widget parentheticalText(BuildContext context, String text) {
-  if (text.isEmpty) return Container();
+Widget parentheticalText(BuildContext context, String? text) {
+  if (text == null) return Container();
   return DictionaryChip(
     child: Text(text, style: italic1(context)),
     color: Colors.cyan.shade100.withOpacity(.6),
@@ -248,12 +250,12 @@ Widget headwordLine(
           FavoritesButton(entry: entry),
           headwordText(
               context,
-              entry.headword.abbreviation.isEmpty
+              entry.headword.abbreviation == null
                   ? entry.headword.headwordText
                   : '${entry.headword.headwordText} (${entry.headword.abbreviation})',
               preview,
               searchString: searchString),
-          if (entry.headword.parentheticalQualifier.isNotEmpty)
+          if (entry.headword.parentheticalQualifier != null)
             Text(' ', style: normal1(context)),
           parentheticalText(context, entry.headword.parentheticalQualifier),
         ],

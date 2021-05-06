@@ -3,15 +3,20 @@ import 'package:flutter/material.dart';
 
 class OverflowMarkdown extends StatelessWidget {
   final String data;
-  final List<String> children;
-  final TextOverflow overflow;
-  final TextStyle defaultStyle;
-  final List<OverrideStyle> overrideStyles;
+  final List<String>? children;
+  final TextOverflow? overflow;
+  final TextStyle? defaultStyle;
+  final List<OverrideStyle>? overrideStyles;
 
   get fullText => data + (children?.join() ?? '');
 
-  OverflowMarkdown(this.data,
-      {this.children, this.overflow, this.defaultStyle, this.overrideStyles});
+  OverflowMarkdown(
+    this.data, {
+    this.children,
+    this.overflow,
+    this.defaultStyle,
+    this.overrideStyles,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,21 +24,22 @@ class OverflowMarkdown extends StatelessWidget {
     var isBold = false;
     var isItalic = false;
     var isSubscript = false;
-    TextStyle currOverrideStyle;
+    TextStyle? currOverrideStyle;
     var buff = StringBuffer();
     var i = 0;
     var charIndex = 0;
 
-    TextStyle getTextStyle() =>
-        (defaultStyle ?? Theme.of(context).textTheme.bodyText1)
-            .merge(currOverrideStyle?.copyWith(inherit: true))
-            .copyWith(
-              fontWeight: isBold ? FontWeight.bold : null,
-              fontStyle: isItalic ? FontStyle.italic : null,
-              fontSize: isSubscript
-                  ? Theme.of(context).textTheme.bodyText1.fontSize / 2
-                  : null,
-            );
+    TextStyle getTextStyle() {
+      final TextStyle baseStyle =
+          defaultStyle ?? Theme.of(context).textTheme.bodyText1!;
+      return baseStyle
+          .merge(currOverrideStyle?.copyWith(inherit: true))
+          .copyWith(
+            fontWeight: isBold ? FontWeight.bold : null,
+            fontStyle: isItalic ? FontStyle.italic : null,
+            fontSize: isSubscript ? baseStyle.fontSize! / 2 : null,
+          );
+    }
 
     void addSpan() {
       spans.add(TextSpan(
@@ -48,8 +54,12 @@ class OverflowMarkdown extends StatelessWidget {
         addSpan();
         currOverrideStyle = null;
       }
-      var startOverrideStyle = (overrideStyles ?? [])
-          .firstWhere((o) => o.matchesStart(i, charIndex), orElse: () => null);
+      // Cast is necessary so that `orElse` can return null.
+      final OverrideStyle? startOverrideStyle =
+          (overrideStyles ?? []).map((e) => e as OverrideStyle?).firstWhere(
+                (o) => o?.matchesStart(i, charIndex) ?? false,
+                orElse: () => null,
+              );
       if (startOverrideStyle != null) {
         addSpan();
         currOverrideStyle = startOverrideStyle.style;
@@ -102,18 +112,16 @@ class OverrideStyle {
   int stop;
   bool ignoreSymbols;
 
-  bool get _shouldIgnoreSymbols => ignoreSymbols ?? false;
-
-  OverrideStyle(
-      {@required this.style,
-      @required this.start,
-      @required this.stop,
-      this.ignoreSymbols})
-      : assert(start != stop);
+  OverrideStyle({
+    required this.style,
+    required this.start,
+    required this.stop,
+    this.ignoreSymbols = true,
+  }) : assert(start != stop);
 
   bool matchesStart(int index, int charIndex) =>
-      _shouldIgnoreSymbols ? charIndex == this.start : index == this.start;
+      ignoreSymbols ? charIndex == this.start : index == this.start;
 
   bool matchesStop(int index, int charIndex) =>
-      _shouldIgnoreSymbols ? charIndex == this.stop : index == this.stop;
+      ignoreSymbols ? charIndex == this.stop : index == this.stop;
 }

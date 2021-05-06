@@ -18,7 +18,6 @@ TranslationMode indexToTranslationMode(int index) =>
     TranslationMode.values[index];
 
 int translationModeToIndex(TranslationMode translationMode) {
-  assert(translationMode != null);
   return TranslationMode.values.indexOf(translationMode);
 }
 
@@ -43,11 +42,6 @@ class DictionaryPageModel {
 
   TranslationPageModel get _currModel => currTranslationPageModel.value;
 
-  TranslationPageModel get _oppModel =>
-      currTranslationPageModel.value.translationMode == TranslationMode.English
-          ? spanishPageModel
-          : englishPageModel;
-
   bool get isEnglish => currTranslationPageModel.value.isEnglish;
 
   static DictionaryPageModel of(BuildContext context) =>
@@ -66,10 +60,10 @@ class DictionaryPageModel {
         context: context, translationMode: TranslationMode.Spanish);
     return DictionaryPageModel._(
       LocalHistoryValueNotifier(
-          modalRoute: ModalRoute.of(context),
+          modalRoute: ModalRoute.of(context)!,
           initialValue: DictionaryTab.search),
       LocalHistoryValueNotifier(
-          modalRoute: ModalRoute.of(context), initialValue: englishPage),
+          modalRoute: ModalRoute.of(context)!, initialValue: englishPage),
       englishPage,
       spanishPage,
     );
@@ -84,7 +78,6 @@ class DictionaryPageModel {
       currTranslationPageModel.value = pageModel(newTranslationMode);
 
   void onEntrySelected(BuildContext context, Entry newEntry) {
-    assert(newEntry != null);
     bool isFavoritesModel = isFavoritesOnly(context);
     // Only update if the value has actually changed
     if (newEntry.urlEncodedHeadword ==
@@ -110,18 +103,19 @@ class DictionaryPageModel {
         _getPageModel(_currModel, isFavoritesModel).currSelectedHeadword)
       return;
     _getPageModel(_currModel, isFavoritesModel).currSelectedEntry.value =
-        SelectedEntry(
-      urlEncodedHeadword: newUrlEncodedHeadword,
-      entry: newUrlEncodedHeadword.isNotEmpty
-          ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
-          : null,
-    );
+        newUrlEncodedHeadword.isNotEmpty
+            ? SelectedEntry(
+                urlEncodedHeadword: newUrlEncodedHeadword,
+                entry: MyApp.db.getEntry(
+                    _currModel.translationMode, newUrlEncodedHeadword),
+              )
+            : null;
   }
 
   void onSearchChanged(
     BuildContext context, {
-    String newSearchString,
-    SearchSettingsModel newSearchSettings,
+    String? newSearchString,
+    SearchSettingsModel? newSearchSettings,
   }) {
     _getPageModel(_currModel, isFavoritesOnly(context))
         .entrySearchModel

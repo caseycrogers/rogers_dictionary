@@ -10,4 +10,6 @@ extension NotShittyString on String {
           : char);
 
   String get searchable => this.toLowerCase().withoutDiacriticalMarks;
+
+  String? get emptyToNull => this.isNotEmpty ? this : null;
 }

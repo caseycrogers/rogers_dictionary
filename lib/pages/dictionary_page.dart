@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
-import 'package:rogers_dictionary/widgets/dictionary_tab_entry.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
 import 'favorites_page.dart';
 import 'search_page.dart';
@@ -43,7 +43,7 @@ class DictionaryPage extends StatelessWidget {
         child: Column(
           children: [
             DictionaryTopBar(),
-            Expanded(child: dictionaryTabView),
+            Expanded(child: dictionaryTabView!),
             Material(
               color: primaryColor(currSearchPage.translationMode),
               elevation: kGroundElevation,

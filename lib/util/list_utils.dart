@@ -1,3 +1,4 @@
 extension NotShittyList<T> on List<T> {
-  T get(int index, {T orElse}) => index < this.length ? this[index] : orElse;
+  T get(int index, {required T orElse}) =>
+      index < this.length ? this[index] : orElse;
 }

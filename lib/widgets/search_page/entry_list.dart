@@ -55,7 +55,7 @@ class EntryList extends StatelessWidget {
           var searchPageModel = SearchPageModel.of(context);
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return LoadingText();
-          var entry = snapshot.data[index];
+          final entry = snapshot.data![index];
           var isSelected =
               entry.urlEncodedHeadword == searchPageModel.currSelectedHeadword;
           return Column(
@@ -76,7 +76,7 @@ class EntryList extends StatelessWidget {
                     if (isSelected) return;
                     dictionaryModel.onEntrySelected(context, entry);
                   }),
-              if (index < snapshot.data.length - 1)
+              if (index < snapshot.data!.length - 1)
                 Divider(
                   thickness: 1.0,
                   height: 1.0,

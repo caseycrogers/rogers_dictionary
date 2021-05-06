@@ -4,16 +4,12 @@ import 'package:flutter/foundation.dart';
 
 class LocalHistoryValueNotifier<T> extends ValueNotifier<T> {
   final ModalRoute modalRoute;
-  T _previousValue;
-
-  T get previousValue => _previousValue;
 
   set value(T newValue) {
     if (value == newValue) return;
     // Create locally scoped variable so onRemove always resets to the correct
     // value.
-    var returnValue = value;
-    _previousValue = value;
+    final returnValue = value;
     super.value = newValue;
     modalRoute.addLocalHistoryEntry(
       LocalHistoryEntry(
@@ -24,8 +20,7 @@ class LocalHistoryValueNotifier<T> extends ValueNotifier<T> {
     );
   }
 
-  LocalHistoryValueNotifier(
-      {@required this.modalRoute, @required T initialValue})
+  LocalHistoryValueNotifier({required this.modalRoute, required T initialValue})
       : super(initialValue);
 
   LocalHistoryValueNotifier<T> copy() =>

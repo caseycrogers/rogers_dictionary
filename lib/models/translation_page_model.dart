@@ -20,22 +20,22 @@ class TranslationPageModel {
 
   final SearchPageModel favoritesPageModel;
 
-  static DialoguesPageModel _dialoguesPageModel;
+  static DialoguesPageModel? _dialoguesPageModel;
 
-  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel;
+  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel!;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 
   factory TranslationPageModel.empty(
-          {@required BuildContext context,
-          @required TranslationMode translationMode}) =>
+          {required BuildContext context,
+          required TranslationMode translationMode}) =>
       TranslationPageModel._(
           context: context, translationMode: translationMode);
 
   TranslationPageModel._({
-    @required BuildContext context,
-    @required this.translationMode,
-  })  : searchPageModel = SearchPageModel.empty(
+    required BuildContext context,
+    required this.translationMode,
+  })   : searchPageModel = SearchPageModel.empty(
           context: context,
           translationMode: translationMode,
           isFavoritesOnly: false,
@@ -45,9 +45,8 @@ class TranslationPageModel {
           translationMode: translationMode,
           isFavoritesOnly: true,
         ) {
-    if (TranslationPageModel._dialoguesPageModel == null)
-      TranslationPageModel._dialoguesPageModel =
-          DialoguesPageModel.empty(context);
+    TranslationPageModel._dialoguesPageModel ??=
+        DialoguesPageModel.empty(context);
   }
 
   static TranslationPageModel of(BuildContext context) =>

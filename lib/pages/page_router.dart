@@ -6,7 +6,7 @@ import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    var uri = Uri.parse(settings.name);
+    var uri = Uri.parse(settings.name ?? '');
     return _serveDictionaryPage(settings, uri);
   }
 }

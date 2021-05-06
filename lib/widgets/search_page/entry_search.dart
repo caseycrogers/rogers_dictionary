@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 
 class EntrySearch extends StatelessWidget {
-  EntrySearch({Key key}) : super(key: key);
+  EntrySearch({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

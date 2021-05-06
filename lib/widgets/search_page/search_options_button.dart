@@ -12,8 +12,8 @@ class SearchOptionsButton extends StatefulWidget {
 
 class _SearchOptionsButtonState extends State<SearchOptionsButton>
     with SingleTickerProviderStateMixin {
-  OverlayEntry _overlayEntry;
-  AnimationController _controller;
+  OverlayEntry? _overlayEntry;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
   }
 
   OverlayEntry _buildOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject();
+    final renderBox = context.findRenderObject() as RenderBox;
     var upperLeft = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(
       builder: (_) => Positioned(
@@ -90,7 +90,7 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
     if (_isMounted) {
       _controller.reverse().then((_) {
         setState(() {
-          _overlayEntry.remove();
+          _overlayEntry?.remove();
           _overlayEntry = null;
         });
       });
@@ -98,7 +98,7 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
     }
     setState(() {
       _overlayEntry = _buildOverlayEntry();
-      Overlay.of(context).insert(_overlayEntry);
+      Overlay.of(context)!.insert(_overlayEntry!);
       _controller.forward();
     });
   }

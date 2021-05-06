@@ -13,9 +13,9 @@ import 'package:rogers_dictionary/widgets/search_page/page_header.dart';
 
 class ChapterView extends StatefulWidget {
   final DialogueChapter chapter;
-  final DialogueSubChapter initialSubChapter;
+  final DialogueSubChapter? initialSubChapter;
 
-  ChapterView({@required this.chapter, this.initialSubChapter})
+  ChapterView({required this.chapter, this.initialSubChapter})
       : super(key: PageStorageKey(chapter.englishTitle));
 
   @override
@@ -24,33 +24,34 @@ class ChapterView extends StatefulWidget {
 
 class _ChapterViewState extends State<ChapterView> {
   static const String _kExpandedStateString = 'is_expanded';
-  bool _internalIsExpanded;
+  late bool _internalIsExpanded;
   bool _inProgrammaticScroll = false;
 
   bool get _isExpanded => _internalIsExpanded;
 
   set _isExpanded(bool value) {
     _internalIsExpanded = value;
-    PageStorage.of(context).writeState(context, _internalIsExpanded,
+    PageStorage.of(context)?.writeState(context, _internalIsExpanded,
         identifier: _kExpandedStateString);
   }
 
   ItemScrollController _scrollController = ItemScrollController();
   ItemPositionsListener _scrollListener = ItemPositionsListener.create();
 
-  ValueNotifier<DialogueSubChapter> _currentSubChapter;
+  late ValueNotifier<DialogueSubChapter> _currentSubChapter;
   final ValueNotifier<double> _subChapterProgress = ValueNotifier(0.0);
 
-  List<MapEntry<DialogueSubChapter, int>> _subChapterAndDialogueIndex;
+  late List<MapEntry<DialogueSubChapter, int>> _subChapterAndDialogueIndex;
 
   @override
   void initState() {
-    _internalIsExpanded = (PageStorage.of(context).readState(
+    _internalIsExpanded = (PageStorage.of(context)?.readState(
           context,
           identifier: _kExpandedStateString,
-        ) as bool) ??
+        ) as bool?) ??
         false;
-    _currentSubChapter = ValueNotifier(widget.initialSubChapter);
+    _currentSubChapter = ValueNotifier(
+        widget.initialSubChapter ?? widget.chapter.subChapters[0]);
     _scrollListener.itemPositions.addListener(() {
       // Don't update during programmatic scrolling.
       if (_inProgrammaticScroll) return;
@@ -163,7 +164,7 @@ class _ChapterViewState extends State<ChapterView> {
                                     duration: Duration(milliseconds: 100),
                                   )
                                   .then((_) => _inProgrammaticScroll = false);
-                              return Future.delayed(Duration(milliseconds: 50))
+                              Future.delayed(Duration(milliseconds: 50))
                                   .then((_) {
                                 _currentSubChapter.value = subChapter;
                                 setState(() {
@@ -188,7 +189,7 @@ class _ChapterViewState extends State<ChapterView> {
         return ScrollablePositionedList.builder(
           key: PageStorageKey(widget.chapter.englishTitle +
               (widget.initialSubChapter?.englishTitle ?? '')),
-          initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
+          initialScrollIndex: _subChapterToIndex(widget.initialSubChapter!),
           itemPositionsListener: _scrollListener,
           itemScrollController: _scrollController,
           itemCount: widget.chapter.subChapters.fold<int>(
@@ -225,17 +226,20 @@ class _ChapterViewState extends State<ChapterView> {
     );
   }
 
-  Widget _progressIndicator() => ValueListenableBuilder(
+  Widget _progressIndicator() => ValueListenableBuilder<double>(
         valueListenable: _subChapterProgress,
         builder: (context, progress, _) => LinearProgressIndicator(
           value: progress,
         ),
       );
 
-  Widget _subchapterTile(BuildContext context, DialogueSubChapter subChapter,
-          {bool isSelected = false,
-          double padding = 2 * kPad,
-          VoidCallback onTap}) =>
+  Widget _subchapterTile(
+    BuildContext context,
+    DialogueSubChapter subChapter, {
+    bool isSelected = false,
+    double padding = 2 * kPad,
+    VoidCallback? onTap,
+  }) =>
       ListTile(
         tileColor: isSelected ? Theme.of(context).selectedRowColor : null,
         contentPadding: EdgeInsets.symmetric(horizontal: padding),
@@ -283,7 +287,7 @@ class _ChapterViewState extends State<ChapterView> {
   double _weightedAvg(double a, double b, double weight) =>
       (1 - weight) * a + weight * b;
 
-  int _subChapterToIndex(DialogueSubChapter subChapter) {
+  int _subChapterToIndex(DialogueSubChapter? subChapter) {
     if (subChapter == null) return 0;
     return widget.chapter.subChapters
         .takeWhile((s) => s != subChapter)

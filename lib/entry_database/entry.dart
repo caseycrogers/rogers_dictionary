@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
+import 'package:rogers_dictionary/util/string_utils.dart';
+
 part 'entry.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
@@ -15,12 +17,43 @@ class Entry {
   final List<Translation> translations;
 
   Entry({
-    @required this.entryId,
-    @required this.headword,
-    @required this.related,
-    @required this.alternateHeadwords,
-    @required this.translations,
+    required this.entryId,
+    required this.headword,
+    required this.related,
+    required this.alternateHeadwords,
+    required this.translations,
   });
+
+  factory Entry.notFound(String headword) {
+    print('WARN: Entry $headword not found');
+    return Entry(
+      entryId: -1,
+      headword: Headword(
+        isDominant: true,
+        headwordText: 'Invalid headword ${urlDecode(headword)}',
+        abbreviation: null,
+        parentheticalQualifier: null,
+        namingStandard: null,
+      ),
+      related: [],
+      alternateHeadwords: [],
+      translations: [
+        Translation(
+          partOfSpeech: '',
+          irregularInflections: null,
+          dominantHeadwordParentheticalQualifier: null,
+          translationText:
+              'Please use the feedback button (upper right) to report this bug.',
+          genderAndPlural: null,
+          translationNamingStandard: null,
+          translationAbbreviation: null,
+          translationParentheticalQualifier: null,
+          examplePhrases: [],
+          editorialNote: null,
+        ),
+      ],
+    );
+  }
 
   @JsonKey(ignore: true)
   static final Map<String, String> _partOfSpeechAbbreviationMap = {
@@ -65,7 +98,7 @@ class Entry {
             case 'phrase':
               return ' phrase';
             default:
-              return separator.group(0);
+              return separator.group(0)!;
           }
         });
   }
@@ -117,16 +150,16 @@ class Entry {
 class Headword {
   final bool isDominant;
   final String headwordText;
-  final String abbreviation;
-  final String namingStandard;
-  final String parentheticalQualifier;
+  final String? abbreviation;
+  final String? namingStandard;
+  final String? parentheticalQualifier;
 
   Headword({
-    @required this.headwordText,
-    @required this.abbreviation,
-    @required this.namingStandard,
-    @required this.parentheticalQualifier,
-    @required this.isDominant,
+    required this.headwordText,
+    required this.isDominant,
+    required this.abbreviation,
+    required this.namingStandard,
+    required this.parentheticalQualifier,
   });
 
   factory Headword.fromJson(Map<String, dynamic> json) =>
@@ -144,27 +177,27 @@ class Headword {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Translation {
   final String partOfSpeech;
-  final String irregularInflections;
-  final String dominantHeadwordParentheticalQualifier;
   final String translationText;
-  final String genderAndPlural;
-  final String translationNamingStandard;
-  final String translationAbbreviation;
-  final String translationParentheticalQualifier;
+  final String? irregularInflections;
+  final String? dominantHeadwordParentheticalQualifier;
+  final String? genderAndPlural;
+  final String? translationNamingStandard;
+  final String? translationAbbreviation;
+  final String? translationParentheticalQualifier;
   final List<String> examplePhrases;
-  final String editorialNote;
+  final String? editorialNote;
 
   Translation({
-    @required this.partOfSpeech,
-    @required this.irregularInflections,
-    @required this.dominantHeadwordParentheticalQualifier,
-    @required this.translationText,
-    @required this.genderAndPlural,
-    @required this.translationNamingStandard,
-    @required this.translationAbbreviation,
-    @required this.translationParentheticalQualifier,
-    @required this.examplePhrases,
-    @required this.editorialNote,
+    required this.partOfSpeech,
+    required this.translationText,
+    required this.irregularInflections,
+    required this.dominantHeadwordParentheticalQualifier,
+    required this.genderAndPlural,
+    required this.translationNamingStandard,
+    required this.translationAbbreviation,
+    required this.translationParentheticalQualifier,
+    required this.examplePhrases,
+    required this.editorialNote,
   });
 
   factory Translation.fromJson(Map<String, dynamic> json) =>
@@ -179,8 +212,8 @@ class Translation {
 }
 
 class EntryBuilder {
-  Headword _headword;
-  int _entryId;
+  late Headword _headword;
+  late int _entryId;
   List<Headword> _alternateHeadwords = [];
   List<String> _related = [];
 
@@ -193,9 +226,9 @@ class EntryBuilder {
   ) {
     _headword = Headword(
       headwordText: headwordText,
-      abbreviation: abbreviation,
+      abbreviation: abbreviation.emptyToNull,
       namingStandard: null,
-      parentheticalQualifier: parentheticalQualifier,
+      parentheticalQualifier: parentheticalQualifier.emptyToNull,
       isDominant: true,
     );
     return this;
@@ -212,57 +245,59 @@ class EntryBuilder {
   }
 
   EntryBuilder addAlternateHeadword({
-    @required String headwordText,
-    @required String abbreviation,
-    @required String namingStandard,
-    @required String parentheticalQualifier,
+    required String headwordText,
+    required String abbreviation,
+    required String namingStandard,
+    required String parentheticalQualifier,
   }) {
     assert(headwordText != '',
         "You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}. Line: ${_entryId + 2}");
-    _alternateHeadwords.add(Headword(
-      headwordText: headwordText,
-      abbreviation: abbreviation,
-      namingStandard: namingStandard,
-      parentheticalQualifier: parentheticalQualifier,
-      isDominant: false,
-    ));
+    _alternateHeadwords.add(
+      Headword(
+        headwordText: headwordText,
+        abbreviation: abbreviation.emptyToNull,
+        namingStandard: namingStandard.emptyToNull,
+        parentheticalQualifier: parentheticalQualifier.emptyToNull,
+        isDominant: false,
+      ),
+    );
     return this;
   }
 
   EntryBuilder addTranslation({
-    @required String partOfSpeech,
-    @required String irregularInflections,
-    @required String dominantHeadwordParentheticalQualifier,
-    @required String translation,
-    @required String genderAndPlural,
-    @required String translationNamingStandard,
-    @required String translationAbbreviation,
-    @required String translationParentheticalQualifier,
-    @required List<String> examplePhrases,
-    @required String editorialNote,
+    required String partOfSpeech,
+    required String irregularInflections,
+    required String dominantHeadwordParentheticalQualifier,
+    required String translation,
+    required String genderAndPlural,
+    required String translationNamingStandard,
+    required String translationAbbreviation,
+    required String translationParentheticalQualifier,
+    required List<String> examplePhrases,
+    required String editorialNote,
   }) {
     assert(translation != '',
         "You must specify a non-empty translation. Headword: ${_headword.headwordText} at line $_entryId");
-    _translations.add(Translation(
+    _translations.add(
+      Translation(
         partOfSpeech: partOfSpeech,
-        irregularInflections: irregularInflections,
+        irregularInflections: irregularInflections.emptyToNull,
         dominantHeadwordParentheticalQualifier:
-            dominantHeadwordParentheticalQualifier,
+            dominantHeadwordParentheticalQualifier.emptyToNull,
         translationText: translation,
-        genderAndPlural: genderAndPlural,
-        translationNamingStandard: translationNamingStandard,
-        translationAbbreviation: translationAbbreviation,
-        translationParentheticalQualifier: translationParentheticalQualifier,
+        genderAndPlural: genderAndPlural.emptyToNull,
+        translationNamingStandard: translationNamingStandard.emptyToNull,
+        translationAbbreviation: translationAbbreviation.emptyToNull,
+        translationParentheticalQualifier:
+            translationParentheticalQualifier.emptyToNull,
         examplePhrases: examplePhrases,
-        editorialNote: editorialNote));
+        editorialNote: editorialNote.emptyToNull,
+      ),
+    );
     return this;
   }
 
   Entry build() {
-    assert(_headword != null,
-        "You must specify a non null headword. Line ${_entryId + 2}.");
-    assert(_entryId != null,
-        "You must specify a non null entry id. Line ${_entryId + 2}.");
     assert(_translations.length != 0,
         "You must specify one or more translations. Line ${_entryId + 2}.");
     return Entry(

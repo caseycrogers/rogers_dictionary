@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 class DictionaryTabEntry extends StatefulWidget {
   DictionaryTabEntry({
-    @required this.selected,
-    @required this.unselected,
-    @required this.index,
+    required this.selected,
+    required this.unselected,
+    required this.index,
   });
 
   final Widget selected;
@@ -17,12 +17,12 @@ class DictionaryTabEntry extends StatefulWidget {
 }
 
 class _DictionaryTabEntryState extends State<DictionaryTabEntry> {
-  TabController _controller;
+  late TabController _controller;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _controller ??= DefaultTabController.of(context);
+    _controller = DefaultTabController.of(context)!;
     _controller.addListener(_onTabSelected);
   }
 
