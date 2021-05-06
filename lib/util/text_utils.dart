@@ -206,8 +206,8 @@ Widget editorialText(BuildContext context, String text) {
   return OverflowMarkdown(text);
 }
 
-Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
-  if (examplePhrases.isEmpty) return Container();
+Widget examplePhraseText(BuildContext context, List<String>? examplePhrases) {
+  if (examplePhrases == null) return Container();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
@@ -261,7 +261,7 @@ Widget headwordLine(
         ],
       ),
       alternateHeadwordLines(
-          context, entry.alternateHeadwords, preview, searchString),
+          context, entry.alternateHeadwords ?? [], preview, searchString),
     ],
   );
 }

@@ -63,9 +63,9 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildRelated(BuildContext context) {
-    if (_entry.related.isEmpty) return Container();
+    if (_entry.related == null) return Container();
     List<TextSpan> relatedSpans =
-        _entry.related.where((r) => r.isNotEmpty).expand(
+        _entry.related!.where((r) => r.isNotEmpty).expand(
       (headword) {
         return [
           TextSpan(
@@ -80,7 +80,7 @@ class EntryView extends StatelessWidget {
                     .onHeadwordSelected(context, Entry.urlEncode(headword));
               },
           ),
-          if (headword != _entry.related.last) TextSpan(text: ', '),
+          if (headword != _entry.related?.last) TextSpan(text: ', '),
         ];
       },
     ).toList();

@@ -40,7 +40,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length && i < 500) {
+  while (i < rows.length) {
     if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
     Map<String, String> row = rows.elementAt(i);
     if (row.values.every((e) => e.isEmpty)) {
@@ -177,21 +177,24 @@ Future<void> _uploadSqlFlite(
       URL_ENCODED_HEADWORD: entry.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headwordText,
-      RUN_ON_PARENTS: entry.related.join(' | '),
+      RUN_ON_PARENTS: (entry.related ?? []).join(' | '),
       HEADWORD_ABBREVIATIONS:
           entry.allHeadwords.map((h) => h.abbreviation).join(' | '),
-      ALTERNATE_HEADWORDS:
-          entry.alternateHeadwords.map((alt) => alt.headwordText).join(' | '),
+      ALTERNATE_HEADWORDS: (entry.alternateHeadwords ?? [])
+          .map((alt) => alt.headwordText)
+          .join(' | '),
       HEADWORD + WITHOUT_DIACRITICAL_MARKS:
           entry.headwordText.withoutDiacriticalMarks,
-      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS:
-          entry.related.map((p) => p.withoutDiacriticalMarks).join(' | '),
+      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS: (entry.related ?? [])
+          .map((p) => p.withoutDiacriticalMarks)
+          .join(' | '),
       HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
           .map((h) => h.abbreviation?.withoutDiacriticalMarks ?? '')
           .join(' | '),
-      ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS: entry.alternateHeadwords
-          .map((alt) => alt.headwordText.withoutDiacriticalMarks)
-          .join(' | '),
+      ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS:
+          (entry.alternateHeadwords ?? [])
+              .map((alt) => alt.headwordText.withoutDiacriticalMarks)
+              .join(' | '),
       ENTRY_BLOB: jsonEncode(entry.toJson()),
     };
     if (verbose) print(entryRecord);
