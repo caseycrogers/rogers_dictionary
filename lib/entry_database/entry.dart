@@ -2,17 +2,19 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 import 'package:rogers_dictionary/util/string_utils.dart';
+import 'package:rogers_dictionary/util/list_utils.dart';
 
 part 'entry.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+@immutable
+@JsonSerializable()
 class Entry {
   // Run the following to rebuild generated files:
   // flutter pub run build_runner build --delete-conflicting-outputs
   final int entryId;
   final Headword headword;
-  final List<String> related;
-  final List<Headword> alternateHeadwords;
+  final List<String>? related;
+  final List<Headword>? alternateHeadwords;
 
   final List<Translation> translations;
 
@@ -35,8 +37,8 @@ class Entry {
         parentheticalQualifier: null,
         namingStandard: null,
       ),
-      related: [],
-      alternateHeadwords: [],
+      related: null,
+      alternateHeadwords: null,
       translations: [
         Translation(
           partOfSpeech: '',
@@ -48,7 +50,7 @@ class Entry {
           translationNamingStandard: null,
           translationAbbreviation: null,
           translationParentheticalQualifier: null,
-          examplePhrases: [],
+          examplePhrases: null,
           editorialNote: null,
         ),
       ],
@@ -136,7 +138,8 @@ class Entry {
 
   String get urlEncodedHeadword => headword.urlEncodedHeadword;
 
-  List<Headword> get allHeadwords => [headword]..addAll(alternateHeadwords);
+  List<Headword> get allHeadwords =>
+      [headword]..addAll(alternateHeadwords ?? []);
 
   @override
   bool operator ==(o) => o is Entry && o.hashCode == hashCode;
@@ -146,7 +149,7 @@ class Entry {
 }
 
 @immutable
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Headword {
   final bool isDominant;
   final String headwordText;
@@ -174,7 +177,7 @@ class Headword {
 }
 
 @immutable
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Translation {
   final String partOfSpeech;
   final String translationText;
@@ -184,7 +187,7 @@ class Translation {
   final String? translationNamingStandard;
   final String? translationAbbreviation;
   final String? translationParentheticalQualifier;
-  final List<String> examplePhrases;
+  final List<String>? examplePhrases;
   final String? editorialNote;
 
   Translation({
@@ -214,8 +217,8 @@ class Translation {
 class EntryBuilder {
   late Headword _headword;
   late int _entryId;
-  List<Headword> _alternateHeadwords = [];
-  List<String> _related = [];
+  List<Headword>? _alternateHeadwords;
+  List<String>? _related;
 
   List<Translation> _translations = [];
 
@@ -240,7 +243,7 @@ class EntryBuilder {
   }
 
   EntryBuilder addRelated(List<String> related) {
-    _related.addAll(related);
+    if (related.isNotEmpty) _related = (_related ?? [])..addAll(related);
     return this;
   }
 
@@ -252,15 +255,16 @@ class EntryBuilder {
   }) {
     assert(headwordText != '',
         "You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}. Line: ${_entryId + 2}");
-    _alternateHeadwords.add(
-      Headword(
-        headwordText: headwordText,
-        abbreviation: abbreviation.emptyToNull,
-        namingStandard: namingStandard.emptyToNull,
-        parentheticalQualifier: parentheticalQualifier.emptyToNull,
-        isDominant: false,
-      ),
-    );
+    _alternateHeadwords = (_alternateHeadwords ?? [])
+      ..add(
+        Headword(
+          headwordText: headwordText,
+          abbreviation: abbreviation.emptyToNull,
+          namingStandard: namingStandard.emptyToNull,
+          parentheticalQualifier: parentheticalQualifier.emptyToNull,
+          isDominant: false,
+        ),
+      );
     return this;
   }
 
@@ -273,7 +277,7 @@ class EntryBuilder {
     required String translationNamingStandard,
     required String translationAbbreviation,
     required String translationParentheticalQualifier,
-    required List<String> examplePhrases,
+    required List<String>? examplePhrases,
     required String editorialNote,
   }) {
     assert(translation != '',
@@ -290,7 +294,7 @@ class EntryBuilder {
         translationAbbreviation: translationAbbreviation.emptyToNull,
         translationParentheticalQualifier:
             translationParentheticalQualifier.emptyToNull,
-        examplePhrases: examplePhrases,
+        examplePhrases: examplePhrases?.emptyToNull,
         editorialNote: editorialNote.emptyToNull,
       ),
     );
