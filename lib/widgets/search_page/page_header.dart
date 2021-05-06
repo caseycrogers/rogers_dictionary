@@ -7,14 +7,14 @@ import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 class PageHeader extends StatelessWidget {
   final Widget header;
   final Widget child;
-  final Function onClose;
+  final VoidCallback onClose;
   final bool scrollable;
   final double padding;
 
   PageHeader(
-      {@required this.header,
-      @required this.child,
-      @required this.onClose,
+      {required this.header,
+      required this.child,
+      required this.onClose,
       this.scrollable = true,
       this.padding = 2 * kPad});
 

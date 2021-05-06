@@ -16,7 +16,7 @@ class SearchSettingsModel {
 
   SearchSettingsModel(this._sortBy, this._ignoreAccents);
 
-  SearchSettingsModel copy({SortOrder newSortBy, bool newIgnoreAccents}) {
+  SearchSettingsModel copy({SortOrder? newSortBy, bool? newIgnoreAccents}) {
     return SearchSettingsModel(
         newSortBy ?? _sortBy, newIgnoreAccents ?? _ignoreAccents);
   }

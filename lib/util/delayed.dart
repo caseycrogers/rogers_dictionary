@@ -6,22 +6,29 @@ class Delayed extends StatefulWidget {
   final Widget child;
   final Duration delay;
 
-  Delayed(
-      {@required this.initialChild,
-      @required this.child,
-      @required this.delay});
+  Delayed({
+    required this.initialChild,
+    required this.child,
+    required this.delay,
+  });
 
   @override
   _DelayedState createState() => _DelayedState();
 }
 
 class _DelayedState extends State<Delayed> {
-  Future<Widget> _delayedChild;
+  late Future<Widget> _delayedChild;
 
   @override
   void initState() {
+    _initialize();
     super.initState();
-    _delayedChild = Future.delayed(widget.delay, () => widget.child);
+  }
+
+  @override
+  void didUpdateWidget(covariant Delayed oldWidget) {
+    if (oldWidget.child != widget.child) _initialize();
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -29,7 +36,10 @@ class _DelayedState extends State<Delayed> {
     return FutureBuilder(
       initialData: widget.initialChild,
       future: _delayedChild,
-      builder: (context, snap) => snap.data,
+      builder: (context, AsyncSnapshot<Widget> snap) => snap.data!,
     );
   }
+
+  void _initialize() =>
+      _delayedChild = Future.delayed(widget.delay, () => widget.child);
 }

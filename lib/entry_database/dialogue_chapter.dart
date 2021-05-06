@@ -16,10 +16,10 @@ class DialogueChapter {
   final List<DialogueSubChapter> subChapters;
 
   DialogueChapter({
-    @required this.chapterId,
-    @required this.englishTitle,
-    @required this.spanishTitle,
-    @required List<DialogueSubChapter> subChapters,
+    required this.chapterId,
+    required this.englishTitle,
+    required this.spanishTitle,
+    required List<DialogueSubChapter> subChapters,
   }) : subChapters = List.from(subChapters, growable: false);
 
   bool get hasSubChapters =>
@@ -40,10 +40,10 @@ class DialogueSubChapter {
   final List<Dialogue> dialogues;
 
   DialogueSubChapter({
-    @required this.englishTitle,
-    @required this.spanishTitle,
-    @required List<Dialogue> dialogues,
-  })  : assert(dialogues != null && dialogues.isNotEmpty),
+    required this.englishTitle,
+    required this.spanishTitle,
+    required List<Dialogue> dialogues,
+  })   : assert(dialogues.isNotEmpty),
         dialogues = List.from(dialogues, growable: false);
 
   factory DialogueSubChapter.fromJson(Map<String, dynamic> json) =>
@@ -58,7 +58,7 @@ class Dialogue {
   final String englishContent;
   final String spanishContent;
 
-  Dialogue({this.englishContent, this.spanishContent});
+  Dialogue({required this.englishContent, required this.spanishContent});
 
   factory Dialogue.fromJson(Map<String, dynamic> json) =>
       _$DialogueFromJson(json);
@@ -74,9 +74,9 @@ class DialogueChapterBuilder {
   final Map<String, DialogueSubChapterBuilder> subChapters = {};
 
   DialogueChapterBuilder({
-    @required this.chapterId,
-    @required this.englishTitle,
-    @required this.spanishTitle,
+    required this.chapterId,
+    required this.englishTitle,
+    required this.spanishTitle,
   });
 
   DialogueChapter build() => DialogueChapter(
@@ -110,8 +110,8 @@ class DialogueSubChapterBuilder {
   List<Dialogue> dialogues = [];
 
   DialogueSubChapterBuilder({
-    @required this.englishTitle,
-    @required this.spanishTitle,
+    required this.englishTitle,
+    required this.spanishTitle,
   });
 
   DialogueSubChapterBuilder addDialogue(

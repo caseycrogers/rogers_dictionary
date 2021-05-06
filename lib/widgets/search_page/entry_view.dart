@@ -23,16 +23,16 @@ class EntryView extends StatelessWidget {
           if (!searchPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
           return FutureBuilder(
-            future: searchPageModel.currSelectedEntry.value.entry,
+            future: searchPageModel.currSelectedEntry.value!.entry,
             builder: (context, AsyncSnapshot<Entry> snap) {
-              if (!snap.hasData)
+              if (!snap.hasData || snap.data == null)
                 // Only display if loading is slow.
                 return Delayed(
                   initialChild: Container(),
                   child: Container(),
                   delay: Duration(milliseconds: 50),
                 );
-              var entry = snap.data;
+              var entry = snap.data!;
               return PageHeader(
                 header: headwordLine(
                     context, entry, false, searchPageModel.searchString),
@@ -72,7 +72,7 @@ class EntryView extends StatelessWidget {
             text: headword,
             style: Theme.of(context)
                 .textTheme
-                .bodyText1
+                .bodyText1!
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
@@ -86,11 +86,7 @@ class EntryView extends StatelessWidget {
     ).toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(height: 48.0),
-      Text("Related",
-          style: Theme.of(context)
-              .textTheme
-              .bodyText1
-              .copyWith(fontWeight: FontWeight.bold)),
+      bold1Text(context, 'Related'),
       Divider(),
       RichText(
           text: TextSpan(
@@ -102,17 +98,13 @@ class EntryView extends StatelessWidget {
   Widget _buildEditorialNotes(BuildContext context) {
     var notes = _entry.translations
         .where((t) => t.editorialNote != null && t.editorialNote != '')
-        .map((t) => editorialText(context, t.editorialNote));
+        .map((t) => editorialText(context, t.editorialNote!));
     if (notes.isEmpty) return Container();
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(height: 48.0),
-          Text("Editorial Notes",
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText1
-                  .copyWith(fontWeight: FontWeight.bold)),
+          bold1Text(context, "Editorial Notes"),
           Divider(),
         ]..addAll(notes));
   }
@@ -149,9 +141,9 @@ class EntryView extends StatelessWidget {
 
   TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
       List<Translation> translations) {
-    String parenthetical = '';
+    String? parenthetical;
     final hasParenthetical = translations
-        .any((t) => t.dominantHeadwordParentheticalQualifier.isNotEmpty);
+        .any((t) => t.dominantHeadwordParentheticalQualifier != null);
     if (_preview)
       return TableRow(children: [
         Container(

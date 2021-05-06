@@ -2,36 +2,28 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 
 class FavoritesButton extends StatefulWidget {
   final Entry entry;
 
-  FavoritesButton({@required this.entry});
+  FavoritesButton({required this.entry});
 
   @override
   _FavoritesButtonState createState() => _FavoritesButtonState();
 }
 
 class _FavoritesButtonState extends State<FavoritesButton> {
-  TranslationMode _translationMode;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _translationMode ??= SearchPageModel.readFrom(context).translationMode;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final translationMode = TranslationPageModel.of(context).translationMode;
     return IconButton(
       icon: _icon,
       onPressed: () async {
         var newFavorite = !MyApp.db
-            .isFavorite(_translationMode, widget.entry.urlEncodedHeadword);
+            .isFavorite(translationMode, widget.entry.urlEncodedHeadword);
         await MyApp.db.setFavorite(
-          _translationMode,
+          translationMode,
           widget.entry.urlEncodedHeadword,
           newFavorite,
         );
@@ -41,7 +33,8 @@ class _FavoritesButtonState extends State<FavoritesButton> {
   }
 
   Widget get _icon => Icon(
-        MyApp.db.isFavorite(_translationMode, widget.entry.urlEncodedHeadword)
+        MyApp.db.isFavorite(TranslationPageModel.of(context).translationMode,
+                widget.entry.urlEncodedHeadword)
             ? Icons.star
             : Icons.star_border,
         color: Theme.of(context).accentIconTheme.color,

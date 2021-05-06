@@ -11,7 +11,7 @@ class SelectedDialogueSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dialoguesModel = TranslationPageModel.of(context).dialoguesPageModel;
-    return AnimatedListenableSwitcher<DialogueChapter>(
+    return AnimatedListenableSwitcher<DialogueChapter?>(
       valueListenable: dialoguesModel.selectedChapter,
       builder: (context, selectedChapter, _) => selectedChapter == null
           ? ChapterList()

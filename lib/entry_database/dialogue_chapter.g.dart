@@ -11,11 +11,9 @@ DialogueChapter _$DialogueChapterFromJson(Map<String, dynamic> json) {
     chapterId: json['chapter_id'] as int,
     englishTitle: json['english_title'] as String,
     spanishTitle: json['spanish_title'] as String,
-    subChapters: (json['sub_chapters'] as List)
-        ?.map((e) => e == null
-            ? null
-            : DialogueSubChapter.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    subChapters: (json['sub_chapters'] as List<dynamic>)
+        .map((e) => DialogueSubChapter.fromJson(e as Map<String, dynamic>))
+        .toList(),
   );
 }
 
@@ -24,17 +22,16 @@ Map<String, dynamic> _$DialogueChapterToJson(DialogueChapter instance) =>
       'chapter_id': instance.chapterId,
       'english_title': instance.englishTitle,
       'spanish_title': instance.spanishTitle,
-      'sub_chapters': instance.subChapters?.map((e) => e?.toJson())?.toList(),
+      'sub_chapters': instance.subChapters.map((e) => e.toJson()).toList(),
     };
 
 DialogueSubChapter _$DialogueSubChapterFromJson(Map<String, dynamic> json) {
   return DialogueSubChapter(
     englishTitle: json['english_title'] as String,
     spanishTitle: json['spanish_title'] as String,
-    dialogues: (json['dialogues'] as List)
-        ?.map((e) =>
-            e == null ? null : Dialogue.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    dialogues: (json['dialogues'] as List<dynamic>)
+        .map((e) => Dialogue.fromJson(e as Map<String, dynamic>))
+        .toList(),
   );
 }
 
@@ -42,7 +39,7 @@ Map<String, dynamic> _$DialogueSubChapterToJson(DialogueSubChapter instance) =>
     <String, dynamic>{
       'english_title': instance.englishTitle,
       'spanish_title': instance.spanishTitle,
-      'dialogues': instance.dialogues?.map((e) => e?.toJson())?.toList(),
+      'dialogues': instance.dialogues.map((e) => e.toJson()).toList(),
     };
 
 Dialogue _$DialogueFromJson(Map<String, dynamic> json) {

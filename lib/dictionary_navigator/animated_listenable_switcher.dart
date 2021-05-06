@@ -8,7 +8,7 @@ class AnimatedListenableSwitcher<T> extends StatelessWidget {
   final ValueWidgetBuilder<T> builder;
 
   AnimatedListenableSwitcher(
-      {@required this.valueListenable, @required this.builder});
+      {required this.valueListenable, required this.builder});
 
   @override
   Widget build(BuildContext context) {

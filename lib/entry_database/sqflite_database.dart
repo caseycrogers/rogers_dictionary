@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
@@ -39,9 +38,9 @@ class SqfliteDatabase extends DictionaryDatabase {
   @override
   Stream<Entry> getEntries(
     TranslationMode translationMode, {
-    @required String searchString,
-    @required int startAfter,
-    @required SearchSettingsModel searchOptions,
+    required String searchString,
+    required int startAfter,
+    required SearchSettingsModel searchOptions,
   }) =>
       _getEntries(
         translationMode,
@@ -54,26 +53,27 @@ class SqfliteDatabase extends DictionaryDatabase {
   @override
   Future<Entry> getEntry(
       TranslationMode translationMode, String urlEncodedHeadword) async {
-    var db = await _dbFuture;
-    var entry = _rowToEntry(
-        translationMode,
-        await db.rawQuery('''
+    final db = await _dbFuture;
+    final entry = _rowToEntry(
+      urlEncodedHeadword,
+      translationMode,
+      await db.rawQuery('''
  SELECT *,
         EXISTS(SELECT $URL_ENCODED_HEADWORD
                FROM ${_favoritesTable(translationMode)}
                WHERE $URL_ENCODED_HEADWORD = ${_entryTable(translationMode)}.$URL_ENCODED_HEADWORD) AS $IS_FAVORITE
  FROM ${_entryTable(translationMode)}
  WHERE $URL_ENCODED_HEADWORD = "$urlEncodedHeadword";''').then((value) => value
-                .isEmpty
-            ? null
-            : value.single));
-    if (entry == null) print('Could not find entry $urlEncodedHeadword!');
+              .isEmpty
+          ? null
+          : value.single),
+    );
     return entry;
   }
 
   @override
   Stream<Entry> getFavorites(TranslationMode translationMode,
-          {int startAfter}) =>
+          {required int startAfter}) =>
       _getEntries(
         translationMode,
         searchString: '',
@@ -100,29 +100,26 @@ class SqfliteDatabase extends DictionaryDatabase {
     return super.setFavorite(translationMode, urlEncodedHeadword, favorite);
   }
 
-  Entry _rowToEntry(
-      TranslationMode translationMode, Map<String, dynamic> snapshot) {
+  Entry _rowToEntry(String headword, TranslationMode translationMode,
+      Map<String, Object?>? snapshot) {
+    if (snapshot == null) return Entry.notFound(headword);
     assert(snapshot.containsKey(IS_FAVORITE));
-    if (snapshot == null) return null;
-    var entry = Entry.fromJson(jsonDecode(snapshot[ENTRY_BLOB]));
+    var entry = Entry.fromJson(jsonDecode(snapshot[ENTRY_BLOB]! as String));
     super.setFavorite(
         translationMode, entry.urlEncodedHeadword, snapshot[IS_FAVORITE] == 1);
     return entry;
   }
 
   DialogueChapter _rowToDialogue(Map<String, dynamic> snapshot) {
-    if (snapshot == null) return null;
     return DialogueChapter.fromJson(jsonDecode(snapshot[DIALOGUE_BLOB]));
   }
 
   @override
   Stream<DialogueChapter> getDialogues({
-    @required int startAfter,
-    String englishChapter,
-    String englishSubChapter,
+    int? startAfter,
   }) async* {
     var db = await _dbFuture;
-    int offset = startAfter;
+    int offset = startAfter ?? 0;
     while (true) {
       var query = '''
     SELECT *
@@ -144,10 +141,10 @@ class SqfliteDatabase extends DictionaryDatabase {
 
   Stream<Entry> _getEntries(
     TranslationMode translationMode, {
-    @required String searchString,
-    @required int startAfter,
-    @required SearchSettingsModel searchOptions,
-    @required bool favoritesOnly,
+    required String searchString,
+    required int startAfter,
+    required SearchSettingsModel searchOptions,
+    required bool favoritesOnly,
   }) async* {
     var db = await _dbFuture;
     int offset = startAfter;
@@ -190,7 +187,7 @@ AND url_encoded_headword > "$startAfter"''';
         return;
       }
       for (var entry
-          in snapshot.map((snap) => _rowToEntry(translationMode, snap))) {
+          in snapshot.map((snap) => _rowToEntry('', translationMode, snap))) {
         yield entry;
         offset++;
       }
@@ -205,7 +202,7 @@ Future<Database> _getDatabase() async {
   // Check if the database exists
   var exists = await databaseExists(path);
 
-  if (!exists) {
+  if (!exists || true) {
     // Should happen only the first time you launch your application
     print("Creating new copy from asset");
 

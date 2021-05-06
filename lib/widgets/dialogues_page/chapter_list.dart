@@ -29,10 +29,10 @@ class ChapterList extends StatelessWidget {
         builder: (BuildContext context) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return LoadingText();
-          var chapter = snapshot.data[index];
+          var chapter = snapshot.data![index];
           if (index != 0 &&
               chapter.title(context) ==
-                  snapshot.data[index - 1].title(context)) {
+                  snapshot.data![index - 1].title(context)) {
             return Container();
           }
           if (chapter.hasSubChapters)
@@ -60,8 +60,8 @@ class ChapterList extends StatelessWidget {
   Widget _clickableHeader(
     BuildContext context,
     bool isSubHeader, {
-    @required DialogueChapter chapter,
-    DialogueSubChapter subChapter,
+    required DialogueChapter chapter,
+    DialogueSubChapter? subChapter,
   }) {
     var dialoguesModel = TranslationPageModel.of(context).dialoguesPageModel;
     return ListTile(

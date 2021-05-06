@@ -12,8 +12,8 @@ class DictionaryTabBarView extends StatefulWidget {
   ///
   /// The length of [children] must be the same as the [controller]'s length.
   const DictionaryTabBarView({
-    @required this.children,
-  }) : assert(children != null);
+    required this.children,
+  });
 
   final LinkedHashMap<DictionaryTab, Widget> children;
 
@@ -22,38 +22,20 @@ class DictionaryTabBarView extends StatefulWidget {
 }
 
 class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
-  TabController _controller;
-  LinkedHashMap<DictionaryTab, Widget> _childrenWithKey;
-
-  // If the TabBarView is rebuilt with a new tab controller, the caller should
-  // dispose the old one. In that case the old controller's animation will be
-  // null and should not be accessed.
-  bool get _controllerIsValid => _controller?.animation != null;
+  TabController? _controller;
+  late LinkedHashMap<DictionaryTab, Widget> _childrenWithKey;
 
   LocalHistoryValueNotifier get currentTab =>
       DictionaryPageModel.readFrom(context).currentTab;
 
   void _updateTabController() {
-    final TabController newController = DefaultTabController.of(context);
-    assert(() {
-      if (newController == null) {
-        throw FlutterError('No TabController for ${widget.runtimeType}.\n'
-            'When creating a ${widget.runtimeType}, you must either provide an explicit '
-            'TabController using the "controller" property, or you must ensure that there '
-            'is a DefaultTabController above the ${widget.runtimeType}.\n'
-            'In this case, there was neither an explicit controller nor a default controller.');
-      }
-      return true;
-    }());
+    final TabController newController = DefaultTabController.of(context)!;
 
     if (newController == _controller) return;
 
-    if (_controllerIsValid) {
-      _controller.animation.removeListener(_handleTabControllerAnimationTick);
-    }
+    _controller?.animation?.removeListener(_handleTabControllerAnimationTick);
     _controller = newController;
-    if (_controller != null)
-      _controller.animation.addListener(_handleTabControllerAnimationTick);
+    _controller?.animation?.addListener(_handleTabControllerAnimationTick);
   }
 
   @override
@@ -71,19 +53,15 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
 
   @override
   void didChangeDependencies() {
-    var shouldInit = _controller == null;
     super.didChangeDependencies();
+    final shouldInit = _controller == null;
     _updateTabController();
-    if (shouldInit) {
-      currentTab.addListener(_onIndexChanged);
-    }
+    if (shouldInit) currentTab.addListener(_onIndexChanged);
   }
 
   @override
   void dispose() {
-    if (_controllerIsValid)
-      _controller.animation.removeListener(_handleTabControllerAnimationTick);
-    _controller = null;
+    _controller?.animation?.removeListener(_handleTabControllerAnimationTick);
     currentTab.removeListener(_onIndexChanged);
     super.dispose();
   }
@@ -98,15 +76,15 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   }
 
   void _handleTabControllerAnimationTick() {
-    currentTab.value = widget.children.keys.toList()[_controller.index];
+    currentTab.value = widget.children.keys.toList()[_controller!.index];
   }
 
   @override
   Widget build(BuildContext context) {
     assert(() {
-      if (_controller.length != widget.children.length) {
+      if (_controller!.length != widget.children.length) {
         throw FlutterError(
-            "Controller's length property (${_controller.length}) does not match the "
+            "Controller's length property (${_controller!.length}) does not match the "
             "number of tabs (${widget.children.length}) present in TabBar's tabs property.");
       }
       return true;
@@ -122,8 +100,8 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   }
 
   _onIndexChanged() {
-    if (_controller.index != currentTab.value) {
-      _controller.animateTo(DictionaryTab.values.indexOf(currentTab.value));
+    if (_controller!.index != currentTab.value) {
+      _controller!.animateTo(DictionaryTab.values.indexOf(currentTab.value));
     }
     setState(() {});
   }

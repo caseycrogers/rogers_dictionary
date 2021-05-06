@@ -8,15 +8,15 @@ import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notif
 class DialoguesPageModel {
   // All static because these can be shared across both translation modes.
   static final LinkedHashSet<DialogueChapter> _dialogues = LinkedHashSet();
-  static Stream<DialogueChapter> _dialogueStream;
+  static Stream<DialogueChapter>? _dialogueStream;
 
-  final LocalHistoryValueNotifier<DialogueChapter> selectedChapter;
+  final LocalHistoryValueNotifier<DialogueChapter?> selectedChapter;
 
-  DialogueSubChapter selectedSubChapter;
+  DialogueSubChapter? selectedSubChapter;
 
   List<DialogueChapter> get dialogues => _dialogues.toList();
 
-  Stream<DialogueChapter> get dialogueStream => _dialogueStream;
+  Stream<DialogueChapter> get dialogueStream => _dialogueStream!;
 
   DialoguesPageModel._(this.selectedChapter) {
     _initializeStream();
@@ -24,7 +24,7 @@ class DialoguesPageModel {
 
   static DialoguesPageModel empty(BuildContext context) =>
       DialoguesPageModel._(LocalHistoryValueNotifier(
-        modalRoute: ModalRoute.of(context),
+        modalRoute: ModalRoute.of(context)!,
         initialValue: null,
       ));
 
@@ -43,7 +43,7 @@ class DialoguesPageModel {
   }
 
   void onChapterSelected(
-      DialogueChapter newChapter, DialogueSubChapter newSubChapter) {
+      DialogueChapter? newChapter, DialogueSubChapter? newSubChapter) {
     selectedChapter.value = newChapter;
     selectedSubChapter = newSubChapter;
   }

@@ -11,9 +11,9 @@ class EntrySearchModel with ChangeNotifier {
   final TranslationMode _translationMode;
   String _searchString;
   SearchSettingsModel _searchSettingsModel;
-  Stream<Entry> _entryStream;
+  late Stream<Entry> _entryStream;
   LinkedHashSet<Entry> _entries;
-  bool _favoritesOnly;
+  final bool _favoritesOnly;
 
   String get searchString => _searchString;
 
@@ -40,6 +40,7 @@ class EntrySearchModel with ChangeNotifier {
       stream =
           MyApp.db.getFavorites(_translationMode, startAfter: entries.length);
     } else {
+      if (searchString.isEmpty) stream = Stream.empty();
       stream = MyApp.db.getEntries(_translationMode,
           searchString: searchString,
           startAfter: entries.length,
@@ -60,17 +61,15 @@ class EntrySearchModel with ChangeNotifier {
             LinkedHashSet(), favoritesOnly);
 
   void onSearchStringChanged({
-    String newSearchString,
-    SearchSettingsModel newSearchSettings,
-    bool newBookmarksOnly,
+    required String? newSearchString,
+    required SearchSettingsModel? newSearchSettings,
   }) {
     // Do nothing if nothing has changed
     if ((newSearchString ?? _searchString) == _searchString &&
-        (newSearchSettings ?? _searchSettingsModel) == _searchSettingsModel &&
-        (newBookmarksOnly ?? _favoritesOnly) == _favoritesOnly) return;
+        (newSearchSettings ?? _searchSettingsModel) == _searchSettingsModel)
+      return;
     _searchString = newSearchString ?? _searchString;
     _searchSettingsModel = newSearchSettings ?? _searchSettingsModel;
-    _favoritesOnly = newBookmarksOnly ?? _favoritesOnly;
     _entries = LinkedHashSet();
     _initializeStream();
     notifyListeners();

@@ -23,9 +23,9 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
   var df = await DataFrame.fromCsv(filePath);
 
   var rows = df.rows.map((row) => row.map(_parseCell));
-  String englishSubChapter;
-  String spanishSubChapter;
-  DialogueChapterBuilder builder;
+  String? englishSubChapter;
+  String? spanishSubChapter;
+  DialogueChapterBuilder? builder;
 
   List<DialogueChapterBuilder> builders = [];
   var i = 0;
@@ -43,18 +43,18 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
   while (i < rows.length) {
     if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
     Map<String, String> row = rows.elementAt(i);
-    if (row.values.every((e) => e == null || e.isEmpty)) {
+    if (row.values.every((e) => e.isEmpty)) {
       print('$WARNING Skipping empty line at ${i + 2}');
       i += 1;
       continue;
     }
-    if (row[ENGLISH_CHAPTER].isNotEmpty) {
-      if (row[SPANISH_CHAPTER].isEmpty) {
+    if (row[ENGLISH_CHAPTER]!.isNotEmpty) {
+      if (row[SPANISH_CHAPTER]!.isEmpty) {
         print(
             '$ERROR Invalid empty cells for \'${row[ENGLISH_CHAPTER]}\' at row ${i + 2}, skipping.');
         i += 1;
         row = rows.elementAt(i);
-        while (row[ENGLISH_CHAPTER].isEmpty && i + 1 < rows.length) {
+        while (row[ENGLISH_CHAPTER]!.isEmpty && i + 1 < rows.length) {
           i += 1;
           row = rows.elementAt(i);
         }
@@ -62,22 +62,22 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
       }
       builder = DialogueChapterBuilder(
         chapterId: builderCount++,
-        englishTitle: row[ENGLISH_CHAPTER],
-        spanishTitle: row[SPANISH_CHAPTER],
+        englishTitle: row[ENGLISH_CHAPTER]!,
+        spanishTitle: row[SPANISH_CHAPTER]!,
       );
       builders.add(builder);
-      englishSubChapter = row[ENGLISH_SUBCHAPTER];
-      spanishSubChapter = row[SPANISH_SUBCHAPTER];
+      englishSubChapter = row[ENGLISH_SUBCHAPTER]!;
+      spanishSubChapter = row[SPANISH_SUBCHAPTER]!;
     } else {
-      if (row[ENGLISH_SUBCHAPTER].isNotEmpty) {
-        englishSubChapter = row[ENGLISH_SUBCHAPTER];
-        spanishSubChapter = row[SPANISH_SUBCHAPTER];
+      if (row[ENGLISH_SUBCHAPTER]!.isNotEmpty) {
+        englishSubChapter = row[ENGLISH_SUBCHAPTER]!;
+        spanishSubChapter = row[SPANISH_SUBCHAPTER]!;
       }
-      builder.addDialogue(
-        englishSubChapter,
-        spanishSubChapter,
-        row[ENGLISH_CONTENT],
-        row[SPANISH_CONTENT],
+      builder!.addDialogue(
+        englishSubChapter!,
+        spanishSubChapter!,
+        row[ENGLISH_CONTENT]!,
+        row[SPANISH_CONTENT]!,
       );
     }
     i++;
@@ -122,7 +122,7 @@ Future<void> _uploadSqlFlite(
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
   if (!(value is String)) value = '';
-  var str = value as String;
+  final str = value;
   return MapEntry(
       key.trim(),
       str
@@ -130,10 +130,6 @@ MapEntry<String, String> _parseCell(String key, dynamic value) {
           .replaceAll(' | ', '|')
           .replaceAll('| ', '|')
           .replaceAll(' |', '|'));
-}
-
-List<String> _split(String pluralValue) {
-  return pluralValue.isEmpty ? [] : pluralValue.split('|');
 }
 
 void main(List<String> arguments) async {

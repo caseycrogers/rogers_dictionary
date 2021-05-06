@@ -5,7 +5,7 @@ class DictionaryPageTransition extends StatelessWidget {
   final Widget child;
   final Animation<double> animation;
 
-  DictionaryPageTransition({@required this.child, @required this.animation});
+  DictionaryPageTransition({required this.child, required this.animation});
 
   @override
   Widget build(BuildContext context) {

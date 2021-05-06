@@ -25,9 +25,9 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   var df = await DataFrame.fromCsv(filePath);
 
   var rows = df.rows.map((row) => row.map(_parseCell));
-  EntryBuilder builder;
-  String partOfSpeech;
-  String dominantHeadwordParentheticalQualifier;
+  EntryBuilder? builder;
+  String? partOfSpeech;
+  String? dominantHeadwordParentheticalQualifier;
   var i = 0;
   Map<String, EntryBuilder> entryBuilders = {};
 
@@ -40,33 +40,33 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < 100) {
+  while (i < rows.length && i < 500) {
     if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
     Map<String, String> row = rows.elementAt(i);
-    if (row.values.every((e) => e == null || e.isEmpty)) {
+    if (row.values.every((e) => e.isEmpty)) {
       print('$WARNING Skipping empty line at ${i + 2}');
       i += 1;
       continue;
     }
-    if (row[HEADWORD].isNotEmpty) {
-      if ((row[PART_OF_SPEECH].isEmpty && row[RUN_ON_PARENTS].isEmpty) ||
-          row[TRANSLATION].isEmpty) {
+    if (row[HEADWORD]!.isNotEmpty) {
+      if ((row[PART_OF_SPEECH]!.isEmpty && row[RUN_ON_PARENTS]!.isEmpty) ||
+          row[TRANSLATION]!.isEmpty) {
         print(
             '$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row ${i + 2}, skipping.');
         i += 1;
         row = rows.elementAt(i);
-        while (row[HEADWORD].isEmpty) {
+        while (row[HEADWORD]!.isEmpty) {
           i += 1;
           row = rows.elementAt(i);
         }
         continue;
       }
       var parents = <String>[];
-      if (row[RUN_ON_PARENTS].isNotEmpty) {
-        parents = row[RUN_ON_PARENTS].split('|');
+      if (row[RUN_ON_PARENTS]!.isNotEmpty) {
+        parents = row[RUN_ON_PARENTS]!.split('|');
         parents.forEach((parent) {
           if (parent == parents[0] && parent.isEmpty) return;
-          entryBuilders[parent]?.addRelated([row[HEADWORD]]) ??
+          entryBuilders[parent]?.addRelated([row[HEADWORD]!]) ??
               print(
                   "$WARNING Missing run on parent \'$parent\' for entry \'${row[HEADWORD]}\' at line ${i + 2}");
         });
@@ -74,54 +74,56 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       builder = EntryBuilder()
           .entryId(i + 2)
           .headword(
-              row[HEADWORD],
-              _split(row[HEADWORD_ABBREVIATIONS]).get(0, orElse: ''),
-              _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]).get(0, orElse: ''))
+              row[HEADWORD]!,
+              _split(row[HEADWORD_ABBREVIATIONS]!).get(0, orElse: ''),
+              _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!)
+                  .get(0, orElse: ''))
           .addRelated(parents);
-      _split(row[ALTERNATE_HEADWORDS])
+      _split(row[ALTERNATE_HEADWORDS]!)
           .asMap()
           .forEach((i, alternateHeadwordText) {
         var index = i + 1;
-        builder.addAlternateHeadword(
+        builder!.addAlternateHeadword(
           headwordText: alternateHeadwordText,
           abbreviation:
-              _split(row[HEADWORD_ABBREVIATIONS]).get(index, orElse: ''),
-          namingStandard: _split(row[ALTERNATE_HEADWORD_NAMING_STANDARDS])
+              _split(row[HEADWORD_ABBREVIATIONS]!).get(index, orElse: ''),
+          namingStandard: _split(row[ALTERNATE_HEADWORD_NAMING_STANDARDS]!)
               .get(index, orElse: ''),
-          parentheticalQualifier: _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS])
-              .get(index, orElse: ''),
+          parentheticalQualifier:
+              _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!)
+                  .get(index, orElse: ''),
         );
       });
       if (entryBuilders.keys.contains(row[HEADWORD]))
         print('$WARNING Duplicate headword ${row[HEADWORD]} at line ${i + 2}');
-      entryBuilders[row[HEADWORD]] = builder;
+      entryBuilders[row[HEADWORD]!] = builder;
       partOfSpeech = '';
       dominantHeadwordParentheticalQualifier = '';
     }
-    if (row[PART_OF_SPEECH].isNotEmpty) {
-      partOfSpeech = row[PART_OF_SPEECH];
+    if (row[PART_OF_SPEECH]!.isNotEmpty) {
+      partOfSpeech = row[PART_OF_SPEECH]!;
       // Reset the qualifier
       dominantHeadwordParentheticalQualifier = '';
       if (Entry.longPartOfSpeech(partOfSpeech).contains('*'))
         print(
             '$WARNING Unrecognized part of speech $partOfSpeech for headword ${row[HEADWORD]} at line ${i + 2}');
     }
-    if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER].isNotEmpty)
+    if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty)
       dominantHeadwordParentheticalQualifier =
-          row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER];
-    builder.addTranslation(
-        partOfSpeech: partOfSpeech,
-        irregularInflections: row[IRREGULAR_INFLECTIONS],
+          row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!;
+    builder!.addTranslation(
+        partOfSpeech: partOfSpeech!,
+        irregularInflections: row[IRREGULAR_INFLECTIONS]!,
         dominantHeadwordParentheticalQualifier:
-            dominantHeadwordParentheticalQualifier,
-        translation: row[TRANSLATION],
-        genderAndPlural: row[GENDER_AND_PLURAL],
-        translationNamingStandard: row[TRANSLATION_NAMING_STANDARD],
-        translationAbbreviation: row[TRANSLATION_ABBREVIATION],
+            dominantHeadwordParentheticalQualifier!,
+        translation: row[TRANSLATION]!,
+        genderAndPlural: row[GENDER_AND_PLURAL]!,
+        translationNamingStandard: row[TRANSLATION_NAMING_STANDARD]!,
+        translationAbbreviation: row[TRANSLATION_ABBREVIATION]!,
         translationParentheticalQualifier:
-            row[TRANSLATION_PARENTHETICAL_QUALIFIER],
-        examplePhrases: _split(row[EXAMPLE_PHRASES]),
-        editorialNote: row[EDITORIAL_NOTE]);
+            row[TRANSLATION_PARENTHETICAL_QUALIFIER]!,
+        examplePhrases: _split(row[EXAMPLE_PHRASES]!),
+        editorialNote: row[EDITORIAL_NOTE]!);
     i++;
   }
   assert(builder != null, "Did not generate any entries!");
@@ -185,7 +187,7 @@ Future<void> _uploadSqlFlite(
       RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS:
           entry.related.map((p) => p.withoutDiacriticalMarks).join(' | '),
       HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
-          .map((h) => h.abbreviation.withoutDiacriticalMarks)
+          .map((h) => h.abbreviation?.withoutDiacriticalMarks ?? '')
           .join(' | '),
       ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS: entry.alternateHeadwords
           .map((alt) => alt.headwordText.withoutDiacriticalMarks)
@@ -200,7 +202,7 @@ Future<void> _uploadSqlFlite(
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
   if (!(value is String)) value = '';
-  var str = value as String;
+  final str = value;
   return MapEntry(
       key.trim(),
       str

@@ -40,11 +40,10 @@ class MyApp extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: BetterFeedback(
-        onFeedback: (context, feedback, feedbackScreenshot) {},
+        mode: FeedbackMode.draw,
         child: MaterialApp(
           title: 'Dictionary',
           onGenerateRoute: PageRouter.generateRoute,
-          // TODO: Initial route breaks '#' navigation, refactor away from initial route?
           initialRoute: '#/' + SearchPage.route,
           theme: ThemeData(
               textTheme: TextTheme(

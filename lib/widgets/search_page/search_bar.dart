@@ -13,16 +13,20 @@ class SearchBar extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBar> {
-  TextEditingController _controller;
-  bool _isEmpty;
+  late TextEditingController _controller;
+  late bool _isEmpty;
+
+  bool _shouldInit = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final searchPageModel = context.read<SearchPageModel>();
-    if (_controller == null) {
+    if (_shouldInit) {
       _controller = TextEditingController(text: searchPageModel.searchString);
       _controller.addListener(_updateIsEmpty);
+      _isEmpty = searchPageModel.searchString.isEmpty;
+      _shouldInit = false;
     }
   }
 

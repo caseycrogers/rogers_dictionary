@@ -76,7 +76,7 @@ class SearchOptionsView extends StatelessWidget {
   }
 
   void _updateOptions(BuildContext context,
-      {SortOrder newSortBy, bool newIgnoreAccents}) {
+      {SortOrder? newSortBy, bool? newIgnoreAccents}) {
     DictionaryPageModel.readFrom(context).onSearchChanged(
       _exteriorContext,
       newSearchSettings: _entrySearchModel.searchSettingsModel

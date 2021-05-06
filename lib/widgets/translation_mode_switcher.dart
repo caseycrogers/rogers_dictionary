@@ -10,7 +10,7 @@ class TranslationModeSwitcher extends StatelessWidget {
   final Widget child;
   final bool maintainState;
 
-  TranslationModeSwitcher({@required this.child, this.maintainState = true});
+  TranslationModeSwitcher({required this.child, this.maintainState = true});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class TranslationModeSwitcher extends StatelessWidget {
           dictionaryModel.currTranslationPageModel.value.translationMode);
       // If the controller isn't attached yet then the PageView will be properly
       // constructed via initialPage.
-      if (!controller.hasClients || controller.page.round() == targetPage)
+      if (!controller.hasClients || controller.page!.round() == targetPage)
         return;
       controller.animateToPage(
         targetPage,

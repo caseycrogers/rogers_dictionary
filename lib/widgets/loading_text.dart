@@ -8,7 +8,7 @@ class LoadingText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<String>(
       builder: (context, snap) => Text(
         snap.data ?? '',
         style: TextStyle(
@@ -20,13 +20,14 @@ class LoadingText extends StatelessWidget {
     );
   }
 
-  _infiniteTextStream() async* {
+  Stream<String> _infiniteTextStream() async* {
     var i = 0;
     while (true) {
       // If _delay is true, display an empty text box for the first three tics
       // to reduce visual disruption for short loading times
       var txt = [''];
-      if (!delay || i == 3) txt = ['.', '..', '...'].map((e) => text + e).toList();
+      if (!delay || i == 3)
+        txt = ['.', '..', '...'].map((e) => text + e).toList();
 
       yield txt[DateTime.now().millisecondsSinceEpoch ~/ 200 % txt.length];
       await Future<void>.delayed(Duration(milliseconds: 200));
