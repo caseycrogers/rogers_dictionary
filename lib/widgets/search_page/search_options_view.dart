@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
@@ -77,10 +78,11 @@ class SearchOptionsView extends StatelessWidget {
 
   void _updateOptions(BuildContext context,
       {SortOrder? newSortBy, bool? newIgnoreAccents}) {
-    DictionaryPageModel.readFrom(context).onSearchChanged(
-      _exteriorContext,
-      newSearchSettings: _entrySearchModel.searchSettingsModel
-          .copy(newSortBy: newSortBy, newIgnoreAccents: newIgnoreAccents),
-    );
+    SearchPageModel.readFrom(_exteriorContext)
+        .entrySearchModel
+        .onSearchStringChanged(
+          newSearchSettings: _entrySearchModel.searchSettingsModel
+              .copy(newSortBy: newSortBy, newIgnoreAccents: newIgnoreAccents),
+        );
   }
 }

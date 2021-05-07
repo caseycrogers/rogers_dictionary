@@ -12,7 +12,6 @@ class DialoguesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TranslationModeSwitcher(
-      maintainState: false,
       child: SelectedDialogueSwitcher(),
     );
   }

@@ -9,6 +9,7 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
@@ -36,9 +37,13 @@ class EntryList extends StatelessWidget {
                   : 'No results! Check for typos.'),
           initialData: entrySearchModel.entries,
           stream: entrySearchModel.entryStream,
-          loadingWidget: Container(
-            padding: EdgeInsets.all(16.0),
-            child: LoadingText(),
+          loadingWidget: Delayed(
+            delay: Duration(milliseconds: 100),
+            initialChild: Container(),
+            child: Container(
+              padding: EdgeInsets.all(16.0),
+              child: LoadingText(),
+            ),
           ),
           itemBuilder: _buildRow,
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,

@@ -111,19 +111,6 @@ class DictionaryPageModel {
               )
             : null;
   }
-
-  void onSearchChanged(
-    BuildContext context, {
-    String? newSearchString,
-    SearchSettingsModel? newSearchSettings,
-  }) {
-    _getPageModel(_currModel, isFavoritesOnly(context))
-        .entrySearchModel
-        .onSearchStringChanged(
-          newSearchString: newSearchString,
-          newSearchSettings: newSearchSettings,
-        );
-  }
 }
 
 bool isFavoritesOnly(BuildContext context) =>
