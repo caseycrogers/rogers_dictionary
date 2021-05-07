@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/util/text_utils.dart';
 
 class LoadingText extends StatelessWidget {
   final String text;
@@ -11,10 +12,7 @@ class LoadingText extends StatelessWidget {
     return StreamBuilder<String>(
       builder: (context, snap) => Text(
         snap.data ?? '',
-        style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.black45,
-        ),
+        style: normal1(context).copyWith(color: Colors.black45),
       ),
       stream: _infiniteTextStream(),
     );

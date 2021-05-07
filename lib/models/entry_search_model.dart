@@ -12,7 +12,7 @@ class EntrySearchModel with ChangeNotifier {
   String _searchString;
   SearchSettingsModel _searchSettingsModel;
   late Stream<Entry> _entryStream;
-  LinkedHashSet<Entry> _entries;
+  LinkedHashSet<Entry> _entries = LinkedHashSet();
   final bool _favoritesOnly;
 
   String get searchString => _searchString;
@@ -28,7 +28,7 @@ class EntrySearchModel with ChangeNotifier {
   bool get favoritesOnly => _favoritesOnly;
 
   EntrySearchModel._(this._translationMode, this._searchString,
-      this._searchSettingsModel, this._entries, this._favoritesOnly) {
+      this._searchSettingsModel, this._favoritesOnly) {
     _initializeStream();
   }
 
@@ -36,33 +36,38 @@ class EntrySearchModel with ChangeNotifier {
 
   void _initializeStream() {
     Stream<Entry> stream;
+    // Use a new hashSet to avoid any potential race conditions.
+    final hashSet = LinkedHashSet<Entry>();
     if (_favoritesOnly) {
-      stream =
-          MyApp.db.getFavorites(_translationMode, startAfter: entries.length);
+      stream = MyApp.db.getFavorites(_translationMode, startAfter: 0);
     } else {
       if (searchString.isEmpty) stream = Stream.empty();
-      stream = MyApp.db.getEntries(_translationMode,
-          searchString: searchString,
-          startAfter: entries.length,
-          searchOptions: searchSettingsModel);
+      stream = MyApp.db.getEntries(
+        _translationMode,
+        searchString: searchString,
+        startAfter: 0,
+        searchOptions: searchSettingsModel,
+      );
     }
     _entryStream = stream
         .handleError((error) => print('ERROR (entry stream): $error'))
-        .map((entry) {
-      if (!_entries.add(entry))
-        print('WARNING: added duplicate entry ${entry.urlEncodedHeadword}. '
-            'Set:\n${_entries.toList()}');
-      return entry;
-    }).asBroadcastStream();
+        .map(
+      (entry) {
+        if (!hashSet.add(entry))
+          print('WARNING: added duplicate entry ${entry.urlEncodedHeadword}. '
+              'Set:\n${hashSet.toList()}');
+        return entry;
+      },
+    ).asBroadcastStream();
+    _entries = hashSet;
   }
 
   EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
-      : this._(translationMode, '', SearchSettingsModel.empty(),
-            LinkedHashSet(), favoritesOnly);
+      : this._(translationMode, '', SearchSettingsModel.empty(), favoritesOnly);
 
   void onSearchStringChanged({
-    required String? newSearchString,
-    required SearchSettingsModel? newSearchSettings,
+    String? newSearchString,
+    SearchSettingsModel? newSearchSettings,
   }) {
     // Do nothing if nothing has changed
     if ((newSearchString ?? _searchString) == _searchString &&
@@ -70,7 +75,6 @@ class EntrySearchModel with ChangeNotifier {
       return;
     _searchString = newSearchString ?? _searchString;
     _searchSettingsModel = newSearchSettings ?? _searchSettingsModel;
-    _entries = LinkedHashSet();
     _initializeStream();
     notifyListeners();
   }

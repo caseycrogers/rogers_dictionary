@@ -1,0 +1,22 @@
+syntax = "proto3";
+package rogers_dictionary;
+
+message DialogueChapter {
+    uint32 chapterId = 1;
+    string englishTitle = 2;
+    string spanishTitle = 3;
+
+    repeated DialogueChapter dialogueSubChapters = 4;
+
+    message DialogueSubChapter {
+        string englishTitle = 1;
+        string spanishTitle = 2;
+
+        repeated Dialogue dialogues = 3;
+    }
+
+    message Dialogue {
+        string englishTitle = 1;
+        string spanishTitle = 2;
+    }
+}

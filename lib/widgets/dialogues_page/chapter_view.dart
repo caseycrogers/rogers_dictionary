@@ -189,7 +189,7 @@ class _ChapterViewState extends State<ChapterView> {
         return ScrollablePositionedList.builder(
           key: PageStorageKey(widget.chapter.englishTitle +
               (widget.initialSubChapter?.englishTitle ?? '')),
-          initialScrollIndex: _subChapterToIndex(widget.initialSubChapter!),
+          initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
           itemPositionsListener: _scrollListener,
           itemScrollController: _scrollController,
           itemCount: widget.chapter.subChapters.fold<int>(
