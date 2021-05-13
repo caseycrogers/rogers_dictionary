@@ -82,16 +82,20 @@ List<Widget> headwordText(BuildContext context, String text, bool preview,
 
 List<OverrideStyle> _highlightSearchMatch(
     BuildContext context, String text, bool preview, String searchString) {
-  var overrideStart = text.searchable.indexOf(searchString.searchable);
-  if (!preview || searchString.isEmpty || overrideStart == -1) return [];
-  return [
-    OverrideStyle(
-      style: TextStyle(
-          backgroundColor: Theme.of(context).accentColor.withOpacity(.25)),
-      start: overrideStart,
-      stop: overrideStart + searchString.length,
-    )
-  ];
+  // Prepend `text` and `searchString` with spaces to rule out matches that are
+  // in the middle of a word.
+  var overrideStarts = ' $searchString'.allMatches(' ${text.searchable}');
+  if (!preview || searchString.isEmpty || overrideStarts == []) return [];
+  return overrideStarts
+      .map(
+        (m) => OverrideStyle(
+          style: TextStyle(
+              backgroundColor: Theme.of(context).accentColor.withOpacity(.25)),
+          start: m.start,
+          stop: m.end - 1,
+        ),
+      )
+      .toList();
 }
 
 Widget alternateHeadwordLines(BuildContext context,
@@ -115,7 +119,12 @@ Widget alternateHeadwordLines(BuildContext context,
                 overflow:
                     preview ? TextOverflow.ellipsis : TextOverflow.visible,
                 overrideStyles: _highlightSearchMatch(
-                    context, '**${alt.headwordText}**', preview, searchString),
+                  context,
+                  // Add two spaces to match the two asterisks.
+                  '  ${alt.headwordText}',
+                  preview,
+                  searchString,
+                ),
               ).forWrap(context),
               ...parentheticalTexts(
                 context,
