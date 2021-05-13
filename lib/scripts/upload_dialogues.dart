@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
-import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
+import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 import 'package:args/args.dart';
 import 'package:df/df.dart';
@@ -106,15 +106,15 @@ Future<void> _uploadSqlFlite(
   }
   await db.execute('''CREATE TABLE $DIALOGUES_TABLE(
     $DIALOGUE_ID INTEGER NOT NULL  PRIMARY KEY,
-    $DIALOGUE_BLOB STRING NOT NULL
+    $DIALOGUE_BLOB BLOB NOT NULL
   )''');
   var batch = db.batch();
   for (final chapter in dialogueChapters) {
     var dialogueRecord = {
       DIALOGUE_ID: chapter.chapterId,
-      DIALOGUE_BLOB: jsonEncode(chapter.toJson()),
+      DIALOGUE_BLOB: chapter.writeToBuffer(),
     };
-    if (verbose) print(dialogueRecord);
+    if (verbose) print(chapter.toProto3Json());
     batch.insert(DIALOGUES_TABLE, dialogueRecord);
   }
   return batch.commit().then((_) => null);

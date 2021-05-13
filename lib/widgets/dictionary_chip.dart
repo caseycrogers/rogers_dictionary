@@ -4,16 +4,25 @@ import 'package:flutter/material.dart';
 class DictionaryChip extends StatelessWidget {
   final Widget child;
   final Color? color;
+  final EdgeInsets? padding;
+  final EdgeInsets? childPadding;
 
-  DictionaryChip({required this.child, this.color});
+  DictionaryChip(
+      {required this.child, this.color, this.padding, this.childPadding});
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      backgroundColor: color ?? Colors.grey.shade300,
-      padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 1.0),
-      label: child,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+    return Padding(
+      padding: padding ?? EdgeInsets.zero,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0)
+            .add(childPadding ?? EdgeInsets.zero),
+        child: child,
+        decoration: BoxDecoration(
+          color: color ?? Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(18.0),
+        ),
+      ),
     );
   }
 }

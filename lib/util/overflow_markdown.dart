@@ -18,8 +18,41 @@ class OverflowMarkdown extends StatelessWidget {
     this.overrideStyles,
   });
 
+  List<Widget> forWrap(BuildContext context) {
+    return _constructSpans(context)
+        .expand(
+          (s) => s.text!.split(' ').map(
+                (word) => _constructText(
+                  context,
+                  [
+                    TextSpan(
+                      // Add space back in for all but first word
+                      text: word == s.text!.split(' ').first ? word : ' $word',
+                      style: s.style,
+                    ),
+                  ],
+                ),
+              ),
+        )
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    return _constructText(context, _constructSpans(context));
+  }
+
+  Widget _constructText(BuildContext context, List<TextSpan> spans) {
+    return RichText(
+      overflow: overflow ?? TextOverflow.visible,
+      text: TextSpan(
+        style: defaultStyle ?? Theme.of(context).textTheme.bodyText1,
+        children: spans,
+      ),
+    );
+  }
+
+  List<TextSpan> _constructSpans(BuildContext context) {
     var spans = <TextSpan>[];
     var isBold = false;
     var isItalic = false;
@@ -42,6 +75,7 @@ class OverflowMarkdown extends StatelessWidget {
     }
 
     void addSpan() {
+      if (buff.isEmpty) return;
       spans.add(TextSpan(
         text: buff.toString(),
         style: getTextStyle(),
@@ -54,8 +88,9 @@ class OverflowMarkdown extends StatelessWidget {
         addSpan();
         currOverrideStyle = null;
       }
-      // Cast is necessary so that `orElse` can return null.
       final OverrideStyle? startOverrideStyle =
+          // Cast is necessary so that `orElse` can return null.
+          // ignore: unnecessary_cast
           (overrideStyles ?? []).map((e) => e as OverrideStyle?).firstWhere(
                 (o) => o?.matchesStart(i, charIndex) ?? false,
                 orElse: () => null,
@@ -97,12 +132,7 @@ class OverflowMarkdown extends StatelessWidget {
     addSpan();
     assert(!isItalic, "Unclosed italic mark in $fullText");
     assert(!isBold, "Unclosed bold mark in $fullText");
-    return RichText(
-      overflow: overflow ?? TextOverflow.visible,
-      text: TextSpan(
-          style: defaultStyle ?? Theme.of(context).textTheme.bodyText1,
-          children: spans),
-    );
+    return spans;
   }
 }
 
@@ -116,7 +146,7 @@ class OverrideStyle {
     required this.style,
     required this.start,
     required this.stop,
-    this.ignoreSymbols = true,
+    this.ignoreSymbols = false,
   }) : assert(start != stop);
 
   bool matchesStart(int index, int charIndex) =>

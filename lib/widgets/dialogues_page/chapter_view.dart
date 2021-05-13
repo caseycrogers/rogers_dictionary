@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
-import 'package:rogers_dictionary/widgets/search_page/page_header.dart';
+import 'package:rogers_dictionary/pages/page_header.dart';
 
 class ChapterView extends StatefulWidget {
   final DialogueChapter chapter;
@@ -51,7 +52,7 @@ class _ChapterViewState extends State<ChapterView> {
         ) as bool?) ??
         false;
     _currentSubChapter = ValueNotifier(
-        widget.initialSubChapter ?? widget.chapter.subChapters[0]);
+        widget.initialSubChapter ?? widget.chapter.dialogueSubChapters[0]);
     _scrollListener.itemPositions.addListener(() {
       // Don't update during programmatic scrolling.
       if (_inProgrammaticScroll) return;
@@ -64,7 +65,7 @@ class _ChapterViewState extends State<ChapterView> {
       _currentSubChapter.value = subChapterAndProgress.key;
       _subChapterProgress.value = subChapterAndProgress.value;
     });
-    _subChapterAndDialogueIndex = widget.chapter.subChapters
+    _subChapterAndDialogueIndex = widget.chapter.dialogueSubChapters
         .expand((subChapter) => subChapter.dialogues
             .asMap()
             .keys
@@ -150,7 +151,7 @@ class _ChapterViewState extends State<ChapterView> {
                         : Text(_currentSubChapter.value.oppositeTitle(context)),
                   ),
                   body: Column(
-                    children: widget.chapter.subChapters
+                    children: widget.chapter.dialogueSubChapters
                         .map(
                           (subChapter) => _subchapterTile(
                             context,
@@ -192,7 +193,7 @@ class _ChapterViewState extends State<ChapterView> {
           initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
           itemPositionsListener: _scrollListener,
           itemScrollController: _scrollController,
-          itemCount: widget.chapter.subChapters.fold<int>(
+          itemCount: widget.chapter.dialogueSubChapters.fold<int>(
               0, (sum, subChapter) => sum += subChapter.dialogues.length),
           itemBuilder: (context, index) => Builder(
             builder: (context) {
@@ -210,7 +211,7 @@ class _ChapterViewState extends State<ChapterView> {
               );
               if (dialogueIndex + 1 == subChapter.dialogues.length &&
                   widget.chapter.hasSubChapters &&
-                  subChapter != widget.chapter.subChapters.last)
+                  subChapter != widget.chapter.dialogueSubChapters.last)
                 return Column(
                   children: [
                     dialogueTile,
@@ -256,13 +257,14 @@ class _ChapterViewState extends State<ChapterView> {
   MapEntry<DialogueSubChapter, double> _subChapterAndProgress(
       ItemPosition first, ItemPosition last) {
     var dialogueIndex = first.index;
-    var subChapter = widget.chapter.subChapters.firstWhere((subChapter) {
+    var subChapter =
+        widget.chapter.dialogueSubChapters.firstWhere((subChapter) {
       dialogueIndex -= subChapter.dialogues.length;
       return dialogueIndex < 0;
     });
     dialogueIndex += subChapter.dialogues.length;
     var lastDialogueIndex = dialogueIndex + (last.index - first.index);
-    var isLast = subChapter == widget.chapter.subChapters.last;
+    var isLast = subChapter == widget.chapter.dialogueSubChapters.last;
     var dialoguePercent = -first.itemLeadingEdge /
         (first.itemTrailingEdge - first.itemLeadingEdge);
     var lastDialoguePercent = 1 -
@@ -289,14 +291,14 @@ class _ChapterViewState extends State<ChapterView> {
 
   int _subChapterToIndex(DialogueSubChapter? subChapter) {
     if (subChapter == null) return 0;
-    return widget.chapter.subChapters
+    return widget.chapter.dialogueSubChapters
         .takeWhile((s) => s != subChapter)
         .fold(0, (sum, subChapter) => sum += subChapter.dialogues.length);
   }
 
   DialogueSubChapter _nextSubChapter(DialogueSubChapter subChapter) {
-    assert(subChapter != widget.chapter.subChapters.last);
-    return widget.chapter
-        .subChapters[widget.chapter.subChapters.indexOf(subChapter) + 1];
+    assert(subChapter != widget.chapter.dialogueSubChapters.last);
+    return widget.chapter.dialogueSubChapters[
+        widget.chapter.dialogueSubChapters.indexOf(subChapter) + 1];
   }
 }

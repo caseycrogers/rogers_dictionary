@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
-import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'package:args/args.dart';
@@ -104,7 +104,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       partOfSpeech = row[PART_OF_SPEECH]!;
       // Reset the qualifier
       dominantHeadwordParentheticalQualifier = '';
-      if (Entry.longPartOfSpeech(partOfSpeech).contains('*'))
+      if (EntryUtils.longPartOfSpeech(partOfSpeech).contains('*'))
         print(
             '$WARNING Unrecognized part of speech $partOfSpeech for headword ${row[HEADWORD]} at line ${i + 2}');
     }
@@ -161,7 +161,7 @@ Future<void> _uploadSqlFlite(
     $RUN_ON_PARENTS$WITHOUT_DIACRITICAL_MARKS STRING,
     $HEADWORD_ABBREVIATIONS$WITHOUT_DIACRITICAL_MARKS STRING,
     $ALTERNATE_HEADWORDS$WITHOUT_DIACRITICAL_MARKS String,
-    $ENTRY_BLOB STRING NOT NULL
+    $ENTRY_BLOB BLOB NOT NULL
   )''');
   try {
     await db.execute('''DROP TABLE ${tableName}_favorites''');
@@ -174,28 +174,26 @@ Future<void> _uploadSqlFlite(
   var batch = db.batch();
   for (var entry in entries) {
     var entryRecord = {
-      URL_ENCODED_HEADWORD: entry.urlEncodedHeadword,
+      URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
-      HEADWORD: entry.headwordText,
-      RUN_ON_PARENTS: (entry.related ?? []).join(' | '),
+      HEADWORD: entry.headword.headwordText,
+      RUN_ON_PARENTS: (entry.related).join(' | '),
       HEADWORD_ABBREVIATIONS:
           entry.allHeadwords.map((h) => h.abbreviation).join(' | '),
-      ALTERNATE_HEADWORDS: (entry.alternateHeadwords ?? [])
-          .map((alt) => alt.headwordText)
-          .join(' | '),
+      ALTERNATE_HEADWORDS:
+          (entry.alternateHeadwords).map((alt) => alt.headwordText).join(' | '),
       HEADWORD + WITHOUT_DIACRITICAL_MARKS:
-          entry.headwordText.withoutDiacriticalMarks,
-      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS: (entry.related ?? [])
-          .map((p) => p.withoutDiacriticalMarks)
-          .join(' | '),
+          entry.headword.headwordText.withoutDiacriticalMarks,
+      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS:
+          (entry.related).map((p) => p.withoutDiacriticalMarks).join(' | '),
       HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
-          .map((h) => h.abbreviation?.withoutDiacriticalMarks ?? '')
+          .map((h) => h.abbreviation.withoutDiacriticalMarks)
           .join(' | '),
       ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS:
-          (entry.alternateHeadwords ?? [])
+          (entry.alternateHeadwords)
               .map((alt) => alt.headwordText.withoutDiacriticalMarks)
               .join(' | '),
-      ENTRY_BLOB: jsonEncode(entry.toJson()),
+      ENTRY_BLOB: entry.writeToBuffer(),
     };
     if (verbose) print(entryRecord);
     batch.insert(tableName, entryRecord);

@@ -4,13 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
@@ -80,12 +80,12 @@ class DictionaryPageModel {
   void onEntrySelected(BuildContext context, Entry newEntry) {
     bool isFavoritesModel = isFavoritesOnly(context);
     // Only update if the value has actually changed
-    if (newEntry.urlEncodedHeadword ==
+    if (newEntry.headword.urlEncodedHeadword ==
         _getPageModel(_currModel, isFavoritesModel).currSelectedHeadword)
       return;
     _getPageModel(_currModel, isFavoritesModel).currSelectedEntry.value =
         SelectedEntry(
-      urlEncodedHeadword: newEntry.urlEncodedHeadword,
+      urlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
       entry: Future.value(newEntry),
     );
   }

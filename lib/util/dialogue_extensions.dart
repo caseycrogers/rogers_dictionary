@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
+import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 extension TranslatableChapter on DialogueChapter {
+  bool get hasSubChapters => dialogueSubChapters.first.englishTitle.isNotEmpty;
+
   String title(BuildContext context) =>
       TranslationPageModel.of(context).isEnglish ? englishTitle : spanishTitle;
 

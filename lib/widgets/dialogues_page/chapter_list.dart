@@ -1,25 +1,28 @@
-import 'dart:math';
-
 import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
+import 'package:rogers_dictionary/pages/headerless_page.dart';
+import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
+import 'package:rogers_dictionary/widgets/buttons/indent_icon.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
 class ChapterList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var dialoguesModel = TranslationPageModel.of(context);
-    return AsyncListView<DialogueChapter>(
-      key: PageStorageKey('dialogues'),
-      padding: EdgeInsets.zero,
-      initialData: dialoguesModel.dialoguesPageModel.dialogues,
-      stream: dialoguesModel.dialoguesPageModel.dialogueStream,
-      itemBuilder: _buildTopic,
+    return HeaderlessPage(
+      child: AsyncListView<DialogueChapter>(
+        key: PageStorageKey('dialogues'),
+        padding: EdgeInsets.zero,
+        initialData: dialoguesModel.dialoguesPageModel.dialogues,
+        stream: dialoguesModel.dialoguesPageModel.dialogueStream,
+        itemBuilder: _buildTopic,
+      ),
     );
   }
 
@@ -41,7 +44,7 @@ class ChapterList extends StatelessWidget {
               subtitle: Text(chapter.oppositeTitle(context),
                   style: TextStyle(color: Colors.grey.shade700)),
               key: _getKey(context, chapter),
-              children: chapter.subChapters
+              children: chapter.dialogueSubChapters
                   .map((subChapter) => _clickableHeader(
                         context,
                         true,
@@ -66,7 +69,7 @@ class ChapterList extends StatelessWidget {
     var dialoguesModel = TranslationPageModel.of(context).dialoguesPageModel;
     return ListTile(
       minLeadingWidth: 0.0,
-      leading: isSubHeader ? indentIcon() : null,
+      leading: isSubHeader ? IndentIcon() : null,
       title: bold1Text(
         context,
         subChapter?.title(context) ?? chapter.title(context),
@@ -77,9 +80,3 @@ class ChapterList extends StatelessWidget {
     );
   }
 }
-
-Widget indentIcon() => Transform(
-      alignment: Alignment.center,
-      transform: Matrix4.rotationY(pi),
-      child: Icon(Icons.keyboard_return),
-    );

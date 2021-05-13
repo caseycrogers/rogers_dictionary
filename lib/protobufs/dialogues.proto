@@ -1,3 +1,5 @@
+// Run protoc --dart_out=. lib/protobufs/dialogues.proto to compile.
+
 syntax = "proto3";
 package rogers_dictionary;
 
@@ -6,9 +8,9 @@ message DialogueChapter {
     string englishTitle = 2;
     string spanishTitle = 3;
 
-    repeated DialogueChapter dialogueSubChapters = 4;
+    repeated SubChapter dialogueSubChapters = 4;
 
-    message DialogueSubChapter {
+    message SubChapter {
         string englishTitle = 1;
         string spanishTitle = 2;
 
@@ -16,7 +18,7 @@ message DialogueChapter {
     }
 
     message Dialogue {
-        string englishTitle = 1;
-        string spanishTitle = 2;
+        string englishContent = 1;
+        string spanishContent = 2;
     }
 }

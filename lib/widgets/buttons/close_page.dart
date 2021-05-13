@@ -8,15 +8,13 @@ class ClosePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: IconButton(
-        icon: Icon(
-          Icons.close,
-          color: Theme.of(context).accentIconTheme.color,
-        ),
-        onPressed: onClose,
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      icon: Icon(
+        Icons.arrow_back,
+        color: Theme.of(context).iconTheme.color,
       ),
+      onPressed: onClose,
     );
   }
 }

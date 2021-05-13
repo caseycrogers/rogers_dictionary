@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
-import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 import 'entry_search_model.dart';
 import 'translation_page_model.dart';
@@ -24,7 +24,8 @@ class SearchPageModel {
 
   String get searchString => entrySearchModel.searchString;
 
-  String? get currSelectedHeadword => currSelectedEntry.value?.urlEncodedHeadword;
+  String? get currSelectedHeadword =>
+      currSelectedEntry.value?.urlEncodedHeadword;
 
   static SearchPageModel of(BuildContext context) =>
       context.select<SearchPageModel, SearchPageModel>((mdl) => mdl);
