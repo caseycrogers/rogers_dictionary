@@ -4,11 +4,12 @@ import 'dart:core';
 import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -61,8 +62,8 @@ class EntryList extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return LoadingText();
           final entry = snapshot.data![index];
-          var isSelected =
-              entry.urlEncodedHeadword == searchPageModel.currSelectedHeadword;
+          var isSelected = entry.headword.urlEncodedHeadword ==
+              searchPageModel.currSelectedHeadword;
           return Column(
             children: [
               InkWell(

@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 class EntrySearchModel with ChangeNotifier {
   final TranslationMode _translationMode;
@@ -50,11 +51,13 @@ class EntrySearchModel with ChangeNotifier {
       );
     }
     _entryStream = stream
-        .handleError((error) => print('ERROR (entry stream): $error'))
+        .handleError((error, StackTrace stackTrace) =>
+            print('ERROR (entry stream): :$error\n$stackTrace'))
         .map(
       (entry) {
         if (!hashSet.add(entry))
-          print('WARNING: added duplicate entry ${entry.urlEncodedHeadword}. '
+          print(
+              'WARNING: added duplicate entry ${entry.headword.urlEncodedHeadword}. '
               'Set:\n${hashSet.toList()}');
         return entry;
       },

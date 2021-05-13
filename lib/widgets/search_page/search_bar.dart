@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/widgets/search_page/search_options_button.dart';
 
@@ -38,7 +37,6 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final dictionaryModel = DictionaryPageModel.of(context);
     final searchPageModel = SearchPageModel.of(context);
     return Material(
       color: primaryColor(searchPageModel.translationMode),

@@ -1,9 +1,10 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
-import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
+import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
+import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 class DialoguesPageModel {
   // All static because these can be shared across both translation modes.

@@ -2,13 +2,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:rogers_dictionary/entry_database/entry.dart';
+import 'package:collection/collection.dart';
+
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
+import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
-import 'package:rogers_dictionary/widgets/search_page/page_header.dart';
+import 'package:rogers_dictionary/pages/page_header.dart';
 
 class EntryView extends StatelessWidget {
   final Entry _entry;
@@ -55,7 +59,7 @@ class EntryView extends StatelessWidget {
         if (_preview)
           headwordLine(context, _entry, _preview,
               SearchPageModel.of(context).searchString),
-        _buildTable(context, _constructTranslationMap(_entry)),
+        _buildTable(context),
         if (!_preview) _buildEditorialNotes(context),
         if (!_preview) _buildRelated(context),
       ],
@@ -63,9 +67,9 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildRelated(BuildContext context) {
-    if (_entry.related == null) return Container();
+    if (_entry.related.isEmpty) return Container();
     List<TextSpan> relatedSpans =
-        _entry.related!.where((r) => r.isNotEmpty).expand(
+        _entry.related.where((r) => r.isNotEmpty).expand(
       (headword) {
         return [
           TextSpan(
@@ -76,47 +80,67 @@ class EntryView extends StatelessWidget {
                 .copyWith(color: Colors.blue),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                DictionaryPageModel.readFrom(context)
-                    .onHeadwordSelected(context, Entry.urlEncode(headword));
+                DictionaryPageModel.readFrom(context).onHeadwordSelected(
+                    context, EntryUtils.urlEncode(headword));
               },
           ),
-          if (headword != _entry.related?.last) TextSpan(text: ', '),
+          if (headword != _entry.related.last) TextSpan(text: ', '),
         ];
       },
     ).toList();
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(height: 48.0),
-      bold1Text(context, 'Related'),
-      Divider(),
-      RichText(
-          text: TextSpan(
-              children: relatedSpans,
-              style: Theme.of(context).textTheme.bodyText1)),
-    ]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(height: 48.0),
+        bold1Text(context, 'Related'),
+        Divider(),
+        ..._entry.related.where((r) => r.isNotEmpty).map(
+              (headword) => TextButton(
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all(EdgeInsets.zero),
+                  minimumSize: MaterialStateProperty.all(Size.zero),
+                  visualDensity: VisualDensity.compact,
+                ),
+                child: OverflowMarkdown(
+                  headword,
+                  defaultStyle: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(color: Colors.blue),
+                ),
+                onPressed: () {
+                  DictionaryPageModel.readFrom(context).onHeadwordSelected(
+                      context, EntryUtils.urlEncode(headword));
+                },
+              ),
+            ),
+      ],
+    );
   }
 
   Widget _buildEditorialNotes(BuildContext context) {
     var notes = _entry.translations
-        .where((t) => t.editorialNote != null && t.editorialNote != '')
-        .map((t) => editorialText(context, t.editorialNote!));
+        .where((t) => t.editorialNote.isNotEmpty)
+        .map((t) => editorialText(context, t.editorialNote));
     if (notes.isEmpty) return Container();
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(height: 48.0),
-          bold1Text(context, "Editorial Notes"),
-          Divider(),
-        ]..addAll(notes));
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(height: 48.0),
+        bold1Text(context, "Editorial Notes"),
+        Divider(),
+        ...notes,
+      ],
+    );
   }
 
-  Widget _buildTable(
-      BuildContext context, Map<String, List<Translation>> translationMap) {
+  Widget _buildTable(BuildContext context) {
     return Table(
         columnWidths: {
           0: IntrinsicColumnWidth(),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.top,
-        children: _buildTranslations(context, translationMap));
+        children: _buildTranslations(context));
   }
 
   Map<String, List<Translation>> _constructTranslationMap(Entry entry) {
@@ -130,20 +154,24 @@ class EntryView extends StatelessWidget {
 
   // Return a list of TableRows corresponding to each part of speech.
   List<TableRow> _buildTranslations(
-      BuildContext context, Map<String, List<Translation>> translationMap) {
-    List<TableRow> partOfSpeechTableRows = [];
-    translationMap.forEach((partOfSpeech, translations) {
-      partOfSpeechTableRows
-          .add(_buildPartOfSpeechTableRow(context, partOfSpeech, translations));
-    });
-    return partOfSpeechTableRows;
+    BuildContext context,
+  ) {
+    return _entry.translations
+        .groupListsBy((t) => t.partOfSpeech)
+        .values
+        .map((translations) {
+      final partOfSpeech = translations.first.partOfSpeech;
+      final inflections = translations.first.irregularInflections;
+      return _buildPartOfSpeechTableRow(
+          context, partOfSpeech, inflections, translations);
+    }).toList();
   }
 
   TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
-      List<Translation> translations) {
-    String? parenthetical;
+      String inflections, List<Translation> translations) {
+    String parenthetical = '';
     final hasParenthetical = translations
-        .any((t) => t.dominantHeadwordParentheticalQualifier != null);
+        .any((t) => t.dominantHeadwordParentheticalQualifier.isNotEmpty);
     if (_preview)
       return TableRow(children: [
         Container(
@@ -163,6 +191,7 @@ class EntryView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             partOfSpeechText(context, partOfSpeech, _preview),
+            irregularInflectionsTable(context, inflections),
             Indent(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,9 +204,13 @@ class EntryView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (parentheticalChanged)
-                        parentheticalText(context, parenthetical),
+                        ...parentheticalTexts(context, parenthetical, false),
                       if (!parentheticalChanged) SizedBox(height: 5.0),
-                      _translationContent(context, t, hasParenthetical),
+                      _translationContent(
+                          context,
+                          t,
+                          hasParenthetical && parenthetical != '',
+                          translations.indexOf(t) + 1),
                     ],
                   );
                 }).toList(),
@@ -190,26 +223,25 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _translationContent(
-      BuildContext context, Translation translation, bool indent) {
+      BuildContext context, Translation translation, bool indent, int i) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Indent(
-              child: translationLine(context, translation),
-              size: indent ? null : 0.0),
-          Indent(
-            child: Indent(
-              child: abbreviationLine(
-                  context,
-                  translation.translationAbbreviation,
-                  _preview,
-                  SearchPageModel.of(context).searchString),
+          normal1Text(context, '${i.toString()}. '),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Indent(
+                    child: translationLine(context, translation),
+                    size: indent ? null : 0.0),
+                examplePhraseText(context, translation.examplePhrases),
+                SizedBox(height: 0.0),
+              ],
             ),
           ),
-          examplePhraseText(context, translation.examplePhrases),
-          SizedBox(height: 0.0),
         ],
       ),
     );

@@ -1,17 +1,18 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:sqflite/sqflite.dart';
+
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
-import 'package:rogers_dictionary/entry_database/dialogue_chapter.dart';
-import 'package:rogers_dictionary/entry_database/entry.dart';
 import 'package:rogers_dictionary/entry_database/dictionary_database.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
+import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:sqflite/sqflite.dart';
 
 class SqfliteDatabase extends DictionaryDatabase {
   Future<Database> _dbFuture = _getDatabase();
@@ -102,16 +103,16 @@ class SqfliteDatabase extends DictionaryDatabase {
 
   Entry _rowToEntry(String headword, TranslationMode translationMode,
       Map<String, Object?>? snapshot) {
-    if (snapshot == null) return Entry.notFound(headword);
+    if (snapshot == null) return EntryUtils.notFound(headword);
     assert(snapshot.containsKey(IS_FAVORITE));
-    var entry = Entry.fromJson(jsonDecode(snapshot[ENTRY_BLOB]! as String));
-    super.setFavorite(
-        translationMode, entry.urlEncodedHeadword, snapshot[IS_FAVORITE] == 1);
+    var entry = Entry.fromBuffer(snapshot[ENTRY_BLOB] as List<int>);
+    super.setFavorite(translationMode, entry.headword.urlEncodedHeadword,
+        snapshot[IS_FAVORITE] == 1);
     return entry;
   }
 
-  DialogueChapter _rowToDialogue(Map<String, dynamic> snapshot) {
-    return DialogueChapter.fromJson(jsonDecode(snapshot[DIALOGUE_BLOB]));
+  DialogueChapter _rowToDialogue(Map<String, Object?> snapshot) {
+    return DialogueChapter.fromBuffer(snapshot[DIALOGUE_BLOB] as List<int>);
   }
 
   @override
@@ -202,7 +203,7 @@ Future<Database> _getDatabase() async {
   // Check if the database exists
   var exists = await databaseExists(path);
 
-  if (!exists || true) {
+  if (!exists) {
     // Should happen only the first time you launch your application
     print("Creating new copy from asset");
 

@@ -1,6 +1,6 @@
 const String ENGLISH = "English";
 const String SPANISH = "Spanish";
-const String DICTIONARY_DB = "dictionaryV0_1_0";
+const String DICTIONARY_DB = "dictionaryV0_2_0";
 
 // Column/field names.
 const URL_ENCODED_HEADWORD = 'url_encoded_headword';

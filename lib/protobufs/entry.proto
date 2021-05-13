@@ -1,0 +1,36 @@
+// Run protoc --dart_out=. lib/protobufs/*.proto to compile.
+
+syntax = "proto3";
+package rogers_dictionary;
+
+message Entry {
+    uint32 entryId = 1;
+    Headword headword = 2;
+
+    repeated string related = 3;
+    repeated Headword alternateHeadwords = 4;
+
+    repeated Translation translations = 5;
+
+    message Headword {
+        bool isAlternate = 1;
+        string headwordText = 2;
+        string abbreviation = 3;
+        string namingStandard = 4;
+        string parentheticalQualifier = 5;
+    }
+
+    message Translation {
+        string partOfSpeech = 1;
+        string translationContent = 2;
+        string irregularInflections = 3;
+        string dominantHeadwordParentheticalQualifier = 4;
+        string genderAndPlural = 5;
+        string translationNamingStandard = 6;
+        string translationAbbreviation = 7;
+        string translationParentheticalQualifier = 8;
+        string editorialNote = 9;
+
+        repeated string examplePhrases = 10;
+    }
+}

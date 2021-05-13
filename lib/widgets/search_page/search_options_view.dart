@@ -36,7 +36,8 @@ class SearchOptionsView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text('sort: '),
-                  ]..addAll(SortOrder.values.map((sortBy) => TextButton(
+                    ...SortOrder.values.map(
+                      (sortBy) => TextButton(
                         style: TextButton.styleFrom(
                             backgroundColor: settingsModel.sortBy == sortBy
                                 ? Colors.black12
@@ -51,7 +52,9 @@ class SearchOptionsView extends StatelessWidget {
                           if (settingsModel.sortBy == sortBy) return;
                           _updateOptions(_exteriorContext, newSortBy: sortBy);
                         },
-                      ))),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Divider(height: 0.0),
