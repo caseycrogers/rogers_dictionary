@@ -42,6 +42,7 @@ class DictionaryPage extends StatelessWidget {
         builder: (context, currSearchPage, dictionaryTabView) => Container(
           color: primaryColor(currSearchPage.translationMode),
           child: DictionaryTopBar(
+            controller: dictionaryModel.topBarController,
             child: Column(
               children: [
                 Expanded(child: dictionaryTabView!),

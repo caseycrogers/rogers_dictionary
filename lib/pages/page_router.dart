@@ -20,7 +20,10 @@ Route<dynamic> _servePage(RouteSettings settings, Uri uri, Widget page) {
       pageBuilder: (context, animation, secondaryAnimation) {
         return Provider<DictionaryPageModel>(
           create: (_) => DictionaryPageModel.empty(context),
-          child: page,
+          builder: (context, _) {
+            DictionaryPageModel.of(context).listenOnPageChanges(context);
+            return page;
+          },
         );
       });
 }

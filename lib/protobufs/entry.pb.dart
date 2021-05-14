@@ -115,13 +115,13 @@ class Entry_Headword extends $pb.GeneratedMessage {
 class Entry_Translation extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Entry.Translation', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'partOfSpeech', protoName: 'partOfSpeech')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translationContent', protoName: 'translationContent')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'irregularInflections', protoName: 'irregularInflections')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dominantHeadwordParentheticalQualifier', protoName: 'dominantHeadwordParentheticalQualifier')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'genderAndPlural', protoName: 'genderAndPlural')
-    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translationNamingStandard', protoName: 'translationNamingStandard')
-    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translationAbbreviation', protoName: 'translationAbbreviation')
-    ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translationParentheticalQualifier', protoName: 'translationParentheticalQualifier')
+    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'namingStandard', protoName: 'namingStandard')
+    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'abbreviation')
+    ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parentheticalQualifier', protoName: 'parentheticalQualifier')
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'editorialNote', protoName: 'editorialNote')
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePhrases', protoName: 'examplePhrases')
     ..hasRequiredFields = false
@@ -130,13 +130,13 @@ class Entry_Translation extends $pb.GeneratedMessage {
   Entry_Translation._() : super();
   factory Entry_Translation({
     $core.String? partOfSpeech,
-    $core.String? translationContent,
+    $core.String? content,
     $core.String? irregularInflections,
     $core.String? dominantHeadwordParentheticalQualifier,
     $core.String? genderAndPlural,
-    $core.String? translationNamingStandard,
-    $core.String? translationAbbreviation,
-    $core.String? translationParentheticalQualifier,
+    $core.String? namingStandard,
+    $core.String? abbreviation,
+    $core.String? parentheticalQualifier,
     $core.String? editorialNote,
     $core.Iterable<$core.String>? examplePhrases,
   }) {
@@ -144,8 +144,8 @@ class Entry_Translation extends $pb.GeneratedMessage {
     if (partOfSpeech != null) {
       _result.partOfSpeech = partOfSpeech;
     }
-    if (translationContent != null) {
-      _result.translationContent = translationContent;
+    if (content != null) {
+      _result.content = content;
     }
     if (irregularInflections != null) {
       _result.irregularInflections = irregularInflections;
@@ -156,14 +156,14 @@ class Entry_Translation extends $pb.GeneratedMessage {
     if (genderAndPlural != null) {
       _result.genderAndPlural = genderAndPlural;
     }
-    if (translationNamingStandard != null) {
-      _result.translationNamingStandard = translationNamingStandard;
+    if (namingStandard != null) {
+      _result.namingStandard = namingStandard;
     }
-    if (translationAbbreviation != null) {
-      _result.translationAbbreviation = translationAbbreviation;
+    if (abbreviation != null) {
+      _result.abbreviation = abbreviation;
     }
-    if (translationParentheticalQualifier != null) {
-      _result.translationParentheticalQualifier = translationParentheticalQualifier;
+    if (parentheticalQualifier != null) {
+      _result.parentheticalQualifier = parentheticalQualifier;
     }
     if (editorialNote != null) {
       _result.editorialNote = editorialNote;
@@ -204,13 +204,13 @@ class Entry_Translation extends $pb.GeneratedMessage {
   void clearPartOfSpeech() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get translationContent => $_getSZ(1);
+  $core.String get content => $_getSZ(1);
   @$pb.TagNumber(2)
-  set translationContent($core.String v) { $_setString(1, v); }
+  set content($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasTranslationContent() => $_has(1);
+  $core.bool hasContent() => $_has(1);
   @$pb.TagNumber(2)
-  void clearTranslationContent() => clearField(2);
+  void clearContent() => clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get irregularInflections => $_getSZ(2);
@@ -240,31 +240,31 @@ class Entry_Translation extends $pb.GeneratedMessage {
   void clearGenderAndPlural() => clearField(5);
 
   @$pb.TagNumber(6)
-  $core.String get translationNamingStandard => $_getSZ(5);
+  $core.String get namingStandard => $_getSZ(5);
   @$pb.TagNumber(6)
-  set translationNamingStandard($core.String v) { $_setString(5, v); }
+  set namingStandard($core.String v) { $_setString(5, v); }
   @$pb.TagNumber(6)
-  $core.bool hasTranslationNamingStandard() => $_has(5);
+  $core.bool hasNamingStandard() => $_has(5);
   @$pb.TagNumber(6)
-  void clearTranslationNamingStandard() => clearField(6);
+  void clearNamingStandard() => clearField(6);
 
   @$pb.TagNumber(7)
-  $core.String get translationAbbreviation => $_getSZ(6);
+  $core.String get abbreviation => $_getSZ(6);
   @$pb.TagNumber(7)
-  set translationAbbreviation($core.String v) { $_setString(6, v); }
+  set abbreviation($core.String v) { $_setString(6, v); }
   @$pb.TagNumber(7)
-  $core.bool hasTranslationAbbreviation() => $_has(6);
+  $core.bool hasAbbreviation() => $_has(6);
   @$pb.TagNumber(7)
-  void clearTranslationAbbreviation() => clearField(7);
+  void clearAbbreviation() => clearField(7);
 
   @$pb.TagNumber(8)
-  $core.String get translationParentheticalQualifier => $_getSZ(7);
+  $core.String get parentheticalQualifier => $_getSZ(7);
   @$pb.TagNumber(8)
-  set translationParentheticalQualifier($core.String v) { $_setString(7, v); }
+  set parentheticalQualifier($core.String v) { $_setString(7, v); }
   @$pb.TagNumber(8)
-  $core.bool hasTranslationParentheticalQualifier() => $_has(7);
+  $core.bool hasParentheticalQualifier() => $_has(7);
   @$pb.TagNumber(8)
-  void clearTranslationParentheticalQualifier() => clearField(8);
+  void clearParentheticalQualifier() => clearField(8);
 
   @$pb.TagNumber(9)
   $core.String get editorialNote => $_getSZ(8);

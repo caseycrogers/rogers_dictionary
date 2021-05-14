@@ -11,6 +11,7 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
 
 const DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
@@ -29,6 +30,8 @@ class DictionaryPageModel {
       currTranslationPageModel;
 
   final LocalHistoryValueNotifier<DictionaryTab> currentTab;
+
+  final DictionaryTopBarController topBarController;
 
   get uri {
     return Uri(pathSegments: [
@@ -51,14 +54,15 @@ class DictionaryPageModel {
       context.read<DictionaryPageModel>();
 
   DictionaryPageModel._(this.currentTab, this.currTranslationPageModel,
-      this.englishPageModel, this.spanishPageModel);
+      this.englishPageModel, this.spanishPageModel)
+      : topBarController = DictionaryTopBarController();
 
   static DictionaryPageModel empty(BuildContext context) {
     var englishPage = TranslationPageModel.empty(
         context: context, translationMode: DEFAULT_TRANSLATION_MODE);
     var spanishPage = TranslationPageModel.empty(
         context: context, translationMode: TranslationMode.Spanish);
-    return DictionaryPageModel._(
+    final dictionaryPageModel = DictionaryPageModel._(
       LocalHistoryValueNotifier(
           modalRoute: ModalRoute.of(context)!,
           initialValue: DictionaryTab.search),
@@ -67,6 +71,7 @@ class DictionaryPageModel {
       englishPage,
       spanishPage,
     );
+    return dictionaryPageModel;
   }
 
   TranslationPageModel pageModel(TranslationMode translationMode) =>
@@ -74,45 +79,85 @@ class DictionaryPageModel {
           ? englishPageModel
           : spanishPageModel;
 
-  void onTranslationModeChanged(TranslationMode newTranslationMode) =>
-      currTranslationPageModel.value = pageModel(newTranslationMode);
-
-  void onEntrySelected(BuildContext context, Entry newEntry) {
-    bool isFavoritesModel = isFavoritesOnly(context);
-    // Only update if the value has actually changed
-    if (newEntry.headword.urlEncodedHeadword ==
-        _getPageModel(_currModel, isFavoritesModel).currSelectedHeadword)
-      return;
-    _getPageModel(_currModel, isFavoritesModel).currSelectedEntry.value =
-        SelectedEntry(
-      urlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
-      entry: Future.value(newEntry),
-    );
+  void onTranslationModeChanged(
+      BuildContext context, TranslationMode newTranslationMode) {
+    currTranslationPageModel.value = pageModel(newTranslationMode);
   }
 
-  SearchPageModel _getPageModel(
-          TranslationPageModel translationPageModel, bool isFavoritesModel) =>
-      isFavoritesModel
-          ? translationPageModel.favoritesPageModel
-          : translationPageModel.searchPageModel;
+  void onEntrySelected(BuildContext context, Entry newEntry) =>
+      _onHeadwordSelected(
+        context,
+        newUrlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
+        newEntry: newEntry,
+      );
 
-  void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) {
-    bool isFavoritesModel = isFavoritesOnly(context);
+  void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) =>
+      _onHeadwordSelected(
+        context,
+        newUrlEncodedHeadword: newUrlEncodedHeadword,
+      );
+
+  void _onHeadwordSelected(BuildContext context,
+      {required String newUrlEncodedHeadword, Entry? newEntry}) {
+    final pageModel = isFavoritesOnly
+        ? _currModel.favoritesPageModel
+        : _currModel.searchPageModel;
     // Only update if the value has actually changed
-    if (newUrlEncodedHeadword ==
-        _getPageModel(_currModel, isFavoritesModel).currSelectedHeadword)
-      return;
-    _getPageModel(_currModel, isFavoritesModel).currSelectedEntry.value =
-        newUrlEncodedHeadword.isNotEmpty
-            ? SelectedEntry(
-                urlEncodedHeadword: newUrlEncodedHeadword,
-                entry: MyApp.db.getEntry(
-                    _currModel.translationMode, newUrlEncodedHeadword),
-              )
-            : null;
+    if (newUrlEncodedHeadword == pageModel.currSelectedHeadword) return;
+    if (newUrlEncodedHeadword.isEmpty) {
+      pageModel.currSelectedEntry.value = null;
+    } else {
+      pageModel.currSelectedEntry.value = SelectedEntry(
+        urlEncodedHeadword: newUrlEncodedHeadword,
+        entry: newEntry == null
+            ? MyApp.db
+                .getEntry(_currModel.translationMode, newUrlEncodedHeadword)
+            : Future.value(newEntry),
+      );
+    }
   }
+
+  void listenOnPageChanges(BuildContext context) {
+    currentTab.addListener(() => updateTopBarArrow(context));
+    currTranslationPageModel.addListener(() => updateTopBarArrow(context));
+    for (var pageModel in [englishPageModel, spanishPageModel]) {
+      pageModel.searchPageModel.currSelectedEntry
+          .addListener(() => updateTopBarArrow(context));
+      pageModel.favoritesPageModel.currSelectedEntry
+          .addListener(() => updateTopBarArrow(context));
+      pageModel.dialoguesPageModel.selectedChapterNotifier
+          .addListener(() => updateTopBarArrow(context));
+    }
+  }
+
+  void updateTopBarArrow(BuildContext context) {
+    // Handle dialogue page.
+    if (currentTab.value == DictionaryTab.dialogues) {
+      if (_currModel.dialoguesPageModel.hasSelection) {
+        topBarController.onClose = (context) => _currModel.dialoguesPageModel
+            .onChapterSelected(context, null, null);
+        return;
+      }
+      topBarController.onClose = null;
+      return;
+    }
+    // Handle search pages.
+    final pageModel = isFavoritesOnly
+        ? _currModel.favoritesPageModel
+        : _currModel.searchPageModel;
+    // Add back button to top bar.
+    if (pageModel.hasSelection) {
+      topBarController.onClose =
+          (context) => _onHeadwordSelected(context, newUrlEncodedHeadword: '');
+      return;
+    }
+    // Remove top bar arrow.
+    return topBarController.onClose = null;
+  }
+
+  bool get isFavoritesOnly => currentTab.value == DictionaryTab.favorites;
 }
 
-bool isFavoritesOnly(BuildContext context) =>
-    DictionaryPageModel.readFrom(context).currentTab.value ==
-    DictionaryTab.favorites;
+abstract class BasePageModel {
+  void onClose(BuildContext context);
+}

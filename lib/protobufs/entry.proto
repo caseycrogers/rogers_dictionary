@@ -22,13 +22,13 @@ message Entry {
 
     message Translation {
         string partOfSpeech = 1;
-        string translationContent = 2;
+        string content = 2;
         string irregularInflections = 3;
         string dominantHeadwordParentheticalQualifier = 4;
         string genderAndPlural = 5;
-        string translationNamingStandard = 6;
-        string translationAbbreviation = 7;
-        string translationParentheticalQualifier = 8;
+        string namingStandard = 6;
+        string abbreviation = 7;
+        string parentheticalQualifier = 8;
         string editorialNote = 9;
 
         repeated string examplePhrases = 10;

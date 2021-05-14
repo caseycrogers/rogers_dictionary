@@ -22,7 +22,4 @@ class LocalHistoryValueNotifier<T> extends ValueNotifier<T> {
 
   LocalHistoryValueNotifier({required this.modalRoute, required T initialValue})
       : super(initialValue);
-
-  LocalHistoryValueNotifier<T> copy() =>
-      LocalHistoryValueNotifier(modalRoute: modalRoute, initialValue: value);
 }

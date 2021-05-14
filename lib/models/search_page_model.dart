@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 import 'entry_search_model.dart';

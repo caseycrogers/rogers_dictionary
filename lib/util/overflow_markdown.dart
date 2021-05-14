@@ -2,44 +2,50 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class OverflowMarkdown extends StatelessWidget {
-  final String data;
-  final List<String>? children;
+  final String text;
   final TextOverflow? overflow;
   final TextStyle? defaultStyle;
   final List<OverrideStyle>? overrideStyles;
 
-  get fullText => data + (children?.join() ?? '');
-
   OverflowMarkdown(
-    this.data, {
-    this.children,
+    this.text, {
     this.overflow,
     this.defaultStyle,
     this.overrideStyles,
   });
 
   List<Widget> forWrap(BuildContext context) {
-    return _constructSpans(context)
-        .expand(
-          (s) => s.text!.split(' ').map(
-                (word) => _constructText(
-                  context,
-                  [
-                    TextSpan(
-                      // Add space back in for all but first word
-                      text: word == s.text!.split(' ').first ? word : ' $word',
-                      style: s.style,
-                    ),
-                  ],
-                ),
+    return _constructSpans(context).expand(
+      (e) {
+        final s = e.value;
+        // This is an override style, return it unperturbed as highlighted
+        // content should not wrap.
+        if (e.key)
+          return [
+            _constructText(context, [s]),
+          ];
+        return s.text!.split(' ').map(
+              (word) => _constructText(
+                context,
+                [
+                  TextSpan(
+                    // Add space back in for all but first word
+                    text: word == s.text!.split(' ').first ? word : ' $word',
+                    style: s.style,
+                  ),
+                ],
               ),
-        )
-        .toList();
+            );
+      },
+    ).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _constructText(context, _constructSpans(context));
+    return _constructText(
+      context,
+      _constructSpans(context).map((e) => e.value).toList(),
+    );
   }
 
   Widget _constructText(BuildContext context, List<TextSpan> spans) {
@@ -52,14 +58,15 @@ class OverflowMarkdown extends StatelessWidget {
     );
   }
 
-  List<TextSpan> _constructSpans(BuildContext context) {
-    var spans = <TextSpan>[];
+  List<MapEntry<bool, TextSpan>> _constructSpans(BuildContext context) {
+    final spans = <MapEntry<bool, TextSpan>>[];
     var isBold = false;
     var isItalic = false;
     var isSubscript = false;
     TextStyle? currOverrideStyle;
     var buff = StringBuffer();
     var i = 0;
+    // Index of user visible characters (excl. parentheses).
     var charIndex = 0;
 
     TextStyle getTextStyle() {
@@ -76,17 +83,29 @@ class OverflowMarkdown extends StatelessWidget {
 
     void addSpan() {
       if (buff.isEmpty) return;
-      spans.add(TextSpan(
-        text: buff.toString(),
-        style: getTextStyle(),
-      ));
+      spans.add(
+        MapEntry(
+          currOverrideStyle != null,
+          TextSpan(
+            text: buff.toString(),
+            style: getTextStyle(),
+          ),
+        ),
+      );
       buff.clear();
     }
 
-    while (i < fullText.length) {
+    while (i < text.length) {
       if ((overrideStyles ?? []).any((o) => o.matchesStop(i, charIndex))) {
         addSpan();
         currOverrideStyle = null;
+      }
+      final char = text[i];
+      // Skip parentheses BEFORE starting override styles.
+      if (['(', ')'].contains(char)) {
+        buff.write(char);
+        i += 1;
+        continue;
       }
       final OverrideStyle? startOverrideStyle =
           // Cast is necessary so that `orElse` can return null.
@@ -99,59 +118,59 @@ class OverflowMarkdown extends StatelessWidget {
         addSpan();
         currOverrideStyle = startOverrideStyle.style;
       }
-      if (fullText[i] == '\\') {
-        assert(i != fullText.length,
-            'Invalid escape character at end of string in $fullText');
-        buff.write(fullText[i + 1]);
+      if (char == '\\') {
+        assert(i != text.length,
+            'Invalid escape character at end of string in $text');
+        buff.write(text[i + 1]);
         charIndex += 1;
         i += 2;
         continue;
       }
-      if (i + 1 < fullText.length && fullText.substring(i, i + 2) == '**') {
+      if (i + 1 < text.length && text.substring(i, i + 2) == '**') {
         addSpan();
         isBold = !isBold;
         i += 2;
         continue;
       }
-      if (fullText[i] == '*') {
+      if (char == '*') {
         addSpan();
         isItalic = !isItalic;
         i += 1;
         continue;
       }
-      if (fullText[i] == '`') {
+      if (char == '`') {
         addSpan();
         isSubscript = !isSubscript;
         i += 1;
         continue;
       }
-      buff.write(fullText[i]);
+      buff.write(char);
       charIndex += 1;
       i += 1;
     }
     addSpan();
-    assert(!isItalic, "Unclosed italic mark in $fullText");
-    assert(!isBold, "Unclosed bold mark in $fullText");
+    assert(!isItalic, "Unclosed italic mark in $text");
+    assert(!isBold, "Unclosed bold mark in $text");
     return spans;
   }
 }
 
 class OverrideStyle {
   TextStyle style;
+
+  /// When to start applying the override style, inclusive.
   int start;
+
+  /// When to stop applying the override style, exclusive.
   int stop;
-  bool ignoreSymbols;
 
   OverrideStyle({
     required this.style,
     required this.start,
     required this.stop,
-    this.ignoreSymbols = false,
   }) : assert(start != stop);
 
-  bool matchesStart(int index, int charIndex) =>
-      ignoreSymbols ? charIndex == this.start : index == this.start;
+  bool matchesStart(int index, int charIndex) => charIndex == this.start;
 
-  bool matchesStop(int index, int charIndex) =>
-      ignoreSymbols ? charIndex == this.stop : index == this.stop;
+  bool matchesStop(int index, int charIndex) => charIndex == this.stop;
 }
