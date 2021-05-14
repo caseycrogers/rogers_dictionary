@@ -79,7 +79,6 @@ class _ChapterViewState extends State<ChapterView> {
     var dialoguesModel = TranslationPageModel.of(context).dialoguesPageModel;
     return PageHeader(
       scrollable: false,
-      padding: 0.0,
       header: ListTile(
         contentPadding: EdgeInsets.zero,
         title: headline1Text(context, widget.chapter.title(context)),
@@ -117,7 +116,7 @@ class _ChapterViewState extends State<ChapterView> {
           if (!widget.chapter.hasSubChapters) _progressIndicator(),
         ],
       ),
-      onClose: () => dialoguesModel.onChapterSelected(null, null),
+      onClose: () => dialoguesModel.onChapterSelected(context, null, null),
     );
   }
 

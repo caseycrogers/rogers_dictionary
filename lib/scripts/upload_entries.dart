@@ -9,6 +9,7 @@ import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:args/args.dart';
 import 'package:df/df.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:rogers_dictionary/util/list_utils.dart';
 
@@ -48,6 +49,11 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       i += 1;
       continue;
     }
+    row.forEach((key, str) {
+      if (str.contains('\n') || str.contains('\r'))
+        print('$WARNING field $key at row ${i + 2} contains a line break.'
+            ' Field:\n$str');
+    });
     if (row[HEADWORD]!.isNotEmpty) {
       if ((row[PART_OF_SPEECH]!.isEmpty && row[RUN_ON_PARENTS]!.isEmpty) ||
           row[TRANSLATION]!.isEmpty) {
@@ -82,13 +88,14 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       _split(row[ALTERNATE_HEADWORDS]!)
           .asMap()
           .forEach((i, alternateHeadwordText) {
+        // Start from i + 1 because the first slow was taken by the headword.
         var index = i + 1;
         builder!.addAlternateHeadword(
           headwordText: alternateHeadwordText,
           abbreviation:
               _split(row[HEADWORD_ABBREVIATIONS]!).get(index, orElse: ''),
           namingStandard: _split(row[ALTERNATE_HEADWORD_NAMING_STANDARDS]!)
-              .get(index, orElse: ''),
+              .get(i, orElse: ''),
           parentheticalQualifier:
               _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!)
                   .get(index, orElse: ''),
@@ -118,10 +125,9 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
             dominantHeadwordParentheticalQualifier!,
         translation: row[TRANSLATION]!,
         genderAndPlural: row[GENDER_AND_PLURAL]!,
-        translationNamingStandard: row[TRANSLATION_NAMING_STANDARD]!,
-        translationAbbreviation: row[TRANSLATION_ABBREVIATION]!,
-        translationParentheticalQualifier:
-            row[TRANSLATION_PARENTHETICAL_QUALIFIER]!,
+        namingStandard: row[TRANSLATION_NAMING_STANDARD]!,
+        abbreviation: row[TRANSLATION_ABBREVIATION]!,
+        parentheticalQualifier: row[TRANSLATION_PARENTHETICAL_QUALIFIER]!,
         examplePhrases: _split(row[EXAMPLE_PHRASES]!),
         editorialNote: row[EDITORIAL_NOTE]!);
     i++;
@@ -145,6 +151,50 @@ Future<void> _uploadSqlFlite(
   print('Writing to: $path.');
   sqfliteFfiInit();
   var db = await databaseFactoryFfi.openDatabase(path);
+  var batch = db.batch();
+  if (!debug) await wipeTables(db, tableName);
+
+  for (var entry in entries) {
+    var entryRecord = {
+      URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
+      ENTRY_ID: entry.entryId,
+      HEADWORD: entry.headword.headwordText.searchable,
+      RUN_ON_PARENTS: (entry.related).join(' | ').searchable,
+      HEADWORD_ABBREVIATIONS:
+          entry.allHeadwords.map((h) => h.abbreviation).join(' | ').searchable,
+      ALTERNATE_HEADWORDS: (entry.alternateHeadwords)
+          .map((alt) => alt.headwordText)
+          .join(' | ')
+          .searchable,
+      HEADWORD + WITHOUT_DIACRITICAL_MARKS:
+          entry.headword.headwordText.withoutDiacriticalMarks.searchable,
+      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS: (entry.related)
+          .map((p) => p.withoutDiacriticalMarks)
+          .join(' | ')
+          .searchable,
+      HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
+          .map((h) => h.abbreviation.withoutDiacriticalMarks)
+          .join(' | ')
+          .searchable,
+      ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS:
+          (entry.alternateHeadwords)
+              .map((alt) => alt.headwordText.withoutDiacriticalMarks)
+              .join(' | ')
+              .searchable,
+      ENTRY_BLOB: entry.writeToBuffer(),
+    };
+    if (verbose) {
+      print(entryRecord.map((key, value) =>
+          MapEntry(key, key == ENTRY_BLOB ? entry.toProto3Json() : value)));
+      print('');
+    }
+    batch.insert(tableName, entryRecord);
+  }
+  if (debug) return;
+  return batch.commit().then((_) => null);
+}
+
+Future<void> wipeTables(Database db, String tableName) async {
   try {
     await db.execute('''DROP TABLE $tableName''');
   } on Exception catch (e) {
@@ -171,34 +221,7 @@ Future<void> _uploadSqlFlite(
   await db.execute('''CREATE TABLE ${tableName}_favorites(
     $URL_ENCODED_HEADWORD STRING NOT NULL
   )''');
-  var batch = db.batch();
-  for (var entry in entries) {
-    var entryRecord = {
-      URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
-      ENTRY_ID: entry.entryId,
-      HEADWORD: entry.headword.headwordText,
-      RUN_ON_PARENTS: (entry.related).join(' | '),
-      HEADWORD_ABBREVIATIONS:
-          entry.allHeadwords.map((h) => h.abbreviation).join(' | '),
-      ALTERNATE_HEADWORDS:
-          (entry.alternateHeadwords).map((alt) => alt.headwordText).join(' | '),
-      HEADWORD + WITHOUT_DIACRITICAL_MARKS:
-          entry.headword.headwordText.withoutDiacriticalMarks,
-      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS:
-          (entry.related).map((p) => p.withoutDiacriticalMarks).join(' | '),
-      HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
-          .map((h) => h.abbreviation.withoutDiacriticalMarks)
-          .join(' | '),
-      ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS:
-          (entry.alternateHeadwords)
-              .map((alt) => alt.headwordText.withoutDiacriticalMarks)
-              .join(' | '),
-      ENTRY_BLOB: entry.writeToBuffer(),
-    };
-    if (verbose) print(entryRecord);
-    batch.insert(tableName, entryRecord);
-  }
-  return batch.commit().then((_) => null);
+  return;
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {

@@ -28,7 +28,7 @@ extension EntryUtils on Entry {
       translations: [
         Translation(
           partOfSpeech: '',
-          translationContent:
+          content:
           'Please use the help button (upper right) to report this bug!',
         ),
       ],
@@ -99,7 +99,7 @@ class EntryBuilder {
 
   EntryBuilder headword(String headwordText,
       String abbreviation,
-      String parentheticalQualifier,) {
+      String parentheticalQualifier) {
     _headword = Headword(
       isAlternate: false,
       headwordText: headwordText,
@@ -149,9 +149,9 @@ class EntryBuilder {
     required String dominantHeadwordParentheticalQualifier,
     required String translation,
     required String genderAndPlural,
-    required String translationNamingStandard,
-    required String translationAbbreviation,
-    required String translationParentheticalQualifier,
+    required String namingStandard,
+    required String abbreviation,
+    required String parentheticalQualifier,
     required List<String> examplePhrases,
     required String editorialNote,
   }) {
@@ -164,12 +164,12 @@ class EntryBuilder {
         irregularInflections: irregularInflections,
         dominantHeadwordParentheticalQualifier:
         dominantHeadwordParentheticalQualifier,
-        translationContent: translation,
+        content: translation,
         genderAndPlural: genderAndPlural,
-        translationNamingStandard: translationNamingStandard,
-        translationAbbreviation: translationAbbreviation,
-        translationParentheticalQualifier:
-        translationParentheticalQualifier,
+        namingStandard: namingStandard,
+        abbreviation: abbreviation,
+        parentheticalQualifier:
+        parentheticalQualifier,
         examplePhrases: examplePhrases,
         editorialNote: editorialNote,
       ),

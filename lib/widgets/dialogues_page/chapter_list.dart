@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-import 'package:rogers_dictionary/pages/headerless_page.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
@@ -15,14 +14,12 @@ class ChapterList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var dialoguesModel = TranslationPageModel.of(context);
-    return HeaderlessPage(
-      child: AsyncListView<DialogueChapter>(
-        key: PageStorageKey('dialogues'),
-        padding: EdgeInsets.zero,
-        initialData: dialoguesModel.dialoguesPageModel.dialogues,
-        stream: dialoguesModel.dialoguesPageModel.dialogueStream,
-        itemBuilder: _buildTopic,
-      ),
+    return AsyncListView<DialogueChapter>(
+      key: PageStorageKey('dialogues'),
+      padding: EdgeInsets.zero,
+      initialData: dialoguesModel.dialoguesPageModel.dialogues,
+      stream: dialoguesModel.dialoguesPageModel.dialogueStream,
+      itemBuilder: _buildTopic,
     );
   }
 
@@ -76,7 +73,8 @@ class ChapterList extends StatelessWidget {
       ),
       subtitle: Text(
           subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context)),
-      onTap: () => dialoguesModel.onChapterSelected(chapter, subChapter),
+      onTap: () =>
+          dialoguesModel.onChapterSelected(context, chapter, subChapter),
     );
   }
 }

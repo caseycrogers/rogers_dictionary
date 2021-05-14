@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
-import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:rogers_dictionary/widgets/buttons/indent_icon.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
 import 'package:rogers_dictionary/widgets/buttons/favorites_button.dart';
 
@@ -71,22 +68,33 @@ class Indent extends StatelessWidget {
       Padding(child: child, padding: EdgeInsets.only(left: size ?? 20.0));
 }
 
-List<Widget> headwordText(BuildContext context, String text, bool preview,
-    {required String searchString}) {
+List<Widget> highlightedText(
+  BuildContext context,
+  String text,
+  bool preview, {
+  bool isHeadword = false,
+  required String searchString,
+}) {
   return OverflowMarkdown(
     text,
-    defaultStyle: preview ? bold1(context) : headline1(context),
+    defaultStyle: !preview && isHeadword ? headline1(context) : bold1(context),
     overrideStyles: _highlightSearchMatch(context, text, preview, searchString),
   ).forWrap(context);
 }
 
 List<OverrideStyle> _highlightSearchMatch(
     BuildContext context, String text, bool preview, String searchString) {
+  if (!preview || searchString.isEmpty) return [];
+  bool ignoreAccents = SearchPageModel.of(context)
+      .entrySearchModel
+      .searchSettingsModel
+      .ignoreAccents;
   // Prepend `text` and `searchString` with spaces to rule out matches that are
   // in the middle of a word.
-  var overrideStarts = ' $searchString'.allMatches(' ${text.searchable}');
-  if (!preview || searchString.isEmpty || overrideStarts == []) return [];
-  return overrideStarts
+  var searchable =
+      ' ${ignoreAccents ? text.searchable.withoutDiacriticalMarks : text.searchable}';
+  var overrideMatches = ' $searchString'.allMatches(searchable);
+  return overrideMatches
       .map(
         (m) => OverrideStyle(
           style: TextStyle(
@@ -103,46 +111,49 @@ Widget alternateHeadwordLines(BuildContext context,
   if (alternateHeadwords.isEmpty) return Container();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
-    children: alternateHeadwords
-        .map(
-          (alt) => Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              // Only display the alt header for the first entry.```
-              Opacity(
-                opacity: alt == alternateHeadwords.first ? 1.0 : 0.0,
-                child: italic1Text(context, 'alt. '),
+    children: alternateHeadwords.map(
+      (alt) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Only display the alt header for the first entry.
+            Opacity(
+              opacity: alt == alternateHeadwords.first ? 1.0 : 0.0,
+              child: italic1Text(context, 'alt. '),
+            ),
+            Expanded(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  ...highlightedText(context, alt.headwordText, preview,
+                      searchString: searchString),
+                  if (alt.abbreviation.isNotEmpty)
+                    ...highlightedText(context, alt.abbreviation, preview,
+                        searchString: searchString),
+                  _namingStandard(context, alt.namingStandard, true),
+                  ...parentheticalTexts(
+                    context,
+                    alt.parentheticalQualifier,
+                    true,
+                  ),
+                ],
               ),
-              ...OverflowMarkdown(
-                '**${alt.headwordText}${alt.abbreviation.isEmpty ? '' : ' (${alt.abbreviation})'}**${_namingStandard(context, alt.namingStandard)}',
-                defaultStyle: normal1(context),
-                overflow:
-                    preview ? TextOverflow.ellipsis : TextOverflow.visible,
-                overrideStyles: _highlightSearchMatch(
-                  context,
-                  // Add two spaces to match the two asterisks.
-                  '  ${alt.headwordText}',
-                  preview,
-                  searchString,
-                ),
-              ).forWrap(context),
-              ...parentheticalTexts(
-                context,
-                alt.parentheticalQualifier,
-                true,
-              ),
-            ],
-          ),
-        )
-        .toList(),
+            ),
+          ],
+        );
+      },
+    ).toList(),
   );
 }
 
-String _namingStandard(BuildContext context, String namingStandard) {
-  if (namingStandard.isEmpty) return '';
-  if (namingStandard == 'i') namingStandard = 'INN';
-  if (namingStandard == 'u') namingStandard = 'USAN';
-  return ' ($namingStandard)';
+Widget _namingStandard(
+    BuildContext context, String namingStandard, isHeadword) {
+  if (namingStandard.isEmpty) return Container();
+  var text = namingStandard;
+  if (namingStandard == 'i') text = 'INN';
+  if (namingStandard == 'u') text = 'USAN';
+  return OverflowMarkdown(' (*$text* )',
+      defaultStyle: isHeadword ? bold1(context) : null);
 }
 
 List<Widget> _translationParentheticals(
@@ -177,26 +188,26 @@ Widget partOfSpeechText(BuildContext context, String text, bool preview) {
 
 Widget previewTranslationLine(
     BuildContext context, Translation translation, bool addEllipsis) {
-  var text = translation.translationContent;
+  var text = translation.content;
   if (translation.genderAndPlural.isNotEmpty)
     text += ' *${translation.genderAndPlural}*';
   if (addEllipsis) text += '...';
   return OverflowMarkdown(text);
 }
 
-Widget translationLine(BuildContext context, Translation translation) {
+Widget translationLine(BuildContext context, Translation translation, int i) {
   return Wrap(
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      ...OverflowMarkdown(translation.translationContent, children: [
-        if (translation.translationAbbreviation.isNotEmpty)
-          ' (${translation.translationAbbreviation})',
-        if (translation.genderAndPlural.isNotEmpty)
-          ' *${translation.genderAndPlural}*',
-        _namingStandard(context, translation.translationNamingStandard)
-      ]).forWrap(context),
+      normal1Text(context, '${i.toString()}. '),
+      ...OverflowMarkdown(translation.content).forWrap(context),
+      if (translation.genderAndPlural.isNotEmpty)
+        OverflowMarkdown(' *${translation.genderAndPlural}*'),
+      if (translation.abbreviation.isNotEmpty)
+        OverflowMarkdown(' (${translation.abbreviation})'),
+      _namingStandard(context, translation.namingStandard, false),
       ..._translationParentheticals(
-          context, translation.translationParentheticalQualifier),
+          context, translation.parentheticalQualifier),
     ],
   );
 }
@@ -275,13 +286,13 @@ Widget headwordLine(
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                ...headwordText(
-                    context,
-                    entry.headword.abbreviation.isEmpty
-                        ? entry.headword.headwordText
-                        : '${entry.headword.headwordText} (${entry.headword.abbreviation})',
-                    preview,
-                    searchString: searchString),
+                ...highlightedText(
+                    context, entry.headword.headwordText, preview,
+                    searchString: searchString, isHeadword: true),
+                if (entry.headword.abbreviation.isNotEmpty)
+                  ...highlightedText(
+                      context, ' (${entry.headword.abbreviation})', preview,
+                      searchString: searchString),
                 ...parentheticalTexts(
                   context,
                   entry.headword.parentheticalQualifier,

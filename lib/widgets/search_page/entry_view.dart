@@ -226,22 +226,14 @@ class EntryView extends StatelessWidget {
       BuildContext context, Translation translation, bool indent, int i) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          normal1Text(context, '${i.toString()}. '),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Indent(
-                    child: translationLine(context, translation),
-                    size: indent ? null : 0.0),
-                examplePhraseText(context, translation.examplePhrases),
-                SizedBox(height: 0.0),
-              ],
-            ),
-          ),
+          Indent(
+              child: translationLine(context, translation, i),
+              size: indent ? null : 0.0),
+          examplePhraseText(context, translation.examplePhrases),
+          SizedBox(height: 0.0),
         ],
       ),
     );

@@ -42,7 +42,7 @@ class TranslationModeSwitcher extends StatelessWidget {
     return PageView(
       controller: controller,
       onPageChanged: (index) => DictionaryPageModel.readFrom(context)
-          .onTranslationModeChanged(indexToTranslationMode(index)),
+          .onTranslationModeChanged(context, indexToTranslationMode(index)),
       children: [
         Provider<TranslationPageModel>.value(
           value: dictionaryModel.englishPageModel,

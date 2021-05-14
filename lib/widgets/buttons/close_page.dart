@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class ClosePage extends StatelessWidget {
-  final VoidCallback onClose;
+  final Function(BuildContext) onClose;
 
   ClosePage({required this.onClose});
 
@@ -14,7 +14,7 @@ class ClosePage extends StatelessWidget {
         Icons.arrow_back,
         color: Theme.of(context).iconTheme.color,
       ),
-      onPressed: onClose,
+      onPressed: () => onClose(context),
     );
   }
 }

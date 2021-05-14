@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
 
-class PageHeader extends StatefulWidget {
+class PageHeader extends StatelessWidget {
   final Widget header;
   final Widget child;
   final VoidCallback onClose;
@@ -20,40 +20,30 @@ class PageHeader extends StatefulWidget {
   });
 
   @override
-  _PageHeaderState createState() => _PageHeaderState();
-}
-
-class _PageHeaderState extends State<PageHeader> {
-  @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration.zero,
-        () => DictionaryTopBar.of(context).onClose = widget.onClose);
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(
-              top: 4.0, left: widget.padding, right: widget.padding),
-          child: widget.header,
+          padding: EdgeInsets.only(top: 4.0, left: padding, right: padding),
+          child: header,
         ),
-        Divider(indent: widget.padding, endIndent: widget.padding, height: 0.0),
-        if (widget.scrollable)
+        Divider(indent: padding, endIndent: padding, height: 0.0),
+        if (scrollable)
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Padding(
                 padding: EdgeInsets.only(
-                    left: widget.padding,
-                    right: widget.padding,
-                    bottom: widget.padding),
-                child: widget.child,
+                    left: padding, right: padding, bottom: padding),
+                child: child,
               ),
             ),
           ),
-        if (!widget.scrollable)
+        if (!scrollable)
           Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: widget.padding),
-              child: widget.child,
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: child,
             ),
           ),
       ],

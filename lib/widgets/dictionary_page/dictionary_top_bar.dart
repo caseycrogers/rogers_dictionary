@@ -9,15 +9,11 @@ import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 import 'package:rogers_dictionary/widgets/buttons/feedback_button.dart';
 
 class DictionaryTopBar extends StatelessWidget {
-  DictionaryTopBar({Key? key, required this.child}) : super(key: key);
+  DictionaryTopBar({Key? key, required this.child, required this.controller})
+      : super(key: key);
 
   final Widget child;
-  final ValueNotifier<VoidCallback?> _onClose = ValueNotifier(null);
-
-  set onClose(VoidCallback? value) => _onClose.value = value;
-
-  static DictionaryTopBar of(BuildContext context) =>
-      context.read<DictionaryTopBar>();
+  final DictionaryTopBarController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +29,8 @@ class DictionaryTopBar extends StatelessWidget {
                 padding: EdgeInsets.all(4),
                 child: Row(
                   children: [
-                    ValueListenableBuilder<VoidCallback?>(
-                      valueListenable: _onClose,
+                    ValueListenableBuilder<Function(BuildContext)?>(
+                      valueListenable: controller._onClose,
                       builder: (context, onClose, _) => onClose != null
                           ? ClosePage(onClose: onClose)
                           : Container(),
@@ -60,12 +56,15 @@ class DictionaryTopBar extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Provider.value(
-            value: this,
-            child: child,
-          ),
+          child: child,
         ),
       ],
     );
   }
+}
+
+class DictionaryTopBarController {
+  final ValueNotifier<Function(BuildContext)?> _onClose = ValueNotifier(null);
+
+  set onClose(Function(BuildContext)? value) => _onClose.value = value;
 }

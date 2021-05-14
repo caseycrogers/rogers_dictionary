@@ -19,7 +19,7 @@ class SqfliteDatabase extends DictionaryDatabase {
 
   // We need an int that represents no string match and is smaller than any
   // conceivable real string match
-  static const NO_MATCH = 10000;
+  static const NO_MATCH = 100000;
 
   String _sqlRelevancyScore(String searchString, String columnName) {
     final index = 'INSTR(LOWER(" " || $columnName), LOWER(" $searchString"))';
@@ -155,9 +155,8 @@ class SqfliteDatabase extends DictionaryDatabase {
       searchString = searchString.withoutDiacriticalMarks;
     switch (searchOptions.sortBy) {
       case SortOrder.relevance:
-        orderByClause =
+        orderByClause = '${_sqlRelevancyScore(searchString, HEADWORD)}, '
             '${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATIONS)}, '
-            '${_sqlRelevancyScore(searchString, HEADWORD)}, '
             '${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS)}, '
             'headword';
         break;

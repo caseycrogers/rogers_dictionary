@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 class DialoguesPageModel {
@@ -11,7 +12,12 @@ class DialoguesPageModel {
   static final LinkedHashSet<DialogueChapter> _dialogues = LinkedHashSet();
   static Stream<DialogueChapter>? _dialogueStream;
 
-  final LocalHistoryValueNotifier<DialogueChapter?> selectedChapter;
+  final LocalHistoryValueNotifier<DialogueChapter?> selectedChapterNotifier;
+
+  DialogueChapter? get selectedChapter => selectedChapterNotifier.value;
+
+  set selectedChapter(DialogueChapter? value) =>
+      selectedChapterNotifier.value = value;
 
   DialogueSubChapter? selectedSubChapter;
 
@@ -19,15 +25,16 @@ class DialoguesPageModel {
 
   Stream<DialogueChapter> get dialogueStream => _dialogueStream!;
 
-  DialoguesPageModel._(this.selectedChapter) {
+  DialoguesPageModel._(this.selectedChapterNotifier) {
     _initializeStream();
   }
 
-  static DialoguesPageModel empty(BuildContext context) =>
-      DialoguesPageModel._(LocalHistoryValueNotifier(
-        modalRoute: ModalRoute.of(context)!,
-        initialValue: null,
-      ));
+  static DialoguesPageModel empty(BuildContext context) => DialoguesPageModel._(
+        LocalHistoryValueNotifier(
+          modalRoute: ModalRoute.of(context)!,
+          initialValue: null,
+        ),
+      );
 
   static void _initializeStream() {
     if (_dialogueStream != null) return;
@@ -43,9 +50,11 @@ class DialoguesPageModel {
     }).asBroadcastStream();
   }
 
-  void onChapterSelected(
-      DialogueChapter? newChapter, DialogueSubChapter? newSubChapter) {
-    selectedChapter.value = newChapter;
+  void onChapterSelected(BuildContext context, DialogueChapter? newChapter,
+      DialogueSubChapter? newSubChapter) {
+    selectedChapter = newChapter;
     selectedSubChapter = newSubChapter;
   }
+
+  bool get hasSelection => selectedChapter != null;
 }

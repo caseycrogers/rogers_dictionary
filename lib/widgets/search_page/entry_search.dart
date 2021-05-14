@@ -7,28 +7,25 @@ import 'search_bar.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/pages/headerless_page.dart';
 
 class EntrySearch extends StatelessWidget {
   EntrySearch({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return HeaderlessPage(
-      child: Column(
-        children: [
-          if (DictionaryPageModel.of(context).currentTab.value ==
-              DictionaryTab.search)
-            Material(
-              elevation: kGroundElevation,
-              color: primaryColor(SearchPageModel.of(context).translationMode),
-              child: SearchBar(),
-            ),
-          Expanded(
-            child: EntryList(),
+    return Column(
+      children: [
+        if (DictionaryPageModel.of(context).currentTab.value ==
+            DictionaryTab.search)
+          Material(
+            elevation: kGroundElevation,
+            color: primaryColor(SearchPageModel.of(context).translationMode),
+            child: SearchBar(),
           ),
-        ],
-      ),
+        Expanded(
+          child: EntryList(),
+        ),
+      ],
     );
   }
 }
