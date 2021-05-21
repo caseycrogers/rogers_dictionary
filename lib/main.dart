@@ -26,7 +26,7 @@ Color secondaryColor(TranslationMode translationMode) =>
         ? englishSecondary
         : spanishSecondary;
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
@@ -44,24 +44,24 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Dictionary',
           onGenerateRoute: PageRouter.generateRoute,
-          initialRoute: '#/' + SearchPage.route,
+          initialRoute: '#/${SearchPage.route}',
           theme: ThemeData(
               textTheme: TextTheme(
                 headline1: GoogleFonts.openSans(
-                    fontSize: 36.0,
+                    fontSize: 36,
                     color: Colors.black,
                     fontWeight: FontWeight.bold),
                 headline2: GoogleFonts.openSans(
                     color: Colors.black,
-                    fontSize: 28.0,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold),
                 bodyText1: GoogleFonts.openSans(
-                    fontSize: 24.0, fontWeight: FontWeight.normal),
+                    fontSize: 24, fontWeight: FontWeight.normal),
                 bodyText2: GoogleFonts.openSans(
-                    fontSize: 20.0, fontWeight: FontWeight.normal),
+                    fontSize: 20, fontWeight: FontWeight.normal),
               ),
-              iconTheme: IconThemeData(color: Colors.white, size: 28),
-              accentIconTheme: IconThemeData(
+              iconTheme: const IconThemeData(color: Colors.white, size: 28),
+              accentIconTheme: const IconThemeData(
                 size: 28,
                 color: Colors.black38,
               ),

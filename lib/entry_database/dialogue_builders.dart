@@ -5,24 +5,25 @@ typedef DialogueSubChapter = DialogueChapter_SubChapter;
 typedef Dialogue = DialogueChapter_Dialogue;
 
 class DialogueChapterBuilder {
-  final int chapterId;
-  final String englishTitle;
-  final String spanishTitle;
-
-  final Map<String, DialogueSubChapterBuilder> subChapters = {};
-
   DialogueChapterBuilder({
     required this.chapterId,
     required this.englishTitle,
     required this.spanishTitle,
   });
 
+  final int chapterId;
+  final String englishTitle;
+  final String spanishTitle;
+
+  final Map<String, DialogueSubChapterBuilder> subChapters = {};
+
   DialogueChapter build() =>
       DialogueChapter(
         chapterId: chapterId,
         englishTitle: englishTitle,
         spanishTitle: spanishTitle,
-        dialogueSubChapters: subChapters.values.map((b) => b.build()),
+        dialogueSubChapters: subChapters.values.map((
+            DialogueSubChapterBuilder b) => b.build()),
       );
 
   DialogueChapterBuilder addDialogue(String englishSubChapter,
@@ -41,15 +42,15 @@ class DialogueChapterBuilder {
 }
 
 class DialogueSubChapterBuilder {
-  final String englishTitle;
-  final String spanishTitle;
-
-  List<Dialogue> dialogues = [];
-
   DialogueSubChapterBuilder({
     required this.englishTitle,
     required this.spanishTitle,
   });
+
+  final String englishTitle;
+  final String spanishTitle;
+
+  List<Dialogue> dialogues = <Dialogue>[];
 
   DialogueSubChapterBuilder addDialogue(String englishContent,
       String spanishContent) {

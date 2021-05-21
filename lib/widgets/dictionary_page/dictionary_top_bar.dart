@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:rogers_dictionary/dictionary_navigator/animated_listenable_switcher.dart';
 
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
@@ -9,15 +9,18 @@ import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 import 'package:rogers_dictionary/widgets/buttons/feedback_button.dart';
 
 class DictionaryTopBar extends StatelessWidget {
-  DictionaryTopBar({Key? key, required this.child, required this.controller})
-      : super(key: key);
+  const DictionaryTopBar({
+    Key? key,
+    required this.child,
+    required this.controller,
+  }) : super(key: key);
 
   final Widget child;
   final DictionaryTopBarController controller;
 
   @override
   Widget build(BuildContext context) {
-    var dictionaryModel = DictionaryPageModel.of(context);
+    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
     return Column(
       children: [
         ValueListenableBuilder<TranslationPageModel>(
@@ -26,14 +29,21 @@ class DictionaryTopBar extends StatelessWidget {
             color: primaryColor(translationPageModel.translationMode),
             child: SafeArea(
               child: Padding(
-                padding: EdgeInsets.all(4),
+                padding: const EdgeInsets.all(4),
                 child: Row(
                   children: [
-                    ValueListenableBuilder<Function(BuildContext)?>(
+                    AnimatedListenableSwitcher<Function(BuildContext)?>(
                       valueListenable: controller._onClose,
                       builder: (context, onClose, _) => onClose != null
                           ? ClosePage(onClose: onClose)
                           : Container(),
+                      transitionBuilder: (child, animation) => SlideTransition(
+                        child: child,
+                        position: Tween(
+                          begin: const Offset(-1, 0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                      ),
                     ),
                     Expanded(
                       child: Text(
@@ -43,10 +53,10 @@ class DictionaryTopBar extends StatelessWidget {
                             fontSize: Theme.of(context).iconTheme.size),
                       ),
                     ),
-                    FeedbackButton(),
+                    const FeedbackButton(),
                     IconButton(
                       visualDensity: VisualDensity.compact,
-                      icon: Icon(Icons.help),
+                      icon: const Icon(Icons.help),
                       onPressed: () {},
                     ),
                   ],

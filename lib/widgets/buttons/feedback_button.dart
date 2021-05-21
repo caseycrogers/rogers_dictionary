@@ -15,7 +15,7 @@ class FeedbackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       visualDensity: VisualDensity.compact,
-      icon: Icon(Icons.bug_report),
+      icon: const Icon(Icons.bug_report),
       onPressed: () => {
         BetterFeedback.of(context)!.controller.show(
           (feedbackText, feedbackScreenshot) async {
@@ -24,7 +24,7 @@ class FeedbackButton extends StatelessWidget {
 
             await FlutterEmailSender.send(
               Email(
-                body: feedbackText,
+                body: feedbackText as String,
                 subject: '[Rogers Dictionary Bug Report]',
                 recipients: ['caseycrogers@berkeley.edu'],
                 attachmentPaths: [screenshotFilePath],

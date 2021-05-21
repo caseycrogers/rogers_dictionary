@@ -8,12 +8,12 @@ import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 // A database interface for fetching dictionary entries.
 abstract class DictionaryDatabase {
-  Map<String, bool> _englishFavoritesCache;
-  Map<String, bool> _spanishFavoritesCache;
-
   DictionaryDatabase()
       : _englishFavoritesCache = {},
         _spanishFavoritesCache = {};
+
+  final Map<String, bool> _englishFavoritesCache;
+  final Map<String, bool> _spanishFavoritesCache;
 
   // Fetch entries from the database.
   Stream<Entry> getEntries(
@@ -30,7 +30,9 @@ abstract class DictionaryDatabase {
   @mustCallSuper
   Future<bool> setFavorite(TranslationMode translationMode,
           String urlEncodedHeadword, bool favorite) =>
-      Future.value(_getCache(translationMode)[urlEncodedHeadword] = favorite);
+      Future<bool>.value(
+        _getCache(translationMode)[urlEncodedHeadword] = favorite,
+      );
 
   Stream<Entry> getFavorites(TranslationMode translationMode,
       {required int startAfter});

@@ -25,13 +25,15 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   TabController? _controller;
   late LinkedHashMap<DictionaryTab, Widget> _childrenWithKey;
 
-  LocalHistoryValueNotifier get currentTab =>
+  LocalHistoryValueNotifier<DictionaryTab> get currentTab =>
       DictionaryPageModel.readFrom(context).currentTab;
 
   void _updateTabController() {
     final TabController newController = DefaultTabController.of(context)!;
 
-    if (newController == _controller) return;
+    if (newController == _controller) {
+      return;
+    }
 
     _controller?.animation?.removeListener(_handleTabControllerAnimationTick);
     _controller = newController;
@@ -48,15 +50,19 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   void didUpdateWidget(DictionaryTabBarView oldWidget) {
     super.didUpdateWidget(oldWidget);
     _updateTabController();
-    if (widget.children != oldWidget.children) _updateChildren();
+    if (widget.children != oldWidget.children) {
+      _updateChildren();
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final shouldInit = _controller == null;
+    final bool shouldInit = _controller == null;
     _updateTabController();
-    if (shouldInit) currentTab.addListener(_onIndexChanged);
+    if (shouldInit) {
+      currentTab.addListener(_onIndexChanged);
+    }
   }
 
   @override
@@ -67,10 +73,14 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   }
 
   void _updateChildren() {
-    _childrenWithKey = LinkedHashMap.fromEntries(widget.children.entries.map(
-      (entry) => MapEntry(
+    _childrenWithKey = LinkedHashMap<DictionaryTab, Widget>.fromEntries(
+        widget.children.entries.map(
+      (MapEntry<DictionaryTab, Widget> entry) => MapEntry(
         entry.key,
-        KeyedSubtree(key: ValueKey(entry.key), child: entry.value),
+        KeyedSubtree(
+          key: ValueKey<DictionaryTab>(entry.key),
+          child: entry.value,
+        ),
       ),
     ));
   }
@@ -84,23 +94,24 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     assert(() {
       if (_controller!.length != widget.children.length) {
         throw FlutterError(
-            "Controller's length property (${_controller!.length}) does not match the "
-            "number of tabs (${widget.children.length}) present in TabBar's tabs property.");
+            'Controller\'s length property (${_controller!.length}) does not '
+            'match the number of tabs (${widget.children.length}) present in '
+            'TabBar\'s tabs property.');
       }
       return true;
     }());
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 200),
-      reverseDuration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 200),
+      reverseDuration: const Duration(milliseconds: 1000),
       transitionBuilder: _getTransition,
       child: _childrenWithKey[currentTab.value],
       switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Interval(0.0, 0.1),
+      switchOutCurve: const Interval(0, 0.1),
     );
   }
 
-  _onIndexChanged() {
-    if (_controller!.index != currentTab.value) {
+  void _onIndexChanged() {
+    if (_controller!.index != DictionaryTab.values.indexOf(currentTab.value)) {
       _controller!.animateTo(DictionaryTab.values.indexOf(currentTab.value));
     }
     setState(() {});
@@ -108,8 +119,8 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
 
   Widget _getTransition(Widget child, Animation<double> animation) =>
       SlideTransition(
-        position: Tween(
-          begin: Offset(0, 1.0),
+        position: Tween<Offset>(
+          begin: const Offset(0, 1),
           end: Offset.zero,
         ).animate(animation),
         child: child,

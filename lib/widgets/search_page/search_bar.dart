@@ -41,7 +41,7 @@ class _SearchBarState extends State<SearchBar> {
     return Material(
       color: primaryColor(searchPageModel.translationMode),
       child: Padding(
-        padding: EdgeInsets.all(8.0).subtract(EdgeInsets.only(right: 8.0)),
+        padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -49,14 +49,14 @@ class _SearchBarState extends State<SearchBar> {
               fit: FlexFit.tight,
               child: Container(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(40.0),
+                  borderRadius: BorderRadius.circular(40),
                   child: Container(
                     color: Theme.of(context).backgroundColor,
                     child: TextField(
-                      style: TextStyle(fontSize: 20.0),
+                      style: const TextStyle(fontSize: 20),
                       controller: _controller,
                       decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
+                        prefixIcon: const Icon(Icons.search),
                         suffixIcon: _controller.text.isNotEmpty
                             ? IconButton(
                                 onPressed: () {
@@ -65,7 +65,7 @@ class _SearchBarState extends State<SearchBar> {
                                       .onSearchStringChanged(
                                           newSearchString: '');
                                 },
-                                icon: Icon(Icons.clear),
+                                icon: const Icon(Icons.clear),
                               )
                             : null,
                         hintText: 'search...',

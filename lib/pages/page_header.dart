@@ -2,16 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:rogers_dictionary/util/constants.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
 
 class PageHeader extends StatelessWidget {
-  final Widget header;
-  final Widget child;
-  final VoidCallback onClose;
-  final bool scrollable;
-  final double padding;
-
-  PageHeader({
+  const PageHeader({
     required this.header,
     required this.child,
     required this.onClose,
@@ -19,15 +12,21 @@ class PageHeader extends StatelessWidget {
     this.padding = 2 * kPad,
   });
 
+  final Widget header;
+  final Widget child;
+  final VoidCallback onClose;
+  final bool scrollable;
+  final double padding;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 4.0, left: padding, right: padding),
+          padding: EdgeInsets.only(left: padding, right: padding),
           child: header,
         ),
-        Divider(indent: padding, endIndent: padding, height: 0.0),
+        Divider(indent: padding, endIndent: padding, height: 0),
         if (scrollable)
           Expanded(
             child: SingleChildScrollView(

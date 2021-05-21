@@ -17,32 +17,36 @@ const WARNING = '(WARN):';
 const ERROR = '(ERROR):';
 
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
-  var filePath = join(
+  final String filePath = join(
     'lib',
     'scripts',
-    'entry_database-${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv',
+    'entry_database-'
+        '${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv',
   );
   print('Uploading: $filePath.');
-  var df = await DataFrame.fromCsv(filePath);
+  final DataFrame df = await DataFrame.fromCsv(filePath);
 
-  var rows = df.rows.map((row) => row.map(_parseCell));
+  final Iterable<Map<String, String>> rows =
+      df.rows.map((row) => row.map(_parseCell));
   EntryBuilder? builder;
   String? partOfSpeech;
   String? dominantHeadwordParentheticalQualifier;
   var i = 0;
-  Map<String, EntryBuilder> entryBuilders = {};
+  final Map<String, EntryBuilder> entryBuilders = {};
 
   while (rows.elementAt(i)[HEADWORD] != 'START') {
     if (i == 100) {
-      print(
-          "$ERROR Reached row ${i + 2} without finding the start of entries, cancelling.");
+      print('$ERROR Reached row ${i + 2} without finding the start of entries, '
+          'cancelling.');
       return;
     }
     i++;
   }
   i++;
   while (i < rows.length) {
-    if ((i + 2) % 500 == 0) print('${i + 2}/${rows.length + 2} complete!');
+    if ((i + 2) % 500 == 0) {
+      print('${i + 2}/${rows.length + 2} complete!');
+    }
     Map<String, String> row = rows.elementAt(i);
     if (row.values.every((e) => e.isEmpty)) {
       print('$WARNING Skipping empty line at ${i + 2}');
@@ -57,8 +61,8 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     if (row[HEADWORD]!.isNotEmpty) {
       if ((row[PART_OF_SPEECH]!.isEmpty && row[RUN_ON_PARENTS]!.isEmpty) ||
           row[TRANSLATION]!.isEmpty) {
-        print(
-            '$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row ${i + 2}, skipping.');
+        print('$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row '
+            '${i + 2}, skipping.');
         i += 1;
         row = rows.elementAt(i);
         while (row[HEADWORD]!.isEmpty) {
@@ -70,12 +74,14 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       var parents = <String>[];
       if (row[RUN_ON_PARENTS]!.isNotEmpty) {
         parents = row[RUN_ON_PARENTS]!.split('|');
-        parents.forEach((parent) {
-          if (parent == parents[0] && parent.isEmpty) return;
+        for (final String parent in parents) {
+          if (parent == parents[0] && parent.isEmpty) {
+            return;
+          }
           entryBuilders[parent]?.addRelated([row[HEADWORD]!]) ??
-              print(
-                  "$WARNING Missing run on parent \'$parent\' for entry \'${row[HEADWORD]}\' at line ${i + 2}");
-        });
+              print('$WARNING Missing run on parent \'$parent\' for entry '
+                  '\'${row[HEADWORD]}\' at line ${i + 2}');
+        }
       }
       builder = EntryBuilder()
           .entryId(i + 2)
@@ -89,7 +95,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
           .asMap()
           .forEach((i, alternateHeadwordText) {
         // Start from i + 1 because the first slow was taken by the headword.
-        var index = i + 1;
+        final int index = i + 1;
         builder!.addAlternateHeadword(
           headwordText: alternateHeadwordText,
           abbreviation:
@@ -112,8 +118,8 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       // Reset the qualifier
       dominantHeadwordParentheticalQualifier = '';
       if (EntryUtils.longPartOfSpeech(partOfSpeech).contains('*'))
-        print(
-            '$WARNING Unrecognized part of speech $partOfSpeech for headword ${row[HEADWORD]} at line ${i + 2}');
+        print('$WARNING Unrecognized part of speech $partOfSpeech for headword '
+            '${row[HEADWORD]} at line ${i + 2}');
     }
     if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty)
       dominantHeadwordParentheticalQualifier =
@@ -132,7 +138,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         editorialNote: row[EDITORIAL_NOTE]!);
     i++;
   }
-  assert(builder != null, "Did not generate any entries!");
+  assert(builder != null, 'Did not generate any entries!');
   return _uploadSqlFlite(
     isSpanish ? SPANISH : ENGLISH,
     entryBuilders.values.map((b) => b.build()).toList(),
@@ -150,12 +156,14 @@ Future<void> _uploadSqlFlite(
   final path = join(Directory.current.path, 'assets', '$DICTIONARY_DB.db');
   print('Writing to: $path.');
   sqfliteFfiInit();
-  var db = await databaseFactoryFfi.openDatabase(path);
-  var batch = db.batch();
-  if (!debug) await wipeTables(db, tableName);
+  final Database db = await databaseFactoryFfi.openDatabase(path);
+  final Batch batch = db.batch();
+  if (!debug) {
+    await wipeTables(db, tableName);
+  }
 
-  for (var entry in entries) {
-    var entryRecord = {
+  for (final Entry entry in entries) {
+    final Map<String, Object> entryRecord = {
       URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headword.headwordText.searchable,
@@ -190,7 +198,9 @@ Future<void> _uploadSqlFlite(
     }
     batch.insert(tableName, entryRecord);
   }
-  if (debug) return;
+  if (debug) {
+    return;
+  }
   return batch.commit().then((_) => null);
 }
 
@@ -225,7 +235,9 @@ Future<void> wipeTables(Database db, String tableName) async {
 }
 
 MapEntry<String, String> _parseCell(String key, dynamic value) {
-  if (!(value is String)) value = '';
+  if (!(value is String)) {
+    value = '';
+  }
   final str = value;
   return MapEntry(
       key.trim(),
@@ -240,14 +252,14 @@ List<String> _split(String pluralValue) {
   return pluralValue.isEmpty ? [] : pluralValue.split('|');
 }
 
-void main(List<String> arguments) async {
+void main(List<String> arguments) {
   final parser = ArgParser()
     ..addFlag('debug', abbr: 'd', defaultsTo: false)
     ..addFlag('verbose', abbr: 'v', defaultsTo: false)
     ..addFlag('spanish', abbr: 's', defaultsTo: false);
-  var argResults = parser.parse(arguments);
+  final argResults = parser.parse(arguments);
 
-  await uploadEntries(argResults['debug'] as bool,
-      argResults['verbose'] as bool, argResults['spanish'] as bool);
+  uploadEntries(argResults['debug'] as bool, argResults['verbose'] as bool,
+      argResults['spanish'] as bool);
   print('done?');
 }

@@ -28,12 +28,12 @@ String dictionaryTabName(DictionaryTab dictionaryTab) =>
 class DictionaryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var dictionaryModel = DictionaryPageModel.of(context);
+    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
     return Scaffold(
       body: ValueListenableBuilder<TranslationPageModel>(
         valueListenable: dictionaryModel.currTranslationPageModel,
         child: DictionaryTabBarView(
-          children: LinkedHashMap.from({
+          children: LinkedHashMap.from(<DictionaryTab, Widget>{
             DictionaryTab.search: SearchPage(),
             DictionaryTab.favorites: FavoritesPage(),
             DictionaryTab.dialogues: DialoguesPage(),
@@ -51,41 +51,41 @@ class DictionaryPage extends StatelessWidget {
                   elevation: kGroundElevation,
                   child: Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: kPad),
+                    padding: const EdgeInsets.symmetric(horizontal: kPad),
                     child: Column(
                       children: [
                         TabBar(
-                          labelPadding: EdgeInsets.all(kPad)
-                              .add(EdgeInsets.only(bottom: kPad)),
+                          labelPadding: const EdgeInsets.all(kPad)
+                              .add(const EdgeInsets.only(bottom: kPad)),
                           indicatorPadding:
-                              EdgeInsets.only(bottom: 2 * kPad - 4),
-                          tabs: [
+                              const EdgeInsets.only(bottom: 2 * kPad - 4),
+                          tabs: const [
                             DictionaryTabEntry(
                                 selected: Text('Dictionary',
-                                    style: TextStyle(fontSize: 24.0)),
+                                    style: TextStyle(fontSize: 24)),
                                 unselected: Text('Dictionary',
-                                    style: TextStyle(fontSize: 24.0)),
+                                    style: TextStyle(fontSize: 24)),
                                 index: 0),
                             DictionaryTabEntry(
                                 selected: Text('Favorites',
-                                    style: TextStyle(fontSize: 24.0)),
+                                    style: TextStyle(fontSize: 24)),
                                 unselected: Text('Favorites',
-                                    style: TextStyle(fontSize: 24.0)),
+                                    style: TextStyle(fontSize: 24)),
                                 index: 1),
                             DictionaryTabEntry(
                                 selected: Text('Dialogues',
-                                    style: TextStyle(fontSize: 24.0)),
+                                    style: TextStyle(fontSize: 24)),
                                 unselected: Text('Dialogues',
-                                    style: TextStyle(fontSize: 24.0)),
+                                    style: TextStyle(fontSize: 24)),
                                 index: 2),
                           ],
                           isScrollable: true,
-                          indicator: UnderlineTabIndicator(
+                          indicator: const UnderlineTabIndicator(
                             borderSide: BorderSide(
                               color: Colors.white,
-                              width: 3.0,
+                              width: 3,
                             ),
-                            insets: EdgeInsets.symmetric(horizontal: 8.0),
+                            insets: EdgeInsets.symmetric(horizontal: 8),
                           ),
                         ),
                       ],

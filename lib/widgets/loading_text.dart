@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 
 class LoadingText extends StatelessWidget {
+  const LoadingText({this.text = 'loading', this.delay = false});
+
   final String text;
   final bool delay;
-
-  LoadingText({this.text: 'loading', this.delay: false});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class LoadingText extends StatelessWidget {
         txt = ['.', '..', '...'].map((e) => text + e).toList();
 
       yield txt[DateTime.now().millisecondsSinceEpoch ~/ 200 % txt.length];
-      await Future<void>.delayed(Duration(milliseconds: 200));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
       i++;
     }
   }

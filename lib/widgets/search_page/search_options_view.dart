@@ -8,9 +8,6 @@ import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
 class SearchOptionsView extends StatelessWidget {
-  final BuildContext _exteriorContext;
-  final EntrySearchModel _entrySearchModel;
-
   SearchOptionsView(this._exteriorContext)
       : _entrySearchModel = DictionaryPageModel.readFrom(_exteriorContext)
             .currTranslationPageModel
@@ -18,38 +15,45 @@ class SearchOptionsView extends StatelessWidget {
             .searchPageModel
             .entrySearchModel;
 
+  final BuildContext _exteriorContext;
+  final EntrySearchModel _entrySearchModel;
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
+    return ChangeNotifierProvider<EntrySearchModel>.value(
       value: _entrySearchModel,
-      builder: (context, _) => Material(
+      builder: (BuildContext context, _) => Material(
         elevation: kHighElevation,
         child: Selector<EntrySearchModel, SearchSettingsModel>(
           selector: (_, entrySearch) => entrySearch.searchSettingsModel,
-          builder: (context, settingsModel, _) => Column(
+          builder:
+              (BuildContext context, SearchSettingsModel settingsModel, _) =>
+                  Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('sort: '),
+                    const Text('sort: '),
                     ...SortOrder.values.map(
                       (sortBy) => TextButton(
                         style: TextButton.styleFrom(
                             backgroundColor: settingsModel.sortBy == sortBy
                                 ? Colors.black12
                                 : null,
-                            textStyle: TextStyle(fontSize: 18.0),
+                            textStyle: const TextStyle(fontSize: 18),
                             primary: Colors.black,
                             animationDuration: settingsModel.sortBy == sortBy
                                 ? Duration.zero
-                                : Duration(milliseconds: 300)),
+                                : const Duration(milliseconds: 300)),
                         child: Text(sortBy.toString().split('.').last),
                         onPressed: () {
-                          if (settingsModel.sortBy == sortBy) return;
+                          if (settingsModel.sortBy == sortBy) {
+                            return;
+                          }
                           _updateOptions(_exteriorContext, newSortBy: sortBy);
                         },
                       ),
@@ -57,12 +61,12 @@ class SearchOptionsView extends StatelessWidget {
                   ],
                 ),
               ),
-              Divider(height: 0.0),
+              const Divider(height: 0),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   children: [
-                    Text('ignore accents'),
+                    const Text('ignore accents'),
                     Switch(
                       value: settingsModel.ignoreAccents,
                       onChanged: (newIgnoreAccents) => _updateOptions(

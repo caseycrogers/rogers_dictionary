@@ -6,9 +6,9 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 class FavoritesButton extends StatefulWidget {
-  final Entry entry;
+  const FavoritesButton({required this.entry});
 
-  FavoritesButton({required this.entry});
+  final Entry entry;
 
   @override
   _FavoritesButtonState createState() => _FavoritesButtonState();
@@ -21,7 +21,7 @@ class _FavoritesButtonState extends State<FavoritesButton> {
     return IconButton(
       icon: _icon,
       onPressed: () async {
-        var newFavorite = !MyApp.db.isFavorite(
+        final bool newFavorite = !MyApp.db.isFavorite(
             translationMode, widget.entry.headword.urlEncodedHeadword);
         await MyApp.db.setFavorite(
           translationMode,

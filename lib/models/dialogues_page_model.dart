@@ -4,10 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 class DialoguesPageModel {
+  DialoguesPageModel._(this.selectedChapterNotifier) {
+    _initializeStream();
+  }
+
+  DialoguesPageModel.empty(BuildContext context)
+      : this._(
+          LocalHistoryValueNotifier<DialogueChapter?>(
+            modalRoute: ModalRoute.of(context)!,
+            initialValue: null,
+          ),
+        );
+
   // All static because these can be shared across both translation modes.
   static final LinkedHashSet<DialogueChapter> _dialogues = LinkedHashSet();
   static Stream<DialogueChapter>? _dialogueStream;
@@ -25,28 +36,19 @@ class DialoguesPageModel {
 
   Stream<DialogueChapter> get dialogueStream => _dialogueStream!;
 
-  DialoguesPageModel._(this.selectedChapterNotifier) {
-    _initializeStream();
-  }
-
-  static DialoguesPageModel empty(BuildContext context) => DialoguesPageModel._(
-        LocalHistoryValueNotifier(
-          modalRoute: ModalRoute.of(context)!,
-          initialValue: null,
-        ),
-      );
-
   static void _initializeStream() {
-    if (_dialogueStream != null) return;
+    if (_dialogueStream != null) {
+      return;
+    }
     Stream<DialogueChapter> stream;
     stream = MyApp.db.getDialogues(startAfter: _dialogues.length);
-    _dialogueStream = stream.handleError((error, StackTrace stackTrace) {
+    _dialogueStream = stream.handleError((Error error, StackTrace stackTrace) {
       print('ERROR (dialogue stream): $error\n$stackTrace');
-    }).map((dialogue) {
-      if (!_dialogues.add(dialogue))
-        print('WARNING: added duplicate dialogue ${dialogue.englishTitle}. '
+    }).map((DialogueChapter chapter) {
+      if (!_dialogues.add(chapter))
+        print('WARNING: added duplicate chapter ${chapter.englishTitle}. '
             'Set:\n${_dialogues.toList()}');
-      return dialogue;
+      return chapter;
     }).asBroadcastStream();
   }
 

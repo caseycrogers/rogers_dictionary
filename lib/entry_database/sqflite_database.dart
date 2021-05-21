@@ -15,14 +15,15 @@ import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 class SqfliteDatabase extends DictionaryDatabase {
-  Future<Database> _dbFuture = _getDatabase();
+  final Future<Database> _dbFuture = _getDatabase();
 
   // We need an int that represents no string match and is smaller than any
   // conceivable real string match
-  static const NO_MATCH = 100000;
+  static const int NO_MATCH = 100000;
 
   String _sqlRelevancyScore(String searchString, String columnName) {
-    final index = 'INSTR(LOWER(" " || $columnName), LOWER(" $searchString"))';
+    final String index =
+        'INSTR(LOWER(" " || $columnName), LOWER(" $searchString"))';
     return '''CASE 
     WHEN $index = 0
     THEN $NO_MATCH
@@ -34,7 +35,7 @@ class SqfliteDatabase extends DictionaryDatabase {
       translationMode == TranslationMode.English ? ENGLISH : SPANISH;
 
   String _favoritesTable(TranslationMode translationMode) =>
-      _entryTable(translationMode) + '_favorites';
+      '${_entryTable(translationMode)}_favorites';
 
   @override
   Stream<Entry> getEntries(
@@ -45,7 +46,7 @@ class SqfliteDatabase extends DictionaryDatabase {
   }) =>
       _getEntries(
         translationMode,
-        searchString: searchString,
+        rawSearchString: searchString,
         startAfter: startAfter,
         searchOptions: searchOptions,
         favoritesOnly: false,
@@ -54,8 +55,8 @@ class SqfliteDatabase extends DictionaryDatabase {
   @override
   Future<Entry> getEntry(
       TranslationMode translationMode, String urlEncodedHeadword) async {
-    final db = await _dbFuture;
-    final entry = _rowToEntry(
+    final Database db = await _dbFuture;
+    final Entry entry = _rowToEntry(
       urlEncodedHeadword,
       translationMode,
       await db.rawQuery('''
@@ -64,10 +65,10 @@ class SqfliteDatabase extends DictionaryDatabase {
                FROM ${_favoritesTable(translationMode)}
                WHERE $URL_ENCODED_HEADWORD = ${_entryTable(translationMode)}.$URL_ENCODED_HEADWORD) AS $IS_FAVORITE
  FROM ${_entryTable(translationMode)}
- WHERE $URL_ENCODED_HEADWORD = "$urlEncodedHeadword";''').then((value) => value
-              .isEmpty
-          ? null
-          : value.single),
+ WHERE $URL_ENCODED_HEADWORD = "$urlEncodedHeadword";''').then((List<
+                  Map<String, Object?>>
+              value) =>
+          value.isEmpty ? null : value.single),
     );
     return entry;
   }
@@ -77,7 +78,7 @@ class SqfliteDatabase extends DictionaryDatabase {
           {required int startAfter}) =>
       _getEntries(
         translationMode,
-        searchString: '',
+        rawSearchString: '',
         startAfter: startAfter,
         searchOptions: SearchSettingsModel(SortOrder.alphabetical, true),
         favoritesOnly: true,
@@ -86,7 +87,7 @@ class SqfliteDatabase extends DictionaryDatabase {
   @override
   Future<bool> setFavorite(TranslationMode translationMode,
       String urlEncodedHeadword, bool favorite) async {
-    var db = await _dbFuture;
+    final Database db = await _dbFuture;
     if (favorite) {
       await db.insert(
         _favoritesTable(translationMode),
@@ -103,9 +104,11 @@ class SqfliteDatabase extends DictionaryDatabase {
 
   Entry _rowToEntry(String headword, TranslationMode translationMode,
       Map<String, Object?>? snapshot) {
-    if (snapshot == null) return EntryUtils.notFound(headword);
+    if (snapshot == null) {
+      return EntryUtils.notFound(headword);
+    }
     assert(snapshot.containsKey(IS_FAVORITE));
-    var entry = Entry.fromBuffer(snapshot[ENTRY_BLOB] as List<int>);
+    final Entry entry = Entry.fromBuffer(snapshot[ENTRY_BLOB] as List<int>);
     super.setFavorite(translationMode, entry.headword.urlEncodedHeadword,
         snapshot[IS_FAVORITE] == 1);
     return entry;
@@ -119,21 +122,24 @@ class SqfliteDatabase extends DictionaryDatabase {
   Stream<DialogueChapter> getDialogues({
     int? startAfter,
   }) async* {
-    var db = await _dbFuture;
+    final Database db = await _dbFuture;
     int offset = startAfter ?? 0;
     while (true) {
-      var query = '''
+      final String query = '''
     SELECT *
     FROM $DIALOGUES_TABLE
     ORDER BY $DIALOGUE_ID ASC
     LIMIT 20
     OFFSET $offset;
       ''';
-      var snapshot = await db.rawQuery(query);
+      final List<Map<String, Object?>> snapshot = await db.rawQuery(query);
       if (snapshot.isEmpty) {
         return;
       }
-      for (final dialogue in snapshot.map((snap) => _rowToDialogue(snap))) {
+      for (final DialogueChapter dialogue
+          in snapshot.map((Map<String, Object?> snap) {
+        return _rowToDialogue(snap);
+      })) {
         yield dialogue;
         offset++;
       }
@@ -142,17 +148,20 @@ class SqfliteDatabase extends DictionaryDatabase {
 
   Stream<Entry> _getEntries(
     TranslationMode translationMode, {
-    required String searchString,
+    required String rawSearchString,
     required int startAfter,
     required SearchSettingsModel searchOptions,
     required bool favoritesOnly,
   }) async* {
-    var db = await _dbFuture;
+    final Database db = await _dbFuture;
     int offset = startAfter;
     String orderByClause;
-    final suffix = searchOptions.ignoreAccents ? WITHOUT_DIACRITICAL_MARKS : '';
-    if (searchOptions.ignoreAccents)
-      searchString = searchString.withoutDiacriticalMarks;
+    final String suffix =
+        searchOptions.ignoreAccents ? WITHOUT_DIACRITICAL_MARKS : '';
+    String searchString = rawSearchString;
+    if (searchOptions.ignoreAccents) {
+      searchString = rawSearchString.withoutDiacriticalMarks;
+    }
     switch (searchOptions.sortBy) {
       case SortOrder.relevance:
         orderByClause = '${_sqlRelevancyScore(searchString, HEADWORD)}, '
@@ -164,7 +173,7 @@ class SqfliteDatabase extends DictionaryDatabase {
         orderByClause = 'headword';
         break;
     }
-    var whereClause = '''$IS_FAVORITE''';
+    String whereClause = '''$IS_FAVORITE''';
     if (!favoritesOnly)
       whereClause = '''
 (${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH
@@ -172,7 +181,7 @@ class SqfliteDatabase extends DictionaryDatabase {
  OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS + suffix)} != $NO_MATCH)
 AND url_encoded_headword > "$startAfter"''';
     while (true) {
-      var query = '''
+      final String query = '''
  SELECT *,
         EXISTS(SELECT $URL_ENCODED_HEADWORD
                FROM ${_favoritesTable(translationMode)}
@@ -183,12 +192,13 @@ AND url_encoded_headword > "$startAfter"''';
  LIMIT 20
  OFFSET $offset;
       ''';
-      var snapshot = await db.rawQuery(query);
+      final List<Map<String, Object?>> snapshot = await db.rawQuery(query);
       if (snapshot.isEmpty) {
         return;
       }
-      for (var entry
-          in snapshot.map((snap) => _rowToEntry('', translationMode, snap))) {
+      for (final Entry entry in snapshot.map((Map<String, Object?> snap) {
+        return _rowToEntry('', translationMode, snap);
+      })) {
         yield entry;
         offset++;
       }
@@ -197,15 +207,15 @@ AND url_encoded_headword > "$startAfter"''';
 }
 
 Future<Database> _getDatabase() async {
-  var databasesPath = await getDatabasesPath();
-  var path = join(databasesPath, "$DICTIONARY_DB.db");
+  final String databasesPath = await getDatabasesPath();
+  final String path = join(databasesPath, '$DICTIONARY_DB.db');
 
   // Check if the database exists
-  var exists = await databaseExists(path);
+  final bool exists = await databaseExists(path);
 
   if (!exists) {
     // Should happen only the first time you launch your application
-    print("Creating new copy from asset");
+    print('Creating new copy from asset');
 
     // Make sure the parent directory exists
     try {
@@ -215,15 +225,16 @@ Future<Database> _getDatabase() async {
     }
 
     // Copy from asset
-    ByteData data = await rootBundle.load(join("assets", "$DICTIONARY_DB.db"));
-    List<int> bytes =
+    final ByteData data =
+        await rootBundle.load(join('assets', '$DICTIONARY_DB.db'));
+    final List<int> bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
     // Write and flush the bytes written
     await File(path).writeAsBytes(bytes, flush: true);
   } else {
-    print("Opening existing database");
+    print('Opening existing database');
   }
   // open the database
-  return await openDatabase(path, readOnly: false);
+  return openDatabase(path, readOnly: false);
 }

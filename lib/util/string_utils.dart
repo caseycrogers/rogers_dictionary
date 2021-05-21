@@ -11,15 +11,15 @@ extension NotShittyString on String {
     '`',
   ];
 
-  String get withoutDiacriticalMarks => this.splitMapJoin('',
+  String get withoutDiacriticalMarks => splitMapJoin('',
       onNonMatch: (char) => char.isNotEmpty && diacritics.contains(char)
           ? nonDiacritics[diacritics.indexOf(char)]
           : char);
 
-  String get searchable => this.toLowerCase().splitMapJoin(
+  String get searchable => toLowerCase().splitMapJoin(
         '',
         onNonMatch: (char) => symbols.contains(char) ? '' : char,
       );
 
-  String? get emptyToNull => this.isNotEmpty ? this : null;
+  String? get emptyToNull => isNotEmpty ? this : null;
 }
