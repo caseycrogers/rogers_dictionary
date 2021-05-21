@@ -25,7 +25,7 @@ extension EntryUtils on Entry {
         isAlternate: false,
         headwordText: 'Invalid headword ${urlDecode(headword)}',
       ),
-      translations: [
+      translations: <Translation>[
         Translation(
           partOfSpeech: '',
           content:
@@ -65,10 +65,10 @@ extension EntryUtils on Entry {
   static String longPartOfSpeech(String partOfSpeech) {
     return partOfSpeech.replaceAll(' ', '').splitMapJoin(
       RegExp('[&,]|phrase'),
-      onNonMatch: (partOfSpeechComponent) =>
+      onNonMatch: (String partOfSpeechComponent) =>
       _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
-          partOfSpeechComponent + '*',
-      onMatch: (separator) {
+          '$partOfSpeechComponent*',
+      onMatch: (Match separator) {
         //  == '&' ? ' and ' : ', ',
         switch (separator.group(0)) {
           case '&':
@@ -95,7 +95,7 @@ class EntryBuilder {
   List<Headword>? _alternateHeadwords;
   List<String>? _related;
 
-  List<Translation> _translations = [];
+  final List<Translation> _translations = <Translation>[];
 
   EntryBuilder headword(String headwordText,
       String abbreviation,
@@ -116,8 +116,10 @@ class EntryBuilder {
   }
 
   EntryBuilder addRelated(List<String> related) {
-    if (related.isNotEmpty) _related = (_related ?? [])
-      ..addAll(related);
+    if (related.isNotEmpty) {
+      _related = (_related ?? <String>[])
+        ..addAll(related);
+    }
     return this;
   }
 
@@ -128,9 +130,9 @@ class EntryBuilder {
     required String parentheticalQualifier,
   }) {
     assert(headwordText != '',
-    "You must specify a non-empty alternate headword. Headword: ${_headword
-        .headwordText}. Line: ${_entryId + 2}");
-    _alternateHeadwords = (_alternateHeadwords ?? [])
+    'You must specify a non-empty alternate headword. Headword: ${_headword
+        .headwordText}. Line: ${_entryId + 2}');
+    _alternateHeadwords = (_alternateHeadwords ?? <Headword>[])
       ..add(
         Headword(
           isAlternate: true,
@@ -156,8 +158,8 @@ class EntryBuilder {
     required String editorialNote,
   }) {
     assert(translation != '',
-    "You must specify a non-empty translation. Headword: ${_headword
-        .headwordText} at line $_entryId");
+    'You must specify a non-empty translation. Headword: ${_headword
+        .headwordText} at line $_entryId');
     _translations.add(
       Translation(
         partOfSpeech: partOfSpeech,
@@ -178,8 +180,8 @@ class EntryBuilder {
   }
 
   Entry build() {
-    assert(_translations.length != 0,
-    "You must specify one or more translations. Line ${_entryId + 2}.");
+    assert(_translations.isNotEmpty,
+    'You must specify one or more translations. Line ${_entryId + 2}.');
     return Entry(
       entryId: _entryId,
       headword: _headword,

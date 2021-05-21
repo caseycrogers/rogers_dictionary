@@ -13,25 +13,6 @@ enum TranslationMode {
 }
 
 class TranslationPageModel {
-  // Translation mode state.
-  final TranslationMode translationMode;
-
-  final SearchPageModel searchPageModel;
-
-  final SearchPageModel favoritesPageModel;
-
-  static DialoguesPageModel? _dialoguesPageModel;
-
-  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel!;
-
-  bool get isEnglish => translationMode == TranslationMode.English;
-
-  factory TranslationPageModel.empty(
-          {required BuildContext context,
-          required TranslationMode translationMode}) =>
-      TranslationPageModel._(
-          context: context, translationMode: translationMode);
-
   TranslationPageModel._({
     required BuildContext context,
     required this.translationMode,
@@ -49,6 +30,23 @@ class TranslationPageModel {
         DialoguesPageModel.empty(context);
   }
 
+  TranslationPageModel.empty(
+      {required BuildContext context, required TranslationMode translationMode})
+      : this._(context: context, translationMode: translationMode);
+
+  // Translation mode state.
+  final TranslationMode translationMode;
+
+  final SearchPageModel searchPageModel;
+
+  final SearchPageModel favoritesPageModel;
+
+  static DialoguesPageModel? _dialoguesPageModel;
+
+  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel!;
+
+  bool get isEnglish => translationMode == TranslationMode.English;
+
   static TranslationPageModel of(BuildContext context) =>
-      context.select<TranslationPageModel, TranslationPageModel>((mdl) => mdl);
+      context.read<TranslationPageModel>();
 }

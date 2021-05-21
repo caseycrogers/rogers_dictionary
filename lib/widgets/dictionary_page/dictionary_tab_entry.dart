@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DictionaryTabEntry extends StatefulWidget {
-  DictionaryTabEntry({
+  const DictionaryTabEntry({
     required this.selected,
     required this.unselected,
     required this.index,
@@ -37,6 +37,8 @@ class _DictionaryTabEntryState extends State<DictionaryTabEntry> {
       _controller.index == widget.index ? widget.selected : widget.unselected;
 
   void _onTabSelected() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 }

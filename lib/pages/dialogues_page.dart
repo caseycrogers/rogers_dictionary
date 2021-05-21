@@ -5,7 +5,7 @@ import 'package:rogers_dictionary/widgets/dialogues_page/selected_dialogue_switc
 import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
 class DialoguesPage extends StatelessWidget {
-  static const route = 'dialogues';
+  static const String route = 'dialogues';
 
   static bool matchesUri(Uri uri) => uri.pathSegments.contains(route);
 

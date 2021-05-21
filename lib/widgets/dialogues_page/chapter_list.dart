@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
+import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
@@ -13,9 +14,10 @@ import 'package:rogers_dictionary/widgets/loading_text.dart';
 class ChapterList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var dialoguesModel = TranslationPageModel.of(context);
+    final TranslationPageModel dialoguesModel =
+        TranslationPageModel.of(context);
     return AsyncListView<DialogueChapter>(
-      key: PageStorageKey('dialogues'),
+      key: const PageStorageKey('dialogues'),
       padding: EdgeInsets.zero,
       initialData: dialoguesModel.dialoguesPageModel.dialogues,
       stream: dialoguesModel.dialoguesPageModel.dialogueStream,
@@ -27,9 +29,13 @@ class ChapterList extends StatelessWidget {
           AsyncSnapshot<List<DialogueChapter>> snapshot, int index) =>
       Builder(
         builder: (BuildContext context) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return LoadingText();
-          var chapter = snapshot.data![index];
+          if (snapshot.hasError) {
+            print(snapshot.error);
+          }
+          if (!snapshot.hasData) {
+            return const LoadingText();
+          }
+          final DialogueChapter chapter = snapshot.data![index];
           if (index != 0 &&
               chapter.title(context) ==
                   snapshot.data![index - 1].title(context)) {
@@ -55,7 +61,7 @@ class ChapterList extends StatelessWidget {
       );
 
   PageStorageKey _getKey(BuildContext context, DialogueChapter dialogue) =>
-      PageStorageKey(dialogue.englishTitle);
+      PageStorageKey<String>(dialogue.englishTitle);
 
   Widget _clickableHeader(
     BuildContext context,
@@ -63,10 +69,11 @@ class ChapterList extends StatelessWidget {
     required DialogueChapter chapter,
     DialogueSubChapter? subChapter,
   }) {
-    var dialoguesModel = TranslationPageModel.of(context).dialoguesPageModel;
+    final DialoguesPageModel dialoguesModel =
+        TranslationPageModel.of(context).dialoguesPageModel;
     return ListTile(
-      minLeadingWidth: 0.0,
-      leading: isSubHeader ? IndentIcon() : null,
+      minLeadingWidth: 0,
+      leading: isSubHeader ? const IndentIcon() : null,
       title: bold1Text(
         context,
         subChapter?.title(context) ?? chapter.title(context),

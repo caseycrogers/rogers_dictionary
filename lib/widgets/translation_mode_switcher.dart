@@ -7,9 +7,9 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
 class TranslationModeSwitcher extends StatelessWidget {
-  final Widget child;
+  const TranslationModeSwitcher({required this.child});
 
-  TranslationModeSwitcher({required this.child});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +21,13 @@ class TranslationModeSwitcher extends StatelessWidget {
   }
 
   Widget pages(BuildContext context) {
-    final dictionaryModel = DictionaryPageModel.of(context);
+    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
     final PageController controller = PageController(
       initialPage: translationModeToIndex(
           dictionaryModel.currTranslationPageModel.value.translationMode),
     );
     dictionaryModel.currTranslationPageModel.addListener(() {
-      var targetPage = translationModeToIndex(
+      final int targetPage = translationModeToIndex(
           dictionaryModel.currTranslationPageModel.value.translationMode);
       // If the controller isn't attached yet then the PageView will be properly
       // constructed via initialPage.
@@ -35,18 +35,18 @@ class TranslationModeSwitcher extends StatelessWidget {
         return;
       controller.animateToPage(
         targetPage,
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeIn,
       );
     });
     return PageView(
       controller: controller,
-      onPageChanged: (index) => DictionaryPageModel.readFrom(context)
+      onPageChanged: (int index) => DictionaryPageModel.readFrom(context)
           .onTranslationModeChanged(context, indexToTranslationMode(index)),
       children: [
         Provider<TranslationPageModel>.value(
           value: dictionaryModel.englishPageModel,
-          builder: (context, _) => Theme(
+          builder: (BuildContext context, _) => Theme(
             data: Theme.of(context)
                 .copyWith(primaryColor: primaryColor(TranslationMode.English)),
             child: child,
@@ -54,7 +54,7 @@ class TranslationModeSwitcher extends StatelessWidget {
         ),
         Provider<TranslationPageModel>.value(
           value: dictionaryModel.spanishPageModel,
-          builder: (context, _) => Theme(
+          builder: (BuildContext context, _) => Theme(
             data: Theme.of(context)
                 .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
             child: child,

@@ -58,14 +58,14 @@ Text bold1Text(BuildContext context, String text, {Color? color}) => Text(
     );
 
 class Indent extends StatelessWidget {
+  const Indent({required this.child, this.size});
+
   final Widget child;
   final double? size;
 
-  Indent({required this.child, this.size});
-
   @override
   Widget build(BuildContext context) =>
-      Padding(child: child, padding: EdgeInsets.only(left: size ?? 20.0));
+      Padding(child: child, padding: EdgeInsets.only(left: size ?? 20));
 }
 
 List<Widget> highlightedText(
@@ -74,26 +74,35 @@ List<Widget> highlightedText(
   bool preview, {
   bool isHeadword = false,
   required String searchString,
+  bool forWrap = true,
 }) {
-  return OverflowMarkdown(
+  final OverflowMarkdown md = OverflowMarkdown(
     text,
     defaultStyle: !preview && isHeadword ? headline1(context) : bold1(context),
     overrideStyles: _highlightSearchMatch(context, text, preview, searchString),
-  ).forWrap(context);
+  );
+  if (forWrap) {
+    return md.forWrap(context);
+  }
+  return [md];
 }
 
 List<OverrideStyle> _highlightSearchMatch(
     BuildContext context, String text, bool preview, String searchString) {
-  if (!preview || searchString.isEmpty) return [];
-  bool ignoreAccents = SearchPageModel.of(context)
+  if (!preview || searchString.isEmpty) {
+    return [];
+  }
+  final bool ignoreAccents = SearchPageModel.of(context)
       .entrySearchModel
       .searchSettingsModel
       .ignoreAccents;
   // Prepend `text` and `searchString` with spaces to rule out matches that are
   // in the middle of a word.
-  var searchable =
+  final String searchable =
+      // ignore: lines_longer_than_80_chars
       ' ${ignoreAccents ? text.searchable.withoutDiacriticalMarks : text.searchable}';
-  var overrideMatches = ' $searchString'.allMatches(searchable);
+  final Iterable<Match> overrideMatches =
+      ' $searchString'.allMatches(searchable);
   return overrideMatches
       .map(
         (m) => OverrideStyle(
@@ -108,76 +117,93 @@ List<OverrideStyle> _highlightSearchMatch(
 
 Widget alternateHeadwordLines(BuildContext context,
     List<Headword> alternateHeadwords, bool preview, String searchString) {
-  if (alternateHeadwords.isEmpty) return Container();
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: alternateHeadwords.map(
-      (alt) {
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Only display the alt header for the first entry.
-            Opacity(
-              opacity: alt == alternateHeadwords.first ? 1.0 : 0.0,
-              child: italic1Text(context, 'alt. '),
-            ),
-            Expanded(
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  ...highlightedText(context, alt.headwordText, preview,
-                      searchString: searchString),
-                  if (alt.abbreviation.isNotEmpty)
-                    ...highlightedText(context, alt.abbreviation, preview,
-                        searchString: searchString),
-                  _namingStandard(context, alt.namingStandard, true),
-                  ...parentheticalTexts(
-                    context,
-                    alt.parentheticalQualifier,
-                    true,
-                  ),
-                ],
+  if (alternateHeadwords.isEmpty) {
+    return Container();
+  }
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: alternateHeadwords.map(
+        (alt) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Only display the alt header for the first entry.
+              Opacity(
+                opacity: alt == alternateHeadwords.first ? 1.0 : 0.0,
+                child: italic1Text(context, 'alt. '),
               ),
-            ),
-          ],
-        );
-      },
-    ).toList(),
+              Expanded(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ...highlightedText(context, alt.headwordText, preview,
+                        searchString: searchString),
+                    if (alt.abbreviation.isNotEmpty) normal1Text(context, ' '),
+                    if (alt.abbreviation.isNotEmpty)
+                      ...highlightedText(
+                          context, '(${alt.abbreviation})', preview,
+                          searchString: searchString, forWrap: false),
+                    if (alt.namingStandard.isNotEmpty)
+                      _namingStandard(context, alt.namingStandard, true),
+                    ...parentheticalTexts(
+                      context,
+                      alt.parentheticalQualifier,
+                      true,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ).toList(),
+    ),
   );
 }
 
 Widget _namingStandard(
-    BuildContext context, String namingStandard, isHeadword) {
-  if (namingStandard.isEmpty) return Container();
-  var text = namingStandard;
-  if (namingStandard == 'i') text = 'INN';
-  if (namingStandard == 'u') text = 'USAN';
+    BuildContext context, String namingStandard, bool isHeadword) {
+  assert(namingStandard.isNotEmpty);
+  String text = namingStandard;
+  if (namingStandard == 'i') {
+    text = 'INN';
+  }
+  if (namingStandard == 'u') {
+    text = 'USAN';
+  }
   return OverflowMarkdown(' (*$text* )',
       defaultStyle: isHeadword ? bold1(context) : null);
 }
 
 List<Widget> _translationParentheticals(
     BuildContext context, String translationParenthetical) {
-  if (translationParenthetical.isEmpty) return [];
+  if (translationParenthetical.isEmpty) {
+    return [];
+  }
   return translationParenthetical
       .split(';')
       .expand((q) => [
             normal1Text(context, ' '),
             DictionaryChip(
-                padding: EdgeInsets.only(top: 4.0),
-                child:
-                    Text(q, style: italic1(context).copyWith(fontSize: 20.0)))
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(q, style: italic1(context).copyWith(fontSize: 20)),
+            )
           ])
       .toList();
 }
 
 Widget partOfSpeechText(BuildContext context, String text, bool preview) {
   var pos = ['na', ''].contains(text) ? '-' : text;
-  if (!preview) pos = EntryUtils.longPartOfSpeech(pos);
+  if (!preview) {
+    pos = EntryUtils.longPartOfSpeech(pos);
+  }
   return Container(
-    padding: EdgeInsets.only(right: 8.0),
+    padding: const EdgeInsets.only(right: 8),
     child: DictionaryChip(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
         pos,
         style: italic1(context),
@@ -191,38 +217,53 @@ Widget previewTranslationLine(
   var text = translation.content;
   if (translation.genderAndPlural.isNotEmpty)
     text += ' *${translation.genderAndPlural}*';
-  if (addEllipsis) text += '...';
+  if (addEllipsis) {
+    text += '...';
+  }
   return OverflowMarkdown(text);
 }
 
 Widget translationLine(BuildContext context, Translation translation, int i) {
-  return Wrap(
-    crossAxisAlignment: WrapCrossAlignment.center,
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       normal1Text(context, '${i.toString()}. '),
-      ...OverflowMarkdown(translation.content).forWrap(context),
-      if (translation.genderAndPlural.isNotEmpty)
-        OverflowMarkdown(' *${translation.genderAndPlural}*'),
-      if (translation.abbreviation.isNotEmpty)
-        OverflowMarkdown(' (${translation.abbreviation})'),
-      _namingStandard(context, translation.namingStandard, false),
-      ..._translationParentheticals(
-          context, translation.parentheticalQualifier),
+      Expanded(
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            ...OverflowMarkdown(translation.content).forWrap(context),
+            if (translation.genderAndPlural.isNotEmpty)
+              OverflowMarkdown(' *${translation.genderAndPlural}*'),
+            if (translation.abbreviation.isNotEmpty) ...[
+              normal1Text(context, ' '),
+              OverflowMarkdown('(${translation.abbreviation})'),
+            ],
+            if (translation.namingStandard.isNotEmpty)
+              _namingStandard(context, translation.namingStandard, false),
+            ..._translationParentheticals(
+                context, translation.parentheticalQualifier),
+          ],
+        ),
+      ),
     ],
   );
 }
 
 List<Widget> parentheticalTexts(
-    BuildContext context, String text, bool addSpace) {
-  if (text.isEmpty) return [];
+    BuildContext context, String text, bool addSpace,
+    {double? size}) {
+  if (text.isEmpty) {
+    return [];
+  }
   return [
     if (addSpace) normal1Text(context, ' '),
     ...text.split(';').expand(
           (t) => [
             if (t != text.split(';').first) normal1Text(context, ' '),
             DictionaryChip(
-              padding: EdgeInsets.symmetric(vertical: 4.0),
-              child: Text(t, style: italic1(context)),
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(t, style: italic1(context).copyWith(fontSize: size)),
               color: Colors.cyan.shade100.withOpacity(.6),
             ),
           ],
@@ -235,15 +276,19 @@ Widget editorialText(BuildContext context, String text) {
 }
 
 Widget irregularInflectionsTable(BuildContext context, String text) {
-  if (text.isEmpty) return Container();
+  if (text.isEmpty) {
+    return Container();
+  }
   return DictionaryChip(
-    childPadding: EdgeInsets.only(left: 4.0),
+    childPadding: const EdgeInsets.only(left: 4),
     color: Colors.grey.shade200,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        bold1Text(context,
-            'Irregular Inflections (${TranslationPageModel.of(context).isEnglish ? 'EN' : 'ES'}):'),
+        bold1Text(
+            context,
+            'Irregular Inflections ('
+            '${TranslationPageModel.of(context).isEnglish ? 'EN' : 'ES'}):'),
         ...text.split(';').map(
               (i) => italic1Text(context, i.trim()),
             ),
@@ -253,10 +298,12 @@ Widget irregularInflectionsTable(BuildContext context, String text) {
 }
 
 Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
-  if (examplePhrases.isEmpty) return Container();
+  if (examplePhrases.isEmpty) {
+    return Container();
+  }
   return DictionaryChip(
-    padding: EdgeInsets.only(top: 8.0),
-    childPadding: EdgeInsets.only(left: 4.0),
+    padding: const EdgeInsets.only(top: 8),
+    childPadding: const EdgeInsets.only(left: 4),
     color: Colors.grey.shade200,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,9 +337,13 @@ Widget headwordLine(
                     context, entry.headword.headwordText, preview,
                     searchString: searchString, isHeadword: true),
                 if (entry.headword.abbreviation.isNotEmpty)
+                  headline1Text(context, ' '),
+                if (entry.headword.abbreviation.isNotEmpty)
                   ...highlightedText(
-                      context, ' (${entry.headword.abbreviation})', preview,
-                      searchString: searchString),
+                      context, '(${entry.headword.abbreviation})', preview,
+                      searchString: searchString,
+                      isHeadword: true,
+                      forWrap: false),
                 ...parentheticalTexts(
                   context,
                   entry.headword.parentheticalQualifier,
@@ -304,7 +355,11 @@ Widget headwordLine(
         ],
       ),
       alternateHeadwordLines(
-          context, entry.alternateHeadwords, preview, searchString),
+        context,
+        entry.alternateHeadwords,
+        preview,
+        searchString,
+      ),
     ],
   );
 }

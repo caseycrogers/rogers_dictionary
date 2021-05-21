@@ -9,6 +9,14 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 class EntrySearchModel with ChangeNotifier {
+  EntrySearchModel._(this._translationMode, this._searchString,
+      this._searchSettingsModel, this._favoritesOnly) {
+    _initializeStream();
+  }
+
+  EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
+      : this._(translationMode, '', SearchSettingsModel.empty(), favoritesOnly);
+
   final TranslationMode _translationMode;
   String _searchString;
   SearchSettingsModel _searchSettingsModel;
@@ -28,21 +36,18 @@ class EntrySearchModel with ChangeNotifier {
 
   bool get favoritesOnly => _favoritesOnly;
 
-  EntrySearchModel._(this._translationMode, this._searchString,
-      this._searchSettingsModel, this._favoritesOnly) {
-    _initializeStream();
-  }
-
   void resetStream() => _initializeStream();
 
   void _initializeStream() {
     Stream<Entry> stream;
     // Use a new hashSet to avoid any potential race conditions.
-    final hashSet = LinkedHashSet<Entry>();
+    final LinkedHashSet<Entry> hashSet = LinkedHashSet();
     if (_favoritesOnly) {
       stream = MyApp.db.getFavorites(_translationMode, startAfter: 0);
     } else {
-      if (searchString.isEmpty) stream = Stream.empty();
+      if (searchString.isEmpty) {
+        stream = const Stream<Entry>.empty();
+      }
       stream = MyApp.db.getEntries(
         _translationMode,
         searchString: searchString,
@@ -51,22 +56,19 @@ class EntrySearchModel with ChangeNotifier {
       );
     }
     _entryStream = stream
-        .handleError((error, StackTrace stackTrace) =>
+        .handleError((Error error, StackTrace stackTrace) =>
             print('ERROR (entry stream): :$error\n$stackTrace'))
         .map(
-      (entry) {
+      (Entry entry) {
         if (!hashSet.add(entry))
-          print(
-              'WARNING: added duplicate entry ${entry.headword.urlEncodedHeadword}. '
+          print('WARNING: added duplicate entry '
+              '${entry.headword.urlEncodedHeadword}. '
               'Set:\n${hashSet.toList()}');
         return entry;
       },
     ).asBroadcastStream();
     _entries = hashSet;
   }
-
-  EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
-      : this._(translationMode, '', SearchSettingsModel.empty(), favoritesOnly);
 
   void onSearchStringChanged({
     String? newSearchString,

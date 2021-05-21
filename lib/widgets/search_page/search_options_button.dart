@@ -18,8 +18,8 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
   @override
   void initState() {
     _controller = AnimationController(
-      duration: Duration(milliseconds: 200),
-      reverseDuration: Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 200),
+      reverseDuration: const Duration(milliseconds: 100),
       vsync: this,
     );
     super.initState();
@@ -35,18 +35,20 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (!_isMounted) return true;
+        if (!_isMounted) {
+          return true;
+        }
         _toggle();
         return false;
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 4.0),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: _isMounted ? Colors.white10 : Colors.transparent,
         ),
         child: IconButton(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           color: Colors.white,
           onPressed: () => _toggle(),
         ),
@@ -56,7 +58,7 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
 
   OverlayEntry _buildOverlayEntry() {
     final renderBox = context.findRenderObject() as RenderBox;
-    var upperLeft = renderBox.localToGlobal(Offset.zero);
+    final Offset upperLeft = renderBox.localToGlobal(Offset.zero);
     return OverlayEntry(
       builder: (_) => Positioned(
         child: Stack(

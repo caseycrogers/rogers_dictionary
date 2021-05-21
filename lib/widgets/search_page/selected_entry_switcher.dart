@@ -12,19 +12,22 @@ import 'package:rogers_dictionary/widgets/search_page/entry_search.dart';
 class SelectedEntrySwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final searchPageModel = _pageModel(context);
+    final SearchPageModel searchPageModel = _pageModel(context);
     return Provider<SearchPageModel>.value(
       value: searchPageModel,
-      builder: (context, _) => AnimatedListenableSwitcher<SelectedEntry?>(
+      builder: (BuildContext context, _) =>
+          AnimatedListenableSwitcher<SelectedEntry?>(
         valueListenable: searchPageModel.currSelectedEntry,
-        builder: (BuildContext context, selectedEntry, _) =>
-            selectedEntry != null ? EntryView.asPage(context) : EntrySearch(),
+        builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
+            selectedEntry != null
+                ? EntryView.asPage(context)
+                : const EntrySearch(),
       ),
     );
   }
 
   SearchPageModel _pageModel(BuildContext context) {
-    var t = TranslationPageModel.of(context);
+    final TranslationPageModel t = TranslationPageModel.of(context);
     return DictionaryPageModel.of(context).currentTab.value ==
             DictionaryTab.search
         ? t.searchPageModel

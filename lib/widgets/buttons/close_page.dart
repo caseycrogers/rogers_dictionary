@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class ClosePage extends StatelessWidget {
-  final Function(BuildContext) onClose;
+  const ClosePage({required this.onClose});
 
-  ClosePage({required this.onClose});
+  final Function(BuildContext) onClose;
 
   @override
   Widget build(BuildContext context) {

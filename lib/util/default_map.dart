@@ -1,6 +1,6 @@
 extension DefaultMap<K,V> on Map<K,V> {
   V getOrElse(K key, V defaultValue) {
-    if (this.containsKey(key)) {
+    if (containsKey(key)) {
       return this[key]!;
     } else {
       this[key] = defaultValue;

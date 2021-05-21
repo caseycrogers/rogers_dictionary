@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Delayed extends StatefulWidget {
-  final Widget initialChild;
-  final Widget child;
-  final Duration delay;
-
-  Delayed({
+  const Delayed({
     required this.initialChild,
     required this.child,
     required this.delay,
   });
+
+  final Widget initialChild;
+  final Widget child;
+  final Duration delay;
 
   @override
   _DelayedState createState() => _DelayedState();
@@ -27,7 +27,9 @@ class _DelayedState extends State<Delayed> {
 
   @override
   void didUpdateWidget(covariant Delayed oldWidget) {
-    if (oldWidget.child != widget.child) _initialize();
+    if (oldWidget.child != widget.child) {
+      _initialize();
+    }
     super.didUpdateWidget(oldWidget);
   }
 

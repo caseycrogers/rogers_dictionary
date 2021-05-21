@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -8,22 +7,21 @@ import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/util/default_map.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/pages/page_header.dart';
 
 class EntryView extends StatelessWidget {
+  const EntryView._instance(this._entry, this._preview);
+
   final Entry _entry;
   final bool _preview;
-
-  EntryView._instance(this._entry, this._preview);
 
   static Widget asPage(BuildContext context) => Builder(
         key: ValueKey(SearchPageModel.of(context).currSelectedHeadword),
         builder: (context) {
-          var searchPageModel = SearchPageModel.of(context);
+          final SearchPageModel searchPageModel = SearchPageModel.of(context);
           if (!searchPageModel.hasSelection)
             return Container(color: Theme.of(context).backgroundColor);
           return FutureBuilder(
@@ -34,9 +32,9 @@ class EntryView extends StatelessWidget {
                 return Delayed(
                   initialChild: Container(),
                   child: Container(),
-                  delay: Duration(milliseconds: 50),
+                  delay: const Duration(milliseconds: 50),
                 );
-              var entry = snap.data!;
+              final Entry entry = snap.data!;
               return PageHeader(
                 header: headwordLine(
                     context, entry, false, searchPageModel.searchString),
@@ -67,33 +65,15 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildRelated(BuildContext context) {
-    if (_entry.related.isEmpty) return Container();
-    List<TextSpan> relatedSpans =
-        _entry.related.where((r) => r.isNotEmpty).expand(
-      (headword) {
-        return [
-          TextSpan(
-            text: headword,
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1!
-                .copyWith(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                DictionaryPageModel.readFrom(context).onHeadwordSelected(
-                    context, EntryUtils.urlEncode(headword));
-              },
-          ),
-          if (headword != _entry.related.last) TextSpan(text: ', '),
-        ];
-      },
-    ).toList();
+    if (_entry.related.isEmpty) {
+      return Container();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(height: 48.0),
+        Container(height: 48),
         bold1Text(context, 'Related'),
-        Divider(),
+        const Divider(),
         ..._entry.related.where((r) => r.isNotEmpty).map(
               (headword) => TextButton(
                 style: ButtonStyle(
@@ -119,16 +99,18 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildEditorialNotes(BuildContext context) {
-    var notes = _entry.translations
+    final Iterable<Widget> notes = _entry.translations
         .where((t) => t.editorialNote.isNotEmpty)
         .map((t) => editorialText(context, t.editorialNote));
-    if (notes.isEmpty) return Container();
+    if (notes.isEmpty) {
+      return Container();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(height: 48.0),
-        bold1Text(context, "Editorial Notes"),
-        Divider(),
+        Container(height: 48),
+        bold1Text(context, 'Editorial Notes'),
+        const Divider(),
         ...notes,
       ],
     );
@@ -136,20 +118,11 @@ class EntryView extends StatelessWidget {
 
   Widget _buildTable(BuildContext context) {
     return Table(
-        columnWidths: {
+        columnWidths: const {
           0: IntrinsicColumnWidth(),
         },
         defaultVerticalAlignment: TableCellVerticalAlignment.top,
         children: _buildTranslations(context));
-  }
-
-  Map<String, List<Translation>> _constructTranslationMap(Entry entry) {
-    // Schema:
-    // {partOfSpeech: [translation]}
-    Map<String, List<Translation>> translationMap = {};
-    _entry.translations
-        .forEach((t) => translationMap.getOrElse(t.partOfSpeech, []).add(t));
-    return translationMap;
   }
 
   // Return a list of TableRows corresponding to each part of speech.
@@ -178,8 +151,8 @@ class EntryView extends StatelessWidget {
           child: partOfSpeechText(context, partOfSpeech, _preview),
           alignment: Alignment.centerRight,
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 6.0),
+        Container(
+          padding: const EdgeInsets.only(top: 10),
           child: previewTranslationLine(
               context, translations.first, translations.length != 1),
         ),
@@ -197,15 +170,18 @@ class EntryView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: translations.map((t) {
-                  var parentheticalChanged =
+                  final bool parentheticalChanged =
                       t.dominantHeadwordParentheticalQualifier != parenthetical;
                   parenthetical = t.dominantHeadwordParentheticalQualifier;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (parentheticalChanged)
-                        ...parentheticalTexts(context, parenthetical, false),
-                      if (!parentheticalChanged) SizedBox(height: 5.0),
+                        Wrap(
+                          children:
+                              parentheticalTexts(context, parenthetical, false),
+                        ),
+                      if (!parentheticalChanged) const SizedBox(height: 5),
                       _translationContent(
                           context,
                           t,
@@ -225,7 +201,7 @@ class EntryView extends StatelessWidget {
   Widget _translationContent(
       BuildContext context, Translation translation, bool indent, int i) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -233,7 +209,7 @@ class EntryView extends StatelessWidget {
               child: translationLine(context, translation, i),
               size: indent ? null : 0.0),
           examplePhraseText(context, translation.examplePhrases),
-          SizedBox(height: 0.0),
+          const SizedBox(height: 0),
         ],
       ),
     );

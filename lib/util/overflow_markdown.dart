@@ -2,17 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class OverflowMarkdown extends StatelessWidget {
-  final String text;
-  final TextOverflow? overflow;
-  final TextStyle? defaultStyle;
-  final List<OverrideStyle>? overrideStyles;
-
-  OverflowMarkdown(
+  const OverflowMarkdown(
     this.text, {
     this.overflow,
     this.defaultStyle,
     this.overrideStyles,
   });
+
+  final String text;
+  final TextOverflow? overflow;
+  final TextStyle? defaultStyle;
+  final List<OverrideStyle>? overrideStyles;
 
   List<Widget> forWrap(BuildContext context) {
     return _constructSpans(context).expand(
@@ -29,8 +29,8 @@ class OverflowMarkdown extends StatelessWidget {
                 context,
                 [
                   TextSpan(
-                    // Add space back in for all but first word
-                    text: word == s.text!.split(' ').first ? word : ' $word',
+                    // Add space back in for all but last word
+                    text: word == s.text!.split(' ').last ? word : '$word ',
                     style: s.style,
                   ),
                 ],
@@ -59,13 +59,13 @@ class OverflowMarkdown extends StatelessWidget {
   }
 
   List<MapEntry<bool, TextSpan>> _constructSpans(BuildContext context) {
-    final spans = <MapEntry<bool, TextSpan>>[];
-    var isBold = false;
-    var isItalic = false;
-    var isSubscript = false;
+    final List<MapEntry<bool, TextSpan>> spans = [];
+    bool isBold = false;
+    bool isItalic = false;
+    bool isSubscript = false;
     TextStyle? currOverrideStyle;
-    var buff = StringBuffer();
-    var i = 0;
+    final StringBuffer buff = StringBuffer();
+    int i = 0;
     // Index of user visible characters (excl. parentheses).
     var charIndex = 0;
 
@@ -82,7 +82,9 @@ class OverflowMarkdown extends StatelessWidget {
     }
 
     void addSpan() {
-      if (buff.isEmpty) return;
+      if (buff.isEmpty) {
+        return;
+      }
       spans.add(
         MapEntry(
           currOverrideStyle != null,
@@ -149,13 +151,19 @@ class OverflowMarkdown extends StatelessWidget {
       i += 1;
     }
     addSpan();
-    assert(!isItalic, "Unclosed italic mark in $text");
-    assert(!isBold, "Unclosed bold mark in $text");
+    assert(!isItalic, 'Unclosed italic mark in $text');
+    assert(!isBold, 'Unclosed bold mark in $text');
     return spans;
   }
 }
 
 class OverrideStyle {
+  OverrideStyle({
+    required this.style,
+    required this.start,
+    required this.stop,
+  }) : assert(start != stop);
+
   TextStyle style;
 
   /// When to start applying the override style, inclusive.
@@ -164,13 +172,7 @@ class OverrideStyle {
   /// When to stop applying the override style, exclusive.
   int stop;
 
-  OverrideStyle({
-    required this.style,
-    required this.start,
-    required this.stop,
-  }) : assert(start != stop);
+  bool matchesStart(int index, int charIndex) => charIndex == start;
 
-  bool matchesStart(int index, int charIndex) => charIndex == this.start;
-
-  bool matchesStop(int index, int charIndex) => charIndex == this.stop;
+  bool matchesStop(int index, int charIndex) => charIndex == stop;
 }

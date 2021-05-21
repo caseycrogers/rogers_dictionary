@@ -6,7 +6,7 @@ import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 class PageRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    var uri = Uri.parse(settings.name ?? '');
+    final Uri uri = Uri.parse(settings.name ?? '');
     return _serveDictionaryPage(settings, uri);
   }
 }
@@ -15,15 +15,17 @@ Route<dynamic> _serveDictionaryPage(RouteSettings settings, Uri uri) =>
     _servePage(settings, uri, DictionaryPage());
 
 Route<dynamic> _servePage(RouteSettings settings, Uri uri, Widget page) {
-  return PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Provider<DictionaryPageModel>(
-          create: (_) => DictionaryPageModel.empty(context),
-          builder: (context, _) {
-            DictionaryPageModel.of(context).listenOnPageChanges(context);
-            return page;
-          },
-        );
-      });
+  return PageRouteBuilder<DictionaryPageModel>(
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (BuildContext context, Animation<double> animation,
+        Animation<double> secondaryAnimation) {
+      return Provider<DictionaryPageModel>(
+        create: (_) => DictionaryPageModel.empty(context),
+        builder: (BuildContext context, _) {
+          DictionaryPageModel.of(context).listenOnPageChanges(context);
+          return page;
+        },
+      );
+    },
+  );
 }
