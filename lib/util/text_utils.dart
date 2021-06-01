@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
@@ -285,10 +284,7 @@ Widget irregularInflectionsTable(BuildContext context, String text) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        bold1Text(
-            context,
-            'Irregular Inflections ('
-            '${TranslationPageModel.of(context).isEnglish ? 'EN' : 'ES'}):'),
+        bold1Text(context, 'Irregular Inflections:'),
         ...text.split(';').map(
               (i) => italic1Text(context, i.trim()),
             ),

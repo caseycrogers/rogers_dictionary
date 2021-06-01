@@ -15,29 +15,33 @@ class OverflowMarkdown extends StatelessWidget {
   final List<OverrideStyle>? overrideStyles;
 
   List<Widget> forWrap(BuildContext context) {
-    return _constructSpans(context).expand(
-      (e) {
-        final s = e.value;
-        // This is an override style, return it unperturbed as highlighted
-        // content should not wrap.
-        if (e.key)
-          return [
-            _constructText(context, [s]),
-          ];
-        return s.text!.split(' ').map(
-              (word) => _constructText(
-                context,
-                [
-                  TextSpan(
-                    // Add space back in for all but last word
-                    text: word == s.text!.split(' ').last ? word : '$word ',
-                    style: s.style,
-                  ),
-                ],
+    final List<TextSpan> spans = [];
+    _constructSpans(context).forEach(
+      (entry) {
+        final s = entry.value;
+        if (!entry.key.canWrap) {
+          spans.add(s);
+          return;
+        }
+        if (entry.key.isSubscript && spans.isNotEmpty) {
+          print('asdf');
+          // Subscript should not be wrapped
+          spans[spans.length - 1] =
+              TextSpan(children: [spans.last, entry.value]);
+          return;
+        }
+        spans.addAll(
+          s.text!.split(' ').map(
+                (word) => TextSpan(
+                  // Add space back in for all but last word
+                  text: word == s.text!.split(' ').last ? word : '$word ',
+                  style: s.style,
+                ),
               ),
-            );
+        );
       },
-    ).toList();
+    );
+    return spans.map((s) => _constructText(context, [s])).toList();
   }
 
   @override
@@ -58,12 +62,11 @@ class OverflowMarkdown extends StatelessWidget {
     );
   }
 
-  List<MapEntry<bool, TextSpan>> _constructSpans(BuildContext context) {
-    final List<MapEntry<bool, TextSpan>> spans = [];
-    bool isBold = false;
-    bool isItalic = false;
-    bool isSubscript = false;
-    TextStyle? currOverrideStyle;
+  List<MapEntry<_MarkdownStyle, TextSpan>> _constructSpans(
+    BuildContext context,
+  ) {
+    final List<MapEntry<_MarkdownStyle, TextSpan>> spans = [];
+    _MarkdownStyle mdStyle = const _MarkdownStyle();
     final StringBuffer buff = StringBuffer();
     int i = 0;
     // Index of user visible characters (excl. parentheses).
@@ -73,21 +76,22 @@ class OverflowMarkdown extends StatelessWidget {
       final TextStyle baseStyle =
           defaultStyle ?? Theme.of(context).textTheme.bodyText1!;
       return baseStyle
-          .merge(currOverrideStyle?.copyWith(inherit: true))
+          .merge(mdStyle.overrideStyle?.copyWith(inherit: true))
           .copyWith(
-            fontWeight: isBold ? FontWeight.bold : null,
-            fontStyle: isItalic ? FontStyle.italic : null,
-            fontSize: isSubscript ? baseStyle.fontSize! / 2 : null,
+            fontWeight: mdStyle.isBold ? FontWeight.bold : null,
+            fontStyle: mdStyle.isItalic ? FontStyle.italic : null,
+            fontSize: mdStyle.isSubscript ? baseStyle.fontSize! / 2 : null,
           );
     }
 
-    void addSpan() {
+    void addSpan(_MarkdownStyle newMdStyle) {
       if (buff.isEmpty) {
+        mdStyle = newMdStyle;
         return;
       }
       spans.add(
         MapEntry(
-          currOverrideStyle != null,
+          mdStyle,
           TextSpan(
             text: buff.toString(),
             style: getTextStyle(),
@@ -95,12 +99,12 @@ class OverflowMarkdown extends StatelessWidget {
         ),
       );
       buff.clear();
+      mdStyle = newMdStyle;
     }
 
     while (i < text.length) {
       if ((overrideStyles ?? []).any((o) => o.matchesStop(i, charIndex))) {
-        addSpan();
-        currOverrideStyle = null;
+        addSpan(mdStyle.copyWith(clearOverride: true));
       }
       final char = text[i];
       // Skip parentheses BEFORE starting override styles.
@@ -109,16 +113,15 @@ class OverflowMarkdown extends StatelessWidget {
         i += 1;
         continue;
       }
-      final OverrideStyle? startOverrideStyle =
+      final OverrideStyle? startOverride =
           // Cast is necessary so that `orElse` can return null.
           // ignore: unnecessary_cast
           (overrideStyles ?? []).map((e) => e as OverrideStyle?).firstWhere(
                 (o) => o?.matchesStart(i, charIndex) ?? false,
                 orElse: () => null,
               );
-      if (startOverrideStyle != null) {
-        addSpan();
-        currOverrideStyle = startOverrideStyle.style;
+      if (startOverride != null) {
+        addSpan(mdStyle.copyWith(overrideStyle: startOverride.style));
       }
       if (char == '\\') {
         assert(i != text.length,
@@ -129,20 +132,17 @@ class OverflowMarkdown extends StatelessWidget {
         continue;
       }
       if (i + 1 < text.length && text.substring(i, i + 2) == '**') {
-        addSpan();
-        isBold = !isBold;
+        addSpan(mdStyle.copyWith(isBold: !mdStyle.isBold));
         i += 2;
         continue;
       }
       if (char == '*') {
-        addSpan();
-        isItalic = !isItalic;
+        addSpan(mdStyle.copyWith(isItalic: !mdStyle.isItalic));
         i += 1;
         continue;
       }
       if (char == '`') {
-        addSpan();
-        isSubscript = !isSubscript;
+        addSpan(mdStyle.copyWith(isSubscript: !mdStyle.isSubscript));
         i += 1;
         continue;
       }
@@ -150,9 +150,9 @@ class OverflowMarkdown extends StatelessWidget {
       charIndex += 1;
       i += 1;
     }
-    addSpan();
-    assert(!isItalic, 'Unclosed italic mark in $text');
-    assert(!isBold, 'Unclosed bold mark in $text');
+    addSpan(mdStyle);
+    assert(!mdStyle.isItalic, 'Unclosed italic mark in $text');
+    assert(!mdStyle.isBold, 'Unclosed bold mark in $text');
     return spans;
   }
 }
@@ -175,4 +175,36 @@ class OverrideStyle {
   bool matchesStart(int index, int charIndex) => charIndex == start;
 
   bool matchesStop(int index, int charIndex) => charIndex == stop;
+}
+
+@immutable
+class _MarkdownStyle {
+  const _MarkdownStyle({
+    this.isBold = false,
+    this.isItalic = false,
+    this.isSubscript = false,
+    this.overrideStyle,
+  });
+
+  _MarkdownStyle copyWith({
+    bool? isBold,
+    bool? isItalic,
+    bool? isSubscript,
+    TextStyle? overrideStyle,
+    bool clearOverride = false,
+  }) =>
+      _MarkdownStyle(
+        isBold: isBold ?? this.isBold,
+        isItalic: isItalic ?? this.isItalic,
+        isSubscript: isSubscript ?? this.isSubscript,
+        overrideStyle:
+            clearOverride ? null : overrideStyle ?? this.overrideStyle,
+      );
+
+  final bool isBold;
+  final bool isItalic;
+  final bool isSubscript;
+  final TextStyle? overrideStyle;
+
+  bool get canWrap => overrideStyle == null;
 }

@@ -4,13 +4,11 @@ typedef Headword = Entry_Headword;
 typedef Translation = Entry_Translation;
 
 extension EntryUtils on Entry {
-  List<Headword> get allHeadwords =>
-      [headword, ...alternateHeadwords];
+  List<Headword> get allHeadwords => [headword, ...alternateHeadwords];
 
   static String urlDecode(String urlEncodedHeadword) {
     return Uri.decodeComponent(
-        (urlEncodedHeadword.split('_')
-          ..removeAt(0)).join(''));
+        (urlEncodedHeadword.split('_')..removeAt(0)).join(''));
   }
 
   static String urlEncode(String headword) {
@@ -29,7 +27,7 @@ extension EntryUtils on Entry {
         Translation(
           partOfSpeech: '',
           content:
-          'Please use the help button (upper right) to report this bug!',
+              'Please use the help button (upper right) to report this bug!',
         ),
       ],
     );
@@ -42,16 +40,16 @@ extension EntryUtils on Entry {
     'deg': 'degree',
     'f': 'feminine noun',
     'fpl': 'feminine plural noun',
-    'f(pl)': 'feminine plural noun',
+    'f(pl)': 'feminine (plural) noun',
     'inf': 'infinitive',
     'interj': 'interjection',
     'm': 'masculine noun',
     'mf': 'masculine/feminine noun',
     'mpl': 'masculine plural noun',
-    'm(pl)': 'masculine plural noun',
+    'm(pl)': 'masculine (plural) noun',
     'n': 'noun',
     'npl': 'plural noun',
-    'n(pl)': 'plural noun',
+    'n(pl)': '(plural) noun',
     'pref': 'prefix',
     'prep': 'preposition',
     'v': 'verb',
@@ -64,24 +62,24 @@ extension EntryUtils on Entry {
 
   static String longPartOfSpeech(String partOfSpeech) {
     return partOfSpeech.replaceAll(' ', '').splitMapJoin(
-      RegExp('[&,]|phrase'),
-      onNonMatch: (String partOfSpeechComponent) =>
-      _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
-          '$partOfSpeechComponent*',
-      onMatch: (Match separator) {
-        //  == '&' ? ' and ' : ', ',
-        switch (separator.group(0)) {
-          case '&':
-            return ' and ';
-          case ',':
-            return ', ';
-          case 'phrase':
-            return ' phrase';
-          default:
-            return separator.group(0)!;
-        }
-      },
-    );
+          RegExp('[&,]|phrase'),
+          onNonMatch: (String partOfSpeechComponent) =>
+              _partOfSpeechAbbreviationMap[partOfSpeechComponent] ??
+              '$partOfSpeechComponent*',
+          onMatch: (Match separator) {
+            //  == '&' ? ' and ' : ', ',
+            switch (separator.group(0)) {
+              case '&':
+                return ' and ';
+              case ',':
+                return ', ';
+              case 'phrase':
+                return ' phrase';
+              default:
+                return separator.group(0)!;
+            }
+          },
+        );
   }
 }
 
@@ -97,9 +95,8 @@ class EntryBuilder {
 
   final List<Translation> _translations = <Translation>[];
 
-  EntryBuilder headword(String headwordText,
-      String abbreviation,
-      String parentheticalQualifier) {
+  EntryBuilder headword(
+      String headwordText, String abbreviation, String parentheticalQualifier) {
     _headword = Headword(
       isAlternate: false,
       headwordText: headwordText,
@@ -117,8 +114,7 @@ class EntryBuilder {
 
   EntryBuilder addRelated(List<String> related) {
     if (related.isNotEmpty) {
-      _related = (_related ?? <String>[])
-        ..addAll(related);
+      _related = (_related ?? <String>[])..addAll(related);
     }
     return this;
   }
@@ -130,8 +126,7 @@ class EntryBuilder {
     required String parentheticalQualifier,
   }) {
     assert(headwordText != '',
-    'You must specify a non-empty alternate headword. Headword: ${_headword
-        .headwordText}. Line: ${_entryId + 2}');
+        'You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}. Line: ${_entryId + 2}');
     _alternateHeadwords = (_alternateHeadwords ?? <Headword>[])
       ..add(
         Headword(
@@ -158,20 +153,18 @@ class EntryBuilder {
     required String editorialNote,
   }) {
     assert(translation != '',
-    'You must specify a non-empty translation. Headword: ${_headword
-        .headwordText} at line $_entryId');
+        'You must specify a non-empty translation. Headword: ${_headword.headwordText} at line $_entryId');
     _translations.add(
       Translation(
         partOfSpeech: partOfSpeech,
         irregularInflections: irregularInflections,
         dominantHeadwordParentheticalQualifier:
-        dominantHeadwordParentheticalQualifier,
+            dominantHeadwordParentheticalQualifier,
         content: translation,
         genderAndPlural: genderAndPlural,
         namingStandard: namingStandard,
         abbreviation: abbreviation,
-        parentheticalQualifier:
-        parentheticalQualifier,
+        parentheticalQualifier: parentheticalQualifier,
         examplePhrases: examplePhrases,
         editorialNote: editorialNote,
       ),
@@ -181,7 +174,7 @@ class EntryBuilder {
 
   Entry build() {
     assert(_translations.isNotEmpty,
-    'You must specify one or more translations. Line ${_entryId + 2}.');
+        'You must specify one or more translations. Line ${_entryId + 2}.');
     return Entry(
       entryId: _entryId,
       headword: _headword,
