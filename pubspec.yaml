@@ -13,8 +13,7 @@ dependencies:
   async: ^2.5.0
   async_list_view: ^0.0.1-dev.8
   cupertino_icons: ^1.0.3
-  feedback:
-    path: '../feedback'
+  feedback: ^2.0.0-beta.0
   firebase_core: ^1.1.0
   flutter:
     sdk: flutter

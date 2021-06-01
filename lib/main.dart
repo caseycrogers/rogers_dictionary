@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rogers_dictionary/entry_database/sqflite_database.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/search_page.dart';
+import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 
 import 'entry_database/dictionary_database.dart';
 import 'pages/page_router.dart';
@@ -41,6 +42,8 @@ class MyApp extends StatelessWidget {
       length: 3,
       child: BetterFeedback(
         mode: FeedbackMode.draw,
+        feedbackBuilder: (BuildContext context, OnSubmit onSubmit) =>
+            GetDictionaryFeedback(onSubmit),
         child: MaterialApp(
           title: 'Dictionary',
           onGenerateRoute: PageRouter.generateRoute,

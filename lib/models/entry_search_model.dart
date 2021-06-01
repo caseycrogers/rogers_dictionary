@@ -56,7 +56,7 @@ class EntrySearchModel with ChangeNotifier {
       );
     }
     _entryStream = stream
-        .handleError((Error error, StackTrace stackTrace) =>
+        .handleError((Object error, StackTrace stackTrace) =>
             print('ERROR (entry stream): :$error\n$stackTrace'))
         .map(
       (Entry entry) {
