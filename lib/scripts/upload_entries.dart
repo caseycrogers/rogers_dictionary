@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'package:args/args.dart';
@@ -48,7 +49,9 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       print('${i + 2}/${rows.length + 2} complete!');
     }
     Map<String, String> row = rows.elementAt(i);
-    if (row.values.every((e) => e.isEmpty)) {
+    if (row.entries
+        .where((e) => e.key.isNotEmpty)
+        .every((e) => e.value.isEmpty)) {
       print('$WARNING Skipping empty line at ${i + 2}');
       i += 1;
       continue;
@@ -76,7 +79,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         parents = row[RUN_ON_PARENTS]!.split('|');
         for (final String parent in parents) {
           if (parent == parents[0] && parent.isEmpty) {
-            return;
+            continue;
           }
           entryBuilders[parent]?.addRelated([row[HEADWORD]!]) ??
               print('$WARNING Missing run on parent \'$parent\' for entry '
@@ -126,7 +129,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
           row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!;
     builder!.addTranslation(
         partOfSpeech: partOfSpeech!,
-        irregularInflections: row[IRREGULAR_INFLECTIONS]!,
+        irregularInflections: _split(row[IRREGULAR_INFLECTIONS]!, pattern: ';'),
         dominantHeadwordParentheticalQualifier:
             dominantHeadwordParentheticalQualifier!,
         translation: row[TRANSLATION]!,
@@ -138,6 +141,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         editorialNote: row[EDITORIAL_NOTE]!);
     i++;
   }
+  print('Finished at $i');
   assert(builder != null, 'Did not generate any entries!');
   return _uploadSqlFlite(
     isSpanish ? SPANISH : ENGLISH,
@@ -167,28 +171,38 @@ Future<void> _uploadSqlFlite(
       URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headword.headwordText.searchable,
-      RUN_ON_PARENTS: (entry.related).join(' | ').searchable,
+      RUN_ON_PARENTS: entry.related.join(' | ').searchable,
       HEADWORD_ABBREVIATIONS:
           entry.allHeadwords.map((h) => h.abbreviation).join(' | ').searchable,
-      ALTERNATE_HEADWORDS: (entry.alternateHeadwords)
+      ALTERNATE_HEADWORDS: entry.alternateHeadwords
           .map((alt) => alt.headwordText)
           .join(' | ')
           .searchable,
-      HEADWORD + WITHOUT_DIACRITICAL_MARKS:
-          entry.headword.headwordText.withoutDiacriticalMarks.searchable,
-      RUN_ON_PARENTS + WITHOUT_DIACRITICAL_MARKS: (entry.related)
-          .map((p) => p.withoutDiacriticalMarks)
+      IRREGULAR_INFLECTIONS: entry.translations.first.irregularInflections
+          // Non-content phrases are italicized in irregular inflections
+          .expand((s) => MarkdownBase(s).strip(italics: true))
+          .where((s) => s.isNotEmpty)
           .join(' | ')
           .searchable,
-      HEADWORD_ABBREVIATIONS + WITHOUT_DIACRITICAL_MARKS: entry.allHeadwords
-          .map((h) => h.abbreviation.withoutDiacriticalMarks)
+      HEADWORD + WITHOUT_OPTIONALS:
+          entry.headword.headwordText.withoutOptionals.searchable,
+      RUN_ON_PARENTS + WITHOUT_OPTIONALS:
+          entry.related.map((p) => p.withoutOptionals).join(' | ').searchable,
+      HEADWORD_ABBREVIATIONS + WITHOUT_OPTIONALS: entry.allHeadwords
+          .map((h) => h.abbreviation.withoutOptionals)
           .join(' | ')
           .searchable,
-      ALTERNATE_HEADWORDS + WITHOUT_DIACRITICAL_MARKS:
-          (entry.alternateHeadwords)
-              .map((alt) => alt.headwordText.withoutDiacriticalMarks)
-              .join(' | ')
-              .searchable,
+      ALTERNATE_HEADWORDS + WITHOUT_OPTIONALS: entry.alternateHeadwords
+          .map((alt) => alt.headwordText.withoutOptionals)
+          .join(' | ')
+          .searchable,
+      IRREGULAR_INFLECTIONS + WITHOUT_OPTIONALS: entry
+          .translations.first.irregularInflections
+          .expand((s) => MarkdownBase(s).strip(italics: true))
+          .map((s) => s.withoutOptionals)
+          .where((s) => s.isNotEmpty)
+          .join(' | ')
+          .searchable,
       ENTRY_BLOB: entry.writeToBuffer(),
     };
     if (verbose) {
@@ -217,10 +231,12 @@ Future<void> wipeTables(Database db, String tableName) async {
     $RUN_ON_PARENTS STRING,
     $HEADWORD_ABBREVIATIONS STRING,
     $ALTERNATE_HEADWORDS String,
-    $HEADWORD$WITHOUT_DIACRITICAL_MARKS STRING NOT NULL,
-    $RUN_ON_PARENTS$WITHOUT_DIACRITICAL_MARKS STRING,
-    $HEADWORD_ABBREVIATIONS$WITHOUT_DIACRITICAL_MARKS STRING,
-    $ALTERNATE_HEADWORDS$WITHOUT_DIACRITICAL_MARKS String,
+    $HEADWORD$WITHOUT_OPTIONALS STRING NOT NULL,
+    $RUN_ON_PARENTS$WITHOUT_OPTIONALS STRING,
+    $HEADWORD_ABBREVIATIONS$WITHOUT_OPTIONALS STRING,
+    $ALTERNATE_HEADWORDS$WITHOUT_OPTIONALS String,
+    $IRREGULAR_INFLECTIONS String,
+    $IRREGULAR_INFLECTIONS$WITHOUT_OPTIONALS String,
     $ENTRY_BLOB BLOB NOT NULL
   )''');
   try {
@@ -248,18 +264,18 @@ MapEntry<String, String> _parseCell(String key, dynamic value) {
           .replaceAll(' |', '|'));
 }
 
-List<String> _split(String pluralValue) {
-  return pluralValue.isEmpty ? [] : pluralValue.split('|');
+List<String> _split(String pluralValue, {String? pattern}) {
+  return pluralValue.isEmpty ? [] : pluralValue.split(pattern ?? '|');
 }
 
-void main(List<String> arguments) {
+Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
     ..addFlag('debug', abbr: 'd', defaultsTo: false)
     ..addFlag('verbose', abbr: 'v', defaultsTo: false)
     ..addFlag('spanish', abbr: 's', defaultsTo: false);
   final argResults = parser.parse(arguments);
 
-  uploadEntries(argResults['debug'] as bool, argResults['verbose'] as bool,
-      argResults['spanish'] as bool);
+  await uploadEntries(argResults['debug'] as bool,
+      argResults['verbose'] as bool, argResults['spanish'] as bool);
   print('done?');
 }

@@ -125,8 +125,10 @@ class EntryBuilder {
     required String namingStandard,
     required String parentheticalQualifier,
   }) {
-    assert(headwordText != '',
-        'You must specify a non-empty alternate headword. Headword: ${_headword.headwordText}. Line: ${_entryId + 2}');
+    assert(
+        headwordText != '',
+        'You must specify a non-empty alternate headword. '
+        'Headword: ${_headword.headwordText}. Line: ${_entryId + 2}');
     _alternateHeadwords = (_alternateHeadwords ?? <Headword>[])
       ..add(
         Headword(
@@ -142,7 +144,7 @@ class EntryBuilder {
 
   EntryBuilder addTranslation({
     required String partOfSpeech,
-    required String irregularInflections,
+    required List<String> irregularInflections,
     required String dominantHeadwordParentheticalQualifier,
     required String translation,
     required String genderAndPlural,
@@ -152,8 +154,10 @@ class EntryBuilder {
     required List<String> examplePhrases,
     required String editorialNote,
   }) {
-    assert(translation != '',
-        'You must specify a non-empty translation. Headword: ${_headword.headwordText} at line $_entryId');
+    assert(
+        translation != '',
+        'You must specify a non-empty translation. '
+        'Headword: ${_headword.headwordText} at line $_entryId');
     _translations.add(
       Translation(
         partOfSpeech: partOfSpeech,

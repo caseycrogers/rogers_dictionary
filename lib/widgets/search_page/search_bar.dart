@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_options_button.dart';
+import 'package:rogers_dictionary/widgets/buttons/drop_down_widget.dart';
+import 'package:rogers_dictionary/widgets/search_page/search_options_view.dart';
 
 class SearchBar extends StatefulWidget {
   @override
@@ -79,7 +80,10 @@ class _SearchBarState extends State<SearchBar> {
                 ),
               ),
             ),
-            SearchOptionsButton(),
+            DropDownButton(
+              icon: const Icon(Icons.more_vert),
+              builder: (context) => SearchOptionsView(context),
+            ),
           ],
         ),
       ),

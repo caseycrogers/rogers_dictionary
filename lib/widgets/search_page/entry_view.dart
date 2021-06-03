@@ -141,7 +141,7 @@ class EntryView extends StatelessWidget {
   }
 
   TableRow _buildPartOfSpeechTableRow(BuildContext context, String partOfSpeech,
-      String inflections, List<Translation> translations) {
+      List<String> inflections, List<Translation> translations) {
     String parenthetical = '';
     final hasParenthetical = translations
         .any((t) => t.dominantHeadwordParentheticalQualifier.isNotEmpty);

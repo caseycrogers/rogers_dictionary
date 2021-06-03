@@ -4,28 +4,22 @@ enum SortOrder {
 }
 
 class SearchSettingsModel {
-  SearchSettingsModel(this._sortBy, this._ignoreAccents);
+  SearchSettingsModel(this._sortBy);
 
-  SearchSettingsModel.empty()
-      : this(_DEFAULT_SORT_ORDER, _DEFAULT_IGNORE_ACCENTS);
+  SearchSettingsModel.empty() : this(_DEFAULT_SORT_ORDER);
 
   static const SortOrder _DEFAULT_SORT_ORDER = SortOrder.relevance;
-  static const bool _DEFAULT_IGNORE_ACCENTS = true;
 
   final SortOrder _sortBy;
-  final bool _ignoreAccents;
 
-  SearchSettingsModel copy({SortOrder? newSortBy, bool? newIgnoreAccents}) {
-    return SearchSettingsModel(
-        newSortBy ?? _sortBy, newIgnoreAccents ?? _ignoreAccents);
+  SearchSettingsModel copy({SortOrder? newSortBy}) {
+    return SearchSettingsModel(newSortBy ?? _sortBy);
   }
 
   SortOrder get sortBy => _sortBy;
 
-  bool get ignoreAccents => _ignoreAccents;
-
   @override
-  int get hashCode => _sortBy.toString().hashCode ^ _ignoreAccents.hashCode;
+  int get hashCode => _sortBy.toString().hashCode;
 
   @override
   bool operator ==(Object other) =>

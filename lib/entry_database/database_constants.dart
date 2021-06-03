@@ -50,4 +50,4 @@ const String ENGLISH_CONTENT = 'english_content';
 const String SPANISH_CONTENT = 'spanish_content';
 
 // Misc.
-const String WITHOUT_DIACRITICAL_MARKS = '_without_diacritical_marks';
+const String WITHOUT_OPTIONALS = '_without_optionals';

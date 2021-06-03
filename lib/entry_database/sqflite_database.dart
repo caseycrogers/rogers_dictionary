@@ -21,7 +21,7 @@ class SqfliteDatabase extends DictionaryDatabase {
   // conceivable real string match
   static const int NO_MATCH = 100000;
 
-  String _sqlRelevancyScore(String searchString, String columnName) {
+  String _relevancyScore(String searchString, String columnName) {
     final String index =
         'INSTR(LOWER(" " || $columnName), LOWER(" $searchString"))';
     return '''CASE 
@@ -80,7 +80,7 @@ class SqfliteDatabase extends DictionaryDatabase {
         translationMode,
         rawSearchString: '',
         startAfter: startAfter,
-        searchOptions: SearchSettingsModel(SortOrder.alphabetical, true),
+        searchOptions: SearchSettingsModel(SortOrder.alphabetical),
         favoritesOnly: true,
       );
 
@@ -156,18 +156,20 @@ class SqfliteDatabase extends DictionaryDatabase {
     final Database db = await _dbFuture;
     int offset = startAfter;
     String orderByClause;
-    final String suffix =
-        searchOptions.ignoreAccents ? WITHOUT_DIACRITICAL_MARKS : '';
     String searchString = rawSearchString;
-    if (searchOptions.ignoreAccents) {
-      searchString = rawSearchString.withoutDiacriticalMarks;
-    }
+    searchString = rawSearchString.withoutDiacriticalMarks;
     switch (searchOptions.sortBy) {
       case SortOrder.relevance:
-        orderByClause = '${_sqlRelevancyScore(searchString, HEADWORD)}, '
-            '${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATIONS)}, '
-            '${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS)}, '
-            'headword';
+        orderByClause = '''
+  ${_relevancyScore(searchString, HEADWORD)},
+  ${_relevancyScore(searchString, HEADWORD_ABBREVIATIONS)},
+  ${_relevancyScore(searchString, ALTERNATE_HEADWORDS)},
+  ${_relevancyScore(searchString, IRREGULAR_INFLECTIONS)},
+  ${_relevancyScore(searchString, HEADWORD + WITHOUT_OPTIONALS)},
+  ${_relevancyScore(searchString, HEADWORD_ABBREVIATIONS + WITHOUT_OPTIONALS)},
+  ${_relevancyScore(searchString, ALTERNATE_HEADWORDS + WITHOUT_OPTIONALS)},
+  ${_relevancyScore(searchString, IRREGULAR_INFLECTIONS + WITHOUT_OPTIONALS)},
+  headword''';
         break;
       case SortOrder.alphabetical:
         orderByClause = 'headword';
@@ -176,22 +178,25 @@ class SqfliteDatabase extends DictionaryDatabase {
     String whereClause = '''$IS_FAVORITE''';
     if (!favoritesOnly)
       whereClause = '''
-(${_sqlRelevancyScore(searchString, HEADWORD + suffix)} != $NO_MATCH
- OR ${_sqlRelevancyScore(searchString, HEADWORD_ABBREVIATIONS + suffix)} != $NO_MATCH
- OR ${_sqlRelevancyScore(searchString, ALTERNATE_HEADWORDS + suffix)} != $NO_MATCH)
-AND url_encoded_headword > "$startAfter"''';
+  (${_relevancyScore(searchString, HEADWORD)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, HEADWORD_ABBREVIATIONS)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, ALTERNATE_HEADWORDS)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, IRREGULAR_INFLECTIONS)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, HEADWORD + WITHOUT_OPTIONALS)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, HEADWORD_ABBREVIATIONS + WITHOUT_OPTIONALS)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, ALTERNATE_HEADWORDS + WITHOUT_OPTIONALS)} != $NO_MATCH
+   OR ${_relevancyScore(searchString, IRREGULAR_INFLECTIONS + WITHOUT_OPTIONALS)} != $NO_MATCH)
+  AND url_encoded_headword > "$startAfter"''';
     while (true) {
-      final String query = '''
- SELECT *,
-        EXISTS(SELECT $URL_ENCODED_HEADWORD
-               FROM ${_favoritesTable(translationMode)}
-               WHERE $URL_ENCODED_HEADWORD = ${_entryTable(translationMode)}.$URL_ENCODED_HEADWORD) AS $IS_FAVORITE
- FROM ${_entryTable(translationMode)}
- WHERE $whereClause
- ORDER BY $orderByClause
- LIMIT 20
- OFFSET $offset;
-      ''';
+      final String query = '''SELECT *,
+       EXISTS(SELECT $URL_ENCODED_HEADWORD
+              FROM ${_favoritesTable(translationMode)}
+              WHERE $URL_ENCODED_HEADWORD = ${_entryTable(translationMode)}.$URL_ENCODED_HEADWORD) AS $IS_FAVORITE
+FROM ${_entryTable(translationMode)}
+WHERE $whereClause
+ORDER BY $orderByClause
+LIMIT 20
+OFFSET $offset;''';
       final List<Map<String, Object?>> snapshot = await db.rawQuery(query);
       if (snapshot.isEmpty) {
         return;

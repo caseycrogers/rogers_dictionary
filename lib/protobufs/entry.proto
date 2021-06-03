@@ -23,7 +23,7 @@ message Entry {
     message Translation {
         string partOfSpeech = 1;
         string content = 2;
-        string irregularInflections = 3;
+        repeated string irregularInflections = 3;
         string dominantHeadwordParentheticalQualifier = 4;
         string genderAndPlural = 5;
         string namingStandard = 6;
