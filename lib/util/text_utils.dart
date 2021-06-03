@@ -1,8 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
 import 'package:rogers_dictionary/widgets/buttons/favorites_button.dart';
@@ -75,10 +78,12 @@ List<Widget> highlightedText(
   required String searchString,
   bool forWrap = true,
 }) {
+  final overrides = _highlightSearchMatch(context, text, preview, searchString);
   final OverflowMarkdown md = OverflowMarkdown(
     text,
     defaultStyle: !preview && isHeadword ? headline1(context) : bold1(context),
-    overrideStyles: _highlightSearchMatch(context, text, preview, searchString),
+    overrideRules: overrides.keys.toList(),
+    overrideStyles: overrides.values.toList(),
   );
   if (forWrap) {
     return md.forWrap(context);
@@ -86,32 +91,40 @@ List<Widget> highlightedText(
   return [md];
 }
 
-List<OverrideStyle> _highlightSearchMatch(
+LinkedHashMap<OverrideRule, TextStyle> _highlightSearchMatch(
     BuildContext context, String text, bool preview, String searchString) {
   if (!preview || searchString.isEmpty) {
-    return [];
+    // ignore: prefer_collection_literals
+    return LinkedHashMap();
   }
-  final bool ignoreAccents = SearchPageModel.of(context)
-      .entrySearchModel
-      .searchSettingsModel
-      .ignoreAccents;
   // Prepend `text` and `searchString` with spaces to rule out matches that are
   // in the middle of a word.
-  final String searchable =
-      // ignore: lines_longer_than_80_chars
-      ' ${ignoreAccents ? text.searchable.withoutDiacriticalMarks : text.searchable}';
-  final Iterable<Match> overrideMatches =
-      ' $searchString'.allMatches(searchable);
-  return overrideMatches
-      .map(
-        (m) => OverrideStyle(
-          style: TextStyle(
+  Iterable<Match> overrideMatches =
+      ' $searchString'.allMatches(' ${text.searchable}');
+  bool isOptionalMatch = false;
+  if (overrideMatches.isEmpty) {
+    overrideMatches =
+        ' $searchString'.allMatches(' ${text.withoutOptionals.searchable}');
+    isOptionalMatch = true;
+  }
+  return LinkedHashMap.fromEntries(
+    overrideMatches.toList().asMap().entries.map(
+      (e) {
+        final int start = e.value.start;
+        int stop = e.value.end - 1;
+        if (isOptionalMatch) {
+          // Add the length of the optional back in
+          stop +=
+              text.searchable.length - text.withoutOptionals.searchable.length;
+        }
+        return MapEntry(
+          OverrideRule(styleIndex: e.key, start: start, stop: stop),
+          TextStyle(
               backgroundColor: Theme.of(context).accentColor.withOpacity(.25)),
-          start: m.start,
-          stop: m.end - 1,
-        ),
-      )
-      .toList();
+        );
+      },
+    ),
+  );
 }
 
 Widget alternateHeadwordLines(BuildContext context,
@@ -274,8 +287,11 @@ Widget editorialText(BuildContext context, String text) {
   return OverflowMarkdown(text);
 }
 
-Widget irregularInflectionsTable(BuildContext context, String text) {
-  if (text.isEmpty) {
+Widget irregularInflectionsTable(
+  BuildContext context,
+  List<String> inflections,
+) {
+  if (inflections.isEmpty) {
     return Container();
   }
   return DictionaryChip(
@@ -285,9 +301,9 @@ Widget irregularInflectionsTable(BuildContext context, String text) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         bold1Text(context, 'Irregular Inflections:'),
-        ...text.split(';').map(
-              (i) => italic1Text(context, i.trim()),
-            ),
+        ...inflections.map(
+          (i) => OverflowMarkdown(i.trim()),
+        ),
       ],
     ),
   );

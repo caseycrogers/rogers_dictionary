@@ -116,7 +116,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Entry.Translation', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'partOfSpeech', protoName: 'partOfSpeech')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'irregularInflections', protoName: 'irregularInflections')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'irregularInflections', protoName: 'irregularInflections')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dominantHeadwordParentheticalQualifier', protoName: 'dominantHeadwordParentheticalQualifier')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'genderAndPlural', protoName: 'genderAndPlural')
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'namingStandard', protoName: 'namingStandard')
@@ -131,7 +131,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
   factory Entry_Translation({
     $core.String? partOfSpeech,
     $core.String? content,
-    $core.String? irregularInflections,
+    $core.Iterable<$core.String>? irregularInflections,
     $core.String? dominantHeadwordParentheticalQualifier,
     $core.String? genderAndPlural,
     $core.String? namingStandard,
@@ -148,7 +148,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
       _result.content = content;
     }
     if (irregularInflections != null) {
-      _result.irregularInflections = irregularInflections;
+      _result.irregularInflections.addAll(irregularInflections);
     }
     if (dominantHeadwordParentheticalQualifier != null) {
       _result.dominantHeadwordParentheticalQualifier = dominantHeadwordParentheticalQualifier;
@@ -213,13 +213,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
   void clearContent() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get irregularInflections => $_getSZ(2);
-  @$pb.TagNumber(3)
-  set irregularInflections($core.String v) { $_setString(2, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasIrregularInflections() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearIrregularInflections() => clearField(3);
+  $core.List<$core.String> get irregularInflections => $_getList(2);
 
   @$pb.TagNumber(4)
   $core.String get dominantHeadwordParentheticalQualifier => $_getSZ(3);

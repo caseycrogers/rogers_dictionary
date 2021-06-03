@@ -61,21 +61,6 @@ class SearchOptionsView extends StatelessWidget {
                   ],
                 ),
               ),
-              const Divider(height: 0),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  children: [
-                    const Text('ignore accents'),
-                    Switch(
-                      value: settingsModel.ignoreAccents,
-                      onChanged: (newIgnoreAccents) => _updateOptions(
-                          _exteriorContext,
-                          newIgnoreAccents: newIgnoreAccents),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -83,13 +68,12 @@ class SearchOptionsView extends StatelessWidget {
     );
   }
 
-  void _updateOptions(BuildContext context,
-      {SortOrder? newSortBy, bool? newIgnoreAccents}) {
+  void _updateOptions(BuildContext context, {SortOrder? newSortBy}) {
     SearchPageModel.readFrom(_exteriorContext)
         .entrySearchModel
         .onSearchStringChanged(
-          newSearchSettings: _entrySearchModel.searchSettingsModel
-              .copy(newSortBy: newSortBy, newIgnoreAccents: newIgnoreAccents),
+          newSearchSettings:
+              _entrySearchModel.searchSettingsModel.copy(newSortBy: newSortBy),
         );
   }
 }

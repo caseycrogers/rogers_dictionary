@@ -3,14 +3,20 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:rogers_dictionary/widgets/search_page/search_options_view.dart';
+class DropDownButton extends StatefulWidget {
+  const DropDownButton({
+    required this.builder,
+    required this.icon,
+  });
 
-class SearchOptionsButton extends StatefulWidget {
+  final WidgetBuilder builder;
+  final Widget icon;
+
   @override
-  _SearchOptionsButtonState createState() => _SearchOptionsButtonState();
+  _DropDownButtonState createState() => _DropDownButtonState();
 }
 
-class _SearchOptionsButtonState extends State<SearchOptionsButton>
+class _DropDownButtonState extends State<DropDownButton>
     with SingleTickerProviderStateMixin {
   OverlayEntry? _overlayEntry;
   late AnimationController _controller;
@@ -75,11 +81,10 @@ class _SearchOptionsButtonState extends State<SearchOptionsButton>
             Positioned(
               top: upperLeft.dy + renderBox.size.height + 4.0,
               right: 0,
-              width: 275,
               child: ScaleTransition(
                 alignment: Alignment.topRight,
                 scale: _curve,
-                child: SearchOptionsView(context),
+                child: widget.builder(context),
               ),
             ),
           ],
