@@ -1,6 +1,7 @@
 const String ENGLISH = 'English';
 const String SPANISH = 'Spanish';
-const String DICTIONARY_DB = 'dictionaryV0_2_0';
+const String DICTIONARY_DB = 'dictionary';
+const String VERSION_FILE = 'database_version.json';
 
 // Column/field names.
 const String URL_ENCODED_HEADWORD = 'url_encoded_headword';

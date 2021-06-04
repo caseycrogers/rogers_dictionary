@@ -41,8 +41,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/dictionaryV0_2_0.db
-    - assets/images/
+    - assets/
 
 flutter_icons:
   ios: true

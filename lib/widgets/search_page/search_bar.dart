@@ -80,9 +80,10 @@ class _SearchBarState extends State<SearchBar> {
                 ),
               ),
             ),
-            DropDownButton(
+            DropDownWidget(
               icon: const Icon(Icons.more_vert),
-              builder: (context) => SearchOptionsView(context),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              builder: (context, _) => SearchOptionsView(context),
             ),
           ],
         ),

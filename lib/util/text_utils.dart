@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -58,6 +57,12 @@ Text bold1Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: bold1(context).copyWith(color: color),
     );
+
+const TextStyle kButtonTextStyle = TextStyle(
+  color: Colors.black,
+  fontSize: 20,
+  fontWeight: FontWeight.normal,
+);
 
 class Indent extends StatelessWidget {
   const Indent({required this.child, this.size});

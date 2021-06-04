@@ -1,0 +1,10 @@
+// Run protoc --dart_out=. lib/protobufs/*.proto to compile.
+
+syntax = "proto3";
+package rogers_dictionary;
+
+message DatabaseVersion {
+    uint32 major = 1;
+    uint32 minor = 2;
+    uint32 patch = 3;
+}

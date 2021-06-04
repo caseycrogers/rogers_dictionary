@@ -6,6 +6,7 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
+import 'package:rogers_dictionary/widgets/buttons/drop_down_widget.dart';
 import 'package:rogers_dictionary/widgets/buttons/feedback_button.dart';
 
 class DictionaryTopBar extends StatelessWidget {
@@ -45,20 +46,19 @@ class DictionaryTopBar extends StatelessWidget {
                         ).animate(animation),
                       ),
                     ),
-                    Expanded(
-                      child: Text(
-                        translationPageModel.isEnglish ? 'English' : 'Español',
-                        style: Theme.of(context).textTheme.headline1!.copyWith(
-                            color: Colors.white,
-                            fontSize: Theme.of(context).iconTheme.size),
-                      ),
+                    Text(
+                      translationPageModel.isEnglish ? 'English' : 'Español',
+                      style: Theme.of(context).textTheme.headline1!.copyWith(
+                          color: Colors.white,
+                          fontSize: Theme.of(context).iconTheme.size),
                     ),
-                    const FeedbackButton(),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      icon: const Icon(Icons.help),
-                      onPressed: () {},
-                    ),
+                    DropDownWidget(
+                        builder: (_, closeMenu) => Column(
+                              children: [
+                                FeedbackButton(onPressed: closeMenu),
+                              ],
+                            ),
+                        icon: const Icon(Icons.info)),
                   ],
                 ),
               ),

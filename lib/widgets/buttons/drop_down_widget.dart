@@ -2,21 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 
-class DropDownButton extends StatefulWidget {
-  const DropDownButton({
+class DropDownWidget extends StatefulWidget {
+  const DropDownWidget({
     required this.builder,
     required this.icon,
+    this.padding,
   });
 
-  final WidgetBuilder builder;
+  final Widget Function(BuildContext, VoidCallback) builder;
   final Widget icon;
+  final EdgeInsets? padding;
 
   @override
-  _DropDownButtonState createState() => _DropDownButtonState();
+  _DropDownWidgetState createState() => _DropDownWidgetState();
 }
 
-class _DropDownButtonState extends State<DropDownButton>
+class _DropDownWidgetState extends State<DropDownWidget>
     with SingleTickerProviderStateMixin {
   OverlayEntry? _overlayEntry;
   late AnimationController _controller;
@@ -48,13 +51,12 @@ class _DropDownButtonState extends State<DropDownButton>
         return false;
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: _isMounted ? Colors.white10 : Colors.transparent,
         ),
         child: IconButton(
-          icon: const Icon(Icons.more_vert),
+          icon: widget.icon,
           color: Colors.white,
           onPressed: () => _toggle(),
         ),
@@ -65,30 +67,40 @@ class _DropDownButtonState extends State<DropDownButton>
   OverlayEntry _buildOverlayEntry() {
     final renderBox = context.findRenderObject() as RenderBox;
     final Offset upperLeft = renderBox.localToGlobal(Offset.zero);
+    bool onLeft = true;
+    final double width = MediaQuery.of(context).size.width;
+    if (upperLeft.dx > width / 2) {
+      onLeft = false;
+    }
     return OverlayEntry(
-      builder: (_) => Positioned(
-        child: Stack(
-          children: [
-            FadeTransition(
-              opacity: _curve,
-              child: Container(
-                color: Colors.black38,
-                child: GestureDetector(
-                  onTap: _toggle,
-                ),
+      builder: (_) => Stack(
+        children: [
+          FadeTransition(
+            opacity: _curve,
+            child: Container(
+              color: Colors.black38,
+              child: GestureDetector(
+                onTap: _toggle,
               ),
             ),
-            Positioned(
-              top: upperLeft.dy + renderBox.size.height + 4.0,
-              right: 0,
-              child: ScaleTransition(
-                alignment: Alignment.topRight,
-                scale: _curve,
-                child: widget.builder(context),
+          ),
+          Positioned(
+            top: upperLeft.dy + renderBox.size.height + 4.0,
+            left: onLeft ? upperLeft.dx : null,
+            right: onLeft ? null : width - upperLeft.dx - renderBox.size.width,
+            child: ScaleTransition(
+              alignment: Alignment.topRight,
+              scale: _curve,
+              child: Material(
+                color: Theme.of(context).cardColor,
+                elevation: kHighElevation,
+                child: Padding(
+                    padding: widget.padding ?? const EdgeInsets.all(2),
+                    child: widget.builder(context, _toggle)),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
