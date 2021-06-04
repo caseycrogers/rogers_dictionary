@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:rogers_dictionary/protobufs/database_version_base.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -13,6 +14,7 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
+import 'entry_builders.dart';
 
 class SqfliteDatabase extends DictionaryDatabase {
   final Future<Database> _dbFuture = _getDatabase();
@@ -213,13 +215,19 @@ OFFSET $offset;''';
 
 Future<Database> _getDatabase() async {
   final String databasesPath = await getDatabasesPath();
-  final String path = join(databasesPath, '$DICTIONARY_DB.db');
+
+  final DatabaseVersion version = VersionUtils.fromString(
+    await rootBundle.loadString(join('assets', '$VERSION_FILE')),
+  );
+  final String path = join(
+    databasesPath,
+    '${DICTIONARY_DB}V${version.versionString}.db',
+  );
 
   // Check if the database exists
   final bool exists = await databaseExists(path);
 
   if (!exists) {
-    // Should happen only the first time you launch your application
     print('Creating new copy from asset');
 
     // Make sure the parent directory exists
@@ -230,8 +238,10 @@ Future<Database> _getDatabase() async {
     }
 
     // Copy from asset
-    final ByteData data =
-        await rootBundle.load(join('assets', '$DICTIONARY_DB.db'));
+    final ByteData data = await rootBundle.load(join(
+      'assets',
+      '${DICTIONARY_DB}V${version.versionString}.db',
+    ));
     final List<int> bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 

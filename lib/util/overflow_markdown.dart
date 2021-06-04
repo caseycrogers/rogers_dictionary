@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
-import 'list_utils.dart';
 
 class OverflowMarkdown extends StatelessWidget {
   OverflowMarkdown(

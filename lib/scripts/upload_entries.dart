@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
+import 'package:rogers_dictionary/protobufs/database_version_base.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -18,14 +19,16 @@ const WARNING = '(WARN):';
 const ERROR = '(ERROR):';
 
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
-  final String filePath = join(
+  final String csvPath = join(
     'lib',
     'scripts',
     'entry_database-'
         '${isSpanish ? SPANISH.toLowerCase() : ENGLISH.toLowerCase()}.csv',
   );
-  print('Uploading: $filePath.');
-  final DataFrame df = await DataFrame.fromCsv(filePath);
+  final String versionPath = join('assets', 'database_version.json');
+  final DatabaseVersion version = VersionUtils.fromDisk(File(versionPath));
+  print('Uploading version ${version.versionString} from $csvPath.');
+  final DataFrame df = await DataFrame.fromCsv(csvPath);
 
   final Iterable<Map<String, String>> rows =
       df.rows.map((row) => row.map(_parseCell));
@@ -44,7 +47,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length) {
+  while (i < rows.length && i < 100) {
     if ((i + 2) % 500 == 0) {
       print('${i + 2}/${rows.length + 2} complete!');
     }
@@ -141,9 +144,13 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         editorialNote: row[EDITORIAL_NOTE]!);
     i++;
   }
-  print('Finished at $i');
+  if (!debug) {
+    version.write(File(versionPath));
+  }
+  print('Finished write $version with hash $hash and $i rows.');
   assert(builder != null, 'Did not generate any entries!');
   return _uploadSqlFlite(
+    version,
     isSpanish ? SPANISH : ENGLISH,
     entryBuilders.values.map((b) => b.build()).toList(),
     debug,
@@ -152,12 +159,17 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
 }
 
 Future<void> _uploadSqlFlite(
+  DatabaseVersion version,
   String tableName,
   List<Entry> entries,
   bool debug,
   bool verbose,
 ) async {
-  final path = join(Directory.current.path, 'assets', '$DICTIONARY_DB.db');
+  final path = join(
+    Directory.current.path,
+    'assets',
+    '${DICTIONARY_DB}V${version.versionString}.db',
+  );
   print('Writing to: $path.');
   sqfliteFfiInit();
   final Database db = await databaseFactoryFfi.openDatabase(path);
@@ -219,11 +231,11 @@ Future<void> _uploadSqlFlite(
 }
 
 Future<void> wipeTables(Database db, String tableName) async {
-  try {
-    await db.execute('''DROP TABLE $tableName''');
-  } on Exception catch (e) {
-    print(e.toString());
-  }
+  //try {
+  //  await db.execute('''DROP TABLE $tableName''');
+  //} on Exception catch (e) {
+  //  print(e.toString());
+  //}
   await db.execute('''CREATE TABLE $tableName(
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
@@ -239,11 +251,11 @@ Future<void> wipeTables(Database db, String tableName) async {
     $IRREGULAR_INFLECTIONS$WITHOUT_OPTIONALS String,
     $ENTRY_BLOB BLOB NOT NULL
   )''');
-  try {
-    await db.execute('''DROP TABLE ${tableName}_favorites''');
-  } on Exception catch (e) {
-    print(e.toString());
-  }
+  //try {
+  //  await db.execute('''DROP TABLE ${tableName}_favorites''');
+  //} on Exception catch (e) {
+  //  print(e.toString());
+  //}
   await db.execute('''CREATE TABLE ${tableName}_favorites(
     $URL_ENCODED_HEADWORD STRING NOT NULL
   )''');

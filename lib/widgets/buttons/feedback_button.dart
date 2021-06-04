@@ -7,17 +7,24 @@ import 'package:flutter/material.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 
 class FeedbackButton extends StatelessWidget {
-  const FeedbackButton({Key? key}) : super(key: key);
+  const FeedbackButton({Key? key, this.onPressed}) : super(key: key);
+
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      visualDensity: VisualDensity.compact,
-      icon: const Icon(Icons.bug_report),
-      onPressed: () => {
+    return TextButton(
+      child: const Text(
+        'give feedback',
+        style: kButtonTextStyle,
+      ),
+      onPressed: () {
+        // CLose the menu before displaying feedback.
+        onPressed?.call();
         BetterFeedback.of(context).controller.show(
           (userFeedback) async {
             final screenshotFilePath =
@@ -40,7 +47,7 @@ class FeedbackButton extends StatelessWidget {
               ),
             );
           },
-        ),
+        );
       },
     );
   }
