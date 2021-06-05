@@ -4,6 +4,7 @@ import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info/package_info.dart';
 import 'package:rogers_dictionary/entry_database/sqflite_database.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/search_page.dart';
@@ -35,6 +36,7 @@ void main() {
 class MyApp extends StatelessWidget {
   static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
   static final DictionaryDatabase db = SqfliteDatabase();
+  static final Future<PackageInfo> packageInfo = PackageInfo.fromPlatform();
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:rogers_dictionary/protobufs/database_version_base.pb.dart';
+import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 typedef Headword = Entry_Headword;
@@ -9,7 +9,7 @@ typedef Translation = Entry_Translation;
 
 extension VersionUtils on DatabaseVersion {
   static DatabaseVersion fromDisk(File file) {
-    return fromString(file.readAsStringSync()).incremented();
+    return fromString(file.readAsStringSync());
   }
 
   static DatabaseVersion fromString(String jsonString) {

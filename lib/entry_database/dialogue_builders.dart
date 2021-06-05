@@ -1,4 +1,4 @@
-import 'package:rogers_dictionary/util/default_map.dart';
+import 'package:rogers_dictionary/util/map_utils.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 typedef DialogueSubChapter = DialogueChapter_SubChapter;
@@ -17,25 +17,26 @@ class DialogueChapterBuilder {
 
   final Map<String, DialogueSubChapterBuilder> subChapters = {};
 
-  DialogueChapter build() =>
-      DialogueChapter(
+  DialogueChapter build() => DialogueChapter(
         chapterId: chapterId,
         englishTitle: englishTitle,
         spanishTitle: spanishTitle,
-        dialogueSubChapters: subChapters.values.map((
-            DialogueSubChapterBuilder b) => b.build()),
+        dialogueSubChapters:
+            subChapters.values.map((DialogueSubChapterBuilder b) => b.build()),
       );
 
-  DialogueChapterBuilder addDialogue(String englishSubChapter,
-      String spanishSubchapter,
-      String englishDialogue,
-      String spanishDialogue,) {
+  DialogueChapterBuilder addDialogue(
+    String englishSubChapter,
+    String spanishSubchapter,
+    String englishDialogue,
+    String spanishDialogue,
+  ) {
     subChapters
         .getOrElse(
-        englishSubChapter,
-        DialogueSubChapterBuilder(
-            englishTitle: englishSubChapter,
-            spanishTitle: spanishSubchapter))
+            englishSubChapter,
+            DialogueSubChapterBuilder(
+                englishTitle: englishSubChapter,
+                spanishTitle: spanishSubchapter))
         .addDialogue(englishDialogue, spanishDialogue);
     return this;
   }
@@ -52,8 +53,8 @@ class DialogueSubChapterBuilder {
 
   List<Dialogue> dialogues = <Dialogue>[];
 
-  DialogueSubChapterBuilder addDialogue(String englishContent,
-      String spanishContent) {
+  DialogueSubChapterBuilder addDialogue(
+      String englishContent, String spanishContent) {
     dialogues.add(Dialogue(
       englishContent: englishContent,
       spanishContent: spanishContent,
@@ -61,8 +62,7 @@ class DialogueSubChapterBuilder {
     return this;
   }
 
-  DialogueSubChapter build() =>
-      DialogueSubChapter(
+  DialogueSubChapter build() => DialogueSubChapter(
         englishTitle: englishTitle,
         spanishTitle: spanishTitle,
         dialogues: dialogues,

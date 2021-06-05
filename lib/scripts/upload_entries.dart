@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
-import 'package:rogers_dictionary/protobufs/database_version_base.pb.dart';
+import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -47,7 +47,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length && i < 100) {
+  while (i < rows.length) {
     if ((i + 2) % 500 == 0) {
       print('${i + 2}/${rows.length + 2} complete!');
     }
@@ -231,11 +231,11 @@ Future<void> _uploadSqlFlite(
 }
 
 Future<void> wipeTables(Database db, String tableName) async {
-  //try {
-  //  await db.execute('''DROP TABLE $tableName''');
-  //} on Exception catch (e) {
-  //  print(e.toString());
-  //}
+  try {
+    await db.execute('''DROP TABLE $tableName''');
+  } on Exception catch (e) {
+    print(e.toString());
+  }
   await db.execute('''CREATE TABLE $tableName(
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
@@ -251,11 +251,11 @@ Future<void> wipeTables(Database db, String tableName) async {
     $IRREGULAR_INFLECTIONS$WITHOUT_OPTIONALS String,
     $ENTRY_BLOB BLOB NOT NULL
   )''');
-  //try {
-  //  await db.execute('''DROP TABLE ${tableName}_favorites''');
-  //} on Exception catch (e) {
-  //  print(e.toString());
-  //}
+  try {
+    await db.execute('''DROP TABLE ${tableName}_favorites''');
+  } on Exception catch (e) {
+    print(e.toString());
+  }
   await db.execute('''CREATE TABLE ${tableName}_favorites(
     $URL_ENCODED_HEADWORD STRING NOT NULL
   )''');
