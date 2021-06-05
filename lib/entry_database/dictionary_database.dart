@@ -1,13 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart';
+import 'package:rogers_dictionary/entry_database/database_constants.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
+import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 // A database interface for fetching dictionary entries.
 abstract class DictionaryDatabase {
+  Future<DatabaseVersion> get version => rootBundle
+      .loadString(join('assets', '$VERSION_FILE'))
+      .then((v) => VersionUtils.fromString(v));
+
   DictionaryDatabase()
       : _englishFavoritesCache = {},
         _spanishFavoritesCache = {};

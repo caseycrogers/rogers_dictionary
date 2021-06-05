@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
-import 'package:rogers_dictionary/protobufs/database_version_base.pb.dart';
+import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:sqflite/sqflite.dart';
 

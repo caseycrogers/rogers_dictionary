@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
+import 'package:rogers_dictionary/entry_database/entry_builders.dart';
+import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 import 'package:args/args.dart';
@@ -99,7 +101,12 @@ Future<void> _uploadSqlFlite(
   bool debug,
   bool verbose,
 ) async {
-  final path = join(Directory.current.path, 'assets', '$DICTIONARY_DB.db');
+  final String versionPath = join('assets', 'database_version.json');
+  final DatabaseVersion version = VersionUtils.fromDisk(
+    File(versionPath),
+  );
+  final path = join(Directory.current.path, 'assets',
+      '${DICTIONARY_DB}V${version.versionString}.db');
   print('Writing to: $path.');
   sqfliteFfiInit();
   final Database db = await databaseFactoryFfi.openDatabase(path);
