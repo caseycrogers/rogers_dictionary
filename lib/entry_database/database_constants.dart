@@ -34,9 +34,7 @@ const String TRANSLATION_PARENTHETICAL_QUALIFIER =
     'translation_parenthetical_qualifier';
 const String EXAMPLE_PHRASES = 'example_phrases';
 const String EDITORIAL_NOTE = 'editorial_note';
-
-const String KEYWORD_LIST = 'keyword_list';
-const String ORDER_BY_FIELD = 'order_by_field';
+const String OPPOSITE_HEADWORD = 'opposite_headword';
 
 // Dialogue constants.
 const String DIALOGUES_TABLE = 'dialogues';

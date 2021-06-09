@@ -47,7 +47,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length) {
+  while (i < rows.length && i < 200) {
     if ((i + 2) % 500 == 0) {
       print('${i + 2}/${rows.length + 2} complete!');
     }
@@ -131,23 +131,25 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       dominantHeadwordParentheticalQualifier =
           row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!;
     builder!.addTranslation(
-        partOfSpeech: partOfSpeech!,
-        irregularInflections: _split(row[IRREGULAR_INFLECTIONS]!, pattern: ';'),
-        dominantHeadwordParentheticalQualifier:
-            dominantHeadwordParentheticalQualifier!,
-        translation: row[TRANSLATION]!,
-        genderAndPlural: row[GENDER_AND_PLURAL]!,
-        namingStandard: row[TRANSLATION_NAMING_STANDARD]!,
-        abbreviation: row[TRANSLATION_ABBREVIATION]!,
-        parentheticalQualifier: row[TRANSLATION_PARENTHETICAL_QUALIFIER]!,
-        examplePhrases: _split(row[EXAMPLE_PHRASES]!),
-        editorialNote: row[EDITORIAL_NOTE]!);
+      partOfSpeech: partOfSpeech!,
+      irregularInflections: _split(row[IRREGULAR_INFLECTIONS]!, pattern: ';'),
+      dominantHeadwordParentheticalQualifier:
+          dominantHeadwordParentheticalQualifier!,
+      translation: row[TRANSLATION]!,
+      genderAndPlural: row[GENDER_AND_PLURAL]!,
+      namingStandard: row[TRANSLATION_NAMING_STANDARD]!,
+      abbreviation: row[TRANSLATION_ABBREVIATION]!,
+      parentheticalQualifier: row[TRANSLATION_PARENTHETICAL_QUALIFIER]!,
+      examplePhrases: _split(row[EXAMPLE_PHRASES]!),
+      editorialNote: row[EDITORIAL_NOTE]!,
+      oppositeHeadword: row[OPPOSITE_HEADWORD]!,
+    );
     i++;
   }
   if (!debug) {
     version.write(File(versionPath));
   }
-  print('Finished write $version with hash $hash and $i rows.');
+  print('Finished writing ${version.versionString} with $i rows.');
   assert(builder != null, 'Did not generate any entries!');
   return _uploadSqlFlite(
     version,

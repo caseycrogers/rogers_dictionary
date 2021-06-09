@@ -42,7 +42,7 @@ class _SearchBarState extends State<SearchBar> {
     return Material(
       color: primaryColor(searchPageModel.translationMode),
       child: Padding(
-        padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
+        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -79,11 +79,6 @@ class _SearchBarState extends State<SearchBar> {
                   ),
                 ),
               ),
-            ),
-            DropDownWidget(
-              icon: const Icon(Icons.more_vert),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              builder: (context, _) => SearchOptionsView(context),
             ),
           ],
         ),

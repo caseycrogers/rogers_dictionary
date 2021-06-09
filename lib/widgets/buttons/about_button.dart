@@ -35,6 +35,7 @@ class AboutButton extends StatelessWidget {
                     color: Theme.of(context).cardColor,
                     child: PageHeader(
                       header: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           IconButton(
                             icon: Icon(

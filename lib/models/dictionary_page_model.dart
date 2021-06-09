@@ -68,6 +68,9 @@ class DictionaryPageModel {
           ? englishPageModel
           : spanishPageModel;
 
+  TranslationPageModel get _oppModel =>
+      _currModel.isEnglish ? spanishPageModel : englishPageModel;
+
   void onTranslationModeChanged(
       BuildContext context, TranslationMode newTranslationMode) {
     currTranslationPageModel.value = pageModel(newTranslationMode);
@@ -86,8 +89,31 @@ class DictionaryPageModel {
         newUrlEncodedHeadword: newUrlEncodedHeadword,
       );
 
-  void _onHeadwordSelected(BuildContext context,
-      {required String newUrlEncodedHeadword, Entry? newEntry}) {
+  void onOppositeHeadwordSelected(
+    BuildContext context,
+    String newUrlEncodedHeadword,
+  ) {
+    final SearchPageModel pageModel = isFavoritesOnly
+        ? _oppModel.favoritesPageModel
+        : _oppModel.searchPageModel;
+    final SelectedEntry? previousSelection = pageModel.currSelectedEntry.value;
+    currTranslationPageModel.setWith(_oppModel, onPop: () {
+      currTranslationPageModel.setWith(_oppModel);
+      pageModel.currSelectedEntry.setWith(previousSelection);
+    });
+    _onHeadwordSelected(
+      context,
+      newUrlEncodedHeadword: newUrlEncodedHeadword,
+      updateStack: false,
+    );
+  }
+
+  void _onHeadwordSelected(
+    BuildContext context, {
+    required String newUrlEncodedHeadword,
+    Entry? newEntry,
+    bool updateStack = true,
+  }) {
     final SearchPageModel pageModel = isFavoritesOnly
         ? _currModel.favoritesPageModel
         : _currModel.searchPageModel;
@@ -96,15 +122,23 @@ class DictionaryPageModel {
       return;
     }
     if (newUrlEncodedHeadword.isEmpty) {
-      pageModel.currSelectedEntry.value = null;
+      if (updateStack) {
+        return pageModel.currSelectedEntry.value = null;
+      }
+      pageModel.currSelectedEntry.setWith(null);
     } else {
-      pageModel.currSelectedEntry.value = SelectedEntry(
+      final SelectedEntry selectedEntry = SelectedEntry(
         urlEncodedHeadword: newUrlEncodedHeadword,
         entry: newEntry == null
             ? MyApp.db
                 .getEntry(_currModel.translationMode, newUrlEncodedHeadword)
             : Future<Entry>.value(newEntry),
       );
+      if (updateStack) {
+        pageModel.currSelectedEntry.value = selectedEntry;
+        return;
+      }
+      pageModel.currSelectedEntry.setWith(selectedEntry);
     }
   }
 

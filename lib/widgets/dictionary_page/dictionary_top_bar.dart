@@ -31,6 +31,7 @@ class DictionaryTopBar extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(4),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     AnimatedListenableSwitcher<Function(BuildContext)?>(
                       valueListenable: controller._onClose,
@@ -45,11 +46,13 @@ class DictionaryTopBar extends StatelessWidget {
                         ).animate(animation),
                       ),
                     ),
-                    Text(
-                      translationPageModel.isEnglish ? 'English' : 'Español',
-                      style: Theme.of(context).textTheme.headline1!.copyWith(
-                          color: Colors.white,
-                          fontSize: Theme.of(context).iconTheme.size),
+                    Expanded(
+                      child: Text(
+                        translationPageModel.isEnglish ? 'English' : 'Español',
+                        style: Theme.of(context).textTheme.headline1!.copyWith(
+                            color: Colors.white,
+                            fontSize: Theme.of(context).iconTheme.size),
+                      ),
                     ),
                     const HelpMenu(),
                   ],
