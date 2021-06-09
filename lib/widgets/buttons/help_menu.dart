@@ -17,7 +17,10 @@ class HelpMenu extends StatelessWidget {
           AboutButton(onPressed: closeMenu),
         ],
       ),
-      icon: const Icon(Icons.more_vert),
+      icon: const Icon(
+        Icons.more_vert,
+        size: 28,
+      ),
     );
   }
 }

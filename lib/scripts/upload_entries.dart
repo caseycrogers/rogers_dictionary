@@ -47,7 +47,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length && i < 200) {
+  while (i < rows.length) {
     if ((i + 2) % 500 == 0) {
       print('${i + 2}/${rows.length + 2} complete!');
     }
@@ -61,7 +61,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     }
     row.forEach((key, str) {
       if (str.contains('\n') || str.contains('\r'))
-        print('$WARNING field $key at row ${i + 2} contains a line break.'
+        print('$WARNING field \'$key\' at row ${i + 2} contains a line break.'
             ' Field:\n$str');
     });
     if (row[HEADWORD]!.isNotEmpty) {
@@ -85,8 +85,8 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
             continue;
           }
           entryBuilders[parent]?.addRelated([row[HEADWORD]!]) ??
-              print('$WARNING Missing run on parent \'$parent\' for entry '
-                  '\'${row[HEADWORD]}\' at line ${i + 2}');
+              print('$WARNING Missing run on parent or related \'$parent\' for '
+                  'entry \'${row[HEADWORD]}\' at line ${i + 2}');
         }
       }
       builder = EntryBuilder()
