@@ -154,7 +154,10 @@ class EntryView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.only(top: 10),
           child: previewTranslationLine(
-              context, translations.first, translations.length != 1),
+            context,
+            translations.first,
+            translations.length != 1,
+          ),
         ),
       ]);
     return TableRow(
@@ -183,10 +186,11 @@ class EntryView extends StatelessWidget {
                         ),
                       if (!parentheticalChanged) const SizedBox(height: 5),
                       _translationContent(
-                          context,
-                          t,
-                          hasParenthetical && parenthetical != '',
-                          translations.indexOf(t) + 1),
+                        context,
+                        t,
+                        hasParenthetical && parenthetical != '',
+                        translations.indexOf(t) + 1,
+                      ),
                     ],
                   );
                 }).toList(),

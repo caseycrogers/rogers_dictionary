@@ -107,7 +107,13 @@ class SqfliteDatabase extends DictionaryDatabase {
   Entry _rowToEntry(String headword, TranslationMode translationMode,
       Map<String, Object?>? snapshot) {
     if (snapshot == null) {
-      return EntryUtils.notFound(headword);
+      final Entry notFound = EntryUtils.notFound(headword);
+      super.setFavorite(
+        translationMode,
+        notFound.headword.urlEncodedHeadword,
+        false,
+      );
+      return notFound;
     }
     assert(snapshot.containsKey(IS_FAVORITE));
     final Entry entry = Entry.fromBuffer(snapshot[ENTRY_BLOB] as List<int>);

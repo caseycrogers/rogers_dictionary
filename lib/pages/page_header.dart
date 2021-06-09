@@ -8,13 +8,15 @@ class PageHeader extends StatelessWidget {
     required this.header,
     required this.child,
     required this.onClose,
+    this.divider = true,
     this.scrollable = true,
-    this.padding = 2 * kPad,
+    this.padding = kPad,
   });
 
   final Widget header;
   final Widget child;
   final VoidCallback onClose;
+  final bool divider;
   final bool scrollable;
   final double padding;
 
@@ -26,7 +28,7 @@ class PageHeader extends StatelessWidget {
           padding: EdgeInsets.only(left: padding, right: padding),
           child: header,
         ),
-        Divider(indent: padding, endIndent: padding, height: 0),
+        if (divider) Divider(indent: padding, endIndent: padding, height: 0),
         if (scrollable)
           Expanded(
             child: SingleChildScrollView(

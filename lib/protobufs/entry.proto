@@ -32,5 +32,7 @@ message Entry {
         string editorialNote = 9;
 
         repeated string examplePhrases = 10;
+
+        string opposite_headword = 11;
     }
 }

@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -240,7 +241,11 @@ Widget previewTranslationLine(
   return OverflowMarkdown(text);
 }
 
-Widget translationLine(BuildContext context, Translation translation, int i) {
+Widget translationLine(
+  BuildContext context,
+  Translation translation,
+  int i,
+) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -249,7 +254,36 @@ Widget translationLine(BuildContext context, Translation translation, int i) {
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            ...OverflowMarkdown(translation.content).forWrap(context),
+            ...OverflowMarkdown(
+              translation.content,
+              defaultStyle: translation.oppositeHeadword.isNotEmpty
+                  ? Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(color: Colors.blue)
+                  : null,
+            ).forWrap(context).map((t) {
+              if (translation.oppositeHeadword.isNotEmpty) {
+                return TextButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    minimumSize: MaterialStateProperty.all(Size.zero),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: translation.oppositeHeadword.isNotEmpty
+                      ? () {
+                          DictionaryPageModel.readFrom(context)
+                              .onOppositeHeadwordSelected(
+                            context,
+                            EntryUtils.urlEncode(translation.oppositeHeadword),
+                          );
+                        }
+                      : null,
+                  child: t,
+                );
+              }
+              return t;
+            }),
             if (translation.genderAndPlural.isNotEmpty)
               OverflowMarkdown(' *${translation.genderAndPlural}*'),
             if (translation.abbreviation.isNotEmpty) ...[

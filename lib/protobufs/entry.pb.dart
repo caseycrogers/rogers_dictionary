@@ -124,6 +124,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
     ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parentheticalQualifier', protoName: 'parentheticalQualifier')
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'editorialNote', protoName: 'editorialNote')
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePhrases', protoName: 'examplePhrases')
+    ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'oppositeHeadword')
     ..hasRequiredFields = false
   ;
 
@@ -139,6 +140,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
     $core.String? parentheticalQualifier,
     $core.String? editorialNote,
     $core.Iterable<$core.String>? examplePhrases,
+    $core.String? oppositeHeadword,
   }) {
     final _result = create();
     if (partOfSpeech != null) {
@@ -170,6 +172,9 @@ class Entry_Translation extends $pb.GeneratedMessage {
     }
     if (examplePhrases != null) {
       _result.examplePhrases.addAll(examplePhrases);
+    }
+    if (oppositeHeadword != null) {
+      _result.oppositeHeadword = oppositeHeadword;
     }
     return _result;
   }
@@ -271,6 +276,15 @@ class Entry_Translation extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(10)
   $core.List<$core.String> get examplePhrases => $_getList(9);
+
+  @$pb.TagNumber(11)
+  $core.String get oppositeHeadword => $_getSZ(10);
+  @$pb.TagNumber(11)
+  set oppositeHeadword($core.String v) { $_setString(10, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasOppositeHeadword() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearOppositeHeadword() => clearField(11);
 }
 
 class Entry extends $pb.GeneratedMessage {

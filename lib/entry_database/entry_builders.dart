@@ -46,7 +46,7 @@ extension EntryUtils on Entry {
   static Entry notFound(String headword) {
     print('WARN: Entry $headword not found');
     return Entry(
-      entryId: -1,
+      entryId: 404,
       headword: Headword(
         isAlternate: false,
         headwordText: 'Invalid headword ${urlDecode(headword)}',
@@ -181,6 +181,7 @@ class EntryBuilder {
     required String parentheticalQualifier,
     required List<String> examplePhrases,
     required String editorialNote,
+    required String oppositeHeadword,
   }) {
     assert(
         translation != '',
@@ -199,6 +200,7 @@ class EntryBuilder {
         parentheticalQualifier: parentheticalQualifier,
         examplePhrases: examplePhrases,
         editorialNote: editorialNote,
+        oppositeHeadword: oppositeHeadword,
       ),
     );
     return this;

@@ -10,19 +10,25 @@ class LocalHistoryValueNotifier<T> extends ValueNotifier<T> {
 
   @override
   set value(T newValue) {
+    final T returnValue = value;
+    setWith(newValue, onPop: () {
+      super.value = returnValue;
+    });
+  }
+
+  void setWith(T newValue, {VoidCallback? onPop}) {
     if (value == newValue) {
       return;
     }
     // Create locally scoped variable so onRemove always resets to the correct
     // value.
-    final T returnValue = value;
     super.value = newValue;
-    modalRoute.addLocalHistoryEntry(
-      LocalHistoryEntry(
-        onRemove: () {
-          super.value = returnValue;
-        },
-      ),
-    );
+    if (onPop != null) {
+      modalRoute.addLocalHistoryEntry(
+        LocalHistoryEntry(
+          onRemove: onPop,
+        ),
+      );
+    }
   }
 }
