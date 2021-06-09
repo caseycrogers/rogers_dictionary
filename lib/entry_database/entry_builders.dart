@@ -111,6 +111,17 @@ extension EntryUtils on Entry {
   }
 }
 
+extension TranslationUtils on Translation {
+  static const String _sentinel = '1';
+
+  // Most opposite headword fields are a sentinel indicating that the opposite
+  // headword and translation are the same.
+  String get getOppositeHeadword =>
+      oppositeHeadword == TranslationUtils._sentinel
+          ? content
+          : oppositeHeadword;
+}
+
 extension HeadwordUtils on Headword {
   String get urlEncodedHeadword => EntryUtils.urlEncode(headwordText);
 }

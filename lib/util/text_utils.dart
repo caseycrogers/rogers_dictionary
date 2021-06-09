@@ -246,6 +246,8 @@ Widget translationLine(
   Translation translation,
   int i,
 ) {
+  final List<Widget> spans =
+      OverflowMarkdown(translation.content).forWrap(context);
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -254,36 +256,39 @@ Widget translationLine(
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            ...OverflowMarkdown(
-              translation.content,
-              defaultStyle: translation.oppositeHeadword.isNotEmpty
-                  ? Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      .copyWith(color: Colors.blue)
-                  : null,
-            ).forWrap(context).map((t) {
+            ...spans.expand((t) {
               if (translation.oppositeHeadword.isNotEmpty) {
-                return TextButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    minimumSize: MaterialStateProperty.all(Size.zero),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  onPressed: translation.oppositeHeadword.isNotEmpty
-                      ? () {
-                          DictionaryPageModel.readFrom(context)
-                              .onOppositeHeadwordSelected(
-                            context,
-                            EntryUtils.urlEncode(translation.oppositeHeadword),
-                          );
-                        }
-                      : null,
-                  child: t,
-                );
+                return [
+                  t,
+                  if (t == spans.last)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 5),
+                        child: Icon(
+                          Icons.open_in_new,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                ];
               }
-              return t;
-            }),
+              return [t];
+            }).map(
+              (t) => translation.oppositeHeadword.isNotEmpty
+                  ? GestureDetector(
+                      child: t,
+                      onTap: () {
+                        DictionaryPageModel.readFrom(context)
+                            .onOppositeHeadwordSelected(
+                          context,
+                          EntryUtils.urlEncode(translation.getOppositeHeadword),
+                        );
+                      },
+                    )
+                  : t,
+            ),
             if (translation.genderAndPlural.isNotEmpty)
               OverflowMarkdown(' *${translation.genderAndPlural}*'),
             if (translation.abbreviation.isNotEmpty) ...[
