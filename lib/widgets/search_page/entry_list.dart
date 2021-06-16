@@ -8,6 +8,7 @@ import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
@@ -27,7 +28,7 @@ class EntryList extends StatelessWidget {
             DictionaryPageModel.of(context).currentTab.value ==
                 DictionaryTab.search) {
           return _noResultsWidget(
-              'Enter text above to search for a translation!');
+              'Enter text above to search for a translation!', context);
         }
         return AsyncListView<Entry>(
           // Maintains scroll state
@@ -37,7 +38,8 @@ class EntryList extends StatelessWidget {
           noResultsWidgetBuilder: (context) => _noResultsWidget(
               entrySearchModel.favoritesOnly
                   ? 'No results! Try favoriting an entry first.'
-                  : 'No results! Check for typos.'),
+                  : 'No results! Check for typos.',
+              context),
           initialData: entrySearchModel.entries,
           stream: entrySearchModel.entryStream,
           loadingWidget: Delayed(
@@ -102,14 +104,34 @@ class EntryList extends StatelessWidget {
         },
       );
 
-  Widget _noResultsWidget(String text) => Padding(
-        padding: const EdgeInsets.all(30),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.grey,
+  Widget _noResultsWidget(String text, BuildContext context) {
+    final TranslationMode mode =
+        DictionaryPageModel.of(context).currTranslationMode;
+    final String direction = mode == TranslationMode.English ? 'left' : 'right';
+    final String oppositeMode =
+        mode == TranslationMode.English ? 'spanish' : 'english';
+    final String tabMode =
+        DictionaryPageModel.of(context).currentTab.value == DictionaryTab.search
+            ? 'search'
+            : 'favorites';
+    return Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        children: [
+          Text(
+            '$text\n\n',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.grey,
+            ),
           ),
-        ),
-      );
+          Text(
+            'Or swipe $direction for $oppositeMode $tabMode.',
+            style: const TextStyle(color: Colors.grey),
+          ),
+          const Icon(Icons.swipe, color: Colors.grey),
+        ],
+      ),
+    );
+  }
 }

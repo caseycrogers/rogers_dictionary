@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
@@ -113,6 +114,13 @@ extension EntryUtils on Entry {
 
 extension HeadwordUtils on Headword {
   String get urlEncodedHeadword => EntryUtils.urlEncode(headwordText);
+}
+
+extension TranslationUtils on Translation {
+  String get getOppositeHeadword =>
+      oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL
+          ? content
+          : oppositeHeadword;
 }
 
 class EntryBuilder {

@@ -13,13 +13,13 @@ import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 // A database interface for fetching dictionary entries.
 abstract class DictionaryDatabase {
-  Future<DatabaseVersion> get version => rootBundle
-      .loadString(join('assets', '$VERSION_FILE'))
-      .then((v) => VersionUtils.fromString(v));
-
   DictionaryDatabase()
       : _englishFavoritesCache = {},
         _spanishFavoritesCache = {};
+
+  Future<DatabaseVersion> get version => rootBundle
+      .loadString(join('assets', '$VERSION_FILE'))
+      .then((v) => VersionUtils.fromString(v));
 
   final Map<String, bool> _englishFavoritesCache;
   final Map<String, bool> _spanishFavoritesCache;

@@ -5,13 +5,50 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
-import 'package:rogers_dictionary/util/on_first_launch.dart';
-import 'package:rogers_dictionary/util/swipe_tutorial.dart';
 
-class TranslationModeSwitcher extends StatelessWidget {
+class TranslationModeSwitcher extends StatefulWidget {
   const TranslationModeSwitcher({required this.child});
 
   final Widget child;
+
+  @override
+  _TranslationModeSwitcherState createState() =>
+      _TranslationModeSwitcherState();
+}
+
+class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
+  PageController? _controller;
+
+  @override
+  void didChangeDependencies() {
+    if (_controller == null) {
+      final DictionaryPageModel dictionaryModel =
+          DictionaryPageModel.readFrom(context);
+      _controller = PageController(
+        initialPage:
+            translationModeToIndex(dictionaryModel.currTranslationMode),
+      );
+      _controller!.addListener(() {
+        dictionaryModel.pageOffset.value = _controller!.offset;
+      });
+      dictionaryModel.translationPageModel.addListener(() {
+        final int targetPage = translationModeToIndex(
+            dictionaryModel.translationPageModel.value.translationMode);
+        // If the controller isn't attached yet then the PageView will be
+        // properly constructed via initialPage.
+        if (!_controller!.hasClients ||
+            _controller!.page!.round() == targetPage) {
+          return;
+        }
+        _controller!.animateToPage(
+          targetPage,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeIn,
+        );
+      });
+    }
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,23 +61,8 @@ class TranslationModeSwitcher extends StatelessWidget {
 
   Widget pages(BuildContext context) {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
-    final PageController controller = dictionaryModel.pageController;
-    onFirstLaunch(() => showSwipeTutorial(context, controller));
-    dictionaryModel.translationPageModel.addListener(() {
-      final int targetPage = translationModeToIndex(
-          dictionaryModel.translationPageModel.value.translationMode);
-      // If the controller isn't attached yet then the PageView will be properly
-      // constructed via initialPage.
-      if (!controller.hasClients || controller.page!.round() == targetPage)
-        return;
-      controller.animateToPage(
-        targetPage,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeIn,
-      );
-    });
     return PageView(
-      controller: controller,
+      controller: _controller,
       onPageChanged: (int index) => DictionaryPageModel.readFrom(context)
           .onTranslationModeChanged(context, indexToTranslationMode(index)),
       children: [
@@ -49,7 +71,7 @@ class TranslationModeSwitcher extends StatelessWidget {
           builder: (BuildContext context, _) => Theme(
             data: Theme.of(context)
                 .copyWith(primaryColor: primaryColor(TranslationMode.English)),
-            child: child,
+            child: widget.child,
           ),
         ),
         Provider<TranslationPageModel>.value(
@@ -57,7 +79,7 @@ class TranslationModeSwitcher extends StatelessWidget {
           builder: (BuildContext context, _) => Theme(
             data: Theme.of(context)
                 .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
-            child: child,
+            child: widget.child,
           ),
         ),
       ],

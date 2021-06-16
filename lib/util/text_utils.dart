@@ -246,40 +246,39 @@ Widget translationLine(
   Translation translation,
   int i,
 ) {
+  final List<Widget> wraps =
+      OverflowMarkdown(translation.content).forWrap(context);
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       normal1Text(context, '${i.toString()}. '),
       Expanded(
         child: Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.start,
           children: [
-            ...OverflowMarkdown(
-              translation.content,
-              defaultStyle: translation.oppositeHeadword.isNotEmpty
-                  ? Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      .copyWith(color: Colors.blue)
-                  : null,
-            ).forWrap(context).map((t) {
-              if (translation.oppositeHeadword.isNotEmpty) {
-                return TextButton(
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    minimumSize: MaterialStateProperty.all(Size.zero),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  onPressed: translation.oppositeHeadword.isNotEmpty
-                      ? () {
+            ...wraps.map((t) {
+              if (t == wraps.last && translation.oppositeHeadword.isNotEmpty) {
+                return Container(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      t,
+                      IconButton(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        onPressed: () {
                           DictionaryPageModel.readFrom(context)
                               .onOppositeHeadwordSelected(
                             context,
-                            EntryUtils.urlEncode(translation.oppositeHeadword),
+                            EntryUtils.urlEncode(
+                                translation.getOppositeHeadword),
                           );
-                        }
-                      : null,
-                  child: t,
+                        },
+                        icon: const Icon(Icons.open_in_new, color: Colors.grey),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ],
+                  ),
                 );
               }
               return t;
@@ -374,34 +373,32 @@ Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
 
 Widget headwordLine(
     BuildContext context, Entry entry, bool preview, String searchString) {
+  final List<Widget> wraps = [
+    ...highlightedText(context, entry.headword.headwordText, preview,
+        searchString: searchString, isHeadword: true),
+    if (entry.headword.abbreviation.isNotEmpty) headline1Text(context, ' '),
+    if (entry.headword.abbreviation.isNotEmpty)
+      ...highlightedText(context, '(${entry.headword.abbreviation})', preview,
+          searchString: searchString, isHeadword: true, forWrap: false),
+    ...parentheticalTexts(
+      context,
+      entry.headword.parentheticalQualifier,
+      true,
+    ),
+  ];
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Row(
+      Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          FavoritesButton(entry: entry),
-          Expanded(
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                ...highlightedText(
-                    context, entry.headword.headwordText, preview,
-                    searchString: searchString, isHeadword: true),
-                if (entry.headword.abbreviation.isNotEmpty)
-                  headline1Text(context, ' '),
-                if (entry.headword.abbreviation.isNotEmpty)
-                  ...highlightedText(
-                      context, '(${entry.headword.abbreviation})', preview,
-                      searchString: searchString,
-                      isHeadword: true,
-                      forWrap: false),
-                ...parentheticalTexts(
-                  context,
-                  entry.headword.parentheticalQualifier,
-                  true,
-                ),
-              ],
-            ),
+          ...wraps.getRange(0, wraps.length - 1),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              wraps[wraps.length - 1],
+              FavoritesButton(entry: entry),
+            ],
           ),
         ],
       ),

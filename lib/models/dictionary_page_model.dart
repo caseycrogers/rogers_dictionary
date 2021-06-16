@@ -11,7 +11,6 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
 
 const TranslationMode DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
@@ -27,8 +26,7 @@ class DictionaryPageModel {
     this.currentTab,
     this.translationPageModel,
     this.spanishPageModel,
-  )   : englishPageModel = translationPageModel.value,
-        topBarController = DictionaryTopBarController();
+  )   : englishPageModel = translationPageModel.value;
 
   DictionaryPageModel.empty(BuildContext context)
       : this._(
@@ -51,9 +49,7 @@ class DictionaryPageModel {
 
   final LocalHistoryValueNotifier<DictionaryTab> currentTab;
 
-  final DictionaryTopBarController topBarController;
-
-  final PageController pageController = PageController();
+  final ValueNotifier<double> pageOffset = ValueNotifier(0);
 
   TranslationPageModel get _currModel => translationPageModel.value;
 
@@ -147,48 +143,6 @@ class DictionaryPageModel {
       }
       pageModel.currSelectedEntry.setWith(selectedEntry);
     }
-  }
-
-  void listenOnPageChanges(BuildContext context) {
-    currentTab.addListener(() => updateTopBarArrow(context));
-    translationPageModel.addListener(() => updateTopBarArrow(context));
-    for (final TranslationPageModel pageModel in [
-      englishPageModel,
-      spanishPageModel
-    ]) {
-      pageModel.searchPageModel.currSelectedEntry
-          .addListener(() => updateTopBarArrow(context));
-      pageModel.favoritesPageModel.currSelectedEntry
-          .addListener(() => updateTopBarArrow(context));
-      pageModel.dialoguesPageModel.selectedChapterNotifier
-          .addListener(() => updateTopBarArrow(context));
-    }
-  }
-
-  void updateTopBarArrow(BuildContext context) {
-    // Handle dialogue page.
-    if (currentTab.value == DictionaryTab.dialogues) {
-      if (_currModel.dialoguesPageModel.hasSelection) {
-        topBarController.onClose = (BuildContext context) => _currModel
-            .dialoguesPageModel
-            .onChapterSelected(context, null, null);
-        return;
-      }
-      topBarController.onClose = null;
-      return;
-    }
-    // Handle search pages.
-    final SearchPageModel pageModel = isFavoritesOnly
-        ? _currModel.favoritesPageModel
-        : _currModel.searchPageModel;
-    // Add back button to top bar.
-    if (pageModel.hasSelection) {
-      topBarController.onClose = (BuildContext context) =>
-          _onHeadwordSelected(context, newUrlEncodedHeadword: '');
-      return;
-    }
-    // Remove top bar arrow.
-    return topBarController.onClose = null;
   }
 
   bool get isFavoritesOnly => currentTab.value == DictionaryTab.favorites;
