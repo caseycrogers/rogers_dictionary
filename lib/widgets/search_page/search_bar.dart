@@ -40,7 +40,7 @@ class _SearchBarState extends State<SearchBar> {
     return Material(
       color: primaryColor(searchPageModel.translationMode),
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8, top: 2),
+        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

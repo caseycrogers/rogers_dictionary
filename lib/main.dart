@@ -15,8 +15,8 @@ import 'pages/page_router.dart';
 
 final Color englishPrimary = Colors.indigo.shade600;
 final Color spanishPrimary = Colors.orange.shade600;
-final Color englishSecondary = Colors.grey.shade300;
-final Color spanishSecondary = Colors.grey.shade300;
+final Color englishSecondary = Colors.indigo.shade200;
+final Color spanishSecondary = Colors.orange.shade200;
 
 Color primaryColor(TranslationMode translationMode) =>
     translationMode == TranslationMode.English
@@ -51,6 +51,7 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: PageRouter.generateRoute,
           initialRoute: '#/${SearchPage.route}',
           theme: ThemeData(
+              selectedRowColor: Colors.grey.shade200,
               textTheme: TextTheme(
                 headline1: GoogleFonts.openSans(
                     fontSize: 36,
