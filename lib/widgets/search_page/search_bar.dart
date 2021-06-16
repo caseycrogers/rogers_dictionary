@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/widgets/buttons/drop_down_widget.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_options_view.dart';
 
 class SearchBar extends StatefulWidget {
   @override
@@ -42,7 +40,7 @@ class _SearchBarState extends State<SearchBar> {
     return Material(
       color: primaryColor(searchPageModel.translationMode),
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
+        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8, top: 2),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

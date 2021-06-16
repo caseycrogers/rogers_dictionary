@@ -9,7 +9,7 @@ import 'package:rogers_dictionary/models/search_settings_model.dart';
 class SearchOptionsView extends StatelessWidget {
   SearchOptionsView(this._exteriorContext)
       : _entrySearchModel = DictionaryPageModel.readFrom(_exteriorContext)
-            .currTranslationPageModel
+            .translationPageModel
             .value
             .searchPageModel
             .entrySearchModel;

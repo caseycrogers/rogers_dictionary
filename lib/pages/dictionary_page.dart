@@ -8,6 +8,8 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/on_first_launch.dart';
+import 'package:rogers_dictionary/util/swipe_tutorial.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
@@ -31,7 +33,7 @@ class DictionaryPage extends StatelessWidget {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
     return Scaffold(
       body: ValueListenableBuilder<TranslationPageModel>(
-        valueListenable: dictionaryModel.currTranslationPageModel,
+        valueListenable: dictionaryModel.translationPageModel,
         child: DictionaryTabBarView(
           children: LinkedHashMap.from(<DictionaryTab, Widget>{
             DictionaryTab.search: SearchPage(),

@@ -41,7 +41,6 @@ class AboutButton extends StatelessWidget {
                             icon: Icon(
                               Icons.close,
                               color: Theme.of(context).accentIconTheme.color,
-                              size: headline1(context).fontSize,
                             ),
                             onPressed: Navigator.of(overlayContext).pop,
                           ),

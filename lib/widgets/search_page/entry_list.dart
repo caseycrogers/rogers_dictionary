@@ -25,9 +25,10 @@ class EntryList extends StatelessWidget {
             context.watch<EntrySearchModel>();
         if (entrySearchModel.isEmpty &&
             DictionaryPageModel.of(context).currentTab.value ==
-                DictionaryTab.search)
+                DictionaryTab.search) {
           return _noResultsWidget(
               'Enter text above to search for a translation!');
+        }
         return AsyncListView<Entry>(
           // Maintains scroll state
           key: PageStorageKey('entry_list-tab'

@@ -5,6 +5,8 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/on_first_launch.dart';
+import 'package:rogers_dictionary/util/swipe_tutorial.dart';
 
 class TranslationModeSwitcher extends StatelessWidget {
   const TranslationModeSwitcher({required this.child});
@@ -22,13 +24,11 @@ class TranslationModeSwitcher extends StatelessWidget {
 
   Widget pages(BuildContext context) {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
-    final PageController controller = PageController(
-      initialPage: translationModeToIndex(
-          dictionaryModel.currTranslationPageModel.value.translationMode),
-    );
-    dictionaryModel.currTranslationPageModel.addListener(() {
+    final PageController controller = dictionaryModel.pageController;
+    onFirstLaunch(() => showSwipeTutorial(context, controller));
+    dictionaryModel.translationPageModel.addListener(() {
       final int targetPage = translationModeToIndex(
-          dictionaryModel.currTranslationPageModel.value.translationMode);
+          dictionaryModel.translationPageModel.value.translationMode);
       // If the controller isn't attached yet then the PageView will be properly
       // constructed via initialPage.
       if (!controller.hasClients || controller.page!.round() == targetPage)
