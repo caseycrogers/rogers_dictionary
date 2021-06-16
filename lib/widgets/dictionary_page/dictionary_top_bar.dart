@@ -7,6 +7,7 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
+import 'package:rogers_dictionary/widgets/buttons/translation_mode_selector.dart';
 
 class DictionaryTopBar extends StatelessWidget {
   const DictionaryTopBar({
@@ -24,12 +25,12 @@ class DictionaryTopBar extends StatelessWidget {
     return Column(
       children: [
         ValueListenableBuilder<TranslationPageModel>(
-          valueListenable: dictionaryModel.currTranslationPageModel,
+          valueListenable: dictionaryModel.translationPageModel,
           builder: (context, translationPageModel, _) => Material(
             color: primaryColor(translationPageModel.translationMode),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -46,14 +47,7 @@ class DictionaryTopBar extends StatelessWidget {
                         ).animate(animation),
                       ),
                     ),
-                    Expanded(
-                      child: Text(
-                        translationPageModel.isEnglish ? 'English' : 'Español',
-                        style: Theme.of(context).textTheme.headline1!.copyWith(
-                            color: Colors.white,
-                            fontSize: Theme.of(context).iconTheme.size),
-                      ),
-                    ),
+                    const TranslationModeSelector(),
                     const HelpMenu(),
                   ],
                 ),

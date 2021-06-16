@@ -24,8 +24,10 @@ int translationModeToIndex(TranslationMode translationMode) {
 
 class DictionaryPageModel {
   DictionaryPageModel._(
-      this.currentTab, this.currTranslationPageModel, this.spanishPageModel)
-      : englishPageModel = currTranslationPageModel.value,
+    this.currentTab,
+    this.translationPageModel,
+    this.spanishPageModel,
+  )   : englishPageModel = translationPageModel.value,
         topBarController = DictionaryTopBarController();
 
   DictionaryPageModel.empty(BuildContext context)
@@ -45,16 +47,20 @@ class DictionaryPageModel {
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
 
-  final LocalHistoryValueNotifier<TranslationPageModel>
-      currTranslationPageModel;
+  final LocalHistoryValueNotifier<TranslationPageModel> translationPageModel;
 
   final LocalHistoryValueNotifier<DictionaryTab> currentTab;
 
   final DictionaryTopBarController topBarController;
 
-  TranslationPageModel get _currModel => currTranslationPageModel.value;
+  final PageController pageController = PageController();
 
-  bool get isEnglish => currTranslationPageModel.value.isEnglish;
+  TranslationPageModel get _currModel => translationPageModel.value;
+
+  TranslationMode get currTranslationMode =>
+      translationPageModel.value.translationMode;
+
+  bool get isEnglish => translationPageModel.value.isEnglish;
 
   static DictionaryPageModel of(BuildContext context) =>
       context.select<DictionaryPageModel, DictionaryPageModel>(
@@ -71,9 +77,10 @@ class DictionaryPageModel {
   TranslationPageModel get _oppModel =>
       _currModel.isEnglish ? spanishPageModel : englishPageModel;
 
-  void onTranslationModeChanged(
-      BuildContext context, TranslationMode newTranslationMode) {
-    currTranslationPageModel.value = pageModel(newTranslationMode);
+  void onTranslationModeChanged(BuildContext context,
+      [TranslationMode? newTranslationMode]) {
+    translationPageModel.value =
+        pageModel(newTranslationMode ?? _oppModel.translationMode);
   }
 
   void onEntrySelected(BuildContext context, Entry newEntry) =>
@@ -97,8 +104,8 @@ class DictionaryPageModel {
         ? _oppModel.favoritesPageModel
         : _oppModel.searchPageModel;
     final SelectedEntry? previousSelection = pageModel.currSelectedEntry.value;
-    currTranslationPageModel.setWith(_oppModel, onPop: () {
-      currTranslationPageModel.setWith(_oppModel);
+    translationPageModel.setWith(_oppModel, onPop: () {
+      translationPageModel.setWith(_oppModel);
       pageModel.currSelectedEntry.setWith(previousSelection);
     });
     _onHeadwordSelected(
@@ -144,7 +151,7 @@ class DictionaryPageModel {
 
   void listenOnPageChanges(BuildContext context) {
     currentTab.addListener(() => updateTopBarArrow(context));
-    currTranslationPageModel.addListener(() => updateTopBarArrow(context));
+    translationPageModel.addListener(() => updateTopBarArrow(context));
     for (final TranslationPageModel pageModel in [
       englishPageModel,
       spanishPageModel
