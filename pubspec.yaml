@@ -18,13 +18,18 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_email_sender: ^5.0.0
+  flutter_keyboard_visibility: ^5.0.2
+  flutter_localizations:
+    sdk: flutter
   google_fonts: ^2.0.0
+  intl: ^0.17.0
   package_info: ^2.0.0
   path: ^1.8.0
   path_provider: ^2.0.1
   provider: ^5.0.0
   scrollable_positioned_list: ^0.2.0-nullsafety.0
   shared_preferences: ^2.0.6
+  sprintf: ^6.0.0
   sqflite: ^2.0.0+3
 
 dev_dependencies:

@@ -15,14 +15,16 @@ class SelectedEntrySwitcher extends StatelessWidget {
     final SearchPageModel searchPageModel = _pageModel(context);
     return Provider<SearchPageModel>.value(
       value: searchPageModel,
-      builder: (BuildContext context, _) =>
-          AnimatedListenableSwitcher<SelectedEntry?>(
-        valueListenable: searchPageModel.currSelectedEntry,
-        builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
-            selectedEntry != null
-                ? EntryView.asPage(context)
-                : const EntrySearch(),
-      ),
+      builder: (BuildContext context, _) {
+        return OrientationBuilder(builder: (context, orientation) {
+          switch (orientation) {
+            case Orientation.portrait:
+              return _PortraitPage(searchPageModel);
+            case Orientation.landscape:
+              return _LandscapePage(searchPageModel);
+          }
+        });
+      },
     );
   }
 
@@ -32,5 +34,53 @@ class SelectedEntrySwitcher extends StatelessWidget {
             DictionaryTab.search
         ? t.searchPageModel
         : t.favoritesPageModel;
+  }
+}
+
+class _PortraitPage extends StatelessWidget {
+  const _PortraitPage(this.searchPageModel, {Key? key}) : super(key: key);
+
+  final SearchPageModel searchPageModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedListenableSwitcher<SelectedEntry?>(
+      valueListenable: searchPageModel.currSelectedEntry,
+      builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
+          selectedEntry != null
+              ? EntryView.asPage(context)
+              : const EntrySearch(),
+    );
+  }
+}
+
+class _LandscapePage extends StatelessWidget {
+  const _LandscapePage(this.searchPageModel, {Key? key}) : super(key: key);
+
+  final SearchPageModel searchPageModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Flexible(child: EntrySearch(), flex: 1),
+        Flexible(
+          flex: 2,
+          child: Row(
+            children: [
+              const VerticalDivider(width: 1),
+              Expanded(
+                child: AnimatedListenableSwitcher<SelectedEntry?>(
+                  valueListenable: searchPageModel.currSelectedEntry,
+                  builder:
+                      (BuildContext context, SelectedEntry? selectedEntry, _) =>
+                          EntryView.asPage(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

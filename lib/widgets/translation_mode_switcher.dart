@@ -29,7 +29,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
             translationModeToIndex(dictionaryModel.currTranslationMode),
       );
       _controller!.addListener(() {
-        dictionaryModel.pageOffset.value = _controller!.offset;
+        dictionaryModel.pageOffset.value = _controller!.page!;
       });
       dictionaryModel.translationPageModel.addListener(() {
         final int targetPage = translationModeToIndex(
@@ -61,28 +61,32 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
 
   Widget pages(BuildContext context) {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
-    return PageView(
-      controller: _controller,
-      onPageChanged: (int index) => DictionaryPageModel.readFrom(context)
-          .onTranslationModeChanged(context, indexToTranslationMode(index)),
-      children: [
-        Provider<TranslationPageModel>.value(
-          value: dictionaryModel.englishPageModel,
-          builder: (BuildContext context, _) => Theme(
-            data: Theme.of(context)
-                .copyWith(primaryColor: primaryColor(TranslationMode.English)),
-            child: widget.child,
-          ),
-        ),
-        Provider<TranslationPageModel>.value(
-          value: dictionaryModel.spanishPageModel,
-          builder: (BuildContext context, _) => Theme(
-            data: Theme.of(context)
-                .copyWith(primaryColor: primaryColor(TranslationMode.Spanish)),
-            child: widget.child,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return PageView(
+          controller: _controller,
+          onPageChanged: (int index) => DictionaryPageModel.readFrom(context)
+              .onTranslationModeChanged(context, indexToTranslationMode(index)),
+          children: [
+            Provider<TranslationPageModel>.value(
+              value: dictionaryModel.englishPageModel,
+              builder: (BuildContext context, _) => Theme(
+                data: Theme.of(context).copyWith(
+                    primaryColor: primaryColor(TranslationMode.English)),
+                child: widget.child,
+              ),
+            ),
+            Provider<TranslationPageModel>.value(
+              value: dictionaryModel.spanishPageModel,
+              builder: (BuildContext context, _) => Theme(
+                data: Theme.of(context).copyWith(
+                    primaryColor: primaryColor(TranslationMode.Spanish)),
+                child: widget.child,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

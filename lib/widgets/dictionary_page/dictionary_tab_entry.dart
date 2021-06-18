@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 class DictionaryTabEntry extends StatefulWidget {
   const DictionaryTabEntry({
     required this.selected,
-    required this.unselected,
     required this.index,
-  });
+    Widget? unselected,
+  }) : unselected = unselected ?? selected;
 
   final Widget selected;
   final Widget unselected;

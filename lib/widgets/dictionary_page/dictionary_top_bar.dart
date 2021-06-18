@@ -9,37 +9,28 @@ import 'package:rogers_dictionary/widgets/buttons/translation_mode_selector.dart
 
 class DictionaryTopBar extends StatelessWidget {
   const DictionaryTopBar({
-    Key? key,
-    required this.child,
+    Key? key
   }) : super(key: key);
-
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
-    return Column(
-      children: [
-        ValueListenableBuilder<TranslationPageModel>(
-          valueListenable: dictionaryModel.translationPageModel,
-          builder: (context, translationPageModel, _) => Material(
-            color: primaryColor(translationPageModel.translationMode),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    TranslationModeSelector(),
-                    HelpMenu(),
-                  ],
-                ),
-              ),
-            ),
+    return ValueListenableBuilder<TranslationPageModel>(
+      valueListenable: dictionaryModel.translationPageModel,
+      builder: (context, translationPageModel, _) => Material(
+        color: primaryColor(translationPageModel.translationMode),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: const [
+              TranslationModeSelector(),
+              Spacer(),
+              HelpMenu(),
+            ],
           ),
         ),
-        Expanded(child: child),
-      ],
+      ),
     );
   }
 }
