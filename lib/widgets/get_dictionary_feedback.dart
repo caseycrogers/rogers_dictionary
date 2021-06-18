@@ -1,3 +1,4 @@
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:feedback/feedback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +30,18 @@ enum DictionaryFeedbackType {
   other,
 }
 
-String typeToString(DictionaryFeedbackType type) =>
-    type.toString().split('.').last.replaceAll('_', ' ');
+String typeToString(BuildContext context, DictionaryFeedbackType type) {
+  switch (type) {
+    case DictionaryFeedbackType.bug_report:
+      return i18n.bugReport.get(context);
+    case DictionaryFeedbackType.feature_request:
+      return i18n.featureRequest.get(context);
+    case DictionaryFeedbackType.translation_error:
+      return i18n.translationError.get(context);
+    case DictionaryFeedbackType.other:
+      return i18n.other.get(context);
+  }
+}
 
 class GetDictionaryFeedback extends StatefulWidget {
   const GetDictionaryFeedback(this.onSubmit, {Key? key}) : super(key: key);
@@ -56,13 +67,13 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
               children: [
                 Row(
                   children: [
-                    const Text('Feedback type: '),
+                    Text('${i18n.feedbackType.cap.get(context)}: '),
                     DropdownButton<DictionaryFeedbackType>(
                       value: _feedbackBuilder.type,
                       items: DictionaryFeedbackType.values
                           .map(
                             (type) => DropdownMenuItem<DictionaryFeedbackType>(
-                              child: Text(typeToString(type)),
+                              child: Text(typeToString(context, type)),
                               value: type,
                             ),
                           )
@@ -76,13 +87,15 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                 ),
                 TextField(
                   maxLength: 60,
-                  decoration: const InputDecoration(helperText: 'Summary'),
+                  decoration: InputDecoration(
+                      helperText: i18n.summary.cap.get(context)),
                   onChanged: (value) => _feedbackBuilder.subject = value,
                 ),
                 TextField(
                   minLines: 2,
                   maxLines: 10,
-                  decoration: const InputDecoration(helperText: 'Feedback'),
+                  decoration: InputDecoration(
+                      helperText: i18n.feedback.cap.get(context)),
                   onChanged: (value) => _feedbackBuilder.body = value,
                 ),
               ],
@@ -97,9 +110,9 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                       },
                     )
                 : null,
-            child: const Text('submit'),
+            child: Text(i18n.submit.cap.get(context)),
           ),
-          const Text('(opens your email app)'),
+          Text(i18n.opensEmail.get(context)),
         ],
       ),
     );

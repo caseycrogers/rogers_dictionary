@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 
@@ -40,7 +41,7 @@ class _SearchBarState extends State<SearchBar> {
     return Material(
       color: primaryColor(searchPageModel.translationMode),
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
+        padding: const EdgeInsets.all(8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -67,7 +68,7 @@ class _SearchBarState extends State<SearchBar> {
                                 icon: const Icon(Icons.clear),
                               )
                             : null,
-                        hintText: 'search...',
+                        hintText: '${i18n.search.get(context)}...',
                         border: InputBorder.none,
                       ),
                       onChanged: (searchString) => searchPageModel

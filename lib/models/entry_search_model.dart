@@ -9,16 +9,16 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
 class EntrySearchModel with ChangeNotifier {
-  EntrySearchModel._(this._translationMode, this._searchString,
+  EntrySearchModel._(this._translationMode,
       this._searchSettingsModel, this._favoritesOnly) {
     _initializeStream();
   }
 
   EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
-      : this._(translationMode, '', SearchSettingsModel.empty(), favoritesOnly);
+      : this._(translationMode, SearchSettingsModel.empty(), favoritesOnly);
 
   final TranslationMode _translationMode;
-  String _searchString;
+  static String _searchString = '';
   SearchSettingsModel _searchSettingsModel;
   late Stream<Entry> _entryStream;
   LinkedHashSet<Entry> _entries = LinkedHashSet();

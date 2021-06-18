@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
@@ -11,6 +13,7 @@ import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -27,8 +30,7 @@ class EntryList extends StatelessWidget {
         if (entrySearchModel.isEmpty &&
             DictionaryPageModel.of(context).currentTab.value ==
                 DictionaryTab.search) {
-          return _noResultsWidget(
-              'Enter text above to search for a translation!', context);
+          return _noResultsWidget(i18n.enterTextHint.get(context), context);
         }
         return AsyncListView<Entry>(
           // Maintains scroll state
@@ -37,8 +39,8 @@ class EntryList extends StatelessWidget {
           padding: EdgeInsets.zero,
           noResultsWidgetBuilder: (context) => _noResultsWidget(
               entrySearchModel.favoritesOnly
-                  ? 'No results! Try favoriting an entry first.'
-                  : 'No results! Check for typos.',
+                  ? i18n.noFavoritesHint.get(context)
+                  : i18n.typosHint.get(context),
               context),
           initialData: entrySearchModel.entries,
           stream: entrySearchModel.entryStream,
@@ -57,24 +59,35 @@ class EntryList extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(BuildContext context, AsyncSnapshot<List<Entry>> snapshot,
-          int index) =>
-      Builder(
-        builder: (BuildContext context) {
-          final dictionaryModel = DictionaryPageModel.of(context);
-          final SearchPageModel searchPageModel = SearchPageModel.of(context);
-          if (snapshot.hasError) {
-            print(snapshot.error);
-          }
-          if (!snapshot.hasData) {
-            return const LoadingText();
-          }
-          final entry = snapshot.data![index];
-          final bool isSelected = entry.headword.urlEncodedHeadword ==
-              searchPageModel.currSelectedHeadword;
-          return Column(
-            children: [
-              InkWell(
+  Widget _buildRow(
+    BuildContext context,
+    AsyncSnapshot<List<Entry>> snapshot,
+    int index,
+  ) {
+    final dictionaryModel = DictionaryPageModel.readFrom(context);
+    final SearchPageModel searchPageModel = SearchPageModel.readFrom(context);
+    return ValueListenableBuilder<SelectedEntry?>(
+      valueListenable: searchPageModel.currSelectedEntry,
+      builder: (context, selectedEntry, _) {
+        if (snapshot.hasError) {
+          print(snapshot.error);
+        }
+        if (!snapshot.hasData) {
+          return const LoadingText();
+        }
+        final entry = snapshot.data![index];
+        final bool isSelected = entry.headword.urlEncodedHeadword ==
+            selectedEntry?.urlEncodedHeadword;
+        final bool shouldHighlight =
+            MediaQuery.of(context).orientation == Orientation.landscape &&
+                isSelected;
+        return Column(
+          children: [
+            InkWell(
+                child: Material(
+                  color: shouldHighlight
+                      ? Theme.of(context).selectedRowColor
+                      : Colors.transparent,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -88,50 +101,49 @@ class EntryList extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     ),
                   ),
-                  onTap: () {
-                    if (isSelected) {
-                      return;
-                    }
-                    dictionaryModel.onEntrySelected(context, entry);
-                  }),
-              if (index < snapshot.data!.length - 1)
-                const Divider(
-                  thickness: 1,
-                  height: 1,
                 ),
-            ],
-          );
-        },
-      );
+                onTap: isSelected
+                    ? null
+                    : () {
+                        dictionaryModel.onEntrySelected(context, entry);
+                      }),
+            if (index < snapshot.data!.length - 1)
+              const Divider(
+                thickness: 1,
+                height: 1,
+              ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget _noResultsWidget(String text, BuildContext context) {
-    final TranslationMode mode =
-        DictionaryPageModel.of(context).currTranslationMode;
-    final String direction = mode == TranslationMode.English ? 'left' : 'right';
-    final String oppositeMode =
-        mode == TranslationMode.English ? 'spanish' : 'english';
-    final String tabMode =
-        DictionaryPageModel.of(context).currentTab.value == DictionaryTab.search
-            ? 'search'
-            : 'favorites';
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: Column(
-        children: [
-          Text(
-            '$text\n\n',
+    final TranslationPageModel pageModel = TranslationPageModel.of(context);
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
+          child: Text(
+            '\n$text\n',
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.grey,
             ),
           ),
-          Text(
-            'Or swipe $direction for $oppositeMode $tabMode.',
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
+          child: Text(
+            pageModel.isEnglish
+                ? i18n.swipeLeft.get(context)
+                : i18n.swipeRight.get(context),
             style: const TextStyle(color: Colors.grey),
+            textAlign: TextAlign.center,
           ),
-          const Icon(Icons.swipe, color: Colors.grey),
-        ],
-      ),
+        ),
+        const Icon(Icons.swipe, color: Colors.grey),
+      ],
     );
   }
 }

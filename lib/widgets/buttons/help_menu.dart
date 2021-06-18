@@ -12,6 +12,7 @@ class HelpMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropDownWidget(
       builder: (_, closeMenu) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           FeedbackButton(onPressed: closeMenu),
           AboutButton(onPressed: closeMenu),
