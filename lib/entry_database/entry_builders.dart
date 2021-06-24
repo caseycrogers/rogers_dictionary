@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
@@ -111,19 +112,15 @@ extension EntryUtils on Entry {
   }
 }
 
-extension TranslationUtils on Translation {
-  static const String _sentinel = '1';
-
-  // Most opposite headword fields are a sentinel indicating that the opposite
-  // headword and translation are the same.
-  String get getOppositeHeadword =>
-      oppositeHeadword == TranslationUtils._sentinel
-          ? content
-          : oppositeHeadword;
-}
-
 extension HeadwordUtils on Headword {
   String get urlEncodedHeadword => EntryUtils.urlEncode(headwordText);
+}
+
+extension TranslationUtils on Translation {
+  String get getOppositeHeadword =>
+      oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL
+          ? content
+          : oppositeHeadword;
 }
 
 class EntryBuilder {

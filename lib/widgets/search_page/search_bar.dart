@@ -1,13 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/widgets/buttons/drop_down_widget.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_options_view.dart';
+import 'package:rogers_dictionary/models/translation_page_model.dart';
 
 class SearchBar extends StatefulWidget {
+  const SearchBar();
+
   @override
   _SearchBarState createState() => _SearchBarState();
 }
@@ -21,7 +24,11 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final searchPageModel = context.read<SearchPageModel>();
+    final SearchPageModel searchPageModel =
+        DictionaryPageModel.readFrom(context)
+            .translationPageModel
+            .value
+            .searchPageModel;
     if (_shouldInit) {
       _controller = TextEditingController(text: searchPageModel.searchString);
       _controller.addListener(_updateIsEmpty);
@@ -38,56 +45,57 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final searchPageModel = SearchPageModel.of(context);
-    return Material(
-      color: primaryColor(searchPageModel.translationMode),
+    return ValueListenableBuilder<TranslationPageModel>(
+      valueListenable: DictionaryPageModel.of(context).translationPageModel,
+      builder: (context, translationPage, content) {
+        return Material(
+          color: primaryColor(translationPage.translationMode),
+          child: content,
+        );
+      },
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              child: Container(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: Container(
-                    color: Theme.of(context).backgroundColor,
-                    child: TextField(
-                      style: const TextStyle(fontSize: 20),
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _controller.text.isNotEmpty
-                            ? IconButton(
-                                onPressed: () {
-                                  _controller.clear();
-                                  searchPageModel.entrySearchModel
-                                      .onSearchStringChanged(
-                                          newSearchString: '');
-                                },
-                                icon: const Icon(Icons.clear),
-                              )
-                            : null,
-                        hintText: 'search...',
-                        border: InputBorder.none,
-                      ),
-                      onChanged: (searchString) => searchPageModel
-                          .entrySearchModel
-                          .onSearchStringChanged(newSearchString: searchString),
-                    ),
-                  ),
-                ),
+        padding: const EdgeInsets.all(8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: Container(
+            color: Theme.of(context).backgroundColor,
+            child: TextField(
+              style: const TextStyle(fontSize: 20),
+              controller: _controller,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _controller.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          _controller.clear();
+                          entrySearchModel.onSearchStringChanged(
+                            newSearchString: '',
+                          );
+                        },
+                        icon: const Icon(Icons.clear),
+                      )
+                    : null,
+                hintText: '${i18n.search.get(context)}...',
+                border: InputBorder.none,
               ),
+              onChanged: (searchString) => entrySearchModel
+                  .onSearchStringChanged(newSearchString: searchString),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  EntrySearchModel get entrySearchModel => DictionaryPageModel.readFrom(context)
+      .translationPageModel
+      .value
+      .searchPageModel
+      .entrySearchModel;
+
   void _updateIsEmpty() {
-    if (_isEmpty != _controller.text.isEmpty)
+    if (_isEmpty != _controller.text.isEmpty) {
       setState(() => _isEmpty = _controller.text.isEmpty);
+    }
   }
 }

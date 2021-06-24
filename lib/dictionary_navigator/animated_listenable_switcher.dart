@@ -9,12 +9,18 @@ class AnimatedListenableSwitcher<T> extends StatelessWidget {
     required this.builder,
     this.child,
     this.transitionBuilder,
+    this.switchInCurve,
+    this.switchOutCurve,
+    this.duration,
   });
 
   final ValueListenable<T> valueListenable;
   final ValueWidgetBuilder<T> builder;
   final Widget? child;
   final AnimatedSwitcherTransitionBuilder? transitionBuilder;
+  final Curve? switchInCurve;
+  final Curve? switchOutCurve;
+  final Duration? duration;
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +33,11 @@ class AnimatedListenableSwitcher<T> extends StatelessWidget {
             transitionBuilder != null
                 ? transitionBuilder!(child, animation)
                 : DictionaryPageTransition(child, animation),
-        duration: const Duration(milliseconds: 200),
-        reverseDuration: const Duration(milliseconds: 100),
+        duration: duration ?? const Duration(milliseconds: 200),
+        reverseDuration: duration ?? const Duration(milliseconds: 200),
         child: builder(context, value, child),
+        switchInCurve: switchInCurve ?? Curves.linear,
+        switchOutCurve: switchOutCurve ?? Curves.linear,
       ),
     );
   }
