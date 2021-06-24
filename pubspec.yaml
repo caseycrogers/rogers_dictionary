@@ -27,8 +27,7 @@ dependencies:
   sqflite: ^2.0.0+3
 
 dev_dependencies:
-  df:
-    path: '../df'
+  df: ^0.4.0-nullsafety.0
   firedart: ^0.9.0+1
   # flutter pub run flutter_launcher_icons:main
   flutter_launcher_icons: ^0.9.0
