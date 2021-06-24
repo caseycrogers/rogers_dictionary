@@ -11,7 +11,6 @@ import 'package:rogers_dictionary/entry_database/database_constants.dart';
 import 'package:rogers_dictionary/entry_database/dictionary_database.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'entry_builders.dart';
@@ -44,13 +43,11 @@ class SqfliteDatabase extends DictionaryDatabase {
     TranslationMode translationMode, {
     required String searchString,
     required int startAfter,
-    required SearchSettingsModel searchOptions,
   }) =>
       _getEntries(
         translationMode,
         rawSearchString: searchString,
         startAfter: startAfter,
-        searchOptions: searchOptions,
         favoritesOnly: false,
       );
 
@@ -82,7 +79,6 @@ class SqfliteDatabase extends DictionaryDatabase {
         translationMode,
         rawSearchString: '',
         startAfter: startAfter,
-        searchOptions: SearchSettingsModel(SortOrder.alphabetical),
         favoritesOnly: true,
       );
 
@@ -158,17 +154,13 @@ class SqfliteDatabase extends DictionaryDatabase {
     TranslationMode translationMode, {
     required String rawSearchString,
     required int startAfter,
-    required SearchSettingsModel searchOptions,
     required bool favoritesOnly,
   }) async* {
     final Database db = await _dbFuture;
     int offset = startAfter;
-    String orderByClause;
     String searchString = rawSearchString;
     searchString = rawSearchString.withoutDiacriticalMarks;
-    switch (searchOptions.sortBy) {
-      case SortOrder.relevance:
-        orderByClause = '''
+    final String orderByClause = '''
   ${_relevancyScore(searchString, HEADWORD)},
   ${_relevancyScore(searchString, HEADWORD_ABBREVIATIONS)},
   ${_relevancyScore(searchString, ALTERNATE_HEADWORDS)},
@@ -178,11 +170,6 @@ class SqfliteDatabase extends DictionaryDatabase {
   ${_relevancyScore(searchString, ALTERNATE_HEADWORDS + WITHOUT_OPTIONALS)},
   ${_relevancyScore(searchString, IRREGULAR_INFLECTIONS + WITHOUT_OPTIONALS)},
   headword''';
-        break;
-      case SortOrder.alphabetical:
-        orderByClause = 'headword';
-        break;
-    }
     String whereClause = '''$IS_FAVORITE''';
     if (!favoritesOnly)
       whereClause = '''
