@@ -14,17 +14,17 @@ _CapMessage dialogues = _CapMessage('dialogues', 'diálogos');
 // Localization for EntryList.
 _CapMessage search = _CapMessage('search', 'buscar');
 _Message enterTextHint = _Message(
-    'Enter text above to search for a translation!',
-    '¡Ingrese el texto arriba para buscar una traducción!');
+    'Enter text above to search for a translation ',
+    '¡Ingrese el texto arriba para buscar una traducción ');
 _Message noFavoritesHint = _Message(
-    'No results! Try favoriting an entry first.',
-    '¡No hay resultados! Primero, intenta marcar una entrada como favorita.');
-_Message typosHint = _Message('No results! Check for typos.',
-    '¡No hay resultados! Compruebe si hay errores tipográficos.');
-_Message swipeLeft = _Message('Or swipe left for spanish mode.',
-    'O desliza el dedo hacia la izquierda para al modo español.');
-_Message swipeRight = _Message('Or swipe right for english mode.',
-    'O deslice hacia la derecha para al modo inglés.');
+    'No results! Try favoriting an entry first ',
+    '¡No hay resultados! Primero, intenta marcar una entrada como favorita ');
+_Message typosHint = _Message('No results! Check for typos ',
+    '¡No hay resultados! Compruebe si hay errores tipográficos ');
+_Message swipeLeft = _Message('or swipe left for spanish mode.',
+    'o desliza el dedo hacia la izquierda para al modo español.');
+_Message swipeRight = _Message('or swipe right for english mode.',
+    'o deslice hacia la derecha para al modo inglés.');
 
 // Localization for the help menu.
 _Message giveFeedback = _Message('give feedback', 'dar opinion');

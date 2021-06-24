@@ -7,7 +7,8 @@ import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
-import 'package:rogers_dictionary/widgets/search_page/entry_search.dart';
+
+import 'entry_list.dart';
 
 class SelectedEntrySwitcher extends StatelessWidget {
   @override
@@ -16,8 +17,8 @@ class SelectedEntrySwitcher extends StatelessWidget {
     return Provider<SearchPageModel>.value(
       value: searchPageModel,
       builder: (BuildContext context, _) {
-        return OrientationBuilder(builder: (context, orientation) {
-          switch (orientation) {
+        return LayoutBuilder(builder: (context, _) {
+          switch (MediaQuery.of(context).orientation) {
             case Orientation.portrait:
               return _PortraitPage(searchPageModel);
             case Orientation.landscape:
@@ -49,7 +50,7 @@ class _PortraitPage extends StatelessWidget {
       builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
           selectedEntry != null
               ? EntryView.asPage(context)
-              : const EntrySearch(),
+              : const EntryList(),
     );
   }
 }
@@ -63,7 +64,7 @@ class _LandscapePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Flexible(child: EntrySearch(), flex: 1),
+        const Flexible(child: EntryList(), flex: 1),
         Flexible(
           flex: 2,
           child: Row(
