@@ -10,7 +10,7 @@ import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notif
 class DictionaryTabBarView extends StatefulWidget {
   /// Creates a page view with one child per tab.
   ///
-  /// The length of [children] must be the same as the [controller]'s length.
+  /// The length of [children] must be the same as the [_controller]'s length.
   const DictionaryTabBarView({
     required this.children,
   });
@@ -102,11 +102,10 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     }());
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
-      reverseDuration: const Duration(milliseconds: 1000),
       transitionBuilder: _getTransition,
       child: _childrenWithKey[currentTab.value],
       switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: const Interval(0, 0.1),
+      switchOutCurve: _InstantOutCurve(),
     );
   }
 
@@ -125,4 +124,11 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
         ).animate(animation),
         child: child,
       );
+}
+
+class _InstantOutCurve extends Curve {
+  @override
+  double transform(double t) {
+    return 1;
+  }
 }

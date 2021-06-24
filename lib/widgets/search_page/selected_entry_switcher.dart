@@ -7,7 +7,8 @@ import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
-import 'package:rogers_dictionary/widgets/search_page/entry_search.dart';
+
+import 'entry_list.dart';
 
 class SelectedEntrySwitcher extends StatelessWidget {
   @override
@@ -15,14 +16,16 @@ class SelectedEntrySwitcher extends StatelessWidget {
     final SearchPageModel searchPageModel = _pageModel(context);
     return Provider<SearchPageModel>.value(
       value: searchPageModel,
-      builder: (BuildContext context, _) =>
-          AnimatedListenableSwitcher<SelectedEntry?>(
-        valueListenable: searchPageModel.currSelectedEntry,
-        builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
-            selectedEntry != null
-                ? EntryView.asPage(context)
-                : const EntrySearch(),
-      ),
+      builder: (BuildContext context, _) {
+        return LayoutBuilder(builder: (context, _) {
+          switch (MediaQuery.of(context).orientation) {
+            case Orientation.portrait:
+              return _PortraitPage(searchPageModel);
+            case Orientation.landscape:
+              return _LandscapePage(searchPageModel);
+          }
+        });
+      },
     );
   }
 
@@ -32,5 +35,53 @@ class SelectedEntrySwitcher extends StatelessWidget {
             DictionaryTab.search
         ? t.searchPageModel
         : t.favoritesPageModel;
+  }
+}
+
+class _PortraitPage extends StatelessWidget {
+  const _PortraitPage(this.searchPageModel, {Key? key}) : super(key: key);
+
+  final SearchPageModel searchPageModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedListenableSwitcher<SelectedEntry?>(
+      valueListenable: searchPageModel.currSelectedEntry,
+      builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
+          selectedEntry != null
+              ? EntryView.asPage(context)
+              : const EntryList(),
+    );
+  }
+}
+
+class _LandscapePage extends StatelessWidget {
+  const _LandscapePage(this.searchPageModel, {Key? key}) : super(key: key);
+
+  final SearchPageModel searchPageModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Flexible(child: EntryList(), flex: 1),
+        Flexible(
+          flex: 2,
+          child: Row(
+            children: [
+              const VerticalDivider(width: 1),
+              Expanded(
+                child: AnimatedListenableSwitcher<SelectedEntry?>(
+                  valueListenable: searchPageModel.currSelectedEntry,
+                  builder:
+                      (BuildContext context, SelectedEntry? selectedEntry, _) =>
+                          EntryView.asPage(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

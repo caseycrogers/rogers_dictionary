@@ -1,4 +1,5 @@
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
+import 'map_utils.dart';
 
 extension NotShittyString on String {
   static const diacritics =
@@ -28,4 +29,9 @@ extension NotShittyString on String {
   String? get emptyToNull => isNotEmpty ? this : null;
 
   List<String> get splitItalicized => MarkdownBase(this).strip(italics: true);
+
+  String get capitalizeFirst => split('')
+      .asMap()
+      .mapDown((i, c) => i == 0 ? c.toUpperCase() : c)
+      .join('');
 }

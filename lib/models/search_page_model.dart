@@ -13,7 +13,13 @@ class SearchPageModel {
     required this.translationMode,
     required this.currSelectedEntry,
     required this.entrySearchModel,
-  });
+  }) {
+    _currSearchString.addListener(() {
+      if (_currSearchString.value.isNotEmpty) {
+        currSelectedEntry.value = null;
+      }
+    });
+  }
 
   SearchPageModel.empty({
     required BuildContext context,
@@ -25,8 +31,11 @@ class SearchPageModel {
             modalRoute: ModalRoute.of(context)!,
             initialValue: null,
           ),
-          entrySearchModel:
-              EntrySearchModel.empty(translationMode, isFavoritesOnly),
+          entrySearchModel: EntrySearchModel.empty(
+            _currSearchString,
+            translationMode,
+            isFavoritesOnly,
+          ),
         );
 
   // Translation mode state.
@@ -37,6 +46,8 @@ class SearchPageModel {
 
   // Entry search state
   final EntrySearchModel entrySearchModel;
+
+  static final ValueNotifier<String> _currSearchString = ValueNotifier('');
 
   bool get isEnglish => translationMode == TranslationMode.English;
 

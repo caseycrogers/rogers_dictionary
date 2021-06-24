@@ -16,7 +16,7 @@ class TranslationPageModel {
   TranslationPageModel._({
     required BuildContext context,
     required this.translationMode,
-  })   : searchPageModel = SearchPageModel.empty(
+  })  : searchPageModel = SearchPageModel.empty(
           context: context,
           translationMode: translationMode,
           isFavoritesOnly: false,
@@ -25,7 +25,8 @@ class TranslationPageModel {
           context: context,
           translationMode: translationMode,
           isFavoritesOnly: true,
-        ) {
+        ),
+        layerLink = LayerLink() {
     TranslationPageModel._dialoguesPageModel ??=
         DialoguesPageModel.empty(context);
   }
@@ -40,6 +41,8 @@ class TranslationPageModel {
   final SearchPageModel searchPageModel;
 
   final SearchPageModel favoritesPageModel;
+
+  final LayerLink layerLink;
 
   static DialoguesPageModel? _dialoguesPageModel;
 

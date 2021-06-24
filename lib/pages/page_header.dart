@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 
 class PageHeader extends StatelessWidget {
   const PageHeader({
@@ -24,9 +25,17 @@ class PageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: EdgeInsets.only(left: padding, right: padding),
-          child: header,
+        Material(
+          color: Theme.of(context).cardColor,
+          child: Padding(
+            padding: EdgeInsets.only(right: padding),
+            child: Row(
+              children: [
+                ClosePage(onClose: onClose),
+                Expanded(child: header),
+              ],
+            ),
+          ),
         ),
         if (divider) Divider(indent: padding, endIndent: padding, height: 0),
         if (scrollable)

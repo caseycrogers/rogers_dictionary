@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/pages/page_header.dart';
 import 'package:rogers_dictionary/util/constants.dart';
@@ -18,8 +19,8 @@ class AboutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      child: const Text(
-        'about this app',
+      child: Text(
+        i18n.aboutThisApp.get(context),
         style: kButtonTextStyle,
       ),
       onPressed: () {
@@ -41,7 +42,6 @@ class AboutButton extends StatelessWidget {
                             icon: Icon(
                               Icons.close,
                               color: Theme.of(context).accentIconTheme.color,
-                              size: headline1(context).fontSize,
                             ),
                             onPressed: Navigator.of(overlayContext).pop,
                           ),

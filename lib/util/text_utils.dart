@@ -246,7 +246,7 @@ Widget translationLine(
   Translation translation,
   int i,
 ) {
-  final List<Widget> spans =
+  final List<Widget> wraps =
       OverflowMarkdown(translation.content).forWrap(context);
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,41 +254,35 @@ Widget translationLine(
       normal1Text(context, '${i.toString()}. '),
       Expanded(
         child: Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.start,
           children: [
-            ...spans.expand((t) {
-              if (translation.oppositeHeadword.isNotEmpty) {
-                return [
-                  t,
-                  if (t == spans.last)
-                    const Padding(
-                      padding: EdgeInsets.only(left: 4),
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 5),
-                        child: Icon(
-                          Icons.open_in_new,
-                          color: Colors.grey,
-                          size: 20,
-                        ),
+            ...wraps.map((t) {
+              if (t == wraps.last && translation.oppositeHeadword.isNotEmpty) {
+                return Container(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      t,
+                      IconButton(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        onPressed: () {
+                          DictionaryPageModel.readFrom(context)
+                              .onOppositeHeadwordSelected(
+                            context,
+                            EntryUtils.urlEncode(
+                                translation.getOppositeHeadword),
+                          );
+                        },
+                        icon: const Icon(Icons.open_in_new, color: Colors.grey),
+                        visualDensity: VisualDensity.compact,
                       ),
-                    ),
-                ];
+                    ],
+                  ),
+                );
               }
-              return [t];
-            }).map(
-              (t) => translation.oppositeHeadword.isNotEmpty
-                  ? GestureDetector(
-                      child: t,
-                      onTap: () {
-                        DictionaryPageModel.readFrom(context)
-                            .onOppositeHeadwordSelected(
-                          context,
-                          EntryUtils.urlEncode(translation.getOppositeHeadword),
-                        );
-                      },
-                    )
-                  : t,
-            ),
+              return t;
+            }),
             if (translation.genderAndPlural.isNotEmpty)
               OverflowMarkdown(' *${translation.genderAndPlural}*'),
             if (translation.abbreviation.isNotEmpty) ...[
@@ -379,34 +373,32 @@ Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
 
 Widget headwordLine(
     BuildContext context, Entry entry, bool preview, String searchString) {
+  final List<Widget> wraps = [
+    ...highlightedText(context, entry.headword.headwordText, preview,
+        searchString: searchString, isHeadword: true),
+    if (entry.headword.abbreviation.isNotEmpty) headline1Text(context, ' '),
+    if (entry.headword.abbreviation.isNotEmpty)
+      ...highlightedText(context, '(${entry.headword.abbreviation})', preview,
+          searchString: searchString, isHeadword: true, forWrap: false),
+    ...parentheticalTexts(
+      context,
+      entry.headword.parentheticalQualifier,
+      true,
+    ),
+  ];
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Row(
+      Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          FavoritesButton(entry: entry),
-          Expanded(
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                ...highlightedText(
-                    context, entry.headword.headwordText, preview,
-                    searchString: searchString, isHeadword: true),
-                if (entry.headword.abbreviation.isNotEmpty)
-                  headline1Text(context, ' '),
-                if (entry.headword.abbreviation.isNotEmpty)
-                  ...highlightedText(
-                      context, '(${entry.headword.abbreviation})', preview,
-                      searchString: searchString,
-                      isHeadword: true,
-                      forWrap: false),
-                ...parentheticalTexts(
-                  context,
-                  entry.headword.parentheticalQualifier,
-                  true,
-                ),
-              ],
-            ),
+          ...wraps.getRange(0, wraps.length - 1),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              wraps[wraps.length - 1],
+              FavoritesButton(entry: entry),
+            ],
           ),
         ],
       ),

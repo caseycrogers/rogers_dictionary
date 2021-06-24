@@ -50,3 +50,4 @@ const String SPANISH_CONTENT = 'spanish_content';
 
 // Misc.
 const String WITHOUT_OPTIONALS = '_without_optionals';
+const String OPPOSITE_HEADWORD_SENTINEL = '1';
