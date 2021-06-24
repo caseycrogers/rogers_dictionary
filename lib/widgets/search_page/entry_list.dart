@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
@@ -20,36 +19,52 @@ import 'package:rogers_dictionary/widgets/loading_text.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 
 class EntryList extends StatelessWidget {
+  const EntryList();
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: SearchPageModel.of(context).entrySearchModel,
-      builder: (context, _) {
+    return ValueListenableBuilder<String>(
+      valueListenable:
+      SearchPageModel
+          .of(context)
+          .entrySearchModel
+          .currSearchString,
+      builder: (context, _, __) {
         final EntrySearchModel entrySearchModel =
-            context.watch<EntrySearchModel>();
+            SearchPageModel
+                .of(context)
+                .entrySearchModel;
         if (entrySearchModel.isEmpty &&
-            DictionaryPageModel.of(context).currentTab.value ==
+            DictionaryPageModel
+                .of(context)
+                .currentTab
+                .value ==
                 DictionaryTab.search) {
           return _noResultsWidget(i18n.enterTextHint.get(context), context);
         }
         return AsyncListView<Entry>(
           // Maintains scroll state
           key: PageStorageKey('entry_list-tab'
-              '${DictionaryPageModel.of(context).currentTab.value.index}'),
+              '${DictionaryPageModel
+              .of(context)
+              .currentTab
+              .value
+              .index}'),
           padding: EdgeInsets.zero,
-          noResultsWidgetBuilder: (context) => _noResultsWidget(
-              entrySearchModel.favoritesOnly
-                  ? i18n.noFavoritesHint.get(context)
-                  : i18n.typosHint.get(context),
-              context),
+          noResultsWidgetBuilder: (context) =>
+              _noResultsWidget(
+                  entrySearchModel.favoritesOnly
+                      ? i18n.noFavoritesHint.get(context)
+                      : i18n.typosHint.get(context),
+                  context),
           initialData: entrySearchModel.entries,
           stream: entrySearchModel.entryStream,
           loadingWidget: Delayed(
             delay: const Duration(milliseconds: 100),
             initialChild: Container(),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: const LoadingText(),
+            child: const Padding(
+              padding: EdgeInsets.all(16),
+              child: LoadingText(),
             ),
           ),
           itemBuilder: _buildRow,
@@ -59,11 +74,9 @@ class EntryList extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(
-    BuildContext context,
-    AsyncSnapshot<List<Entry>> snapshot,
-    int index,
-  ) {
+  Widget _buildRow(BuildContext context,
+      AsyncSnapshot<List<Entry>> snapshot,
+      int index,) {
     final dictionaryModel = DictionaryPageModel.readFrom(context);
     final SearchPageModel searchPageModel = SearchPageModel.readFrom(context);
     return ValueListenableBuilder<SelectedEntry?>(
@@ -79,14 +92,18 @@ class EntryList extends StatelessWidget {
         final bool isSelected = entry.headword.urlEncodedHeadword ==
             selectedEntry?.urlEncodedHeadword;
         final bool shouldHighlight =
-            MediaQuery.of(context).orientation == Orientation.landscape &&
+            MediaQuery
+                .of(context)
+                .orientation == Orientation.landscape &&
                 isSelected;
         return Column(
           children: [
             InkWell(
                 child: Material(
                   color: shouldHighlight
-                      ? Theme.of(context).selectedRowColor
+                      ? Theme
+                      .of(context)
+                      .selectedRowColor
                       : Colors.transparent,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -105,8 +122,8 @@ class EntryList extends StatelessWidget {
                 onTap: isSelected
                     ? null
                     : () {
-                        dictionaryModel.onEntrySelected(context, entry);
-                      }),
+                  dictionaryModel.onEntrySelected(context, entry);
+                }),
             if (index < snapshot.data!.length - 1)
               const Divider(
                 thickness: 1,
@@ -120,26 +137,19 @@ class EntryList extends StatelessWidget {
 
   Widget _noResultsWidget(String text, BuildContext context) {
     final TranslationPageModel pageModel = TranslationPageModel.of(context);
+    final String swipeText = pageModel.isEnglish
+        ? i18n.swipeLeft.get(context)
+        : i18n.swipeRight.get(context);
     return ListView(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
           child: Text(
-            '\n$text\n',
+            '\n\n$text$swipeText',
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.grey,
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
-          child: Text(
-            pageModel.isEnglish
-                ? i18n.swipeLeft.get(context)
-                : i18n.swipeRight.get(context),
-            style: const TextStyle(color: Colors.grey),
-            textAlign: TextAlign.center,
           ),
         ),
         const Icon(Icons.swipe, color: Colors.grey),

@@ -1,38 +1,44 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/search_settings_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
-class EntrySearchModel with ChangeNotifier {
-  EntrySearchModel._(this._translationMode,
-      this._searchSettingsModel, this._favoritesOnly) {
+class EntrySearchModel {
+  EntrySearchModel._(
+    this.currSearchString,
+    this._translationMode,
+    this._favoritesOnly,
+  ) {
     _initializeStream();
+    currSearchString.addListener(() {
+      _initializeStream();
+    });
   }
 
-  EntrySearchModel.empty(TranslationMode translationMode, bool favoritesOnly)
-      : this._(translationMode, SearchSettingsModel.empty(), favoritesOnly);
+  EntrySearchModel.empty(
+    ValueNotifier<String> currSearchString,
+    TranslationMode translationMode,
+    bool favoritesOnly,
+  ) : this._(currSearchString, translationMode, favoritesOnly);
 
   final TranslationMode _translationMode;
-  static String _searchString = '';
-  SearchSettingsModel _searchSettingsModel;
+  final ValueNotifier<String> currSearchString;
   late Stream<Entry> _entryStream;
   LinkedHashSet<Entry> _entries = LinkedHashSet();
   final bool _favoritesOnly;
 
-  String get searchString => _searchString;
-
-  SearchSettingsModel get searchSettingsModel => _searchSettingsModel;
+  String get searchString => currSearchString.value;
 
   Stream<Entry> get entryStream => _entryStream;
 
   List<Entry> get entries => _entries.toList();
 
-  bool get isEmpty => _searchString.isEmpty;
+  bool get isEmpty => currSearchString.value.isEmpty;
 
   bool get favoritesOnly => _favoritesOnly;
 
@@ -52,7 +58,6 @@ class EntrySearchModel with ChangeNotifier {
         _translationMode,
         searchString: searchString,
         startAfter: 0,
-        searchOptions: searchSettingsModel,
       );
     }
     _entryStream = stream
@@ -72,15 +77,7 @@ class EntrySearchModel with ChangeNotifier {
 
   void onSearchStringChanged({
     String? newSearchString,
-    SearchSettingsModel? newSearchSettings,
   }) {
-    // Do nothing if nothing has changed
-    if ((newSearchString ?? _searchString) == _searchString &&
-        (newSearchSettings ?? _searchSettingsModel) == _searchSettingsModel)
-      return;
-    _searchString = newSearchString ?? _searchString;
-    _searchSettingsModel = newSearchSettings ?? _searchSettingsModel;
-    _initializeStream();
-    notifyListeners();
+    currSearchString.value = newSearchString ?? currSearchString.value;
   }
 }

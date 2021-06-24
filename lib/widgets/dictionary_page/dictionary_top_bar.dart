@@ -22,7 +22,6 @@ class DictionaryTopBar extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: const [
               TranslationModeSelector(),
               Spacer(),

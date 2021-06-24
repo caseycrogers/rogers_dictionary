@@ -7,9 +7,11 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
 class TranslationModeSwitcher extends StatefulWidget {
-  const TranslationModeSwitcher({required this.child});
+  const TranslationModeSwitcher({required this.child, this.header});
 
   final Widget child;
+
+  final Widget? header;
 
   @override
   _TranslationModeSwitcherState createState() =>
@@ -27,6 +29,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
       _controller = PageController(
         initialPage:
             translationModeToIndex(dictionaryModel.currTranslationMode),
+
       );
       _controller!.addListener(() {
         dictionaryModel.pageOffset.value = _controller!.page!;
@@ -54,7 +57,12 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
   Widget build(BuildContext context) {
     return Material(
       color: Theme.of(context).cardColor,
-      child: pages(context),
+      child: Column(
+        children: [
+          if (widget.header != null) widget.header!,
+          Expanded(child: pages(context)),
+        ],
+      ),
       elevation: kHighElevation,
     );
   }

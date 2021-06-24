@@ -26,7 +26,7 @@ class DictionaryPageModel {
     this.currentTab,
     this.translationPageModel,
     this.spanishPageModel,
-  )   : englishPageModel = translationPageModel.value;
+  ) : englishPageModel = translationPageModel.value;
 
   DictionaryPageModel.empty(BuildContext context)
       : this._(
@@ -86,10 +86,15 @@ class DictionaryPageModel {
         newEntry: newEntry,
       );
 
-  void onHeadwordSelected(BuildContext context, String newUrlEncodedHeadword) =>
+  void onHeadwordSelected(
+    BuildContext context,
+    String newUrlEncodedHeadword, {
+    SearchPageModel? pageModel,
+  }) =>
       _onHeadwordSelected(
         context,
         newUrlEncodedHeadword: newUrlEncodedHeadword,
+        pageModel: pageModel,
       );
 
   void onOppositeHeadwordSelected(
@@ -115,9 +120,10 @@ class DictionaryPageModel {
     BuildContext context, {
     required String newUrlEncodedHeadword,
     Entry? newEntry,
+    SearchPageModel? pageModel,
     bool updateStack = true,
   }) {
-    final SearchPageModel pageModel = isFavoritesOnly
+    pageModel ??= isFavoritesOnly
         ? _currModel.favoritesPageModel
         : _currModel.searchPageModel;
     // Only update if the value has actually changed

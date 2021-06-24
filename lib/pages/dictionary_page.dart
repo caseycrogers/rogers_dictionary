@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
@@ -11,7 +12,7 @@ import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar_delagate.dart';
 import 'favorites_page.dart';
 import 'search_page.dart';
 
@@ -35,76 +36,71 @@ class _DictionaryPageState extends State<DictionaryPage> {
   final ScrollController _controller = ScrollController();
 
   bool _isDriving = false;
-  bool _expanded = true;
+  ScrollDirection _lastDirection = ScrollDirection.forward;
 
   @override
   Widget build(BuildContext context) {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
-    return Scaffold(
-      body: ValueListenableBuilder<TranslationPageModel>(
-        valueListenable: dictionaryModel.translationPageModel,
-        child: DictionaryTabBarView(
-          children: LinkedHashMap.from(<DictionaryTab, Widget>{
-            DictionaryTab.search: SearchPage(),
-            DictionaryTab.favorites: FavoritesPage(),
-            DictionaryTab.dialogues: DialoguesPage(),
-          }),
-        ),
-        builder: (context, translationPageModel, tabBarView) => Material(
-          color: primaryColor(translationPageModel.translationMode),
-          child: SafeArea(
-            child: NotificationListener<ScrollEndNotification>(
-              onNotification: _onScrollEnd,
-              child: NestedScrollView(
-                controller: _controller,
-                headerSliverBuilder: (context, _) => [
-                  const SliverAppBar(
-                    backgroundColor: Colors.transparent,
-                    title: DictionaryTopBar(),
-                    automaticallyImplyLeading: false,
-                    elevation: kHighElevation,
+    return ValueListenableBuilder<TranslationPageModel>(
+      valueListenable: dictionaryModel.translationPageModel,
+      child: DictionaryTabBarView(
+        children: LinkedHashMap.from(<DictionaryTab, Widget>{
+          DictionaryTab.search: SearchPage(),
+          DictionaryTab.favorites: FavoritesPage(),
+          DictionaryTab.dialogues: DialoguesPage(),
+        }),
+      ),
+      builder: (context, translationPageModel, tabBarView) => Material(
+        color: primaryColor(translationPageModel.translationMode),
+        child: SafeArea(
+          child: NotificationListener<ScrollNotification>(
+            onNotification: _onScrollEnd,
+            child: NestedScrollView(
+              controller: _controller,
+              headerSliverBuilder: (context, _) => [
+                const SliverPersistentHeader(
+                  delegate: DictionaryTopBarDelegate(),
+                ),
+              ],
+              body: Column(
+                children: [
+                  Expanded(
+                    child: tabBarView!,
                   ),
-                ],
-                body: Column(
-                  children: [
-                    Expanded(
-                      child: tabBarView!,
-                    ),
-                    Material(
-                      color: primaryColor(translationPageModel.translationMode),
-                      child: Center(
-                        child: TabBar(
-                          labelPadding: const EdgeInsets.all(kPad)
-                              .add(const EdgeInsets.only(bottom: kPad)),
-                          indicatorPadding:
-                              const EdgeInsets.only(bottom: 2 * kPad - 4),
-                          tabs: [
-                            DictionaryTabEntry(
-                                selected: Text(i18n.dictionary.cap.get(context),
-                                    style: const TextStyle(fontSize: 24)),
-                                index: 0),
-                            DictionaryTabEntry(
-                                selected: Text(i18n.favorites.cap.get(context),
-                                    style: const TextStyle(fontSize: 24)),
-                                index: 1),
-                            DictionaryTabEntry(
-                                selected: Text(i18n.dialogues.cap.get(context),
-                                    style: const TextStyle(fontSize: 24)),
-                                index: 2),
-                          ],
-                          isScrollable: true,
-                          indicator: const UnderlineTabIndicator(
-                            borderSide: BorderSide(
-                              color: Colors.white,
-                              width: 3,
-                            ),
-                            insets: EdgeInsets.symmetric(horizontal: 8),
+                  Material(
+                    color: primaryColor(translationPageModel.translationMode),
+                    child: Center(
+                      child: TabBar(
+                        labelPadding: const EdgeInsets.all(kPad)
+                            .add(const EdgeInsets.only(bottom: kPad)),
+                        indicatorPadding:
+                            const EdgeInsets.only(bottom: 2 * kPad - 4),
+                        tabs: [
+                          DictionaryTabEntry(
+                              selected: Text(i18n.dictionary.cap.get(context),
+                                  style: const TextStyle(fontSize: 24)),
+                              index: 0),
+                          DictionaryTabEntry(
+                              selected: Text(i18n.favorites.cap.get(context),
+                                  style: const TextStyle(fontSize: 24)),
+                              index: 1),
+                          DictionaryTabEntry(
+                              selected: Text(i18n.dialogues.cap.get(context),
+                                  style: const TextStyle(fontSize: 24)),
+                              index: 2),
+                        ],
+                        isScrollable: true,
+                        indicator: const UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                            color: Colors.white,
+                            width: 3,
                           ),
+                          insets: EdgeInsets.symmetric(horizontal: 8),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -113,8 +109,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
     );
   }
 
-  bool _onScrollEnd(ScrollEndNotification notification) {
+  bool _onScrollEnd(ScrollNotification notification) {
     if (notification.depth != 0 || notification.metrics.atEdge || _isDriving) {
+      return false;
+    }
+    if (!(notification is ScrollEndNotification)) {
+      if (_controller.position.userScrollDirection != ScrollDirection.idle) {
+        _lastDirection = _controller.position.userScrollDirection;
+      }
       return false;
     }
     _isDriving = true;
@@ -122,7 +124,9 @@ class _DictionaryPageState extends State<DictionaryPage> {
     Future<void>.delayed(Duration.zero).then(
       (_) => _controller
           .animateTo(
-        _expanded ? metrics.minScrollExtent : metrics.maxScrollExtent,
+        _lastDirection == ScrollDirection.forward
+            ? metrics.minScrollExtent
+            : metrics.maxScrollExtent,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
       )
@@ -130,7 +134,6 @@ class _DictionaryPageState extends State<DictionaryPage> {
         return _isDriving = false;
       }),
     );
-    _expanded = !_expanded;
-    return true;
+    return false;
   }
 }
