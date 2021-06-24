@@ -22,7 +22,6 @@ Route<dynamic> _servePage(RouteSettings settings, Uri uri, Widget page) {
       return Provider<DictionaryPageModel>(
         create: (_) => DictionaryPageModel.empty(context),
         builder: (BuildContext context, _) {
-          DictionaryPageModel.of(context).listenOnPageChanges(context);
           return page;
         },
       );
