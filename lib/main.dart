@@ -52,45 +52,53 @@ class MyApp extends StatelessWidget {
         ],
         feedbackBuilder: (BuildContext context, OnSubmit onSubmit) =>
             GetDictionaryFeedback(onSubmit),
-        child: MaterialApp(
-          title: 'Dictionary',
-          onGenerateRoute: PageRouter.generateRoute,
-          initialRoute: '#/${SearchPage.route}',
-          theme: ThemeData(
-            selectedRowColor: Colors.grey.shade200,
-            textTheme: TextTheme(
-              headline1: GoogleFonts.openSans(
-                  fontSize: 36,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold),
-              headline2: GoogleFonts.openSans(
-                  color: Colors.black,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold),
-              bodyText1: GoogleFonts.openSans(
-                  fontSize: 24, fontWeight: FontWeight.normal),
-              bodyText2: GoogleFonts.openSans(
-                  fontSize: 20, fontWeight: FontWeight.normal),
+        child: GestureDetector(
+          onTap: () {
+            final FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: MaterialApp(
+            title: 'Dictionary',
+            onGenerateRoute: PageRouter.generateRoute,
+            initialRoute: '#/${SearchPage.route}',
+            theme: ThemeData(
+              selectedRowColor: Colors.grey.shade200,
+              textTheme: TextTheme(
+                headline1: GoogleFonts.openSans(
+                    fontSize: 36,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+                headline2: GoogleFonts.openSans(
+                    color: Colors.black,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold),
+                bodyText1: GoogleFonts.openSans(
+                    fontSize: 24, fontWeight: FontWeight.normal),
+                bodyText2: GoogleFonts.openSans(
+                    fontSize: 20, fontWeight: FontWeight.normal),
+              ),
+              iconTheme: const IconThemeData(
+                color: Colors.white,
+                size: 28,
+              ),
+              accentIconTheme: const IconThemeData(
+                size: 28,
+                color: Colors.black38,
+              ),
+              backgroundColor: Colors.white,
             ),
-            iconTheme: const IconThemeData(
-              color: Colors.white,
-              size: 28,
-            ),
-            accentIconTheme: const IconThemeData(
-              size: 28,
-              color: Colors.black38,
-            ),
-            backgroundColor: Colors.white,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''),
+              Locale('es', ''),
+            ],
           ),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''),
-            Locale('es', ''),
-          ],
         ),
       ),
     );

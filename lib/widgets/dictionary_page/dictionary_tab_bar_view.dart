@@ -116,19 +116,23 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     setState(() {});
   }
 
-  Widget _getTransition(Widget child, Animation<double> animation) =>
-      SlideTransition(
+  Widget _getTransition(Widget child, Animation<double> animation) {
+    return SlideTransition(
         position: Tween<Offset>(
           begin: const Offset(0, 1),
           end: Offset.zero,
         ).animate(animation),
         child: child,
       );
+  }
 }
 
 class _InstantOutCurve extends Curve {
   @override
   double transform(double t) {
+    if (t == 0.0) {
+      return 0;
+    }
     return 1;
   }
 }

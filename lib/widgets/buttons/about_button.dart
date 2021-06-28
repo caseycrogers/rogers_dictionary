@@ -27,64 +27,62 @@ class AboutButton extends StatelessWidget {
         onPressed();
         showDialog<void>(
             context: context,
-            builder: (overlayContext) {
-              return Container(
-                margin: const EdgeInsets.all(2 * kPad),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(2 * kPad),
-                  child: Material(
-                    color: Theme.of(context).cardColor,
-                    child: PageHeader(
-                      header: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.close,
-                              color: Theme.of(context).accentIconTheme.color,
-                            ),
-                            onPressed: Navigator.of(overlayContext).pop,
-                          ),
-                          Expanded(child: headline1Text(context, 'About')),
-                        ],
-                      ),
-                      onClose: () {
-                        Navigator.of(overlayContext).pop();
-                      },
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Hi,\nMy name is Dr. Glenn Rogers!',
-                            textAlign: TextAlign.center,
-                          ),
-                          Container(
-                            height: 240,
-                            width: 240,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage(
-                                  join('assets', 'images', 'glenn.jpg'),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const Text(
-                            'This is my dictionary. It\'s super cool. I hope '
-                            'you like it. And if you don\'t, well then fuck '
-                            'off!',
-                            textAlign: TextAlign.center,
-                          ),
-                          const Divider(),
-                          const _DebugInfo(),
-                        ],
+            builder: (overlayContext) =>_AboutPage(() {
+                Navigator.of(overlayContext).pop();
+            }),
+        );
+      },
+    );
+  }
+}
+
+class _AboutPage extends StatelessWidget {
+  const _AboutPage(this.onClose);
+
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(2 * kPad),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2 * kPad),
+        child: Material(
+          color: Theme.of(context).cardColor,
+          child: PageHeader(
+            header: headline1Text(context, 'About'),
+            onClose: onClose,
+            child: Column(
+              children: [
+                const Text(
+                  'Hi,\nMy name is Dr. Glenn Rogers!',
+                  textAlign: TextAlign.center,
+                ),
+                Container(
+                  height: 240,
+                  width: 240,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage(
+                        join('assets', 'images', 'glenn.jpg'),
                       ),
                     ),
                   ),
                 ),
-              );
-            });
-      },
+                const Text(
+                  'This is my dictionary. It\'s super cool. I hope '
+                      'you like it. And if you don\'t, well then fuck '
+                      'off!',
+                  textAlign: TextAlign.center,
+                ),
+                const Divider(),
+                const _DebugInfo(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

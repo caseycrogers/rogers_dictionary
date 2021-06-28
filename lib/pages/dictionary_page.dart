@@ -12,7 +12,7 @@ import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
-import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar_delagate.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
 import 'favorites_page.dart';
 import 'search_page.dart';
 
@@ -23,6 +23,8 @@ enum DictionaryTab {
   about,
   settings,
 }
+
+const String _kAppBar = 'appBar';
 
 String dictionaryTabName(DictionaryTab dictionaryTab) =>
     dictionaryTab.toString().split('.').last;
@@ -53,54 +55,60 @@ class _DictionaryPageState extends State<DictionaryPage> {
       builder: (context, translationPageModel, tabBarView) => Material(
         color: primaryColor(translationPageModel.translationMode),
         child: SafeArea(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: _onScrollEnd,
-            child: NestedScrollView(
-              controller: _controller,
-              headerSliverBuilder: (context, _) => [
-                const SliverPersistentHeader(
-                  delegate: DictionaryTopBarDelegate(),
-                ),
-              ],
-              body: Column(
-                children: [
-                  Expanded(
-                    child: tabBarView!,
+          child: Scaffold(
+            body: NotificationListener<ScrollNotification>(
+              onNotification: _onScroll,
+              child: NestedScrollView(
+                controller: _controller,
+                headerSliverBuilder: (context, value) => [
+                  SliverAppBar(
+                    key: const ValueKey(_kAppBar),
+                    titleSpacing: 0,
+                    title: const DictionaryTopBar(),
+                    backgroundColor:
+                        primaryColor(translationPageModel.translationMode),
                   ),
-                  Material(
-                    color: primaryColor(translationPageModel.translationMode),
-                    child: Center(
-                      child: TabBar(
-                        labelPadding: const EdgeInsets.all(kPad)
-                            .add(const EdgeInsets.only(bottom: kPad)),
-                        indicatorPadding:
-                            const EdgeInsets.only(bottom: 2 * kPad - 4),
-                        tabs: [
-                          DictionaryTabEntry(
-                              selected: Text(i18n.dictionary.cap.get(context),
-                                  style: const TextStyle(fontSize: 24)),
-                              index: 0),
-                          DictionaryTabEntry(
-                              selected: Text(i18n.favorites.cap.get(context),
-                                  style: const TextStyle(fontSize: 24)),
-                              index: 1),
-                          DictionaryTabEntry(
-                              selected: Text(i18n.dialogues.cap.get(context),
-                                  style: const TextStyle(fontSize: 24)),
-                              index: 2),
-                        ],
-                        isScrollable: true,
-                        indicator: const UnderlineTabIndicator(
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width: 3,
+                ],
+                body: Column(
+                  children: [
+                    Expanded(
+                      child: tabBarView!,
+                    ),
+                    Material(
+                      color: primaryColor(translationPageModel.translationMode),
+                      child: Center(
+                        child: TabBar(
+                          labelPadding: const EdgeInsets.all(kPad)
+                              .add(const EdgeInsets.only(bottom: kPad)),
+                          indicatorPadding:
+                              const EdgeInsets.only(bottom: 2 * kPad - 4),
+                          tabs: [
+                            DictionaryTabEntry(
+                                selected: Text(i18n.dictionary.cap.get(context),
+                                    style: const TextStyle(fontSize: 24)),
+                                index: 0),
+                            DictionaryTabEntry(
+                                selected: Text(i18n.favorites.cap.get(context),
+                                    style: const TextStyle(fontSize: 24)),
+                                index: 1),
+                            DictionaryTabEntry(
+                                selected: Text(i18n.dialogues.cap.get(context),
+                                    style: const TextStyle(fontSize: 24)),
+                                index: 2),
+                          ],
+                          isScrollable: true,
+                          indicator: const UnderlineTabIndicator(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                              width: 3,
+                            ),
+                            insets: EdgeInsets.symmetric(horizontal: 8),
                           ),
-                          insets: EdgeInsets.symmetric(horizontal: 8),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -109,14 +117,18 @@ class _DictionaryPageState extends State<DictionaryPage> {
     );
   }
 
-  bool _onScrollEnd(ScrollNotification notification) {
-    if (notification.depth != 0 || notification.metrics.atEdge || _isDriving) {
-      return false;
+  bool _onScroll(ScrollNotification notification) {
+    final FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      //currentFocus.unfocus();
     }
     if (!(notification is ScrollEndNotification)) {
       if (_controller.position.userScrollDirection != ScrollDirection.idle) {
         _lastDirection = _controller.position.userScrollDirection;
       }
+      return false;
+    }
+    if (notification.depth != 0 || notification.metrics.atEdge || _isDriving) {
       return false;
     }
     _isDriving = true;

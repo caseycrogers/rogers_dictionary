@@ -130,6 +130,10 @@ class DictionaryPageModel {
     if (newUrlEncodedHeadword == pageModel.currSelectedHeadword) {
       return;
     }
+    final FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
     if (newUrlEncodedHeadword.isEmpty) {
       if (updateStack) {
         return pageModel.currSelectedEntry.value = null;
