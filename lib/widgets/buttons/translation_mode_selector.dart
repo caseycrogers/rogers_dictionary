@@ -11,45 +11,74 @@ import 'package:rogers_dictionary/models/translation_page_model.dart';
 class TranslationModeSelector extends StatelessWidget {
   const TranslationModeSelector({Key? key}) : super(key: key);
 
-  static const _englishKey = ValueKey('spanishButton');
-  static const _spanishKey = ValueKey('englishButton');
+  static final GlobalKey _englishKey = GlobalKey();
+  static final GlobalKey _spanishKey = GlobalKey();
+
+  RenderBox _getBox(TranslationMode mode) {
+    if (mode == TranslationMode.English) {
+      return _englishKey.currentContext!.findRenderObject() as RenderBox;
+    }
+    return _spanishKey.currentContext!.findRenderObject() as RenderBox;
+  }
 
   @override
   Widget build(BuildContext context) {
     final DictionaryPageModel pageModel = DictionaryPageModel.of(context);
+    final BoxDecoration decoration = BoxDecoration(
+      color: Colors.black38,
+      borderRadius: BorderRadius.circular(4),
+    );
     return ValueListenableBuilder<double>(
       valueListenable: pageModel.pageOffset,
-      builder: (context, pageOffset, _) =>
-          Container(
-            height: _Button._buttonHeight,
-            child: Stack(
-              children: [
-                AnimatedPositioned(
-                  left: lerpDouble(
-                    0,
-                    100 + _Button._buttonSpacing,
+      builder: (context, pageOffset, _) => Container(
+        height: _Button._buttonHeight,
+        child: Stack(
+          children: [
+            if (pageOffset % 1 != 0)
+              AnimatedPositioned(
+                left: lerpDouble(
+                  0,
+                  _getBox(TranslationMode.Spanish)
+                      .localToGlobal(
+                        Offset.zero,
+                        ancestor: context.findRenderObject() as RenderBox,
+                      )
+                      .dx,
+                  pageOffset,
+                )!,
+                child: Container(
+                  width: lerpDouble(
+                    _getBox(TranslationMode.English).size.width,
+                    _getBox(TranslationMode.Spanish).size.width,
                     pageOffset,
                   )!,
-                  child: Container(
-                    width: 100,
-                    height: _Button._buttonHeight,
-                    decoration: BoxDecoration(
-                      color: Colors.black38,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  duration: const Duration(milliseconds: 100),
+                  height: _Button._buttonHeight,
+                  decoration: decoration,
                 ),
-                Row(
-                  children: const [
-                    _Button(TranslationMode.English, key: _englishKey),
-                    SizedBox(width: _Button._buttonSpacing),
-                    _Button(TranslationMode.Spanish, key: _spanishKey),
-                  ],
+                duration: const Duration(milliseconds: 100),
+              ),
+            Row(
+              children: [
+                Container(
+                  decoration: pageOffset == 0 ? decoration : null,
+                  child: _Button(
+                    TranslationMode.English,
+                    key: _englishKey,
+                  ),
+                ),
+                const SizedBox(width: _Button._buttonSpacing),
+                Container(
+                  decoration: pageOffset == 1 ? decoration : null,
+                  child: _Button(
+                    TranslationMode.Spanish,
+                    key: _spanishKey,
+                  ),
                 ),
               ],
             ),
-          ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -83,14 +112,10 @@ class _Button extends StatelessWidget {
             mode == TranslationMode.English
                 ? i18n.english.cap.get(context)
                 : i18n.spanish.cap.get(context),
-            style: Theme
-                .of(context)
-                .textTheme
-                .headline1!
-                .copyWith(
-              color: Colors.white,
-              fontSize: 24,
-            ),
+            style: Theme.of(context).textTheme.headline1!.copyWith(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
           ),
         ),
       ),
