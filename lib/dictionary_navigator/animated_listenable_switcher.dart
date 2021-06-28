@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:rogers_dictionary/widgets/search_page/transitions.dart';
 
 class AnimatedListenableSwitcher<T> extends StatelessWidget {
@@ -32,7 +35,7 @@ class AnimatedListenableSwitcher<T> extends StatelessWidget {
         transitionBuilder: (Widget child, Animation<double> animation) =>
             transitionBuilder != null
                 ? transitionBuilder!(child, animation)
-                : DictionaryPageTransition(child, animation),
+                : _getTransitionBuilder(child, animation),
         duration: duration ?? const Duration(milliseconds: 200),
         reverseDuration: duration ?? const Duration(milliseconds: 200),
         child: builder(context, value, child),
@@ -40,5 +43,9 @@ class AnimatedListenableSwitcher<T> extends StatelessWidget {
         switchOutCurve: switchOutCurve ?? Curves.linear,
       ),
     );
+  }
+
+  Widget _getTransitionBuilder(Widget child, Animation<double> animation) {
+    return DictionaryPageTransition(child, animation);
   }
 }

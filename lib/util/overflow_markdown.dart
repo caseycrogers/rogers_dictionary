@@ -33,7 +33,6 @@ class OverflowMarkdown extends StatelessWidget {
           return;
         }
         if (entry.key.isSubscript && spans.isNotEmpty) {
-          print('asdf');
           // Subscript should not be wrapped
           spans[spans.length - 1] = TextSpan(
               children: [spans.last, TextSpan(text: s, style: textStyle)]);
