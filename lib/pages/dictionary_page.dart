@@ -35,8 +35,6 @@ class DictionaryPage extends StatefulWidget {
 }
 
 class _DictionaryPageState extends State<DictionaryPage> {
-  final ScrollController _controller = ScrollController();
-
   bool _isDriving = false;
   ScrollDirection _lastDirection = ScrollDirection.forward;
 
@@ -59,7 +57,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
             body: NotificationListener<ScrollNotification>(
               onNotification: _onScroll,
               child: NestedScrollView(
-                controller: _controller,
+                controller: dictionaryModel.nestedController,
                 headerSliverBuilder: (context, value) => [
                   SliverAppBar(
                     key: const ValueKey(_kAppBar),
@@ -118,13 +116,13 @@ class _DictionaryPageState extends State<DictionaryPage> {
   }
 
   bool _onScroll(ScrollNotification notification) {
-    final FocusScopeNode currentFocus = FocusScope.of(context);
-    if (!currentFocus.hasPrimaryFocus) {
-      //currentFocus.unfocus();
-    }
+    final DictionaryPageModel dictionaryModel =
+        DictionaryPageModel.readFrom(context);
     if (!(notification is ScrollEndNotification)) {
-      if (_controller.position.userScrollDirection != ScrollDirection.idle) {
-        _lastDirection = _controller.position.userScrollDirection;
+      if (dictionaryModel.nestedController.position.userScrollDirection !=
+          ScrollDirection.idle) {
+        _lastDirection =
+            dictionaryModel.nestedController.position.userScrollDirection;
       }
       return false;
     }
@@ -134,7 +132,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
     _isDriving = true;
     final ScrollMetrics metrics = notification.metrics;
     Future<void>.delayed(Duration.zero).then(
-      (_) => _controller
+      (_) => dictionaryModel.nestedController
           .animateTo(
         _lastDirection == ScrollDirection.forward
             ? metrics.minScrollExtent

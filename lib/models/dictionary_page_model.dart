@@ -51,6 +51,8 @@ class DictionaryPageModel {
 
   final ValueNotifier<double> pageOffset = ValueNotifier(0);
 
+  final ScrollController nestedController = ScrollController();
+
   TranslationPageModel get _currModel => translationPageModel.value;
 
   TranslationMode get currTranslationMode =>
