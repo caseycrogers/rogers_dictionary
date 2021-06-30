@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
@@ -202,48 +203,40 @@ class _ChapterViewState extends State<ChapterView> {
       );
 
   Widget _dialoguesList(DialoguesPageModel dialoguesModel) {
-    ScrollActivity
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        final ScrollController nestedController =
-            DictionaryPageModel.readFrom(context).nestedController;
-        nestedController.position.beginActivity(newActivity);
-      },
-      child: ScrollablePositionedList.builder(
-        key: PageStorageKey(widget.chapter.englishTitle +
-            (widget.initialSubChapter?.englishTitle ?? '')),
-        initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
-        itemPositionsListener: _scrollListener,
-        itemScrollController: _scrollController,
-        itemCount: widget.chapter.dialogueSubChapters.fold<int>(
-            0, (sum, subChapter) => sum += subChapter.dialogues.length),
-        itemBuilder: (context, index) => Builder(
-          builder: (context) {
-            final DialogueChapter_SubChapter subChapter =
-                _subChapterAndDialogueIndex[index].key;
-            final int dialogueIndex = _subChapterAndDialogueIndex[index].value;
-            final DialogueChapter_Dialogue dialogue =
-                _subChapterAndDialogueIndex[index].key.dialogues[dialogueIndex];
-            final ListTile dialogueTile = ListTile(
-              title: bold1Text(context, dialogue.content(context)),
-              subtitle: Text(dialogue.oppositeContent(context)),
-              tileColor: dialogueIndex % 2 == 0
-                  ? Theme.of(context).selectedRowColor
-                  : Colors.transparent,
+    return ScrollablePositionedList.builder(
+      key: PageStorageKey(widget.chapter.englishTitle +
+          (widget.initialSubChapter?.englishTitle ?? '')),
+      initialScrollIndex: _subChapterToIndex(widget.initialSubChapter),
+      itemPositionsListener: _scrollListener,
+      itemScrollController: _scrollController,
+      itemCount: widget.chapter.dialogueSubChapters.fold<int>(
+          0, (sum, subChapter) => sum += subChapter.dialogues.length),
+      itemBuilder: (context, index) => Builder(
+        builder: (context) {
+          final DialogueChapter_SubChapter subChapter =
+              _subChapterAndDialogueIndex[index].key;
+          final int dialogueIndex = _subChapterAndDialogueIndex[index].value;
+          final DialogueChapter_Dialogue dialogue =
+              _subChapterAndDialogueIndex[index].key.dialogues[dialogueIndex];
+          final ListTile dialogueTile = ListTile(
+            title: bold1Text(context, dialogue.content(context)),
+            subtitle: Text(dialogue.oppositeContent(context)),
+            tileColor: dialogueIndex % 2 == 0
+                ? Theme.of(context).selectedRowColor
+                : Colors.transparent,
+          );
+          if (dialogueIndex + 1 == subChapter.dialogues.length &&
+              widget.chapter.hasSubChapters &&
+              subChapter != widget.chapter.dialogueSubChapters.last)
+            return Column(
+              children: [
+                dialogueTile,
+                _subchapterTile(context, _nextSubChapter(subChapter),
+                    padding: 0),
+              ],
             );
-            if (dialogueIndex + 1 == subChapter.dialogues.length &&
-                widget.chapter.hasSubChapters &&
-                subChapter != widget.chapter.dialogueSubChapters.last)
-              return Column(
-                children: [
-                  dialogueTile,
-                  _subchapterTile(context, _nextSubChapter(subChapter),
-                      padding: 0),
-                ],
-              );
-            return dialogueTile;
-          },
-        ),
+          return dialogueTile;
+        },
       ),
     );
   }
