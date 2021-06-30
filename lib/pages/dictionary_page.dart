@@ -13,7 +13,6 @@ import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
 import 'favorites_page.dart';
 import 'search_page.dart';
 
@@ -36,9 +35,6 @@ class DictionaryPage extends StatefulWidget {
 }
 
 class _DictionaryPageState extends State<DictionaryPage> {
-  bool _isDriving = false;
-  ScrollDirection _lastDirection = ScrollDirection.forward;
-
   @override
   Widget build(BuildContext context) {
     final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
@@ -107,39 +103,5 @@ class _DictionaryPageState extends State<DictionaryPage> {
         ),
       ),
     );
-  }
-
-  bool _onScroll(ScrollNotification notification) {
-    final DictionaryPageModel dictionaryModel =
-        DictionaryPageModel.readFrom(context);
-    if (!(notification is ScrollEndNotification)) {
-      if (dictionaryModel.nestedController.position.userScrollDirection !=
-          ScrollDirection.idle) {
-        _lastDirection =
-            dictionaryModel.nestedController.position.userScrollDirection;
-      }
-      return false;
-    }
-    if (notification.depth != 0 || notification.metrics.atEdge || _isDriving) {
-      return false;
-    }
-    _isDriving = true;
-    final ScrollMetrics metrics = notification.metrics;
-    Future<void>.delayed(Duration.zero).then(
-      (_) {
-        return dictionaryModel.nestedController
-            .animateTo(
-          _lastDirection == ScrollDirection.forward
-              ? metrics.minScrollExtent
-              : metrics.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-        )
-            .then((_) {
-          return _isDriving = false;
-        });
-      },
-    );
-    return false;
   }
 }
