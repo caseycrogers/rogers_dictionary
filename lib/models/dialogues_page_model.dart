@@ -15,7 +15,7 @@ class DialoguesPageModel {
       : this._(
           LocalHistoryValueNotifier<DialogueChapter?>(
             modalRoute: ModalRoute.of(context)!,
-            initialValue: null,
+            value: null,
           ),
         );
 

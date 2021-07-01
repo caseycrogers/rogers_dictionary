@@ -47,59 +47,61 @@ class _DictionaryPageState extends State<DictionaryPage> {
           DictionaryTab.dialogues: DialoguesPage(),
         }),
       ),
-      builder: (context, translationPageModel, tabBarView) => Material(
-        color: primaryColor(translationPageModel.translationMode),
-        child: SafeArea(
-          child: Scaffold(
-            body: Column(
-              children: [
-                AppBar(
-                  elevation: kGroundElevation,
-                  key: const ValueKey(_kAppBar),
-                  titleSpacing: 0,
-                  title: const DictionaryTopBar(),
-                  backgroundColor:
-                      primaryColor(translationPageModel.translationMode),
-                ),
-                Expanded(
-                  child: tabBarView!,
-                ),
-                Material(
-                  color: primaryColor(translationPageModel.translationMode),
-                  child: Center(
-                    child: TabBar(
-                      labelPadding: const EdgeInsets.all(kPad)
-                          .add(const EdgeInsets.only(bottom: kPad)),
-                      indicatorPadding:
-                          const EdgeInsets.only(bottom: 2 * kPad - 4),
-                      tabs: [
-                        DictionaryTabEntry(
-                            selected: Text(i18n.dictionary.cap.get(context),
-                                style: const TextStyle(fontSize: 24)),
-                            index: 0),
-                        DictionaryTabEntry(
-                            selected: Text(i18n.favorites.cap.get(context),
-                                style: const TextStyle(fontSize: 24)),
-                            index: 1),
-                        DictionaryTabEntry(
-                            selected: Text(i18n.dialogues.cap.get(context),
-                                style: const TextStyle(fontSize: 24)),
-                            index: 2),
-                      ],
-                      isScrollable: true,
-                      indicator: const UnderlineTabIndicator(
-                        borderSide: BorderSide(
-                          color: Colors.white,
-                          width: 3,
-                        ),
-                        insets: EdgeInsets.symmetric(horizontal: 8),
+      builder: (context, translationPageModel, tabBarView) => Scaffold(
+        body: Column(
+          children: [
+            AppBar(
+              elevation: kGroundElevation,
+              key: const ValueKey(_kAppBar),
+              titleSpacing: 0,
+              title: const DictionaryTopBar(),
+              backgroundColor:
+                  primaryColor(translationPageModel.translationMode),
+            ),
+            Expanded(
+              child: tabBarView!,
+            ),
+            Material(
+              color: primaryColor(translationPageModel.translationMode),
+              child: Container(
+                alignment: Alignment.topCenter,
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom),
+                child: MediaQuery(
+                  data:
+                      MediaQuery.of(context).removePadding(removeBottom: true),
+                  child: TabBar(
+                    labelPadding: const EdgeInsets.all(kPad)
+                        .add(const EdgeInsets.only(bottom: kPad)),
+                    indicatorPadding:
+                        const EdgeInsets.only(bottom: 2 * kPad - 4),
+                    tabs: [
+                      DictionaryTabEntry(
+                          selected: Text(i18n.dictionary.cap.get(context),
+                              style: const TextStyle(fontSize: 24)),
+                          index: 0),
+                      DictionaryTabEntry(
+                          selected: Text(i18n.favorites.cap.get(context),
+                              style: const TextStyle(fontSize: 24)),
+                          index: 1),
+                      DictionaryTabEntry(
+                          selected: Text(i18n.dialogues.cap.get(context),
+                              style: const TextStyle(fontSize: 24)),
+                          index: 2),
+                    ],
+                    isScrollable: true,
+                    indicator: const UnderlineTabIndicator(
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                        width: 3,
                       ),
+                      insets: EdgeInsets.symmetric(horizontal: 8),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
