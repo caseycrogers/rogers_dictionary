@@ -30,55 +30,57 @@ class TranslationModeSelector extends StatelessWidget {
     );
     return ValueListenableBuilder<double>(
       valueListenable: pageModel.pageOffset,
-      builder: (context, pageOffset, _) => Container(
-        height: _Button._buttonHeight,
-        child: Stack(
-          children: [
-            if (pageOffset % 1 != 0)
-              AnimatedPositioned(
-                left: lerpDouble(
-                  0,
-                  _getBox(TranslationMode.Spanish)
-                      .localToGlobal(
-                        Offset.zero,
-                        ancestor: context.findRenderObject() as RenderBox,
-                      )
-                      .dx,
-                  pageOffset,
-                )!,
-                child: Container(
-                  width: lerpDouble(
-                    _getBox(TranslationMode.English).size.width,
-                    _getBox(TranslationMode.Spanish).size.width,
+      builder: (context, pageOffset, _) {
+        return Container(
+          height: _Button._buttonHeight,
+          child: Stack(
+            children: [
+              if (pageOffset % 1 != 0)
+                AnimatedPositioned(
+                  left: lerpDouble(
+                    0,
+                    _getBox(TranslationMode.Spanish)
+                        .localToGlobal(
+                          Offset.zero,
+                          ancestor: context.findRenderObject() as RenderBox,
+                        )
+                        .dx,
                     pageOffset,
                   )!,
-                  height: _Button._buttonHeight,
-                  decoration: decoration,
+                  child: Container(
+                    width: lerpDouble(
+                      _getBox(TranslationMode.English).size.width,
+                      _getBox(TranslationMode.Spanish).size.width,
+                      pageOffset,
+                    )!,
+                    height: _Button._buttonHeight,
+                    decoration: decoration,
+                  ),
+                  duration: const Duration(milliseconds: 100),
                 ),
-                duration: const Duration(milliseconds: 100),
+              Row(
+                children: [
+                  Container(
+                    decoration: pageOffset == 0 ? decoration : null,
+                    child: _Button(
+                      TranslationMode.English,
+                      key: _englishKey,
+                    ),
+                  ),
+                  const SizedBox(width: _Button._buttonSpacing),
+                  Container(
+                    decoration: pageOffset == 1 ? decoration : null,
+                    child: _Button(
+                      TranslationMode.Spanish,
+                      key: _spanishKey,
+                    ),
+                  ),
+                ],
               ),
-            Row(
-              children: [
-                Container(
-                  decoration: pageOffset == 0 ? decoration : null,
-                  child: _Button(
-                    TranslationMode.English,
-                    key: _englishKey,
-                  ),
-                ),
-                const SizedBox(width: _Button._buttonSpacing),
-                Container(
-                  decoration: pageOffset == 1 ? decoration : null,
-                  child: _Button(
-                    TranslationMode.Spanish,
-                    key: _spanishKey,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

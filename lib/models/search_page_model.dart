@@ -29,7 +29,8 @@ class SearchPageModel {
           translationMode: translationMode,
           currSelectedEntry: LocalHistoryValueNotifier<SelectedEntry?>(
             modalRoute: ModalRoute.of(context)!,
-            initialValue: null,
+            value: null,
+            getDepth: (selectedEntry) => selectedEntry == null ?  0 : 1,
           ),
           entrySearchModel: EntrySearchModel.empty(
             _currSearchString,

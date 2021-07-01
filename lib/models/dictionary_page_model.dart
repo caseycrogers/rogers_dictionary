@@ -32,10 +32,10 @@ class DictionaryPageModel {
       : this._(
           LocalHistoryValueNotifier<DictionaryTab>(
               modalRoute: ModalRoute.of(context)!,
-              initialValue: DictionaryTab.search),
-          LocalHistoryValueNotifier<TranslationPageModel>(
-            modalRoute: ModalRoute.of(context)!,
-            initialValue: TranslationPageModel.empty(
+              value: DictionaryTab.search,
+              getDepth: (newValue) => newValue == DictionaryTab.search ? 0 : 1),
+          ValueNotifier<TranslationPageModel>(
+            TranslationPageModel.empty(
                 context: context, translationMode: DEFAULT_TRANSLATION_MODE),
           ),
           TranslationPageModel.empty(
@@ -45,7 +45,7 @@ class DictionaryPageModel {
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
 
-  final LocalHistoryValueNotifier<TranslationPageModel> translationPageModel;
+  final ValueNotifier<TranslationPageModel> translationPageModel;
 
   final LocalHistoryValueNotifier<DictionaryTab> currentTab;
 
@@ -103,18 +103,30 @@ class DictionaryPageModel {
     BuildContext context,
     String newUrlEncodedHeadword,
   ) {
-    final SearchPageModel pageModel = isFavoritesOnly
-        ? _oppModel.favoritesPageModel
-        : _oppModel.searchPageModel;
-    final SelectedEntry? previousSelection = pageModel.currSelectedEntry.value;
-    translationPageModel.setWith(_oppModel, onPop: () {
-      translationPageModel.setWith(_oppModel);
-      pageModel.currSelectedEntry.setWith(previousSelection);
-    });
+    // We need special case history stack and pop behavior so we need to
+    // manually implement implement it.
+    // Namely, we should add to the stack with first onOppHeadword and onPop
+    // should pop the entry and the translation mode.
+    final TranslationPageModel oldPageModel = _currModel;
+    final LocalHistoryValueNotifier<SelectedEntry?> selectedEntryNotifier =
+        isFavoritesOnly
+            ? _oppModel.favoritesPageModel.currSelectedEntry
+            : _oppModel.searchPageModel.currSelectedEntry;
+    final int oldDepth = selectedEntryNotifier.depth;
+    final SelectedEntry? oldSelectedEntry = selectedEntryNotifier.value;
+    translationPageModel.value = _oppModel;
     _onHeadwordSelected(
       context,
       newUrlEncodedHeadword: newUrlEncodedHeadword,
-      updateStack: false,
+      // The depth of an opp headword selection is 1 deeper than a typical
+      // selection.
+      overrideDepth: 2,
+      onPop: () {
+        translationPageModel.value = oldPageModel;
+        selectedEntryNotifier.depth = oldDepth;
+        // A negative depth will never update the stack.
+        selectedEntryNotifier.setWith(oldSelectedEntry, overrideDepth: -1);
+      },
     );
   }
 
@@ -123,7 +135,8 @@ class DictionaryPageModel {
     required String newUrlEncodedHeadword,
     Entry? newEntry,
     SearchPageModel? pageModel,
-    bool updateStack = true,
+    VoidCallback? onPop,
+    int? overrideDepth,
   }) {
     pageModel ??= isFavoritesOnly
         ? _currModel.favoritesPageModel
@@ -137,24 +150,19 @@ class DictionaryPageModel {
       currentFocus.unfocus();
     }
     if (newUrlEncodedHeadword.isEmpty) {
-      if (updateStack) {
-        return pageModel.currSelectedEntry.value = null;
-      }
-      pageModel.currSelectedEntry.setWith(null);
-    } else {
-      final SelectedEntry selectedEntry = SelectedEntry(
-        urlEncodedHeadword: newUrlEncodedHeadword,
-        entry: newEntry == null
-            ? MyApp.db
-                .getEntry(_currModel.translationMode, newUrlEncodedHeadword)
-            : Future<Entry>.value(newEntry),
-      );
-      if (updateStack) {
-        pageModel.currSelectedEntry.value = selectedEntry;
-        return;
-      }
-      pageModel.currSelectedEntry.setWith(selectedEntry);
+      return pageModel.currSelectedEntry.value = null;
     }
+    final SelectedEntry selectedEntry = SelectedEntry(
+      urlEncodedHeadword: newUrlEncodedHeadword,
+      entry: newEntry == null
+          ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
+          : Future<Entry>.value(newEntry),
+    );
+    pageModel.currSelectedEntry.setWith(
+      selectedEntry,
+      overrideDepth: overrideDepth,
+      onPop: onPop,
+    );
   }
 
   bool get isFavoritesOnly => currentTab.value == DictionaryTab.favorites;

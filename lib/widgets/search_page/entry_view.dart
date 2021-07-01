@@ -39,8 +39,6 @@ class EntryView extends StatelessWidget {
                 header: headwordLine(
                     context, entry, false, searchPageModel.searchString),
                 child: EntryView._instance(entry, false),
-                onClose: () => DictionaryPageModel.readFrom(context)
-                    .onHeadwordSelected(context, ''),
               );
             },
           );

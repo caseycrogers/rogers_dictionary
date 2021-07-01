@@ -29,7 +29,6 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
       _controller = PageController(
         initialPage:
             translationModeToIndex(dictionaryModel.currTranslationMode),
-
       );
       _controller!.addListener(() {
         dictionaryModel.pageOffset.value = _controller!.page!;

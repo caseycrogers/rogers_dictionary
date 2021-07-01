@@ -8,7 +8,7 @@ class PageHeader extends StatelessWidget {
   const PageHeader({
     required this.header,
     required this.child,
-    required this.onClose,
+    this.onClose,
     this.divider = true,
     this.scrollable = true,
     this.padding = kPad,
@@ -16,7 +16,7 @@ class PageHeader extends StatelessWidget {
 
   final Widget header;
   final Widget child;
-  final VoidCallback onClose;
+  final VoidCallback? onClose;
   final bool divider;
   final bool scrollable;
   final double padding;
@@ -28,10 +28,10 @@ class PageHeader extends StatelessWidget {
         Material(
           color: Theme.of(context).cardColor,
           child: Padding(
-            padding: EdgeInsets.only(right: padding),
+            padding: EdgeInsets.symmetric(horizontal: padding),
             child: Row(
               children: [
-                ClosePage(onClose: onClose),
+                if (onClose != null) ClosePage(onClose: onClose!),
                 Expanded(child: header),
               ],
             ),
