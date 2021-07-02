@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:rogers_dictionary/dictionary_navigator/animated_listenable_switcher.dart';
+import 'package:rogers_dictionary/dictionary_navigator/listenable_navigator.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
@@ -45,12 +45,13 @@ class _PortraitPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedListenableSwitcher<SelectedEntry?>(
+    return ListenableNavigator<SelectedEntry?>(
       valueListenable: searchPageModel.currSelectedEntry,
       builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
           selectedEntry != null
               ? EntryView.asPage(context)
               : const EntryList(),
+      getDepth: (selectedEntry) => selectedEntry == null ? 0 : 1,
     );
   }
 }
@@ -71,11 +72,12 @@ class _LandscapePage extends StatelessWidget {
             children: [
               const VerticalDivider(width: 1),
               Expanded(
-                child: AnimatedListenableSwitcher<SelectedEntry?>(
+                child: ListenableNavigator<SelectedEntry?>(
                   valueListenable: searchPageModel.currSelectedEntry,
                   builder:
                       (BuildContext context, SelectedEntry? selectedEntry, _) =>
                           EntryView.asPage(context),
+                  getDepth: (selectedEntry) => selectedEntry == null ? 0 : 1,
                 ),
               ),
             ],

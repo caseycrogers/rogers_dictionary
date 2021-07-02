@@ -2,10 +2,9 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:rogers_dictionary/dictionary_navigator/listenable_navigator.dart';
 import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
-
-import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 
 class DictionaryTabBarView extends StatefulWidget {
   /// Creates a page view with one child per tab.
@@ -23,9 +22,8 @@ class DictionaryTabBarView extends StatefulWidget {
 
 class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   TabController? _controller;
-  late LinkedHashMap<DictionaryTab, Widget> _childrenWithKey;
 
-  LocalHistoryValueNotifier<DictionaryTab> get currentTab =>
+  ValueNotifier<DictionaryTab> get currentTab =>
       DictionaryPageModel.readFrom(context).currentTab;
 
   void _updateTabController() {
@@ -41,18 +39,9 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _updateChildren();
-  }
-
-  @override
   void didUpdateWidget(DictionaryTabBarView oldWidget) {
     super.didUpdateWidget(oldWidget);
     _updateTabController();
-    if (widget.children != oldWidget.children) {
-      _updateChildren();
-    }
   }
 
   @override
@@ -72,19 +61,6 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     super.dispose();
   }
 
-  void _updateChildren() {
-    _childrenWithKey = LinkedHashMap<DictionaryTab, Widget>.fromEntries(
-        widget.children.entries.map(
-      (MapEntry<DictionaryTab, Widget> entry) => MapEntry(
-        entry.key,
-        KeyedSubtree(
-          key: ValueKey<DictionaryTab>(entry.key),
-          child: entry.value,
-        ),
-      ),
-    ));
-  }
-
   void _handleTabControllerAnimationTick() {
     currentTab.value = widget.children.keys.toList()[_controller!.index];
   }
@@ -100,12 +76,10 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
       }
       return true;
     }());
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      transitionBuilder: _getTransition,
-      child: _childrenWithKey[currentTab.value],
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: _InstantOutCurve(),
+    return ListenableNavigator(
+      valueListenable: currentTab,
+      builder: (context, tab, _) => widget.children[tab]!,
+      getDepth: (tab) => tab == DictionaryTab.search ? 0 : 1,
     );
   }
 
@@ -116,14 +90,19 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     setState(() {});
   }
 
-  Widget _getTransition(Widget child, Animation<double> animation) {
+  Widget _getTransition(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, 1),
-          end: Offset.zero,
-        ).animate(animation),
-        child: child,
-      );
+      position: Tween<Offset>(
+        begin: const Offset(0, 1),
+        end: Offset.zero,
+      ).animate(animation),
+      child: child,
+    );
   }
 }
 

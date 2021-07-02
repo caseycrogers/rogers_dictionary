@@ -1,29 +1,25 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'package:rogers_dictionary/entry_database/dialogue_builders.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 
 class DialoguesPageModel {
-  DialoguesPageModel._(this.selectedChapterNotifier) {
+  DialoguesPageModel() {
     _initializeStream();
   }
-
-  DialoguesPageModel.empty(BuildContext context)
-      : this._(
-          LocalHistoryValueNotifier<DialogueChapter?>(
-            modalRoute: ModalRoute.of(context)!,
-            value: null,
-          ),
-        );
 
   // All static because these can be shared across both translation modes.
   static final LinkedHashSet<DialogueChapter> _dialogues = LinkedHashSet();
   static Stream<DialogueChapter>? _dialogueStream;
 
-  final LocalHistoryValueNotifier<DialogueChapter?> selectedChapterNotifier;
+  final ValueNotifier<DialogueChapter?> selectedChapterNotifier = ValueNotifier<
+      DialogueChapter?>(
+    null,
+  );
 
   DialogueChapter? get selectedChapter => selectedChapterNotifier.value;
 

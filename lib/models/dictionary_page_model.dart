@@ -8,7 +8,6 @@ import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-import 'package:rogers_dictionary/dictionary_navigator/local_history_value_notifier.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
@@ -22,32 +21,26 @@ int translationModeToIndex(TranslationMode translationMode) {
 }
 
 class DictionaryPageModel {
-  DictionaryPageModel._(
-    this.currentTab,
-    this.translationPageModel,
-    this.spanishPageModel,
-  ) : englishPageModel = translationPageModel.value;
-
-  DictionaryPageModel.empty(BuildContext context)
-      : this._(
-          LocalHistoryValueNotifier<DictionaryTab>(
-              modalRoute: ModalRoute.of(context)!,
-              value: DictionaryTab.search,
-              getDepth: (newValue) => newValue == DictionaryTab.search ? 0 : 1),
-          ValueNotifier<TranslationPageModel>(
-            TranslationPageModel.empty(
-                context: context, translationMode: DEFAULT_TRANSLATION_MODE),
-          ),
-          TranslationPageModel.empty(
-              context: context, translationMode: TranslationMode.Spanish),
-        );
+  DictionaryPageModel()
+      : currentTab = ValueNotifier(DictionaryTab.search),
+        englishPageModel = TranslationPageModel(
+          translationMode: TranslationMode.English,
+        ),
+        spanishPageModel = TranslationPageModel(
+          translationMode: TranslationMode.Spanish,
+        ) {
+    translationPageModel =
+        ValueNotifier<TranslationPageModel>(englishPageModel);
+  }
 
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
 
-  final ValueNotifier<TranslationPageModel> translationPageModel;
+  final ValueNotifier<int> netDepth = ValueNotifier(0);
 
-  final LocalHistoryValueNotifier<DictionaryTab> currentTab;
+  late final ValueNotifier<TranslationPageModel> translationPageModel;
+
+  final ValueNotifier<DictionaryTab> currentTab;
 
   final ValueNotifier<double> pageOffset = ValueNotifier(0);
 
@@ -90,13 +83,11 @@ class DictionaryPageModel {
 
   void onHeadwordSelected(
     BuildContext context,
-    String newUrlEncodedHeadword, {
-    SearchPageModel? pageModel,
-  }) =>
+    String newUrlEncodedHeadword,
+  ) =>
       _onHeadwordSelected(
         context,
         newUrlEncodedHeadword: newUrlEncodedHeadword,
-        pageModel: pageModel,
       );
 
   void onOppositeHeadwordSelected(
@@ -108,11 +99,9 @@ class DictionaryPageModel {
     // Namely, we should add to the stack with first onOppHeadword and onPop
     // should pop the entry and the translation mode.
     final TranslationPageModel oldPageModel = _currModel;
-    final LocalHistoryValueNotifier<SelectedEntry?> selectedEntryNotifier =
-        isFavoritesOnly
-            ? _oppModel.favoritesPageModel.currSelectedEntry
-            : _oppModel.searchPageModel.currSelectedEntry;
-    final int oldDepth = selectedEntryNotifier.depth;
+    final ValueNotifier<SelectedEntry?> selectedEntryNotifier = isFavoritesOnly
+        ? _oppModel.favoritesPageModel.currSelectedEntry
+        : _oppModel.searchPageModel.currSelectedEntry;
     final SelectedEntry? oldSelectedEntry = selectedEntryNotifier.value;
     translationPageModel.value = _oppModel;
     _onHeadwordSelected(
@@ -120,13 +109,7 @@ class DictionaryPageModel {
       newUrlEncodedHeadword: newUrlEncodedHeadword,
       // The depth of an opp headword selection is 1 deeper than a typical
       // selection.
-      overrideDepth: 2,
-      onPop: () {
-        translationPageModel.value = oldPageModel;
-        selectedEntryNotifier.depth = oldDepth;
-        // A negative depth will never update the stack.
-        selectedEntryNotifier.setWith(oldSelectedEntry, overrideDepth: -1);
-      },
+      isOppositeHeadword: true,
     );
   }
 
@@ -135,8 +118,7 @@ class DictionaryPageModel {
     required String newUrlEncodedHeadword,
     Entry? newEntry,
     SearchPageModel? pageModel,
-    VoidCallback? onPop,
-    int? overrideDepth,
+    bool? isOppositeHeadword,
   }) {
     pageModel ??= isFavoritesOnly
         ? _currModel.favoritesPageModel
@@ -158,16 +140,8 @@ class DictionaryPageModel {
           ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
           : Future<Entry>.value(newEntry),
     );
-    pageModel.currSelectedEntry.setWith(
-      selectedEntry,
-      overrideDepth: overrideDepth,
-      onPop: onPop,
-    );
+    pageModel.currSelectedEntry.value = selectedEntry;
   }
 
   bool get isFavoritesOnly => currentTab.value == DictionaryTab.favorites;
-}
-
-abstract class BasePageModel {
-  void onClose(BuildContext context);
 }
