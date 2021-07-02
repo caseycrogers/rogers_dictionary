@@ -10,6 +10,7 @@ import 'package:rogers_dictionary/models/dictionary_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/widgets/dialogues_page/dictionary_back_button.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
@@ -20,11 +21,7 @@ enum DictionaryTab {
   search,
   favorites,
   dialogues,
-  about,
-  settings,
 }
-
-const String _kAppBar = 'appBar';
 
 String dictionaryTabName(DictionaryTab dictionaryTab) =>
     dictionaryTab.toString().split('.').last;
@@ -51,8 +48,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
         body: Column(
           children: [
             AppBar(
+              leading: const DictionaryBackButton(),
               elevation: kGroundElevation,
-              key: const ValueKey(_kAppBar),
               titleSpacing: 0,
               title: const DictionaryTopBar(),
               backgroundColor:
@@ -68,8 +65,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom),
                 child: MediaQuery(
-                  data:
-                      MediaQuery.of(context).removePadding(removeBottom: true),
+                  data: MediaQuery.of(context)
+                      .removePadding(removeBottom: true),
                   child: TabBar(
                     labelPadding: const EdgeInsets.all(kPad)
                         .add(const EdgeInsets.only(bottom: kPad)),

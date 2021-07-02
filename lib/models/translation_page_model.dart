@@ -13,27 +13,17 @@ enum TranslationMode {
 }
 
 class TranslationPageModel {
-  TranslationPageModel._({
-    required BuildContext context,
+  TranslationPageModel({
     required this.translationMode,
-  })  : searchPageModel = SearchPageModel.empty(
-          context: context,
+  })  : searchPageModel = SearchPageModel(
           translationMode: translationMode,
           isFavoritesOnly: false,
         ),
-        favoritesPageModel = SearchPageModel.empty(
-          context: context,
+        favoritesPageModel = SearchPageModel(
           translationMode: translationMode,
           isFavoritesOnly: true,
         ),
-        layerLink = LayerLink() {
-    TranslationPageModel._dialoguesPageModel ??=
-        DialoguesPageModel.empty(context);
-  }
-
-  TranslationPageModel.empty(
-      {required BuildContext context, required TranslationMode translationMode})
-      : this._(context: context, translationMode: translationMode);
+        layerLink = LayerLink();
 
   // Translation mode state.
   final TranslationMode translationMode;
@@ -44,9 +34,9 @@ class TranslationPageModel {
 
   final LayerLink layerLink;
 
-  static DialoguesPageModel? _dialoguesPageModel;
+  static final DialoguesPageModel _dialoguesPageModel = DialoguesPageModel();
 
-  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel!;
+  DialoguesPageModel get dialoguesPageModel => _dialoguesPageModel;
 
   bool get isEnglish => translationMode == TranslationMode.English;
 

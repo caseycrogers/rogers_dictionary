@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info/package_info.dart';
+import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/entry_database/sqflite_database.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
-import 'package:rogers_dictionary/pages/search_page.dart';
+import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 
 import 'entry_database/dictionary_database.dart';
-import 'pages/page_router.dart';
+import 'models/dictionary_page_model.dart';
 
 final Color englishPrimary = Colors.indigo.shade600;
 final Color spanishPrimary = Colors.orange.shade600;
@@ -61,8 +62,12 @@ class MyApp extends StatelessWidget {
           },
           child: MaterialApp(
             title: 'Dictionary',
-            onGenerateRoute: PageRouter.generateRoute,
-            initialRoute: '#/${SearchPage.route}',
+            home: Provider<DictionaryPageModel>(
+              create: (_) => DictionaryPageModel(),
+              builder: (BuildContext context, _) {
+                return DictionaryPage();
+              },
+            ),
             theme: ThemeData(
               selectedRowColor: Colors.grey.shade200,
               textTheme: TextTheme(
