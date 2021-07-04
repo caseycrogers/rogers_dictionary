@@ -78,6 +78,7 @@ class DictionaryPageModel {
         newUrlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
         newEntry: newEntry,
         isRelated: false,
+        isOppositeHeadword: false,
       );
 
   void onHeadwordSelected(
@@ -86,10 +87,11 @@ class DictionaryPageModel {
     bool? isRelated,
   }) {
     _onHeadwordSelected(
-        context,
-        newUrlEncodedHeadword: newUrlEncodedHeadword,
-        isRelated: isRelated ?? false,
-      );
+      context,
+      newUrlEncodedHeadword: newUrlEncodedHeadword,
+      isRelated: isRelated ?? false,
+      isOppositeHeadword: false,
+    );
   }
 
   void onOppositeHeadwordSelected(
@@ -100,9 +102,10 @@ class DictionaryPageModel {
     _onHeadwordSelected(
       context,
       newUrlEncodedHeadword: newUrlEncodedHeadword,
+      isRelated: false,
       // The depth of an opp headword selection is 1 deeper than a typical
       // selection.
-      isRelated: true,
+      isOppositeHeadword: true,
     );
   }
 
@@ -110,6 +113,7 @@ class DictionaryPageModel {
     BuildContext context, {
     required String newUrlEncodedHeadword,
     required bool isRelated,
+    required bool isOppositeHeadword,
     Entry? newEntry,
     SearchPageModel? pageModel,
   }) {
@@ -133,6 +137,7 @@ class DictionaryPageModel {
           ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
           : Future<Entry>.value(newEntry),
       isRelated: isRelated,
+      isOppositeHeadword: isOppositeHeadword,
     );
     pageModel.currSelectedEntry.value = selectedEntry;
   }
