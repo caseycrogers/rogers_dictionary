@@ -76,10 +76,11 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
       }
       return true;
     }());
-    return ListenableNavigator(
+    return ListenableNavigator<DictionaryTab>(
       valueListenable: currentTab,
       builder: (context, tab, _) => widget.children[tab]!,
       getDepth: (tab) => tab == DictionaryTab.search ? 0 : 1,
+      transitionBuilder: _getTransition,
     );
   }
 
@@ -97,11 +98,18 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
     Widget child,
   ) {
     return SlideTransition(
-      position: Tween<Offset>(
+      position: Tween(
         begin: const Offset(0, 1),
         end: Offset.zero,
       ).animate(animation),
-      child: child,
+      child: SlideTransition(
+        position: Tween(
+          begin: Offset.zero,
+          end: const Offset(0, 1),
+        ).animate(CurvedAnimation(
+            parent: secondaryAnimation, curve: _InstantOutCurve())),
+        child: child,
+      ),
     );
   }
 }
@@ -109,9 +117,9 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
 class _InstantOutCurve extends Curve {
   @override
   double transform(double t) {
-    if (t == 0.0) {
-      return 0;
+    if (t == 1.0) {
+      return 1;
     }
-    return 1;
+    return 0;
   }
 }

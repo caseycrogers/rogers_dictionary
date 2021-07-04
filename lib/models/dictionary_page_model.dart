@@ -36,8 +36,6 @@ class DictionaryPageModel {
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
 
-  final ValueNotifier<int> netDepth = ValueNotifier(0);
-
   late final ValueNotifier<TranslationPageModel> translationPageModel;
 
   final ValueNotifier<DictionaryTab> currentTab;
@@ -79,46 +77,41 @@ class DictionaryPageModel {
         context,
         newUrlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
         newEntry: newEntry,
+        isRelated: false,
       );
 
   void onHeadwordSelected(
     BuildContext context,
-    String newUrlEncodedHeadword,
-  ) =>
-      _onHeadwordSelected(
+    String newUrlEncodedHeadword, {
+    bool? isRelated,
+  }) {
+    _onHeadwordSelected(
         context,
         newUrlEncodedHeadword: newUrlEncodedHeadword,
+        isRelated: isRelated ?? false,
       );
+  }
 
   void onOppositeHeadwordSelected(
     BuildContext context,
     String newUrlEncodedHeadword,
   ) {
-    // We need special case history stack and pop behavior so we need to
-    // manually implement implement it.
-    // Namely, we should add to the stack with first onOppHeadword and onPop
-    // should pop the entry and the translation mode.
-    final TranslationPageModel oldPageModel = _currModel;
-    final ValueNotifier<SelectedEntry?> selectedEntryNotifier = isFavoritesOnly
-        ? _oppModel.favoritesPageModel.currSelectedEntry
-        : _oppModel.searchPageModel.currSelectedEntry;
-    final SelectedEntry? oldSelectedEntry = selectedEntryNotifier.value;
     translationPageModel.value = _oppModel;
     _onHeadwordSelected(
       context,
       newUrlEncodedHeadword: newUrlEncodedHeadword,
       // The depth of an opp headword selection is 1 deeper than a typical
       // selection.
-      isOppositeHeadword: true,
+      isRelated: true,
     );
   }
 
   void _onHeadwordSelected(
     BuildContext context, {
     required String newUrlEncodedHeadword,
+    required bool isRelated,
     Entry? newEntry,
     SearchPageModel? pageModel,
-    bool? isOppositeHeadword,
   }) {
     pageModel ??= isFavoritesOnly
         ? _currModel.favoritesPageModel
@@ -139,6 +132,7 @@ class DictionaryPageModel {
       entry: newEntry == null
           ? MyApp.db.getEntry(_currModel.translationMode, newUrlEncodedHeadword)
           : Future<Entry>.value(newEntry),
+      isRelated: isRelated,
     );
     pageModel.currSelectedEntry.value = selectedEntry;
   }

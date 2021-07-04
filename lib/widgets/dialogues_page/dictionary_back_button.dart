@@ -1,20 +1,35 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/dictionary_navigator/listenable_navigator.dart';
 
 class DictionaryBackButton extends StatelessWidget {
   const DictionaryBackButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
-    return ValueListenableBuilder<int>(
-      valueListenable: dictionaryModel.netDepth,
-      builder: (context, depth, _) {
-        if (depth == 0) {
-          return Container();
-        }
-        return const BackButton();
+    return ValueListenableBuilder<bool>(
+      valueListenable: ListenableNavigator.emptyNotifier,
+      builder: (context, isEmpty, _) {
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 100),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: const Interval(0, .8),
+              ),
+              child: SlideTransition(
+                child: child,
+                position:
+                    Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero)
+                        .animate(animation),
+              ),
+            );
+          },
+          child: isEmpty
+              ? Container()
+              : const BackButton(onPressed: ListenableNavigator.pop),
+        );
       },
     );
   }

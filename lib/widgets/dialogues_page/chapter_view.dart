@@ -27,33 +27,19 @@ class ChapterView extends StatefulWidget {
 }
 
 class _ChapterViewState extends State<ChapterView> {
-  static const String _kExpandedStateString = 'is_expanded';
-  late bool _internalIsExpanded;
+  static bool _isExpanded = false;
   bool _inProgrammaticScroll = false;
-
-  bool get _isExpanded => _internalIsExpanded;
-
-  set _isExpanded(bool value) {
-    _internalIsExpanded = value;
-    PageStorage.of(context)?.writeState(context, _internalIsExpanded,
-        identifier: _kExpandedStateString);
-  }
 
   final ItemScrollController _scrollController = ItemScrollController();
   final ItemPositionsListener _scrollListener = ItemPositionsListener.create();
 
-  late ValueNotifier<DialogueSubChapter> _currentSubChapter;
+  static late ValueNotifier<DialogueSubChapter> _currentSubChapter;
   final ValueNotifier<double> _subChapterProgress = ValueNotifier(0);
 
   late List<MapEntry<DialogueSubChapter, int>> _subChapterAndDialogueIndex;
 
   @override
   void initState() {
-    _internalIsExpanded = (PageStorage.of(context)?.readState(
-          context,
-          identifier: _kExpandedStateString,
-        ) as bool?) ??
-        false;
     _currentSubChapter = ValueNotifier(
         widget.initialSubChapter ?? widget.chapter.dialogueSubChapters[0]);
     _scrollListener.itemPositions.addListener(() {

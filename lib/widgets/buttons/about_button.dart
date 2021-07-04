@@ -26,10 +26,10 @@ class AboutButton extends StatelessWidget {
       onPressed: () {
         onPressed();
         showDialog<void>(
-            context: context,
-            builder: (overlayContext) =>_AboutPage(() {
-                Navigator.of(overlayContext).pop();
-            }),
+          context: context,
+          builder: (overlayContext) => _AboutPage(() {
+            Navigator.of(overlayContext).pop();
+          }),
         );
       },
     );
@@ -54,10 +54,6 @@ class _AboutPage extends StatelessWidget {
             onClose: onClose,
             child: Column(
               children: [
-                const Text(
-                  'Hi,\nMy name is Dr. Glenn Rogers!',
-                  textAlign: TextAlign.center,
-                ),
                 Container(
                   height: 240,
                   width: 240,
@@ -71,11 +67,32 @@ class _AboutPage extends StatelessWidget {
                   ),
                 ),
                 const Text(
-                  'This is my dictionary. It\'s super cool. I hope '
-                      'you like it. And if you don\'t, well then fuck '
-                      'off!',
-                  textAlign: TextAlign.center,
+                  'Hi, welcome to my English/Spanish medical app, the digital '
+                  'version of the 5th edition of my medical bilingual '
+                  'dictionary to be published later this year (2021). The app '
+                  'translates any medical word likely to come up in a '
+                  'health professional and a patient, including:',
                 ),
+                const Text(''' - slang
+ - technical terms
+ - regionalisms
+ - 600+ medication names
+ - long phrases (eg against medical advice)
+ - abbreviations and acronyms
+ - non-medical terms commonly used in a medical setting
+ '''),
+                const Text(
+                  'It also provides an extensive sample dialogue '
+                  'section based on my 30-plus year history as an internist '
+                  'with Spanish-speaking patients in outpatient, Med-Surg '
+                  'ward, and ICU settings.\n',
+                ),
+                const Text('The app was developed by my son, Casey Rogers, '
+                    'using skills he acquired at Google and GM Cruise.\n'),
+                const Text('Enjoy the app! If you have any feedback on the '
+                    'app or the translations, you can provide feedback by '
+                    'pressing the \'options\' button at the top right of any '
+                    'screen.'),
                 const Divider(),
                 const _DebugInfo(),
               ],

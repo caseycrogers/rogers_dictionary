@@ -3,87 +3,160 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:rogers_dictionary/models/search_page_model.dart';
-import 'package:rogers_dictionary/pages/default_page.dart';
 
-import 'package:rogers_dictionary/widgets/search_page/transitions.dart';
+import 'package:rogers_dictionary/pages/default_page.dart';
+import 'package:rogers_dictionary/util/map_utils.dart';
 
 class ListenableNavigator<T> extends StatefulWidget {
   const ListenableNavigator({
+    Key? key,
     required this.valueListenable,
     required this.builder,
     required this.getDepth,
     this.child,
     this.transitionBuilder,
-    this.switchInCurve,
-    this.switchOutCurve,
     this.duration,
-  });
+  }) : super(key: key);
 
-  final ValueListenable<T> valueListenable;
+  static final Map<int, _ListenableNavigatorState> navigatorStack =
+      SplayTreeMap();
+
+  static bool get isEmpty {
+    if (navigatorStack.isEmpty) {
+      return true;
+    }
+    return navigatorStack.values.every((navigator) => navigator.isEmpty);
+  }
+
+  static void _updateEmptyNotifier() {
+    Future<void>.delayed(Duration.zero).whenComplete(() {
+      emptyNotifier.value = isEmpty;
+    });
+  }
+
+  static ValueNotifier<bool> emptyNotifier = ValueNotifier(true);
+
+  final ValueNotifier<T> valueListenable;
   final ValueWidgetBuilder<T> builder;
   final int Function(T) getDepth;
 
   final Widget? child;
-  final AnimatedSwitcherTransitionBuilder? transitionBuilder;
-  final Curve? switchInCurve;
-  final Curve? switchOutCurve;
+  final RouteTransitionsBuilder? transitionBuilder;
   final Duration? duration;
 
   @override
-  _ListenableNavigatorState<T> createState() =>
-      _ListenableNavigatorState<T>();
+  _ListenableNavigatorState<T> createState() => _ListenableNavigatorState<T>();
+
+  static Future<bool> pop() async {
+    // Iterate from the deepest to the highest listenable navigator.
+    for (final _ListenableNavigatorState navigatorState
+        in navigatorStack.values.toList().reversed) {
+      final bool willPop = await navigatorState._onWillPop();
+      if (!willPop) {
+        // We have reached a listenable navigator that consumed the pop.
+        return false;
+      }
+    }
+    // No listenable navigators consumed the pop, pop the topmost navigator.
+    return true;
+  }
 }
 
-class _ListenableNavigatorState<T>
-    extends State<ListenableNavigator<T>> {
-  final SplayTreeMap<int, T> stack = SplayTreeMap();
+class _ListenableNavigatorState<T> extends State<ListenableNavigator<T>> {
+  static final Map<Key, SplayTreeMap<int, Object?>> stackCache = {};
+
+  late final bool isPrimary;
+
+  late final Map<int, T> stack = stackCache.getOrElse(
+    widget.key ?? ValueKey(widget.hashCode),
+    SplayTreeMap<int, T>(),
+  ) as SplayTreeMap<int, T>;
+
+  _ListenableNavigatorState? get parent {
+    return context.findAncestorStateOfType<_ListenableNavigatorState>();
+  }
+
+  bool get isEmpty {
+    return stack.length <= 1;
+  }
+
+  int get depth {
+    return (parent?.depth ?? -1) + 1;
+  }
+
+  @override
+  void initState() {
+    // This listenable navigator is the primary one if it's the first built.
+    isPrimary = ListenableNavigator.navigatorStack.isEmpty;
+    ListenableNavigator.navigatorStack[depth] = this;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    ListenableNavigator.navigatorStack.removeWhere((_, value) => value == this);
+    ListenableNavigator._updateEmptyNotifier();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<T>(
-      valueListenable: widget.valueListenable,
-      child: widget.child,
-      builder: (BuildContext context, T value, Widget? child) {
-        final int depth = widget.getDepth(value);
-        if (stack.isEmpty) {
-          assert(
-          depth == 0,
-          'Depth of initial value must be 0. Actual: $depth',
+    return WillPopScope(
+      // Only add a pop scope if this is the primary navigator so that this
+      // navigator alone can handle pops.
+      onWillPop: isPrimary ? ListenableNavigator.pop : null,
+      child: ValueListenableBuilder<T>(
+        valueListenable: widget.valueListenable,
+        child: widget.child,
+        builder: (BuildContext context, T value, Widget? child) {
+          final int depth = widget.getDepth(value);
+          if (stack.isEmpty) {
+            assert(
+              depth == 0,
+              'Depth of initial value must be 0. '
+              'Value: $value. Depth: $depth',
+            );
+          }
+          stack.removeWhere((key, _) => key >= depth);
+          if (stack[depth] == null) {
+            stack[depth] = value;
+          }
+          ListenableNavigator._updateEmptyNotifier();
+          return Navigator(
+            pages: _pages(context),
+            onPopPage: (route, dynamic result) {
+              throw UnsupportedError(
+                'ListenableNavigators should never be popped directly.',
+              );
+            },
           );
-        }
-        stack.removeWhere((key, _) => key >= depth);
-        if (stack[depth] == null) {
-          stack[depth] = value;
-        }
-        if (value is SelectedEntry?) {
-          print(stack);
-        }
-        return Navigator(
-          pages: _pages(context),
-          onPopPage: (route, dynamic result) {
-            if (!route.didPop(result)) {
-              return false;
-            }
-            // Remove the top item in the stack
-            stack.remove(stack.values.last);
-            return true;
-          },
-        );
-      },
+        },
+      ),
     );
-  }
-
-  Widget _getTransitionBuilder(Widget child, Animation<double> animation) {
-    return DictionaryPageTransition(child, animation);
   }
 
   List<DefaultPage> _pages(BuildContext context) {
     return stack.values
-        .map((value) => DefaultPage(
-              key: ValueKey(value),
-              child: widget.builder(context, value, widget.child),
-            ))
+        .map(
+          (value) => DefaultPage(
+            key: ValueKey(value),
+            child: widget.builder(context, value, widget.child),
+            transitionsBuilder: widget.transitionBuilder,
+          ),
+        )
         .toList();
+  }
+
+  Future<bool> _onWillPop() {
+    if (stack.length == 1) {
+      // This navigator is empty, propagate the pop upwards.
+      return Future.value(true);
+    }
+    // Remove the top item in the stack
+    stack.remove(stack.keys.last);
+    final T oldValue = stack.values.last;
+    widget.valueListenable.value = oldValue;
+    // Return false to veto the pop because it will be handled internally.
+    return Future.value(false);
   }
 }

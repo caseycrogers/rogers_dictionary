@@ -29,6 +29,8 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
       _controller = PageController(
         initialPage:
             translationModeToIndex(dictionaryModel.currTranslationMode),
+        viewportFraction: (MediaQuery.of(context).size.width + .25) /
+            MediaQuery.of(context).size.width,
       );
       _controller!.addListener(() {
         dictionaryModel.pageOffset.value = _controller!.page!;
@@ -75,21 +77,39 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
           onPageChanged: (int index) => DictionaryPageModel.readFrom(context)
               .onTranslationModeChanged(context, indexToTranslationMode(index)),
           children: [
-            Provider<TranslationPageModel>.value(
-              value: dictionaryModel.englishPageModel,
-              builder: (BuildContext context, _) => Theme(
-                data: Theme.of(context).copyWith(
-                    primaryColor: primaryColor(TranslationMode.English)),
-                child: widget.child,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Provider<TranslationPageModel>.value(
+                    key: const PageStorageKey<TranslationMode>(
+                        TranslationMode.English),
+                    value: dictionaryModel.englishPageModel,
+                    builder: (BuildContext context, _) => Theme(
+                      data: Theme.of(context).copyWith(
+                          primaryColor: primaryColor(TranslationMode.English)),
+                      child: widget.child,
+                    ),
+                  ),
+                ),
+                const VerticalDivider(width: .25, thickness: .25),
+              ],
             ),
-            Provider<TranslationPageModel>.value(
-              value: dictionaryModel.spanishPageModel,
-              builder: (BuildContext context, _) => Theme(
-                data: Theme.of(context).copyWith(
-                    primaryColor: primaryColor(TranslationMode.Spanish)),
-                child: widget.child,
-              ),
+            Row(
+              children: [
+                const VerticalDivider(width: .25, thickness: .25),
+                Expanded(
+                  child: Provider<TranslationPageModel>.value(
+                    key: const PageStorageKey<TranslationMode>(
+                        TranslationMode.Spanish),
+                    value: dictionaryModel.spanishPageModel,
+                    builder: (BuildContext context, _) => Theme(
+                      data: Theme.of(context).copyWith(
+                          primaryColor: primaryColor(TranslationMode.Spanish)),
+                      child: widget.child,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );

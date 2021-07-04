@@ -21,7 +21,7 @@ class _FavoritesButtonState extends State<FavoritesButton> {
     return IconButton(
       icon: _icon,
       onPressed: () async {
-        final bool newFavorite = !MyApp.db.isFavorite(
+        final bool newFavorite = !await MyApp.db.isFavorite(
             translationMode, widget.entry.headword.urlEncodedHeadword);
         await MyApp.db.setFavorite(
           translationMode,
@@ -33,12 +33,25 @@ class _FavoritesButtonState extends State<FavoritesButton> {
     );
   }
 
-  Widget get _icon => Icon(
-        MyApp.db.isFavorite(TranslationPageModel.of(context).translationMode,
-                widget.entry.headword.urlEncodedHeadword)
-            ? Icons.star
-            : Icons.star_border,
-        color: Theme.of(context).accentIconTheme.color,
-        size: Theme.of(context).accentIconTheme.size,
-      );
+  Widget get _icon {
+    final Future<bool> favoriteFuture = MyApp.db.isFavorite(
+        TranslationPageModel.of(context).translationMode,
+        widget.entry.headword.urlEncodedHeadword);
+    return FutureBuilder<bool>(
+      future: favoriteFuture,
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return Container(
+            height: Theme.of(context).iconTheme.size,
+            child: const CircularProgressIndicator(),
+          );
+        }
+        return Icon(
+          snap.data! ? Icons.star : Icons.star_border,
+          color: Theme.of(context).accentIconTheme.color,
+          size: Theme.of(context).accentIconTheme.size,
+        );
+      },
+    );
+  }
 }

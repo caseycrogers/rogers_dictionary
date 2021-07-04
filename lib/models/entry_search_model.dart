@@ -40,7 +40,7 @@ class EntrySearchModel {
 
   bool get isEmpty => currSearchString.value.isEmpty;
 
-  bool get favoritesOnly => _favoritesOnly;
+  bool get isFavoritesOnly => _favoritesOnly;
 
   void resetStream() => _initializeStream();
 

@@ -5,19 +5,29 @@ class DefaultPage extends Page<void> {
   const DefaultPage({
     LocalKey? key,
     required this.child,
-    this.transitionsBuilder = _dictionaryTransitionBuilder,
+    this.transitionsBuilder,
+    this.duration = const Duration(milliseconds: 200),
   }) : super(key: key);
 
+  static final PageStorageBucket _globalBucket = PageStorageBucket();
+
   final Widget child;
-  final RouteTransitionsBuilder transitionsBuilder;
+  final RouteTransitionsBuilder? transitionsBuilder;
+  final Duration duration;
 
   @override
   Route<void> createRoute(BuildContext context) {
     return PageRouteBuilder(
+      transitionDuration: duration,
       settings: this,
+      transitionsBuilder: transitionsBuilder ?? _dictionaryTransitionBuilder,
       pageBuilder: (context, animation, secondaryAnimation) {
-        return child;
+        return PageStorage(
+          bucket: _globalBucket,
+          child: child,
+        );
       },
+      maintainState: false,
     );
   }
 }
@@ -29,7 +39,12 @@ Widget _dictionaryTransitionBuilder(
   Widget child,
 ) {
   return FadeTransition(
-    child: child,
+    child: FadeTransition(
+      child: child,
+      opacity: secondaryAnimation.drive(
+        Tween<double>(begin: 1, end: 0),
+      ),
+    ),
     opacity: animation,
   );
 }

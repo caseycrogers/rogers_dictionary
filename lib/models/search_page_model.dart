@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rogers_dictionary/main.dart';
 
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
@@ -17,6 +18,11 @@ class SearchPageModel {
           translationMode,
           isFavoritesOnly,
         ) {
+    MyApp.db.isFavoritesDirty(translationMode).addListener(() {
+      if (MyApp.db.isFavoritesDirty(translationMode).value == true) {
+        entrySearchModel.resetStream();
+      }
+    });
     _currSearchString.addListener(() {
       if (_currSearchString.value.isNotEmpty) {
         currSelectedEntry.value = null;
@@ -39,6 +45,8 @@ class SearchPageModel {
 
   bool get hasSelection => currSelectedEntry.value != null;
 
+  bool get isFavoritesOnly => entrySearchModel.isFavoritesOnly;
+
   String get searchString => entrySearchModel.searchString;
 
   String? get currSelectedHeadword =>
@@ -55,10 +63,15 @@ class SelectedEntry {
   SelectedEntry({
     required this.urlEncodedHeadword,
     required this.entry,
-    this.isOppositeHeadword = false,
-  });
+    bool? isRelated,
+  }) : isRelated = isRelated ?? false;
 
   final String urlEncodedHeadword;
   final Future<Entry> entry;
-  final bool isOppositeHeadword;
+  final bool isRelated;
+
+  @override
+  String toString() {
+    return 'SelectedEntry($urlEncodedHeadword)';
+  }
 }
