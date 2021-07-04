@@ -16,6 +16,7 @@ class ListenableNavigator<T> extends StatefulWidget {
     this.child,
     this.transitionBuilder,
     this.duration,
+    this.onPopCallback,
   }) : super(key: key);
 
   static final Map<int, _ListenableNavigatorState> navigatorStack =
@@ -43,6 +44,8 @@ class ListenableNavigator<T> extends StatefulWidget {
   final Widget? child;
   final RouteTransitionsBuilder? transitionBuilder;
   final Duration? duration;
+
+  final void Function(T?)? onPopCallback;
 
   @override
   _ListenableNavigatorState<T> createState() => _ListenableNavigatorState<T>();
@@ -153,10 +156,11 @@ class _ListenableNavigatorState<T> extends State<ListenableNavigator<T>> {
       return Future.value(true);
     }
     // Remove the top item in the stack
-    stack.remove(stack.keys.last);
+    final T value = stack.remove(stack.keys.last)!;
     final T oldValue = stack.values.last;
     widget.valueListenable.value = oldValue;
-    // Return false to veto the pop because it will be handled internally.
+    widget.onPopCallback?.call(value);
+    // Return false to veto the pop because it was handled internally.
     return Future.value(false);
   }
 }

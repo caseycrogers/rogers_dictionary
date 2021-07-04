@@ -62,6 +62,13 @@ class _PortraitPage extends StatelessWidget {
         }
         return 2;
       },
+      onPopCallback: (selectedEntry) {
+        if (selectedEntry != null && selectedEntry.isOppositeHeadword) {
+          final DictionaryPageModel dictionaryModel =
+              DictionaryPageModel.readFrom(context);
+          dictionaryModel.onTranslationModeChanged(context);
+        }
+      },
     );
   }
 

@@ -64,11 +64,14 @@ class SelectedEntry {
     required this.urlEncodedHeadword,
     required this.entry,
     bool? isRelated,
-  }) : isRelated = isRelated ?? false;
+    bool? isOppositeHeadword,
+  })  : isRelated = isRelated ?? false,
+        isOppositeHeadword = isOppositeHeadword ?? false;
 
   final String urlEncodedHeadword;
   final Future<Entry> entry;
   final bool isRelated;
+  final bool isOppositeHeadword;
 
   @override
   String toString() {

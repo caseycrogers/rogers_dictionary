@@ -73,19 +73,10 @@ abstract class DictionaryDatabase {
     return const Stream.empty();
   }
 
-  Future<bool> isFavorite(
-      TranslationMode translationMode, String urlEncodedHeadword) async {
-    return _getCache(translationMode).getOrElse(
-      urlEncodedHeadword,
-      await internalIsFavorite(translationMode, urlEncodedHeadword),
-    );
+  bool isFavorite(
+      TranslationMode translationMode, String urlEncodedHeadword) {
+    return _getCache(translationMode)[urlEncodedHeadword]!;
   }
-
-  @protected
-  Future<bool> internalIsFavorite(
-    TranslationMode translationMode,
-    String urlEncodedHeadword,
-  );
 
   Stream<DialogueChapter> getDialogues({
     int startAfter,

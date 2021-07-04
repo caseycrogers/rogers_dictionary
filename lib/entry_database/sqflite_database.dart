@@ -85,23 +85,6 @@ class SqfliteDatabase extends DictionaryDatabase {
   }
 
   @override
-  Future<bool> internalIsFavorite(
-    TranslationMode translationMode,
-    String urlEncodedHeadword,
-  ) async {
-    final Database db = await _dbFuture;
-    final String query = '''
-SELECT $IS_FAVORITE
-FROM ${_favoritesTable(translationMode)}
-WHERE $URL_ENCODED_HEADWORD = $urlEncodedHeadword;''';
-    final List<Map<String, Object?>> snapshot = await db.rawQuery(query);
-    if (snapshot.isEmpty) {
-      return false;
-    }
-    return snapshot.single[IS_FAVORITE] as bool;
-  }
-
-  @override
   Future<bool> setFavorite(TranslationMode translationMode,
       String urlEncodedHeadword, bool favorite) async {
     final Database db = await _dbFuture;
