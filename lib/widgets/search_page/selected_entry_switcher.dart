@@ -11,6 +11,8 @@ import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 import 'entry_list.dart';
 
 class SelectedEntrySwitcher extends StatelessWidget {
+  const SelectedEntrySwitcher({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final SearchPageModel searchPageModel = _pageModel(context);
@@ -46,12 +48,28 @@ class _PortraitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableNavigator<SelectedEntry?>(
+      key: _getKey,
       valueListenable: searchPageModel.currSelectedEntry,
       builder: (BuildContext context, SelectedEntry? selectedEntry, _) =>
           selectedEntry != null
               ? EntryView.asPage(context)
-              : const EntryList(),
-      getDepth: (selectedEntry) => selectedEntry == null ? 0 : 1,
+              : EntryList(key: _getKey),
+      getDepth: (selectedEntry) {
+        if (selectedEntry == null) {
+          return 0;
+        } else if (!selectedEntry.isRelated) {
+          return 1;
+        }
+        return 2;
+      },
+    );
+  }
+
+  PageStorageKey get _getKey {
+    final String tabString =
+        searchPageModel.isFavoritesOnly ? 'favorites' : 'search';
+    return PageStorageKey<String>(
+      '${tabString}_selected_entry_listenable_navigator',
     );
   }
 }
@@ -65,7 +83,7 @@ class _LandscapePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Flexible(child: EntryList(), flex: 1),
+        Flexible(child: EntryList(key: _getKey), flex: 1),
         Flexible(
           flex: 2,
           child: Row(
@@ -73,6 +91,7 @@ class _LandscapePage extends StatelessWidget {
               const VerticalDivider(width: 1),
               Expanded(
                 child: ListenableNavigator<SelectedEntry?>(
+                  key: _getKey,
                   valueListenable: searchPageModel.currSelectedEntry,
                   builder:
                       (BuildContext context, SelectedEntry? selectedEntry, _) =>
@@ -84,6 +103,14 @@ class _LandscapePage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  PageStorageKey get _getKey {
+    final String tabString =
+        searchPageModel.isFavoritesOnly ? 'favorites' : 'search';
+    return PageStorageKey<String>(
+      '${tabString}_selected_entry_listenable_navigator',
     );
   }
 }

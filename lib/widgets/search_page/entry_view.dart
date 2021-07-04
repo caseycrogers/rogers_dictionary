@@ -88,7 +88,10 @@ class EntryView extends StatelessWidget {
                 ),
                 onPressed: () {
                   DictionaryPageModel.readFrom(context).onHeadwordSelected(
-                      context, EntryUtils.urlEncode(headword));
+                    context,
+                    EntryUtils.urlEncode(headword),
+                    isRelated: true,
+                  );
                 },
               ),
             ),
