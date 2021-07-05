@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:rogers_dictionary/dictionary_navigator/listenable_navigator.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
@@ -33,7 +33,7 @@ class SelectedEntrySwitcher extends StatelessWidget {
 
   SearchPageModel _pageModel(BuildContext context) {
     final TranslationPageModel t = TranslationPageModel.of(context);
-    return DictionaryPageModel.of(context).currentTab.value ==
+    return DictionaryModel.of(context).currentTab.value ==
             DictionaryTab.search
         ? t.searchPageModel
         : t.favoritesPageModel;
@@ -64,8 +64,8 @@ class _PortraitPage extends StatelessWidget {
       },
       onPopCallback: (selectedEntry) {
         if (selectedEntry != null && selectedEntry.isOppositeHeadword) {
-          final DictionaryPageModel dictionaryModel =
-              DictionaryPageModel.readFrom(context);
+          final DictionaryModel dictionaryModel =
+              DictionaryModel.readFrom(context);
           dictionaryModel.onTranslationModeChanged(context);
         }
       },

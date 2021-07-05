@@ -6,14 +6,16 @@ import 'package:flutter/rendering.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dialogues_page.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/dialogues_page/dictionary_back_button.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_entry.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_top_bar.dart';
+
 import 'favorites_page.dart';
 import 'search_page.dart';
 
@@ -24,7 +26,7 @@ enum DictionaryTab {
 }
 
 String dictionaryTabName(DictionaryTab dictionaryTab) =>
-    dictionaryTab.toString().split('.').last;
+    dictionaryTab.toString().enumString;
 
 class DictionaryPage extends StatefulWidget {
   @override
@@ -34,7 +36,7 @@ class DictionaryPage extends StatefulWidget {
 class _DictionaryPageState extends State<DictionaryPage> {
   @override
   Widget build(BuildContext context) {
-    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
+    final DictionaryModel dictionaryModel = DictionaryModel.of(context);
     return ValueListenableBuilder<TranslationPageModel>(
       valueListenable: dictionaryModel.translationPageModel,
       child: DictionaryTabBarView(
@@ -65,8 +67,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom),
                 child: MediaQuery(
-                  data: MediaQuery.of(context)
-                      .removePadding(removeBottom: true),
+                  data:
+                      MediaQuery.of(context).removePadding(removeBottom: true),
                   child: TabBar(
                     labelPadding: const EdgeInsets.all(kPad)
                         .add(const EdgeInsets.only(bottom: kPad)),

@@ -34,4 +34,6 @@ extension NotShittyString on String {
       .asMap()
       .mapDown((i, c) => i == 0 ? c.toUpperCase() : c)
       .join('');
+
+  String get enumString => split('.').last;
 }

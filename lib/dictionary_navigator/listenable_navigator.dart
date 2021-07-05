@@ -3,6 +3,8 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:rogers_dictionary/main.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 import 'package:rogers_dictionary/pages/default_page.dart';
 import 'package:rogers_dictionary/util/map_utils.dart';
@@ -50,7 +52,15 @@ class ListenableNavigator<T> extends StatefulWidget {
   @override
   _ListenableNavigatorState<T> createState() => _ListenableNavigatorState<T>();
 
-  static Future<bool> pop() async {
+  static Future<bool> pop({bool isSystem = true}) async {
+    await MyApp.analytics.logEvent(
+      name: 'pop${isSystem ? '_system' : ''}',
+      parameters: {
+        'stack': navigatorStack.map(
+          (depth, nav) => MapEntry(depth.toString(), nav.stack.toString()),
+        ).toString(),
+      },
+    );
     // Iterate from the deepest to the highest listenable navigator.
     for (final _ListenableNavigatorState navigatorState
         in navigatorStack.values.toList().reversed) {
@@ -67,6 +77,8 @@ class ListenableNavigator<T> extends StatefulWidget {
 
 class _ListenableNavigatorState<T> extends State<ListenableNavigator<T>> {
   static final Map<Key, SplayTreeMap<int, Object?>> stackCache = {};
+
+  VoidCallback? analyticsListener;
 
   late final bool isPrimary;
 
@@ -96,9 +108,22 @@ class _ListenableNavigatorState<T> extends State<ListenableNavigator<T>> {
   }
 
   @override
+  void didChangeDependencies() {
+    analyticsListener ??= () {
+      MyApp.analytics
+          .setCurrentScreen(screenName: DictionaryModel.readFrom(context).name);
+    };
+    widget.valueListenable.addListener(analyticsListener!);
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     ListenableNavigator.navigatorStack.removeWhere((_, value) => value == this);
     ListenableNavigator._updateEmptyNotifier();
+    if (analyticsListener != null) {
+      widget.valueListenable.removeListener(analyticsListener!);
+    }
     super.dispose();
   }
 
@@ -145,6 +170,7 @@ class _ListenableNavigatorState<T> extends State<ListenableNavigator<T>> {
             key: ValueKey(value),
             child: widget.builder(context, value, widget.child),
             transitionsBuilder: widget.transitionBuilder,
+            dictionaryModel: DictionaryModel.of(context),
           ),
         )
         .toList();

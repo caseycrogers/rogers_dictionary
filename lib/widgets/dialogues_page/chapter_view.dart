@@ -73,7 +73,7 @@ class _ChapterViewState extends State<ChapterView> {
       scrollable: false,
       padding: 0,
       header: Container(
-        padding: const EdgeInsets.only(right: 2 * kPad),
+        padding: const EdgeInsets.symmetric(horizontal: kPad),
         color: Theme.of(context).cardColor,
         child: ListTile(
           contentPadding: EdgeInsets.zero,
@@ -117,7 +117,6 @@ class _ChapterViewState extends State<ChapterView> {
             ),
         ],
       ),
-      onClose: () => dialoguesModel.onChapterSelected(context, null, null),
     );
   }
 

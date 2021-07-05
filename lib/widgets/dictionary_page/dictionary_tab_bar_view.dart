@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/dictionary_navigator/listenable_navigator.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 
 class DictionaryTabBarView extends StatefulWidget {
@@ -24,7 +24,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   TabController? _controller;
 
   ValueNotifier<DictionaryTab> get currentTab =>
-      DictionaryPageModel.readFrom(context).currentTab;
+      DictionaryModel.readFrom(context).currentTab;
 
   void _updateTabController() {
     final TabController newController = DefaultTabController.of(context)!;
