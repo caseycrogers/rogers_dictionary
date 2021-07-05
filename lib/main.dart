@@ -1,19 +1,24 @@
 import 'dart:async';
 
 import 'package:feedback/feedback.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+
 import 'package:rogers_dictionary/entry_database/sqflite_database.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 
 import 'entry_database/dictionary_database.dart';
-import 'models/dictionary_page_model.dart';
+import 'models/dictionary_model.dart';
 
 final Color englishPrimary = Colors.indigo.shade600;
 final Color spanishPrimary = Colors.orange.shade600;
@@ -30,15 +35,31 @@ Color secondaryColor(TranslationMode translationMode) =>
         ? englishSecondary
         : spanishSecondary;
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  await Firebase.initializeApp();
+  return runZonedGuarded<void>(
+    () async {
+      if (kDebugMode) {
+        await FirebaseCrashlytics.instance
+            .setCrashlyticsCollectionEnabled(false);
+      }
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+      runApp(MyApp());
+    },
+    FirebaseCrashlytics.instance.recordError,
+  );
 }
 
 class MyApp extends StatelessWidget {
-  static final Future<FirebaseApp> isInitialized = Firebase.initializeApp();
   static final DictionaryDatabase db = SqfliteDatabase();
   static final Future<PackageInfo> packageInfo = PackageInfo.fromPlatform();
+
+  static final FirebaseAnalytics analytics = FirebaseAnalytics();
+
+  static FirebaseAnalyticsObserver get observer =>
+      FirebaseAnalyticsObserver(analytics: analytics);
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +83,8 @@ class MyApp extends StatelessWidget {
           },
           child: MaterialApp(
             title: 'Dictionary',
-            home: Provider<DictionaryPageModel>(
-              create: (_) => DictionaryPageModel(),
+            home: Provider<DictionaryModel>(
+              create: (_) => DictionaryModel(),
               builder: (BuildContext context, _) {
                 return DictionaryPage();
               },

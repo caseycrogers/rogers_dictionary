@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 
@@ -80,7 +81,8 @@ class EntrySearchModel {
     required BuildContext context,
     required String newSearchString,
   }) {
-    DictionaryPageModel.readFrom(context).onHeadwordSelected(
+    MyApp.analytics.logSearch(searchTerm: newSearchString);
+    DictionaryModel.readFrom(context).onHeadwordSelected(
       context,
       '',
     );

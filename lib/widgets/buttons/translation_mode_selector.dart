@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 
 class TranslationModeSelector extends StatelessWidget {
@@ -23,7 +23,7 @@ class TranslationModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DictionaryPageModel pageModel = DictionaryPageModel.of(context);
+    final DictionaryModel pageModel = DictionaryModel.of(context);
     final BoxDecoration decoration = BoxDecoration(
       color: Colors.black38,
       borderRadius: BorderRadius.circular(4),
@@ -95,7 +95,7 @@ class _Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
+    final DictionaryModel dictionaryModel = DictionaryModel.of(context);
     final bool isSelected =
         dictionaryModel.translationPageModel.value.translationMode == mode;
     return Container(
