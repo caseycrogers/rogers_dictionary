@@ -71,16 +71,9 @@ class _AboutPage extends StatelessWidget {
                   'version of the 5th edition of my medical bilingual '
                   'dictionary to be published later this year (2021). The app '
                   'translates any medical word likely to come up in a '
-                  'health professional and a patient, including:',
+                  'health professional and a patient, including slang, '
+                  'regionalisms, and more.\n',
                 ),
-                const Text(''' - slang
- - technical terms
- - regionalisms
- - 600+ medication names
- - long phrases (eg against medical advice)
- - abbreviations and acronyms
- - non-medical terms commonly used in a medical setting
- '''),
                 const Text(
                   'It also provides an extensive sample dialogue '
                   'section based on my 30-plus year history as an internist '
@@ -91,8 +84,7 @@ class _AboutPage extends StatelessWidget {
                     'using skills he acquired at Google and GM Cruise.\n'),
                 const Text('Enjoy the app! If you have any feedback on the '
                     'app or the translations, you can provide feedback by '
-                    'pressing the \'options\' button at the top right of any '
-                    'screen.'),
+                    'pressing the \'options\' button at the top right.'),
                 const Divider(),
                 const _DebugInfo(),
               ],

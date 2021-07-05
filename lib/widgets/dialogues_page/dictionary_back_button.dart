@@ -27,6 +27,7 @@ class DictionaryBackButton extends StatelessWidget {
             );
           },
           child: Visibility(
+            key: ValueKey(!isEmpty),
             visible: !isEmpty,
             child: const BackButton(onPressed: ListenableNavigator.pop),
           ),
