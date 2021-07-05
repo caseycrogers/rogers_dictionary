@@ -36,6 +36,13 @@ class DictionaryPageModel {
   final TranslationPageModel englishPageModel;
   final TranslationPageModel spanishPageModel;
 
+  TranslationPageModel pageModel(TranslationMode translationMode) {
+    if (translationMode == TranslationMode.English) {
+      return englishPageModel;
+    }
+    return spanishPageModel;
+  }
+
   late final ValueNotifier<TranslationPageModel> translationPageModel;
 
   final ValueNotifier<DictionaryTab> currentTab;
@@ -58,7 +65,7 @@ class DictionaryPageModel {
   static DictionaryPageModel readFrom(BuildContext context) =>
       context.read<DictionaryPageModel>();
 
-  TranslationPageModel pageModel(TranslationMode translationMode) =>
+  TranslationPageModel getPageModel(TranslationMode translationMode) =>
       translationMode == TranslationMode.English
           ? englishPageModel
           : spanishPageModel;
@@ -124,12 +131,12 @@ class DictionaryPageModel {
     if (newUrlEncodedHeadword == pageModel.currSelectedHeadword) {
       return;
     }
+    if (newUrlEncodedHeadword.isEmpty) {
+      return pageModel.currSelectedEntry.value = null;
+    }
     final FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
-    }
-    if (newUrlEncodedHeadword.isEmpty) {
-      return pageModel.currSelectedEntry.value = null;
     }
     final SelectedEntry selectedEntry = SelectedEntry(
       urlEncodedHeadword: newUrlEncodedHeadword,
