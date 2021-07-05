@@ -12,8 +12,8 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TranslationModeSwitcher(
-      header: const SearchBar(),
+    return const TranslationModeSwitcher(
+      header: SearchBar(),
       child: SelectedEntrySwitcher(),
     );
   }
