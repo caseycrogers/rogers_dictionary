@@ -47,7 +47,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length && i < 200) {
+  while (i < rows.length) {
     if ((i + 2) % 500 == 0) {
       print('${i + 2}/${rows.length + 2} complete!');
     }
