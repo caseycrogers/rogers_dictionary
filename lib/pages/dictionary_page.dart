@@ -67,8 +67,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom),
                 child: MediaQuery(
-                  data: MediaQuery.of(context)
-                      .removePadding(removeBottom: true),
+                  data:
+                      MediaQuery.of(context).removePadding(removeBottom: true),
                   child: TabBar(
                     labelPadding: const EdgeInsets.all(kPad)
                         .add(const EdgeInsets.only(bottom: kPad)),

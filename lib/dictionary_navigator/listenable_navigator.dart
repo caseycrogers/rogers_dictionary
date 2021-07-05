@@ -52,7 +52,15 @@ class ListenableNavigator<T> extends StatefulWidget {
   @override
   _ListenableNavigatorState<T> createState() => _ListenableNavigatorState<T>();
 
-  static Future<bool> pop() async {
+  static Future<bool> pop({bool isSystem = true}) async {
+    await MyApp.analytics.logEvent(
+      name: 'pop${isSystem ? '_system' : ''}',
+      parameters: {
+        'stack': navigatorStack.map(
+          (depth, nav) => MapEntry(depth.toString(), nav.stack.toString()),
+        ).toString(),
+      },
+    );
     // Iterate from the deepest to the highest listenable navigator.
     for (final _ListenableNavigatorState navigatorState
         in navigatorStack.values.toList().reversed) {

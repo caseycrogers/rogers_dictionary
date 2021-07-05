@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:715990126622:android:24553fb6fc1f1c66c95e0f",
+        "mobilesdk_app_id": "1:715990126622:android:6aba9e6aee86a5cbc95e0f",
         "android_client_info": {
-          "package_name": "example.rogers_dictionary"
+          "package_name": "com.rogers_dictionary"
         }
       },
       "oauth_client": [
         {
-          "client_id": "715990126622-0g4m2h0qnt6runf30a91ljj1m1uejo13.apps.googleusercontent.com",
+          "client_id": "715990126622-ftu4k0tuklf34nh1ppcb3he14ic5566h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "example.rogers_dictionary",
+            "package_name": "com.rogers_dictionary",
             "certificate_hash": "2f950784b75c59abd90396aa7b780b2cfbff4b30"
           }
         },
