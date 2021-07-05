@@ -69,6 +69,7 @@ class _SearchBarState extends State<SearchBar> {
                         onPressed: () {
                           _controller.clear();
                           entrySearchModel.onSearchStringChanged(
+                            context: context,
                             newSearchString: '',
                           );
                         },
@@ -78,8 +79,12 @@ class _SearchBarState extends State<SearchBar> {
                 hintText: '${i18n.search.get(context)}...',
                 border: InputBorder.none,
               ),
-              onChanged: (searchString) => entrySearchModel
-                  .onSearchStringChanged(newSearchString: searchString),
+              onChanged: (searchString) {
+                entrySearchModel.onSearchStringChanged(
+                  context: context,
+                  newSearchString: searchString,
+                );
+              },
             ),
           ),
         ),
