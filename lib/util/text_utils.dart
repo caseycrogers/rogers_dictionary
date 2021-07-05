@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -267,7 +267,7 @@ Widget translationLine(
                       IconButton(
                         padding: const EdgeInsets.only(bottom: 2),
                         onPressed: () {
-                          DictionaryPageModel.readFrom(context)
+                          DictionaryModel.readFrom(context)
                               .onOppositeHeadwordSelected(
                             context,
                             EntryUtils.urlEncode(

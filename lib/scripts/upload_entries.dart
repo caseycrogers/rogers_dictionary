@@ -60,7 +60,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       continue;
     }
     row.forEach((key, str) {
-      if (str.contains('\n') || str.contains('\r'))
+      if (key != EDITORIAL_NOTE && (str.contains('\n') || str.contains('\r')))
         print('$WARNING field $key at row ${i + 2} contains a line break.'
             ' Field:\n$str');
     });

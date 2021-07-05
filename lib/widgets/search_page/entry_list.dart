@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
@@ -31,7 +31,7 @@ class EntryList extends StatelessWidget {
         final EntrySearchModel entrySearchModel =
             searchPageModel.entrySearchModel;
         if (entrySearchModel.isEmpty &&
-            DictionaryPageModel.of(context).currentTab.value ==
+            DictionaryModel.of(context).currentTab.value ==
                 DictionaryTab.search) {
           return _noResultsWidget(i18n.enterTextHint.get(context), context);
         }
@@ -68,7 +68,7 @@ class EntryList extends StatelessWidget {
     AsyncSnapshot<List<Entry>> snapshot,
     int index,
   ) {
-    final dictionaryModel = DictionaryPageModel.readFrom(context);
+    final dictionaryModel = DictionaryModel.readFrom(context);
     final SearchPageModel searchPageModel = SearchPageModel.readFrom(context);
     return ValueListenableBuilder<SelectedEntry?>(
       valueListenable: searchPageModel.currSelectedEntry,

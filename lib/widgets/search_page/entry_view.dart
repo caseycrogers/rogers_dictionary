@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:collection/collection.dart';
 
 import 'package:rogers_dictionary/entry_database/entry_builders.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
@@ -87,7 +87,7 @@ class EntryView extends StatelessWidget {
                       .copyWith(color: Colors.blue),
                 ),
                 onPressed: () {
-                  DictionaryPageModel.readFrom(context).onHeadwordSelected(
+                  DictionaryModel.readFrom(context).onHeadwordSelected(
                     context,
                     EntryUtils.urlEncode(headword),
                     isRelated: true,

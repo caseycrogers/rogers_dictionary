@@ -10,6 +10,7 @@ import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 
 const TranslationMode DEFAULT_TRANSLATION_MODE = TranslationMode.English;
 
@@ -20,8 +21,8 @@ int translationModeToIndex(TranslationMode translationMode) {
   return TranslationMode.values.indexOf(translationMode);
 }
 
-class DictionaryPageModel {
-  DictionaryPageModel()
+class DictionaryModel {
+  DictionaryModel()
       : currentTab = ValueNotifier(DictionaryTab.search),
         englishPageModel = TranslationPageModel(
           translationMode: TranslationMode.English,
@@ -31,6 +32,9 @@ class DictionaryPageModel {
         ) {
     translationPageModel =
         ValueNotifier<TranslationPageModel>(englishPageModel);
+    translationPageModel.addListener(() {
+      MyApp.analytics.setCurrentScreen(screenName: name);
+    });
   }
 
   final TranslationPageModel englishPageModel;
@@ -58,12 +62,11 @@ class DictionaryPageModel {
 
   bool get isEnglish => translationPageModel.value.isEnglish;
 
-  static DictionaryPageModel of(BuildContext context) =>
-      context.select<DictionaryPageModel, DictionaryPageModel>(
-          (DictionaryPageModel mdl) => mdl);
+  static DictionaryModel of(BuildContext context) => context
+      .select<DictionaryModel, DictionaryModel>((DictionaryModel mdl) => mdl);
 
-  static DictionaryPageModel readFrom(BuildContext context) =>
-      context.read<DictionaryPageModel>();
+  static DictionaryModel readFrom(BuildContext context) =>
+      context.read<DictionaryModel>();
 
   TranslationPageModel getPageModel(TranslationMode translationMode) =>
       translationMode == TranslationMode.English
@@ -150,4 +153,25 @@ class DictionaryPageModel {
   }
 
   bool get isFavoritesOnly => currentTab.value == DictionaryTab.favorites;
+
+  String get name {
+    String? thirdTier;
+    switch (currentTab.value) {
+      case DictionaryTab.search:
+        thirdTier =
+            translationPageModel.value.searchPageModel.currSelectedHeadword;
+        break;
+      case DictionaryTab.favorites:
+        thirdTier =
+            translationPageModel.value.searchPageModel.currSelectedHeadword;
+        break;
+      case DictionaryTab.dialogues:
+        thirdTier = translationPageModel
+            .value.dialoguesPageModel.selectedChapter?.englishTitle;
+        break;
+    }
+    return '${currTranslationMode.toString().split(',')}'
+        ' > ${currentTab.value}'
+        ' > ${thirdTier.toString().enumString}';
+  }
 }

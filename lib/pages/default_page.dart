@@ -1,13 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 class DefaultPage extends Page<void> {
-  const DefaultPage({
+  DefaultPage({
     LocalKey? key,
+    required DictionaryModel dictionaryModel,
     required this.child,
     this.transitionsBuilder,
     this.duration = const Duration(milliseconds: 200),
-  }) : super(key: key);
+  }) : super(
+    key: key,
+    name: dictionaryModel.name,
+    arguments: dictionaryModel,
+  );
 
   static final PageStorageBucket _globalBucket = PageStorageBucket();
 
@@ -32,12 +38,10 @@ class DefaultPage extends Page<void> {
   }
 }
 
-Widget _dictionaryTransitionBuilder(
-  BuildContext context,
-  Animation<double> animation,
-  Animation<double> secondaryAnimation,
-  Widget child,
-) {
+Widget _dictionaryTransitionBuilder(BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,) {
   return FadeTransition(
     child: FadeTransition(
       child: child,
