@@ -1,7 +1,10 @@
-import 'package:rogers_dictionary/i18n.dart' as i18n;
-import 'package:feedback/feedback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:feedback/feedback.dart';
+
+import 'package:rogers_dictionary/i18n.dart' as i18n;
+import 'package:rogers_dictionary/util/string_utils.dart';
 
 class DictionaryFeedback {
   DictionaryFeedback(this.subject, this.body, this.type);
@@ -9,6 +12,14 @@ class DictionaryFeedback {
   final String subject;
   final String body;
   final DictionaryFeedbackType type;
+
+  Map<String, String> toMap() {
+    return {
+      'subject': subject,
+      'body': body,
+      'type': type.toString().enumString
+    };
+  }
 }
 
 class _DictionaryFeedbackBuilder {

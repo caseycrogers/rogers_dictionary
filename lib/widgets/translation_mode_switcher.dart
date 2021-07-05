@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
@@ -24,8 +24,8 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
   @override
   void didChangeDependencies() {
     if (_controller == null) {
-      final DictionaryPageModel dictionaryModel =
-          DictionaryPageModel.readFrom(context);
+      final DictionaryModel dictionaryModel =
+          DictionaryModel.readFrom(context);
       _controller = PageController(
         initialPage:
             translationModeToIndex(dictionaryModel.currTranslationMode),
@@ -69,12 +69,12 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
   }
 
   Widget pages(BuildContext context) {
-    final DictionaryPageModel dictionaryModel = DictionaryPageModel.of(context);
+    final DictionaryModel dictionaryModel = DictionaryModel.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         return PageView(
           controller: _controller,
-          onPageChanged: (int index) => DictionaryPageModel.readFrom(context)
+          onPageChanged: (int index) => DictionaryModel.readFrom(context)
               .onTranslationModeChanged(context, indexToTranslationMode(index)),
           children: [
             Row(

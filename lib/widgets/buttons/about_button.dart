@@ -8,6 +8,7 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/pages/page_header.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/map_utils.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
@@ -106,7 +107,7 @@ class _DebugInfo extends StatelessWidget {
       child: Column(
         children: <String, Future<String>>{
           '': Future.value(
-              Theme.of(context).platform.toString().split('.').last),
+              Theme.of(context).platform.toString().enumString),
           'app v': MyApp.packageInfo.then((p) => p.version),
           'database v': MyApp.db.version.then((v) => v.versionString),
         }

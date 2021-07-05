@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
-import 'package:rogers_dictionary/models/dictionary_page_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_page_model.dart';
 import 'package:rogers_dictionary/models/translation_page_model.dart';
@@ -25,7 +25,7 @@ class _SearchBarState extends State<SearchBar> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final SearchPageModel searchPageModel =
-        DictionaryPageModel.readFrom(context)
+        DictionaryModel.readFrom(context)
             .translationPageModel
             .value
             .searchPageModel;
@@ -46,7 +46,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<TranslationPageModel>(
-      valueListenable: DictionaryPageModel.of(context).translationPageModel,
+      valueListenable: DictionaryModel.of(context).translationPageModel,
       builder: (context, translationPage, content) {
         return Material(
           color: primaryColor(translationPage.translationMode),
@@ -92,7 +92,7 @@ class _SearchBarState extends State<SearchBar> {
     );
   }
 
-  EntrySearchModel get entrySearchModel => DictionaryPageModel.readFrom(context)
+  EntrySearchModel get entrySearchModel => DictionaryModel.readFrom(context)
       .translationPageModel
       .value
       .searchPageModel
