@@ -25,6 +25,7 @@ class AboutButton extends StatelessWidget {
         style: kButtonTextStyle,
       ),
       onPressed: () {
+        MyApp.analytics.logEvent(name: 'about_pressed');
         onPressed();
         showDialog<void>(
           context: context,
@@ -72,8 +73,8 @@ class _AboutPage extends StatelessWidget {
                   'version of the 5th edition of my medical bilingual '
                   'dictionary to be published later this year (2021). The app '
                   'translates any medical word likely to come up in a '
-                  'health professional and a patient, including slang, '
-                  'regionalisms, and more.\n',
+                  'conversation between a health professional and a patient, '
+                  'including slang, regionalisms, and more.\n',
                 ),
                 const Text(
                   'It also provides an extensive sample dialogue '
@@ -83,9 +84,9 @@ class _AboutPage extends StatelessWidget {
                 ),
                 const Text('The app was developed by my son, Casey Rogers, '
                     'using skills he acquired at Google and GM Cruise.\n'),
-                const Text('Enjoy the app! If you have any feedback on the '
-                    'app or the translations, you can provide feedback by '
-                    'pressing the \'options\' button at the top right.'),
+                const Text('Enjoy the app! If you have any feedback, you can '
+                    'let us know by pressing the "options" button at the top '
+                    'right and tapping "give feedback."'),
                 const Divider(),
                 const _DebugInfo(),
               ],
@@ -106,8 +107,7 @@ class _DebugInfo extends StatelessWidget {
       style: const TextStyle(color: Colors.black38, fontSize: 20),
       child: Column(
         children: <String, Future<String>>{
-          '': Future.value(
-              Theme.of(context).platform.toString().enumString),
+          '': Future.value(Theme.of(context).platform.toString().enumString),
           'app v': MyApp.packageInfo.then((p) => p.version),
           'database v': MyApp.db.version.then((v) => v.versionString),
         }

@@ -59,8 +59,7 @@ class FeedbackButton extends StatelessWidget {
                 ' ${feedback.subject}',
             recipients: [
               'caseycrogers+$typeString@berkeley.edu',
-              if (feedback.type == DictionaryFeedbackType.translation_error)
-                'glenntrogers+$typeString@gmail.com'
+              'glenntrogers+$typeString@gmail.com',
             ],
             body: feedback.body,
             attachmentPaths: [screenshotFilePath],
