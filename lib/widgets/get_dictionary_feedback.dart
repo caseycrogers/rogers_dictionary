@@ -41,16 +41,16 @@ enum DictionaryFeedbackType {
   other,
 }
 
-String typeToString(BuildContext context, DictionaryFeedbackType type) {
+String typeToString(Locale locale, DictionaryFeedbackType type) {
   switch (type) {
     case DictionaryFeedbackType.bug_report:
-      return i18n.bugReport.get(context);
+      return i18n.bugReport.getForLocale(locale);
     case DictionaryFeedbackType.feature_request:
-      return i18n.featureRequest.get(context);
+      return i18n.featureRequest.getForLocale(locale);
     case DictionaryFeedbackType.translation_error:
-      return i18n.translationError.get(context);
+      return i18n.translationError.getForLocale(locale);
     case DictionaryFeedbackType.other:
-      return i18n.other.get(context);
+      return i18n.other.getForLocale(locale);
   }
 }
 
@@ -84,7 +84,12 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                       items: DictionaryFeedbackType.values
                           .map(
                             (type) => DropdownMenuItem<DictionaryFeedbackType>(
-                              child: Text(typeToString(context, type)),
+                              child: Text(
+                                typeToString(
+                                  Localizations.localeOf(context),
+                                  type,
+                                ),
+                              ),
                               value: type,
                             ),
                           )
