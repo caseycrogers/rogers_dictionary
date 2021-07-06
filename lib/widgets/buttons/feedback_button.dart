@@ -38,6 +38,7 @@ class FeedbackButton extends StatelessWidget {
     unawaited(MyApp.analytics.logEvent(
       name: 'feedback_opened',
     ));
+    Locale locale = Localizations.localeOf(context);
     BetterFeedback.of(context).controller.show(
       (userFeedback) async {
         final screenshotFilePath =
@@ -55,7 +56,7 @@ class FeedbackButton extends StatelessWidget {
         await FlutterEmailSender.send(
           Email(
             subject:
-                '[Rogers Dictionary - ${typeToString(context, feedback.type)}]'
+                '[Rogers Dictionary - ${typeToString(locale, feedback.type)}]'
                 ' ${feedback.subject}',
             recipients: [
               'caseycrogers+$typeString@berkeley.edu',

@@ -52,7 +52,11 @@ class _Message {
   _Message(this._en, this._es);
 
   String get(BuildContext context) {
-    return Localizations.localeOf(context).languageCode == 'es' ? _es : _en;
+    return getForLocale(Localizations.localeOf(context));
+  }
+
+  String getForLocale(Locale locale) {
+    return locale.languageCode == 'es' ? _es : _en;
   }
 
   final String _en;
