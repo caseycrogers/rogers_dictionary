@@ -170,8 +170,8 @@ class DictionaryModel {
             .value.dialoguesPageModel.selectedChapter?.englishTitle;
         break;
     }
-    return '${currTranslationMode.toString().split(',')}'
-        ' > ${currentTab.value}'
+    return '${currTranslationMode.toString().enumString}'
+        ' > ${currentTab.value.toString().enumString}'
         ' > ${thirdTier.toString().enumString}';
   }
 }
