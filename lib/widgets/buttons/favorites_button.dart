@@ -23,6 +23,12 @@ class _FavoritesButtonState extends State<FavoritesButton> {
       onPressed: () async {
         final bool newFavorite = !MyApp.db.isFavorite(
             translationMode, widget.entry.headword.urlEncodedHeadword);
+        await MyApp.analytics.logEvent(
+          name: 'set_favorite',
+          parameters: {
+            'value': newFavorite.toString(),
+          },
+        );
         await MyApp.db.setFavorite(
           translationMode,
           widget.entry.headword.urlEncodedHeadword,
