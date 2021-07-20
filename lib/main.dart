@@ -30,11 +30,6 @@ Color primaryColor(TranslationMode translationMode) =>
         ? englishPrimary
         : spanishPrimary;
 
-Color secondaryColor(TranslationMode translationMode) =>
-    translationMode == TranslationMode.English
-        ? englishSecondary
-        : spanishSecondary;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

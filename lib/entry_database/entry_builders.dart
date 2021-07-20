@@ -35,6 +35,9 @@ extension VersionUtils on DatabaseVersion {
 extension EntryUtils on Entry {
   List<Headword> get allHeadwords => [headword, ...alternateHeadwords];
 
+  bool get isNotFound =>
+      headword.urlEncodedHeadword.startsWith('Invalid headword ');
+
   static String urlDecode(String urlEncodedHeadword) {
     return Uri.decodeComponent(
         (urlEncodedHeadword.split('_')..removeAt(0)).join(''));
@@ -45,12 +48,11 @@ extension EntryUtils on Entry {
   }
 
   static Entry notFound(String headword) {
-    print('WARN: Entry $headword not found');
     return Entry(
       entryId: 404,
       headword: Headword(
         isAlternate: false,
-        headwordText: 'Invalid headword ${urlDecode(headword)}',
+        headwordText: 'Invalid headword \'$headword\'',
       ),
       translations: <Translation>[
         Translation(

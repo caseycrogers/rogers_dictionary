@@ -78,6 +78,7 @@ class _SearchBarState extends State<SearchBar> {
                     : null,
                 hintText: '${i18n.search.get(context)}...',
                 border: InputBorder.none,
+
               ),
               onChanged: (searchString) {
                 entrySearchModel.onSearchStringChanged(
