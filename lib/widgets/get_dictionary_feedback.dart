@@ -7,28 +7,21 @@ import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 class DictionaryFeedback {
-  DictionaryFeedback(this.subject, this.body, this.type);
+  DictionaryFeedback(this.body, this.type);
 
-  final String subject;
   final String body;
   final DictionaryFeedbackType type;
 
   Map<String, String> toMap() {
-    return {
-      'subject': subject,
-      'body': body,
-      'type': type.toString().enumString
-    };
+    return {'body': body, 'type': type.toString().enumString};
   }
 }
 
 class _DictionaryFeedbackBuilder {
-  String? subject;
   String? body;
   DictionaryFeedbackType? type;
 
   DictionaryFeedback build() => DictionaryFeedback(
-        subject ?? '',
         body ?? '',
         type!,
       );
@@ -102,16 +95,11 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                   ],
                 ),
                 TextField(
-                  maxLength: 60,
-                  decoration: InputDecoration(
-                      helperText: i18n.summary.cap.get(context)),
-                  onChanged: (value) => _feedbackBuilder.subject = value,
-                ),
-                TextField(
                   minLines: 2,
                   maxLines: 10,
                   decoration: InputDecoration(
-                      helperText: i18n.feedback.cap.get(context)),
+                    helperText: i18n.feedback.cap.get(context),
+                  ),
                   onChanged: (value) => _feedbackBuilder.body = value,
                 ),
               ],

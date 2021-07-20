@@ -223,7 +223,8 @@ Future<Database> _getDatabase() async {
   final bool exists = await databaseExists(path);
 
   if (!exists) {
-    print('Creating new copy from asset');
+    print('Creating new copy from asset: '
+        '${DICTIONARY_DB}V${version.versionString}.db');
 
     // Make sure the parent directory exists
     try {

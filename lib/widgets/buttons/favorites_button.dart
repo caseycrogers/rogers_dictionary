@@ -26,6 +26,7 @@ class _FavoritesButtonState extends State<FavoritesButton> {
         await MyApp.analytics.logEvent(
           name: 'set_favorite',
           parameters: {
+            'entry': widget.entry.headword.urlEncodedHeadword,
             'value': newFavorite.toString(),
           },
         );

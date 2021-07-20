@@ -33,7 +33,6 @@ _Message aboutThisApp = _Message('about this app', 'acerca de esta aplicación')
 // Localization for getting feedback.
 _CapMessage feedback = _CapMessage('feedback', 'comentarios');
 _CapMessage feedbackType = _CapMessage('feedback type', 'tipo de comentarios');
-_CapMessage summary = _CapMessage('summary', 'resumen');
 _CapMessage submit = _CapMessage('submit', 'enviar');
 _Message opensEmail = _Message(
     '(opens your email app)', '(abre tu aplicación de correo electrónico)');

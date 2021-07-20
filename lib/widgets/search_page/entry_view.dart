@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -13,7 +14,14 @@ import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/pages/page_header.dart';
 
 class EntryView extends StatelessWidget {
-  const EntryView._instance(this._entry, this._preview);
+  EntryView._instance(this._entry, this._preview) {
+    if (_entry.isNotFound) {
+      FirebaseCrashlytics.instance.recordError(
+        'Invalid headword ${_entry.headword}',
+        null,
+      );
+    }
+  }
 
   final Entry _entry;
   final bool _preview;

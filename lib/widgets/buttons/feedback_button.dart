@@ -27,47 +27,47 @@ class FeedbackButton extends StatelessWidget {
         i18n.giveFeedback.get(context),
         style: kButtonTextStyle,
       ),
-      onPressed: () => _submit(context),
+      onPressed: () => _showFeedback(context),
     );
   }
 
-  void _submit(BuildContext context) {
+  void _showFeedback(BuildContext context) {
     // Close the menu before displaying feedback.
     onPressed?.call();
     // Log user feedback in analytics
     unawaited(MyApp.analytics.logEvent(
       name: 'feedback_opened',
     ));
-    Locale locale = Localizations.localeOf(context);
+    final Locale locale = Localizations.localeOf(context);
     BetterFeedback.of(context).controller.show(
-      (userFeedback) async {
-        final screenshotFilePath =
-            await writeImageToStorage(userFeedback.screenshot);
-        final DictionaryFeedback feedback =
-            userFeedback.extra!['feedback'] as DictionaryFeedback;
-        final String typeString = feedback.type.toString().enumString;
-
-        // Log user feedback in analytics
-        unawaited(MyApp.analytics.logEvent(
-          name: 'feedback_submitted',
-          parameters: feedback.toMap(),
-        ));
-
-        await FlutterEmailSender.send(
-          Email(
-            subject:
-                '[Rogers Dictionary - ${typeToString(locale, feedback.type)}]'
-                ' ${feedback.subject}',
-            recipients: [
-              'caseycrogers+$typeString@berkeley.edu',
-              'glenntrogers+$typeString@gmail.com',
-            ],
-            body: feedback.body,
-            attachmentPaths: [screenshotFilePath],
-            isHTML: false,
-          ),
+          (userFeedback) => _onFeedback(userFeedback, locale),
         );
-      },
+  }
+
+  Future<void> _onFeedback(UserFeedback userFeedback, Locale locale) async {
+    final screenshotFilePath =
+        await writeImageToStorage(userFeedback.screenshot);
+    final DictionaryFeedback feedback =
+        userFeedback.extra!['feedback'] as DictionaryFeedback;
+    final String typeString = feedback.type.toString().enumString;
+
+    // Log user feedback in analytics
+    unawaited(MyApp.analytics.logEvent(
+      name: 'feedback_submitted',
+      parameters: feedback.toMap(),
+    ));
+
+    await FlutterEmailSender.send(
+      Email(
+        subject: '[Rogers Dictionary - ${typeToString(locale, feedback.type)}]',
+        recipients: [
+          'caseycrogers+$typeString@berkeley.edu',
+          'glenntrogers+$typeString@gmail.com',
+        ],
+        body: feedback.body,
+        attachmentPaths: [screenshotFilePath],
+        isHTML: false,
+      ),
     );
   }
 }

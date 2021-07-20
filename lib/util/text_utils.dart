@@ -246,8 +246,19 @@ Widget translationLine(
   Translation translation,
   int i,
 ) {
-  final List<Widget> wraps =
-      OverflowMarkdown(translation.content).forWrap(context);
+  final List<Widget> wraps = [
+    ...OverflowMarkdown(translation.content).forWrap(context),
+    if (translation.genderAndPlural.isNotEmpty)
+      OverflowMarkdown(' *${translation.genderAndPlural}*'),
+    if (translation.abbreviation.isNotEmpty) ...[
+      normal1Text(context, ' '),
+      OverflowMarkdown('(${translation.abbreviation})'),
+    ],
+    if (translation.namingStandard.isNotEmpty)
+      _namingStandard(context, translation.namingStandard, false),
+    ..._translationParentheticals(
+        context, translation.parentheticalQualifier),
+  ];
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -255,15 +266,18 @@ Widget translationLine(
       Expanded(
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.start,
-          children: [
-            ...wraps.map((t) {
-              if (t == wraps.last && translation.oppositeHeadword.isNotEmpty) {
-                return Container(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      t,
+          // Opposite headword button is always paired with the last item.
+          children: wraps
+            ..replaceRange(
+              wraps.length - 1,
+              wraps.length,
+              [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    wraps.last,
+                    if (translation.oppositeHeadword.isNotEmpty)
                       IconButton(
                         padding: const EdgeInsets.only(bottom: 2),
                         onPressed: () {
@@ -276,24 +290,11 @@ Widget translationLine(
                         },
                         icon: const Icon(Icons.open_in_new, color: Colors.grey),
                         visualDensity: VisualDensity.compact,
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return t;
-            }),
-            if (translation.genderAndPlural.isNotEmpty)
-              OverflowMarkdown(' *${translation.genderAndPlural}*'),
-            if (translation.abbreviation.isNotEmpty) ...[
-              normal1Text(context, ' '),
-              OverflowMarkdown('(${translation.abbreviation})'),
-            ],
-            if (translation.namingStandard.isNotEmpty)
-              _namingStandard(context, translation.namingStandard, false),
-            ..._translationParentheticals(
-                context, translation.parentheticalQualifier),
-          ],
+                      )
+                  ],
+                ),
+              ],
+            ),
         ),
       ),
     ],
