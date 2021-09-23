@@ -123,7 +123,7 @@ class _PlayingButton extends StatelessWidget {
                 ),
                 duration: const Duration(seconds: 2),
                 action: SnackBarAction(
-                  label: i18n.dissmiss.get(context),
+                  label: i18n.dismiss.get(context),
                   onPressed: () {
                     scaffoldMessenger.hideCurrentSnackBar();
                   },

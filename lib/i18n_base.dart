@@ -14,15 +14,15 @@ _CapMessage about = _CapMessage('about', 'sobre');
 // Localization for EntryList.
 _CapMessage search = _CapMessage('search', 'buscar');
 Message enterTextHint = Message('Enter text above to search for a translation ',
-    '¡Ingrese el texto arriba para buscar una traducción ');
-Message noBookmarksHint = Message('No results! Try favoriting an entry first ',
-    '¡No hay resultados! Primero, intenta marcar una entrada como favorita ');
+    'Ingrese texto arriba para buscar una traducción ');
+Message noBookmarksHint = Message('No results! Try bookmarking an entry first ',
+    '¡No hay entradas! Intenta aplicar marcador a un artículo primero ');
 Message typosHint = Message('No results! Check for typos ',
-    '¡No hay resultados! Compruebe si hay errores tipográficos ');
-Message swipeForSpanish = Message(
-    'or swipe for spanish mode.', 'o desliza el dedo para al modo español.');
-Message swipeForEnglish = Message(
-    'or swipe for english mode.', 'o desliza el dedo para al modo inglés.');
+    '¡No hay resultados! Compruebe si hay errores ortográficos ');
+Message swipeForSpanish = Message('or swipe left for spanish mode.',
+    'o desliza a la izquierda para traducir términos en español.');
+Message swipeForEnglish = Message('or swipe right for english mode.',
+    'o desliza a la derecha para traducir términos en inglés.');
 
 // Localizations for EntryView.
 Message irregularInflections =
@@ -32,19 +32,19 @@ Message editorialNotes = Message('Editorial Notes', 'Notas Editoriales');
 Message related = Message('Related', 'Relacionado');
 
 // Localization for the help menu.
-Message giveFeedback = Message('give feedback', 'dar opinion');
-Message aboutThisApp = Message('about this app', 'acerca de esta aplicación');
+Message giveFeedback = Message('give feedback', 'dar opinión');
+Message aboutThisApp = Message('about this app', 'sobre la app');
 
 // Localization for getting feedback.
 _CapMessage feedback = _CapMessage('feedback', 'comentarios');
 _CapMessage feedbackType = _CapMessage('feedback type', 'tipo de comentarios');
 _CapMessage submit = _CapMessage('submit', 'enviar');
 Message opensEmail = Message(
-    '(opens your email app)', '(abre tu aplicación de correo electrónico)');
+    '(opens your email app)', '(abre el correo electrónico)');
 
 _CapMessage translationError =
     _CapMessage('translation error', 'error de traducción');
-_CapMessage bugReport = _CapMessage('bug report', 'informe de error');
+_CapMessage bugReport = _CapMessage('bug report', 'error informático');
 _CapMessage featureRequest =
     _CapMessage('feature request', 'solicitud de función');
 _CapMessage other = _CapMessage('other', 'otro');
@@ -84,22 +84,9 @@ Message adjectivePhrase = Message('adjective phrase', 'frase adjectival');
 Message adverbPhrase = Message('adverb phrase', 'frase adverbial');
 Message degreePhrase = Message('degree phrase', 'frase de grado');
 Message nounPhrase = Message('noun phrase', 'frase nominal');
-Message pluralNounPhrase = Message('plural noun phrase', 'frase nominal');
 Message prepositionPhrase =
     Message('prepositional phrase', 'frase preposicional');
 Message verbPhrase = Message('verb phrase', 'frase verbal');
-Message feminineNounPhrase =
-    Message('feminine noun phrase', 'frase nominal femenina');
-Message femininePluralNounPhrase =
-    Message('feminine plural noun phrase', 'frase nominal femenina');
-Message masculineFeminineNounPhrase = Message(
-    'masculine/feminine noun phrase', 'frase nominal masculina/femenina');
-Message masculineNounPhrase =
-    Message('masculine noun phase', 'frase nominal masculina');
-Message masculinePluralNounPhrase =
-    Message('masculine plural phrase', 'frase nominal masculina');
-Message masculinePluralNounPhraseParen =
-    Message('masculine (plural) phrase', 'frase nominal masculina');
 
 // Misc.
 _CapMessage loading = _CapMessage('loading', 'cargando');
@@ -109,7 +96,7 @@ Message audioPlaybackTimeoutMsg = Message(
   'Se agotó el tiempo de reproducción de audio, verifique la conexión a '
       'Internet.',
 );
-Message dissmiss = Message('Dismiss', 'despide');
+Message dismiss = Message('Dismiss', 'despide');
 
 class Message {
   Message(this.en, this.es);
