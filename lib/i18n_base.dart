@@ -8,6 +8,9 @@ _CapMessage dictionary = _CapMessage('terms', 'términos');
 _CapMessage bookmarks = _CapMessage('bookmarks', 'marcadores');
 _CapMessage dialogues = _CapMessage('dialogues', 'diálogos');
 
+// Localizations for the about page.
+_CapMessage about = _CapMessage('about', 'sobre');
+
 // Localization for EntryList.
 _CapMessage search = _CapMessage('search', 'buscar');
 Message enterTextHint = Message('Enter text above to search for a translation ',
