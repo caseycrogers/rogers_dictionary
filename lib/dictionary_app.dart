@@ -25,10 +25,6 @@ class DictionaryApp extends StatefulWidget {
 
   @override
   _DictionaryAppState createState() => _DictionaryAppState();
-
-  static _DictionaryAppState of(BuildContext context) {
-    return context.findAncestorStateOfType<_DictionaryAppState>()!;
-  }
 }
 
 class _DictionaryAppState extends State<DictionaryApp> {

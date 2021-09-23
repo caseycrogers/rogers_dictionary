@@ -7,6 +7,7 @@ import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/pages/dialogues_page.dart';
+import 'package:rogers_dictionary/util/focus_utils.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_banner_ad.dart';
@@ -23,10 +24,7 @@ class DictionaryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        final FocusScopeNode focusNode = FocusScope.of(context);
-        if (focusNode.hasFocus) {
-          focusNode.unfocus();
-        }
+        unFocus();
       },
       child: ValueListenableBuilder<TranslationModel>(
         valueListenable: DictionaryModel.of(context).translationModel,

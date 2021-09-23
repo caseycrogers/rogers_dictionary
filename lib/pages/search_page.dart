@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/util/focus_utils.dart';
 
 import 'package:rogers_dictionary/widgets/search_page/search_page_layout.dart';
 
@@ -29,9 +30,8 @@ class _UnFocusOnDrag extends StatelessWidget {
     return NotificationListener<ScrollUpdateNotification>(
       child: child,
       onNotification: (ScrollUpdateNotification notification) {
-        final FocusScopeNode focusNode = FocusScope.of(context);
-        if (notification.dragDetails != null && focusNode.hasFocus) {
-          focusNode.unfocus();
+        if (notification.dragDetails != null) {
+          unFocus();
         }
         return false;
       },

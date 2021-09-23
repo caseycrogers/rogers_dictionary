@@ -11,6 +11,7 @@ import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/util/focus_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/value_notifier_extension.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
@@ -153,10 +154,7 @@ class DictionaryModel {
       ];
       return pageModel.currSelectedEntry.value = null;
     }
-    final FocusScopeNode currentFocus = FocusScope.of(context);
-    if (!currentFocus.hasPrimaryFocus) {
-      currentFocus.unfocus();
-    }
+    unFocus();
     final SelectedEntry selectedEntry = SelectedEntry(
       urlEncodedHeadword: newUrlEncodedHeadword,
       entry: newEntry == null
