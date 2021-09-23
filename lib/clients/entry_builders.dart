@@ -109,9 +109,7 @@ extension EntryUtils on Entry {
     String partOfSpeech,
     bool isSpanish,
   ) {
-    return partOfSpeech
-        .replaceAll(' ', '')
-        .splitMapJoin(
+    return partOfSpeech.replaceAll(' ', '').splitMapJoin(
           RegExp('[&,]'),
           onNonMatch: (String partOfSpeechComponent) =>
               _partOfSpeechAbbreviationMap[partOfSpeechComponent]
@@ -151,7 +149,11 @@ class EntryBuilder {
   late Headword _headword;
   late int _entryId;
   List<Headword>? _alternateHeadwords;
+  List<String>? _transitiveRelated;
   List<String>? _related;
+
+  List<String> get transitiveRelated =>
+      List.from(_transitiveRelated ?? <String>[], growable: false);
 
   final List<Translation> _translations = <Translation>[];
 
@@ -172,9 +174,16 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder addRelated(List<String> related) {
-    if (related.isNotEmpty) {
-      _related = (_related ?? <String>[])..addAll(related);
+  EntryBuilder addRelated(List<String> related, bool transitive) {
+    if (related.isEmpty) {
+      return this;
+    }
+    if (transitive) {
+      _transitiveRelated = (_transitiveRelated ?? <String>[])
+        ..addAll(related.where((v) => v.isNotEmpty));
+    } else {
+      _related = (_related ?? <String>[])
+        ..addAll(related.where((v) => v.isNotEmpty));
     }
     return this;
   }
@@ -244,7 +253,7 @@ class EntryBuilder {
     return Entry(
       entryId: _entryId,
       headword: _headword,
-      related: _related,
+      related: (_related ?? [])..addAll(_transitiveRelated ?? []),
       alternateHeadwords: _alternateHeadwords,
       translations: _translations,
     );

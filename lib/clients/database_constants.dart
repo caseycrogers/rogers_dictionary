@@ -19,7 +19,7 @@ const String BOOKMARK_TAG = 'tag';
 
 const String IS_FAVORITE = 'is_favorite';
 
-const String RUN_ON_PARENTS = 'run_on_parents';
+const String RELATED_TERMS = 'related_terms';
 const String RUN_ON_TEXT = 'run_on_text';
 const String HEADWORD_ABBREVIATIONS = 'headword_abbreviations';
 const String ALTERNATE_HEADWORDS = 'alternate_headwords';

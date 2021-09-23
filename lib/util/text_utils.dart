@@ -185,7 +185,7 @@ Widget alternateHeadwordLines(BuildContext context,
                 context,
                 alt.parentheticalQualifier,
                 true,
-                size: 20,
+                size: Theme.of(context).textTheme.bodyText2!.fontSize,
               ),
             ],
           );
@@ -328,6 +328,7 @@ Widget irregularInflectionsTable(
   if (inflections.isEmpty) {
     return Container();
   }
+  print(inflections);
   return Padding(
     padding: const EdgeInsets.only(top: kPad / 2),
     child: DictionaryChip(
@@ -344,7 +345,10 @@ Widget irregularInflectionsTable(
                 (i) => TableRow(
                   children: [
                     OverflowMarkdown('${i.split('* ').first.trim()}* '),
-                    Indent(child: OverflowMarkdown(i.split('* ').last.trim())),
+                    Indent(
+                      child: OverflowMarkdown(
+                          i.split('* ').sublist(1).join('* ').trim()),
+                    ),
                   ],
                 ),
               ),
@@ -360,21 +364,25 @@ Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
   if (examplePhrases.isEmpty) {
     return Container();
   }
-  return DictionaryChip(
-    childPadding: const EdgeInsets.all(kPad / 2),
-    color: Colors.grey.shade200,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('${i18n.examplePhrases.get(context)}:', style: bold1(context)),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: examplePhrases
-              .map((example) => OverflowMarkdown(example.replaceAll('/', ' / '),
-                  defaultStyle: normal1(context).copyWith(height: 1.5)))
-              .toList(),
-        ),
-      ],
+  return Padding(
+    padding: const EdgeInsets.only(bottom: kPad),
+    child: DictionaryChip(
+      childPadding: const EdgeInsets.all(kPad / 2),
+      color: Colors.grey.shade200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('${i18n.examplePhrases.get(context)}:', style: bold1(context)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: examplePhrases
+                .map((example) => OverflowMarkdown(
+                    example.replaceAll('/', ' / '),
+                    defaultStyle: normal1(context).copyWith(height: 1.5)))
+                .toList(),
+          ),
+        ],
+      ),
     ),
   );
 }

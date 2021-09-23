@@ -16,10 +16,10 @@ Message noBookmarksHint = Message('No results! Try favoriting an entry first ',
     '¡No hay resultados! Primero, intenta marcar una entrada como favorita ');
 Message typosHint = Message('No results! Check for typos ',
     '¡No hay resultados! Compruebe si hay errores tipográficos ');
-Message swipeForSpanish = Message('or swipe for spanish mode.',
-    'o desliza el dedo para al modo español.');
-Message swipeForEnglish = Message('or swipe for english mode.',
-    'o desliza el dedo para al modo inglés.');
+Message swipeForSpanish = Message(
+    'or swipe for spanish mode.', 'o desliza el dedo para al modo español.');
+Message swipeForEnglish = Message(
+    'or swipe for english mode.', 'o desliza el dedo para al modo inglés.');
 
 // Localizations for EntryView.
 Message irregularInflections =
@@ -81,8 +81,7 @@ Message adjectivePhrase = Message('adjective phrase', 'frase adjectival');
 Message adverbPhrase = Message('adverb phrase', 'frase adverbial');
 Message degreePhrase = Message('degree phrase', 'frase de grado');
 Message nounPhrase = Message('noun phrase', 'frase nominal');
-Message pluralNounPhrase =
-    Message('plural noun phrase', 'frase nominal');
+Message pluralNounPhrase = Message('plural noun phrase', 'frase nominal');
 Message prepositionPhrase =
     Message('prepositional phrase', 'frase preposicional');
 Message verbPhrase = Message('verb phrase', 'frase verbal');
@@ -101,6 +100,13 @@ Message masculinePluralNounPhraseParen =
 
 // Misc.
 _CapMessage loading = _CapMessage('loading', 'cargando');
+
+Message audioPlaybackTimeoutMsg = Message(
+  'Audio playback timed out, check internet connection.',
+  'Se agotó el tiempo de reproducción de audio, verifique la conexión a '
+      'Internet.',
+);
+Message dissmiss = Message('Dismiss', 'despide');
 
 class Message {
   Message(this.en, this.es);

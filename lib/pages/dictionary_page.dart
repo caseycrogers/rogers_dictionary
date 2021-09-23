@@ -31,10 +31,10 @@ class DictionaryPage extends StatelessWidget {
       child: ValueListenableBuilder<TranslationModel>(
         valueListenable: DictionaryModel.of(context).translationModel,
         builder: (context, model, tabBarView) {
-          return Scaffold(
-            body: Theme(
-              data: Theme.of(context).copyWith(colorScheme: themeOf(model)),
-              child: Column(
+          return Theme(
+            data: Theme.of(context).copyWith(colorScheme: themeOf(model)),
+            child: Scaffold(
+              body: Column(
                 children: [
                   const DictionaryAppBar(),
                   // Intentionally don't wrap this in theme, it'll cause excess
@@ -52,10 +52,11 @@ class DictionaryPage extends StatelessWidget {
                     ),
                   ),
                   const DictionaryBannerAd(),
-                  if (!isBigEnoughForAdvanced(context))
-                    const DictionaryTabBar(),
                 ],
               ),
+              bottomNavigationBar: !isBigEnoughForAdvanced(context)
+                  ? const DictionaryTabBar()
+                  : null,
             ),
           );
         },

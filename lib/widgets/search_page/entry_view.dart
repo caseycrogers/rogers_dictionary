@@ -212,8 +212,11 @@ class EntryView extends StatelessWidget {
                     children: [
                       if (parentheticalChanged)
                         Wrap(
-                          children:
-                              parentheticalTexts(context, parenthetical, false),
+                          children: parentheticalTexts(
+                            context,
+                            parenthetical,
+                            false,
+                          ),
                         ),
                       _translationContent(
                         context,

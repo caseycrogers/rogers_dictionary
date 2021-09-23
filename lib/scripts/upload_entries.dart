@@ -49,7 +49,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
     i++;
   }
   i++;
-  while (i < rows.length && i < 100) {
+  while (i < rows.length) {
     if ((i + 2) % 500 == 0) {
       print('${i + 2}/${rows.length + 2} complete!');
     }
@@ -67,7 +67,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
             ' Field:\n$str');
     });
     if (row[HEADWORD]!.isNotEmpty) {
-      if ((row[PART_OF_SPEECH]!.isEmpty && row[RUN_ON_PARENTS]!.isEmpty) ||
+      if ((row[PART_OF_SPEECH]!.isEmpty && row[RELATED_TERMS]!.isEmpty) ||
           row[TRANSLATION]!.isEmpty) {
         print('$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row '
             '${i + 2}, skipping.');
@@ -79,26 +79,44 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         }
         continue;
       }
-      var parents = <String>[];
-      if (row[RUN_ON_PARENTS]!.isNotEmpty) {
-        parents = row[RUN_ON_PARENTS]!.split('|');
-        for (final String parent in parents) {
-          if (parent == parents[0] && parent.isEmpty) {
+      void printParentError(String parent) {
+        print('$WARNING Missing related entry \'$parent\' for entry '
+            '\'${row[HEADWORD]}\' at line ${i + 2}');
+      }
+
+      final String headword = row[HEADWORD]!;
+      builder = EntryBuilder().entryId(i + 2).headword(
+          headword,
+          _split(row[HEADWORD_ABBREVIATIONS]!).get(0, orElse: ''),
+          _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!).get(0, orElse: ''));
+
+      List<String> relatedList = <String>[];
+      if (row[RELATED_TERMS]!.isNotEmpty) {
+        relatedList = row[RELATED_TERMS]!.split('|');
+        for (final String parent in relatedList.where((p) => p.isNotEmpty)) {
+          if (parent == relatedList.first) {
+            // Add transitive links for the first element in the related list.
+            for (final String transitiveParent
+                in entryBuilders[parent]?.transitiveRelated ?? []) {
+              entryBuilders[transitiveParent]?.addRelated([headword], true) ??
+                  printParentError(transitiveParent);
+              builder.addRelated([transitiveParent], true);
+            }
+            entryBuilders[parent]?.addRelated([headword], true) ??
+                printParentError(parent);
             continue;
           }
-          entryBuilders[parent]?.addRelated([row[HEADWORD]!]) ??
-              print('$WARNING Missing run on parent \'$parent\' for entry '
-                  '\'${row[HEADWORD]}\' at line ${i + 2}');
+          entryBuilders[parent]?.addRelated([headword], false) ??
+              printParentError(parent);
         }
       }
-      builder = EntryBuilder()
-          .entryId(i + 2)
-          .headword(
-              row[HEADWORD]!,
-              _split(row[HEADWORD_ABBREVIATIONS]!).get(0, orElse: ''),
-              _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!)
-                  .get(0, orElse: ''))
-          .addRelated(parents);
+      // First element in related is always transitive
+      if (relatedList.isNotEmpty) {
+        builder.addRelated(relatedList.sublist(0, 1), true);
+      }
+      if (relatedList.length > 1) {
+        builder.addRelated(relatedList.sublist(1), false);
+      }
       _split(row[ALTERNATE_HEADWORDS]!)
           .asMap()
           .forEach((i, alternateHeadwordText) {
@@ -197,7 +215,7 @@ Future<void> _uploadSqlFlite(
       URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headword.headwordText.searchable,
-      RUN_ON_PARENTS: entry.related.join(' | ').searchable,
+      RELATED_TERMS: entry.related.join(' | ').searchable,
       HEADWORD_ABBREVIATIONS:
           entry.allHeadwords.map((h) => h.abbreviation).join(' | ').searchable,
       ALTERNATE_HEADWORDS: entry.alternateHeadwords
@@ -212,7 +230,7 @@ Future<void> _uploadSqlFlite(
           .searchable,
       HEADWORD + WITHOUT_OPTIONALS:
           entry.headword.headwordText.withoutOptionals.searchable,
-      RUN_ON_PARENTS + WITHOUT_OPTIONALS:
+      RELATED_TERMS + WITHOUT_OPTIONALS:
           entry.related.map((p) => p.withoutOptionals).join(' | ').searchable,
       HEADWORD_ABBREVIATIONS + WITHOUT_OPTIONALS: entry.allHeadwords
           .map((h) => h.abbreviation.withoutOptionals)
@@ -259,11 +277,11 @@ Future<void> createEntryTable(Database db, String tableName) async {
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
     $HEADWORD STRING NOT NULL,
-    $RUN_ON_PARENTS STRING,
+    $RELATED_TERMS STRING,
     $HEADWORD_ABBREVIATIONS STRING,
     $ALTERNATE_HEADWORDS String,
     $HEADWORD$WITHOUT_OPTIONALS STRING NOT NULL,
-    $RUN_ON_PARENTS$WITHOUT_OPTIONALS STRING,
+    $RELATED_TERMS$WITHOUT_OPTIONALS STRING,
     $HEADWORD_ABBREVIATIONS$WITHOUT_OPTIONALS STRING,
     $ALTERNATE_HEADWORDS$WITHOUT_OPTIONALS String,
     $IRREGULAR_INFLECTIONS String,

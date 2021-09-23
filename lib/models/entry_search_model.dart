@@ -66,6 +66,7 @@ class EntrySearchModel {
     if (!isBigEnoughForAdvanced(context)) {
       DictionaryModel.of(context).onHeadwordSelected(context, '');
     }
+    entries = [];
     currSearchString.value = newSearchString;
   }
 }

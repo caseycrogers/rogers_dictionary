@@ -26,7 +26,7 @@ class SqfliteDatabase extends DictionaryDatabase {
   late final String _path;
   late final String _bookmarksPath;
   late final DatabaseVersion _version;
-  final Completer<Database> _dbCompleter = Completer();
+  Completer<Database> _dbCompleter = Completer();
 
   Future<Database> get _dbFuture => _dbCompleter.future;
 
@@ -251,10 +251,10 @@ OFFSET $offset;''';
     return getDatabasesPath();
   }
 
-  Future<Database> _getDatabase() async {
+  Future<Database> _getDatabase({bool forceFromDisk = true}) async {
     // Check if the database exists
     final bool exists = await databaseExists(_path);
-    if (!exists) {
+    if (forceFromDisk || !exists) {
       // Make sure the parent directory exists
       try {
         await Directory(dirname(_path)).create(recursive: true);
@@ -292,8 +292,12 @@ OFFSET $offset;''';
     } else {
       db = await databaseFactory.openDatabase(_path);
     }
-    db = await databaseFactory.openDatabase(_path);
     await db.execute('''ATTACH DATABASE '$_bookmarksPath' AS $BOOKMARKS_DB''');
     return db;
+  }
+
+  Future<void> reloadFromDisk() async {
+    await dispose();
+    _dbCompleter = Completer()..complete(_getDatabase(forceFromDisk: true));
   }
 }

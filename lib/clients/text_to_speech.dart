@@ -30,6 +30,7 @@ class TextToSpeech {
   TextToSpeech();
 
   final http.Client _client = http.Client();
+
   // Trivial call to `play()` ensures that the player is fully initialized
   // before the first actual call to play.
   final AudioPlayer _player = AudioPlayer()..play();
@@ -52,10 +53,25 @@ class TextToSpeech {
   static late final Future<String> _apiKey =
       rootBundle.loadString(join('assets', '$_apiKeyFile'));
 
-  Stream<PlaybackInfo> playAudio(
-    String text,
-    TranslationMode mode,
-  ) async* {
+  Stream<PlaybackInfo> playAudio(String text, TranslationMode mode) async* {
+    final AudioSource? source =
+        await _getSource(text, mode).timeout(
+      const Duration(seconds: 2),
+      onTimeout: () {
+        return null;
+      },
+    );
+    if (source == null) {
+      throw PlaybackTimeout();
+    }
+    await _player.setAudioSource(source);
+    await _player.play();
+
+    yield* _getStream(text, mode);
+  }
+
+  // Need to return nullable because `Future.timeout` sucks.
+  Future<AudioSource?> _getSource(String text, TranslationMode mode) async {
     final Directory tmpDir = await getTemporaryDirectory();
     final File mp3 = File(
       join(
@@ -68,11 +84,7 @@ class TextToSpeech {
       await mp3.writeAsBytes(await _getMp3(text, mode));
     }
     await _session;
-    final ProgressiveAudioSource source = ProgressiveAudioSource(mp3.uri);
-    await _player.setAudioSource(source);
-    await _player.play();
-
-    yield* _getStream(text, mode);
+    return ProgressiveAudioSource(mp3.uri);
   }
 
   bool isPlaying(String text, TranslationMode mode) {
@@ -213,3 +225,5 @@ class PlaybackInfo {
         '-- $track';
   }
 }
+
+class PlaybackTimeout implements Exception {}

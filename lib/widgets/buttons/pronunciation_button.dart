@@ -5,6 +5,7 @@ import 'package:pedantic/pedantic.dart';
 
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/util/color_utils.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
@@ -106,6 +107,31 @@ class _PlayingButton extends StatelessWidget {
     return StreamBuilder<PlaybackInfo>(
       stream: _playbackStream,
       builder: (context, snap) {
+        if (snap.hasError) {
+          // We need to save a reference before calling `_onDone` as on done
+          // will dispose of `context`.
+          final ScaffoldMessengerState scaffoldMessenger =
+              ScaffoldMessenger.of(context);
+          _onDone();
+          // Have to wrap in a post frame callback because otherwise we'll be
+          WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+            print("Timed out after 2 seconds attempting to play '$text'.");
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text(
+                  i18n.audioPlaybackTimeoutMsg.get(context),
+                ),
+                duration: const Duration(seconds: 2),
+                action: SnackBarAction(
+                  label: i18n.dissmiss.get(context),
+                  onPressed: () {
+                    scaffoldMessenger.hideCurrentSnackBar();
+                  },
+                ),
+              ),
+            );
+          });
+        }
         if (snap.connectionState == ConnectionState.done) {
           _onDone();
         }
