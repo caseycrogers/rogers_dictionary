@@ -328,7 +328,6 @@ Widget irregularInflectionsTable(
   if (inflections.isEmpty) {
     return Container();
   }
-  print(inflections);
   return Padding(
     padding: const EdgeInsets.only(top: kPad / 2),
     child: DictionaryChip(

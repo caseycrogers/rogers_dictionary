@@ -25,8 +25,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _searchModel =
-        DictionaryModel.instance.translationModel.value.searchModel;
+    _searchModel = DictionaryModel.instance.translationModel.value.searchModel;
 
     if (_shouldInit) {
       _controller = TextEditingController(text: _searchModel.searchString);
@@ -41,9 +40,9 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   void dispose() {
-    _controller.dispose();
     _searchModel.entrySearchModel.currSearchString
         .removeListener(_onTextChanged);
+    _controller.dispose();
     super.dispose();
   }
 
@@ -60,19 +59,14 @@ class _SearchBarState extends State<SearchBar> {
 
   // Listener to update model if the local text has changed.
   void _onTextChanged() {
-    final EntrySearchModel entrySearchModel = DictionaryModel.instance
-        .currTranslationModel
-        .searchModel
-        .entrySearchModel;
+    final EntrySearchModel entrySearchModel = DictionaryModel
+        .instance.currTranslationModel.searchModel.entrySearchModel;
     final bool oldIsEmpty = entrySearchModel.isEmpty;
-    DictionaryModel.instance
-        .currTranslationModel
-        .searchModel
-        .entrySearchModel
+    DictionaryModel.instance.currTranslationModel.searchModel.entrySearchModel
         .onSearchStringChanged(
-          context: context,
-          newSearchString: _controller.text,
-        );
+      context: context,
+      newSearchString: _controller.text,
+    );
     if (oldIsEmpty != _controller.text.isEmpty) {
       setState(() {});
     }
@@ -80,10 +74,8 @@ class _SearchBarState extends State<SearchBar> {
 
   // Listener to update local text if the model has changed.
   void _onSearchChanged() {
-    final EntrySearchModel entrySearchModel = DictionaryModel.instance
-        .currTranslationModel
-        .searchModel
-        .entrySearchModel;
+    final EntrySearchModel entrySearchModel = DictionaryModel
+        .instance.currTranslationModel.searchModel.entrySearchModel;
     final String oldText = _controller.text;
     if (oldText != entrySearchModel.searchString) {
       _controller.text = entrySearchModel.searchString;

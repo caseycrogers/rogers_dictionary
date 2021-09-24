@@ -53,6 +53,10 @@ class _EntryListState extends State<EntryList> {
       },
       // This breaks if duration is zero.
       transitionDuration: const Duration(milliseconds: 1),
+      initialHistory: const [
+        // Ensure we have a base page on translation mode changed.
+        ValueHistoryEntry(0, ''),
+      ],
       builder: (context, searchString, _, __) {
         if (searchString != _lastSearchString) {
           _i += 1;

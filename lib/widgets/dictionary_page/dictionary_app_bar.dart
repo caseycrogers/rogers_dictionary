@@ -45,7 +45,7 @@ class _DictionaryTopBar extends StatelessWidget {
     if (!isBigEnoughForAdvanced(context)) {
       return Row(
         children: const [
-          ImplicitNavigatorBackButton(),
+          SizedBox(width: kToolbarHeight, child: ImplicitNavigatorBackButton()),
           Padding(
             padding: EdgeInsets.all(kPad / 2),
             child: TranslationModeSelector(),
@@ -132,8 +132,7 @@ class _TopSearchBarAndBackButton extends StatelessWidget {
   }
 
   bool _shouldDisplaySearchBar(BuildContext context) {
-    return DictionaryModel.instance.currentTab.value ==
-            DictionaryTab.search &&
+    return DictionaryModel.instance.currentTab.value == DictionaryTab.search &&
         isBigEnoughForAdvanced(context);
   }
 }

@@ -251,7 +251,7 @@ OFFSET $offset;''';
     return getDatabasesPath();
   }
 
-  Future<Database> _getDatabase({bool forceFromDisk = true}) async {
+  Future<Database> _getDatabase({bool forceFromDisk = false}) async {
     // Check if the database exists
     final bool exists = await databaseExists(_path);
     if (forceFromDisk || !exists) {

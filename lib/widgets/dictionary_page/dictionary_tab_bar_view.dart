@@ -81,10 +81,12 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
       }
       return true;
     }());
-    late ImplicitNavigatorState navigator;
+    ImplicitNavigatorState? navigator;
     void updateBackButton() {
       WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-        DictionaryModel.instance.displayBackButton.value = navigator.canPop;
+        if (navigator != null) {
+          DictionaryModel.instance.displayBackButton.value = navigator!.canPop;
+        }
       });
     }
     return NotificationListener<ImplicitNavigatorNotification<dynamic>>(
