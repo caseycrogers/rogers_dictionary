@@ -10,6 +10,27 @@ _CapMessage dialogues = _CapMessage('dialogues', 'diálogos');
 
 // Localizations for the about page.
 _CapMessage about = _CapMessage('about', 'sobre');
+Message aboutPassage = Message(
+  'Hi, welcome to my English/Spanish medical translation app, the digital '
+      'version of the 5th edition of my bilingual medical dictionary to be '
+      'published later this year (2021). The app translates any medical term'
+      ' likely to come up in a conversation between a health professional and '
+      'a patient, including slang, regionalisms, and more.\n\n'
+      'It also provides an extensive sample dialogue section based on my '
+      '30-plus year history as an internist with Spanish-speaking patients in '
+      'outpatient, Med-Surg ward, and ICU settings.\n',
+  'Hola, bienvenido a mi applicación de traducción médica inglés/español, '
+      'la versión digital de la 5ta edición de mi diccionario médico bilingüe '
+      'que se publicará a finales de este año (2021). La app traduce cualquier '
+      'término médico que pueda surgir en una conversación entre un '
+      'profesional de la salud y un paciente, incluyendo jergas, regionalismos '
+      'y más.\n\n'
+      'También proporciona una amplia sección de diálogos de muestra '
+      'basada en mi experiencia de más de 30 años como internista con '
+      'pacientes hispanohablantes en entornos ambulatorios y hospitalarios, '
+      'incluso en la UCI.\n',
+);
+Message enjoyTheApp = Message('Enjoy the app!', '¡Disfruta de la app!');
 
 // Localization for EntryList.
 _CapMessage search = _CapMessage('search', 'buscar');
@@ -39,8 +60,8 @@ Message aboutThisApp = Message('about this app', 'sobre la app');
 _CapMessage feedback = _CapMessage('feedback', 'comentarios');
 _CapMessage feedbackType = _CapMessage('feedback type', 'tipo de comentarios');
 _CapMessage submit = _CapMessage('submit', 'enviar');
-Message opensEmail = Message(
-    '(opens your email app)', '(abre el correo electrónico)');
+Message opensEmail =
+    Message('(opens your email app)', '(abre el correo electrónico)');
 
 _CapMessage translationError =
     _CapMessage('translation error', 'error de traducción');
@@ -84,9 +105,22 @@ Message adjectivePhrase = Message('adjective phrase', 'frase adjectival');
 Message adverbPhrase = Message('adverb phrase', 'frase adverbial');
 Message degreePhrase = Message('degree phrase', 'frase de grado');
 Message nounPhrase = Message('noun phrase', 'frase nominal');
+Message pluralNounPhrase = Message('plural noun phrase', 'frase nominal');
 Message prepositionPhrase =
     Message('prepositional phrase', 'frase preposicional');
 Message verbPhrase = Message('verb phrase', 'frase verbal');
+Message feminineNounPhrase =
+    Message('feminine noun phrase', 'frase nominal femenina');
+Message femininePluralNounPhrase =
+    Message('feminine plural noun phrase', 'frase nominal femenina');
+Message masculineFeminineNounPhrase = Message(
+    'masculine/feminine noun phrase', 'frase nominal masculina/femenina');
+Message masculineNounPhrase =
+    Message('masculine noun phase', 'frase nominal masculina');
+Message masculinePluralNounPhrase =
+    Message('masculine plural phrase', 'frase nominal masculina');
+Message masculinePluralNounPhraseParen =
+    Message('masculine (plural) phrase', 'frase nominal masculina');
 
 // Misc.
 _CapMessage loading = _CapMessage('loading', 'cargando');

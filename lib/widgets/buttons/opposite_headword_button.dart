@@ -18,7 +18,7 @@ class OppositeHeadwordButton extends StatelessWidget {
     return AdaptiveIconButton(
       visualDensity: VisualDensity.compact,
       onPressed: () {
-        DictionaryModel.of(context).onOppositeHeadwordSelected(
+        DictionaryModel.instance.onOppositeHeadwordSelected(
           context,
           EntryUtils.urlEncode(translation.getOppositeHeadword),
         );

@@ -29,7 +29,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
   @override
   void didChangeDependencies() {
     if (_controller == null) {
-      final DictionaryModel dictionaryModel = DictionaryModel.of(context);
+      final DictionaryModel dictionaryModel = DictionaryModel.instance;
       _controller = PageController(
         keepPage: false,
         initialPage:
@@ -74,14 +74,14 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
   }
 
   Widget pages(BuildContext context) {
-    final DictionaryModel dictionaryModel = DictionaryModel.of(context);
+    final DictionaryModel dictionaryModel = DictionaryModel.instance;
     // Used to force rebuilds on phone rotation. Otherwise translation mode
     // switcher gets messed up.
     return LayoutBuilder(
       builder: (context, constraints) {
         return PageView(
           controller: _controller,
-          onPageChanged: (int index) => DictionaryModel.of(context)
+          onPageChanged: (int index) => DictionaryModel.instance
               .onTranslationModeChanged(context, indexToTranslationMode(index)),
           children: [
             Theme(
@@ -146,5 +146,5 @@ class TranslationModelProvider extends StatelessWidget {
 
 bool isCurrentTranslationPage(BuildContext context) {
   return TranslationModel.of(context) ==
-      DictionaryModel.of(context).currTranslationModel;
+      DictionaryModel.instance.currTranslationModel;
 }

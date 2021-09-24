@@ -26,14 +26,14 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
   @override
   void initState() {
     super.initState();
-    DictionaryModel.of(context)
+    DictionaryModel.instance
         .translationModel
         .addListener(_onTranslationModeChanged);
   }
 
   @override
   void dispose() {
-    DictionaryModel.of(context)
+    DictionaryModel.instance
         .translationModel
         .removeListener(_onTranslationModeChanged);
     super.dispose();
@@ -81,7 +81,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
       onPop: (selectedEntry, prevEntry) {
         if (selectedEntry != null &&
             selectedEntry.referrer == SelectedEntryReferrer.oppositeHeadword) {
-          DictionaryModel.of(context).onTranslationModeChanged(context);
+          DictionaryModel.instance.onTranslationModeChanged(context);
         }
       },
     );

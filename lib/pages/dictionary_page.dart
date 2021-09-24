@@ -27,7 +27,7 @@ class DictionaryPage extends StatelessWidget {
         unFocus();
       },
       child: ValueListenableBuilder<TranslationModel>(
-        valueListenable: DictionaryModel.of(context).translationModel,
+        valueListenable: DictionaryModel.instance.translationModel,
         builder: (context, model, tabBarView) {
           return Theme(
             data: Theme.of(context).copyWith(colorScheme: themeOf(model)),

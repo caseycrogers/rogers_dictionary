@@ -62,6 +62,8 @@ class DictionaryModel {
 
   late ImplicitNavigatorState<DictionaryTab> tabNavigator;
 
+  static DictionaryModel get instance => _instance;
+
   ValueNotifier<List<String>> get currentAdKeywords {
     return currentTab.expand<List<String>>((tab) {
       switch (tab) {
@@ -84,10 +86,6 @@ class DictionaryModel {
       translationModel.value.translationMode;
 
   bool get isEnglish => translationModel.value.isEnglish;
-
-  static DictionaryModel of(BuildContext context) {
-    return _instance;
-  }
 
   TranslationModel getPageModel(TranslationMode translationMode) =>
       isEnglish ? englishPageModel : spanishPageModel;

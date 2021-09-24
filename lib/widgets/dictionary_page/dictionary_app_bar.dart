@@ -91,7 +91,7 @@ class _TopSearchBarAndBackButton extends StatelessWidget {
 
   double _width(BuildContext context) {
     if (!_shouldDisplaySearchBar(context)) {
-      return DictionaryModel.of(context).displayBackButton.value
+      return DictionaryModel.instance.displayBackButton.value
           ? kToolbarHeight
           : 0;
     }
@@ -105,10 +105,10 @@ class _TopSearchBarAndBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
         child: const SearchBar(),
-        valueListenable: DictionaryModel.of(context).displayBackButton,
+        valueListenable: DictionaryModel.instance.displayBackButton,
         builder: (context, displayBack, child) {
           return ValueListenableBuilder<DictionaryTab>(
-            valueListenable: DictionaryModel.of(context).currentTab,
+            valueListenable: DictionaryModel.instance.currentTab,
             builder: (context, tab, _) {
               return Container(
                 width: _width(context),
@@ -132,7 +132,7 @@ class _TopSearchBarAndBackButton extends StatelessWidget {
   }
 
   bool _shouldDisplaySearchBar(BuildContext context) {
-    return DictionaryModel.of(context).currentTab.value ==
+    return DictionaryModel.instance.currentTab.value ==
             DictionaryTab.search &&
         isBigEnoughForAdvanced(context);
   }

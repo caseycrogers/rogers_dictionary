@@ -103,7 +103,7 @@ class EntryView extends StatelessWidget {
                       .copyWith(color: Colors.blue),
                 ),
                 onPressed: () {
-                  DictionaryModel.of(context).onHeadwordSelected(
+                  DictionaryModel.instance.onHeadwordSelected(
                     context,
                     EntryUtils.urlEncode(headword),
                     referrer: SelectedEntryReferrer.relatedHeadword,

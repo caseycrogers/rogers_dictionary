@@ -25,7 +25,7 @@ class TranslationModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DictionaryModel pageModel = DictionaryModel.of(context);
+    final DictionaryModel pageModel = DictionaryModel.instance;
     final BoxDecoration decoration = BoxDecoration(
       color: Colors.black38,
       borderRadius: BorderRadius.circular(4),
@@ -96,7 +96,7 @@ class _Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DictionaryModel dictionaryModel = DictionaryModel.of(context);
+    final DictionaryModel dictionaryModel = DictionaryModel.instance;
     final bool isSelected =
         dictionaryModel.translationModel.value.translationMode == mode;
     return Container(

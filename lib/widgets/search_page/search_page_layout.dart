@@ -103,5 +103,5 @@ class _LandscapeLayout extends StatelessWidget {
 }
 
 bool _isSearch(BuildContext context) {
-  return DictionaryModel.of(context).currentTab.value == DictionaryTab.search;
+  return DictionaryModel.instance.currentTab.value == DictionaryTab.search;
 }

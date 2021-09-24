@@ -26,7 +26,7 @@ class _SearchBarState extends State<SearchBar> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _searchModel =
-        DictionaryModel.of(context).translationModel.value.searchModel;
+        DictionaryModel.instance.translationModel.value.searchModel;
 
     if (_shouldInit) {
       _controller = TextEditingController(text: _searchModel.searchString);
@@ -50,7 +50,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<TranslationModel>(
-      valueListenable: DictionaryModel.of(context).translationModel,
+      valueListenable: DictionaryModel.instance.translationModel,
       builder: (context, translationPage, child) {
         return child!;
       },
@@ -60,12 +60,12 @@ class _SearchBarState extends State<SearchBar> {
 
   // Listener to update model if the local text has changed.
   void _onTextChanged() {
-    final EntrySearchModel entrySearchModel = DictionaryModel.of(context)
+    final EntrySearchModel entrySearchModel = DictionaryModel.instance
         .currTranslationModel
         .searchModel
         .entrySearchModel;
     final bool oldIsEmpty = entrySearchModel.isEmpty;
-    DictionaryModel.of(context)
+    DictionaryModel.instance
         .currTranslationModel
         .searchModel
         .entrySearchModel
@@ -80,7 +80,7 @@ class _SearchBarState extends State<SearchBar> {
 
   // Listener to update local text if the model has changed.
   void _onSearchChanged() {
-    final EntrySearchModel entrySearchModel = DictionaryModel.of(context)
+    final EntrySearchModel entrySearchModel = DictionaryModel.instance
         .currTranslationModel
         .searchModel
         .entrySearchModel;

@@ -94,7 +94,7 @@ class _EntryListState extends State<EntryList> {
                 // Put the no results widget at the top if applicable.
                 if (index == 0 &&
                     searchModel.searchString.isEmpty &&
-                    DictionaryModel.of(context).currentTab.value ==
+                    DictionaryModel.instance.currentTab.value ==
                         DictionaryTab.search) ...[
                   const CollapsingNoResultsWidget(),
                   const Divider(height: 0),
@@ -125,7 +125,7 @@ class _EntryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dictionaryModel = DictionaryModel.of(context);
+    final dictionaryModel = DictionaryModel.instance;
     return ValueListenableBuilder<SelectedEntry?>(
       valueListenable: SearchModel.of(context).currSelectedEntry,
       builder: (context, selectedEntry, _) {

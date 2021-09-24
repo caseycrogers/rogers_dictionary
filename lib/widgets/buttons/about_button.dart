@@ -46,43 +46,42 @@ class _AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Theme.of(context).cardColor,
-      child: PageHeader(
-        header: headline1Text(context, i18n.about.cap.get(context)),
-        onClose: onClose,
-        child: Column(
-          children: [
-            const SelectableText(
-              '\t\tHi, welcome to my English/Spanish medical app, the digital '
-              'version of the 5th edition of my medical bilingual '
-              'dictionary to be published later this year (2021). The app '
-              'translates any medical word likely to come up in a '
-              'conversation between a health professional and a patient, '
-              'including slang, regionalisms, and more.\n\n'
-              '\t\tIt also provides an extensive sample dialogue '
-              'section based on my 30-plus year history as an internist '
-              'with Spanish-speaking patients in outpatient, Med-Surg '
-              'ward, and ICU settings.\n\n'
-              '\t\tThe app was developed by my son, Casey Rogers, '
-              'using skills he acquired at Google and GM Cruise.\n',
-            ),
-            const SelectableText('Enjoy the app!\n'),
-            Container(
-              height: 120,
-              width: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage(
-                    join('assets', 'images', 'glenn.jpg'),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: PageHeader(
+          header: headline1Text(context, i18n.about.cap.get(context)),
+          onClose: onClose,
+          child: Column(
+            children: [
+              SelectableText(
+                i18n.aboutPassage.get(context),
+                textAlign: TextAlign.center,
+              ),
+              SelectableText(
+                i18n.enjoyTheApp.get(context),
+                textAlign: TextAlign.center,
+              ),
+              const Text(''),
+              Container(
+                height: 130,
+                width: 130,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(
+                      join('assets', 'images', 'glenn.jpg'),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SelectableText('Dr. Glenn Rogers',
-                textAlign: TextAlign.center),
-            const Divider(),
-            const _DebugInfo(),
-          ],
+              const SelectableText(
+                'Dr. Glenn Rogers',
+                textAlign: TextAlign.center,
+              ),
+              const Divider(),
+              const _DebugInfo(),
+            ],
+          ),
         ),
       ),
     );

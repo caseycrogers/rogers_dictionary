@@ -25,7 +25,7 @@ class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
   ];
 
   ValueNotifier<List<String>> get adKeywords {
-    return DictionaryModel.of(context).currentAdKeywords;
+    return DictionaryModel.instance.currentAdKeywords;
   }
 
   @override

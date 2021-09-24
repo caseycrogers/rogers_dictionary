@@ -26,7 +26,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
   TabController? _controller;
 
   ValueNotifier<DictionaryTab> get currentTab =>
-      DictionaryModel.of(context).currentTab;
+      DictionaryModel.instance.currentTab;
 
   void _updateTabController() {
     final TabController newController = DefaultTabController.of(context)!;
@@ -81,28 +81,28 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
       }
       return true;
     }());
-    return ImplicitNavigator<DictionaryTab>.fromNotifier(
-      key: const PageStorageKey('tab_selector'),
-      valueNotifier: currentTab,
-      builder: (context, tab, _, __) {
-        void updateBackButton() {
-          WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-            DictionaryModel.of(context).displayBackButton.value =
-                ImplicitNavigator.of<dynamic>(context, root: true).canPop;
-          });
-        }
-
+    late ImplicitNavigatorState navigator;
+    void updateBackButton() {
+      WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+        DictionaryModel.instance.displayBackButton.value = navigator.canPop;
+      });
+    }
+    return NotificationListener<ImplicitNavigatorNotification<dynamic>>(
+      onNotification: (notification) {
         updateBackButton();
-        return NotificationListener(
-          onNotification: (notification) {
-            updateBackButton();
-            return false;
-          },
-          child: widget.children[tab]!,
-        );
+        return false;
       },
-      getDepth: (tab) => tab == DictionaryTab.search ? 0 : 1,
-      transitionsBuilder: _getTransition,
+      child: ImplicitNavigator<DictionaryTab>.fromNotifier(
+        key: const PageStorageKey('tab_selector'),
+        valueNotifier: currentTab,
+        builder: (context, tab, _, __) {
+          // Save a reference earlier so that the listener can reference it.
+          navigator = ImplicitNavigator.of<dynamic>(context, root: true);
+          return widget.children[tab]!;
+        },
+        getDepth: (tab) => tab == DictionaryTab.search ? 0 : 1,
+        transitionsBuilder: _getTransition,
+      ),
     );
   }
 

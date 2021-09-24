@@ -94,8 +94,15 @@ extension EntryUtils on Entry {
     'advphrase': i18n.adverbPhrase,
     'degphrase': i18n.degreePhrase,
     'nphrase': i18n.nounPhrase,
+    'nplphrase': i18n.pluralNounPhrase,
     'prepphrase': i18n.prepositionPhrase,
     'vphrase': i18n.verbPhrase,
+    'fphrase': i18n.feminineNounPhrase,
+    'fplphrase': i18n.femininePluralNounPhrase,
+    'mfphrase': i18n.masculineFeminineNounPhrase,
+    'mphrase': i18n.masculineNounPhrase,
+    'mplphrase': i18n.masculinePluralNounPhrase,
+    'm(pl)phrase': i18n.masculinePluralNounPhraseParen,
   };
 
   static String longPartOfSpeech(
