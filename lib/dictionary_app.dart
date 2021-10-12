@@ -9,6 +9,8 @@ import 'package:package_info/package_info.dart';
 
 import 'package:rogers_dictionary/clients/dictionary_database/dictionary_database.dart';
 import 'package:rogers_dictionary/clients/dictionary_database/sqflite_database.dart';
+import 'package:rogers_dictionary/clients/feedback_sender.dart';
+import 'package:rogers_dictionary/clients/snack_bar_notifier.dart';
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
@@ -19,6 +21,12 @@ class DictionaryApp extends StatefulWidget {
   static final TextToSpeech textToSpeech = TextToSpeech();
   static final Future<PackageInfo> packageInfo = PackageInfo.fromPlatform();
   static final FirebaseAnalytics analytics = FirebaseAnalytics();
+  static late SnackBarNotifier _snackBarNotifier;
+  static late FeedbackSender _feedback;
+
+  static SnackBarNotifier get snackBarNotifier => _snackBarNotifier;
+
+  static FeedbackSender get feedback => _feedback;
 
   static FirebaseAnalyticsObserver get observer =>
       FirebaseAnalyticsObserver(analytics: analytics);
@@ -32,6 +40,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
   Future<void> dispose() async {
     await DictionaryApp.textToSpeech.dispose();
     await DictionaryApp.db.dispose();
+    await DictionaryApp.feedback.dispose();
     super.dispose();
   }
 
@@ -50,7 +59,14 @@ class _DictionaryAppState extends State<DictionaryApp> {
             GetDictionaryFeedback(onSubmit),
         child: MaterialApp(
           title: 'Rogers Dictionary',
-          home: DictionaryPage(),
+          home: Builder(builder: (context) {
+            DictionaryApp._snackBarNotifier = SnackBarNotifier(context);
+            DictionaryApp._feedback = FeedbackSender(
+              locale: Localizations.localeOf(context),
+              betterFeedback: BetterFeedback.of(context),
+            );
+            return DictionaryPage();
+          }),
           theme: ThemeData(
             selectedRowColor: Colors.grey.shade200,
             textTheme: TextTheme(

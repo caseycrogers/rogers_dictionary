@@ -11,8 +11,8 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 class DialogueChapter_SubChapter extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DialogueChapter.SubChapter', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'englishTitle', protoName: 'englishTitle')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'spanishTitle', protoName: 'spanishTitle')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'englishTitle')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'spanishTitle')
     ..pc<DialogueChapter_Dialogue>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dialogues', $pb.PbFieldType.PM, subBuilder: DialogueChapter_Dialogue.create)
     ..hasRequiredFields = false
   ;
@@ -141,10 +141,10 @@ class DialogueChapter_Dialogue extends $pb.GeneratedMessage {
 
 class DialogueChapter extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DialogueChapter', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
-    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'chapterId', $pb.PbFieldType.OU3, protoName: 'chapterId')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'englishTitle', protoName: 'englishTitle')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'spanishTitle', protoName: 'spanishTitle')
-    ..pc<DialogueChapter_SubChapter>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dialogueSubChapters', $pb.PbFieldType.PM, protoName: 'dialogueSubChapters', subBuilder: DialogueChapter_SubChapter.create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'chapterId', $pb.PbFieldType.OU3)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'englishTitle')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'spanishTitle')
+    ..pc<DialogueChapter_SubChapter>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dialogueSubChapters', $pb.PbFieldType.PM, subBuilder: DialogueChapter_SubChapter.create)
     ..hasRequiredFields = false
   ;
 

@@ -117,7 +117,6 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                 : null,
             child: Text(i18n.submit.cap.get(context)),
           ),
-          Text(i18n.opensEmail.get(context)),
         ],
       ),
     );

@@ -60,8 +60,8 @@ Message aboutThisApp = Message('about this app', 'sobre la app');
 _CapMessage feedback = _CapMessage('feedback', 'comentarios');
 _CapMessage feedbackType = _CapMessage('feedback type', 'tipo de comentarios');
 _CapMessage submit = _CapMessage('submit', 'enviar');
-Message opensEmail =
-    Message('(opens your email app)', '(abre el correo electrónico)');
+Message feedbackError = Message('Unknown error, failed to submit feedback',
+    'Error desconocido, no se pudo enviar comentarios');
 
 _CapMessage translationError =
     _CapMessage('translation error', 'error de traducción');
@@ -124,13 +124,15 @@ Message masculinePluralNounPhraseParen =
 
 // Misc.
 _CapMessage loading = _CapMessage('loading', 'cargando');
+_CapMessage dismiss = _CapMessage('dismiss', 'despedir');
 
 Message audioPlaybackTimeoutMsg = Message(
   'Audio playback timed out, check internet connection.',
   'Se agotó el tiempo de reproducción de audio, verifique la conexión a '
       'Internet.',
 );
-Message dismiss = Message('Dismiss', 'despide');
+Message reportBug = Message('report bug', 'reporte un error');
+Message retry = Message('retry', 'rever');
 
 class Message {
   Message(this.en, this.es);

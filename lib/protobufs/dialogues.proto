@@ -4,15 +4,15 @@ syntax = "proto3";
 package rogers_dictionary;
 
 message DialogueChapter {
-    uint32 chapterId = 1;
-    string englishTitle = 2;
-    string spanishTitle = 3;
+    uint32 chapter_id = 1;
+    string english_title = 2;
+    string spanish_title = 3;
 
-    repeated SubChapter dialogueSubChapters = 4;
+    repeated SubChapter dialogue_sub_chapters = 4;
 
     message SubChapter {
-        string englishTitle = 1;
-        string spanishTitle = 2;
+        string english_title = 1;
+        string spanish_title = 2;
 
         repeated Dialogue dialogues = 3;
     }

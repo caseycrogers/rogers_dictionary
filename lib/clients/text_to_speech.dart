@@ -27,8 +27,6 @@ const String _audioContent = 'audioContent';
 const String _apiKeyFile = 'text_to_speech.key';
 
 class TextToSpeech {
-  TextToSpeech();
-
   final http.Client _client = http.Client();
 
   // Trivial call to `play()` ensures that the player is fully initialized
@@ -53,16 +51,20 @@ class TextToSpeech {
   static late final Future<String> _apiKey =
       rootBundle.loadString(join('assets', '$_apiKeyFile'));
 
+  static const _timeoutDuration = Duration(seconds: 2);
+
   Stream<PlaybackInfo> playAudio(String text, TranslationMode mode) async* {
-    final AudioSource? source =
-        await _getSource(text, mode).timeout(
-      const Duration(seconds: 2),
+    final AudioSource? source = await _getSource(text, mode).timeout(
+      _timeoutDuration,
       onTimeout: () {
         return null;
       },
     );
     if (source == null) {
-      throw PlaybackTimeout();
+      throw TimeoutException(
+        "Timed out after 2 seconds attempting to play '$text'.",
+        _timeoutDuration,
+      );
     }
     await _player.setAudioSource(source);
     await _player.play();
@@ -177,7 +179,7 @@ class TextToSpeech {
   }
 
   Future<Uint8List> _getMp3(String text, TranslationMode mode) async {
-    final http.Response response = await http.post(
+    final http.Response response = await _client.post(
       _textToSpeechUrl,
       headers: {
         'Authorization': '',

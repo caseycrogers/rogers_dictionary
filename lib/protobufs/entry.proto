@@ -4,34 +4,34 @@ syntax = "proto3";
 package rogers_dictionary;
 
 message Entry {
-    uint32 entryId = 1;
+    uint32 entry_id = 1;
     Headword headword = 2;
 
     repeated string related = 3;
-    repeated Headword alternateHeadwords = 4;
+    repeated Headword alternate_headwords = 4;
 
     repeated Translation translations = 5;
 
     message Headword {
-        bool isAlternate = 1;
-        string headwordText = 2;
+        bool is_alternate = 1;
+        string headword_text = 2;
         string abbreviation = 3;
-        string namingStandard = 4;
-        string parentheticalQualifier = 5;
+        string naming_standard = 4;
+        string parenthetical_qualifier = 5;
     }
 
     message Translation {
-        string partOfSpeech = 1;
+        string part_of_speech = 1;
         string content = 2;
-        repeated string irregularInflections = 3;
-        string dominantHeadwordParentheticalQualifier = 4;
-        string genderAndPlural = 5;
-        string namingStandard = 6;
+        repeated string irregular_inflections = 3;
+        string dominant_headword_parenthetical_qualifier = 4;
+        string gender_and_plural = 5;
+        string naming_standard = 6;
         string abbreviation = 7;
-        string parentheticalQualifier = 8;
-        string editorialNote = 9;
+        string parenthetical_qualifier = 8;
+        string editorial_note = 9;
 
-        repeated string examplePhrases = 10;
+        repeated string example_phrases = 10;
 
         string opposite_headword = 11;
     }

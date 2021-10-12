@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/text_utils.dart';
+import 'package:rogers_dictionary/widgets/on_error_stream_builder.dart';
 
 class LoadingText extends StatelessWidget {
   const LoadingText({this.delay = false});
@@ -11,7 +12,7 @@ class LoadingText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String text = i18n.loading.get(context);
-    return StreamBuilder<String>(
+    return LoggingStreamBuilder<String>(
       builder: (context, snap) => Text(
         snap.data ?? '',
         style: normal1(context).copyWith(color: Colors.black45),

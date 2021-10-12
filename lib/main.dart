@@ -37,10 +37,8 @@ Future<void> main() async {
   await MobileAds.instance.initialize();
   return runZonedGuarded<void>(
     () async {
-      if (kDebugMode) {
-        await FirebaseCrashlytics.instance
-            .setCrashlyticsCollectionEnabled(false);
-      }
+      await FirebaseCrashlytics.instance
+          .setCustomKey('mode', kDebugMode ? 'debug' : 'release');
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
       runApp(DictionaryApp());

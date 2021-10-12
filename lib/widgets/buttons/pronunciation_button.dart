@@ -1,7 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:pedantic/pedantic.dart';
 
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
@@ -11,6 +11,7 @@ import 'package:rogers_dictionary/util/color_utils.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_icon_button.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/on_error_stream_builder.dart';
 
 class PronunciationButton extends StatelessWidget {
   PronunciationButton({
@@ -70,16 +71,16 @@ class _PlayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return AdaptiveIconButton(
       visualDensity: VisualDensity.compact,
-      onPressed: () async {
-        unawaited(DictionaryApp.analytics.logEvent(
+      onPressed: () {
+        _currPlaybackStream.value =
+            DictionaryApp.textToSpeech.playAudio(text, mode);
+        DictionaryApp.analytics.logEvent(
           name: 'play_audio',
           parameters: {
             'text': text,
             'mode': mode.toString().split('.').last,
           },
-        ));
-        _currPlaybackStream.value =
-            DictionaryApp.textToSpeech.playAudio(text, mode);
+        );
       },
       icon: const Icon(Icons.volume_up),
     );
@@ -104,33 +105,19 @@ class _PlayingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<PlaybackInfo>(
+    return LoggingStreamBuilder<PlaybackInfo>(
       stream: _playbackStream,
       builder: (context, snap) {
         if (snap.hasError) {
-          // We need to save a reference before calling `_onDone` as on done
-          // will dispose of `context`.
-          final ScaffoldMessengerState scaffoldMessenger =
-              ScaffoldMessenger.of(context);
+          String message = snap.error.toString();
+          if (snap.error is TimeoutException) {
+            message = i18n.audioPlaybackTimeoutMsg.get(context);
+          }
+          DictionaryApp.snackBarNotifier.showErrorMessage(
+            message: message,
+            extraText: snap.error.toString()
+          );
           _onDone();
-          // Have to wrap in a post frame callback because otherwise we'll be
-          WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-            print("Timed out after 2 seconds attempting to play '$text'.");
-            scaffoldMessenger.showSnackBar(
-              SnackBar(
-                content: Text(
-                  i18n.audioPlaybackTimeoutMsg.get(context),
-                ),
-                duration: const Duration(seconds: 2),
-                action: SnackBarAction(
-                  label: i18n.dismiss.get(context),
-                  onPressed: () {
-                    scaffoldMessenger.hideCurrentSnackBar();
-                  },
-                ),
-              ),
-            );
-          });
         }
         if (snap.connectionState == ConnectionState.done) {
           _onDone();

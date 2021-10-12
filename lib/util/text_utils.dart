@@ -154,8 +154,12 @@ LinkedHashMap<OverrideRule, TextStyle> _highlightSearchMatch(
   );
 }
 
-Widget alternateHeadwordLines(BuildContext context,
-    List<Headword> alternateHeadwords, bool preview, String searchString) {
+Widget alternateHeadwordLines(
+  BuildContext context,
+  List<Headword> alternateHeadwords,
+  bool preview,
+  String searchString,
+) {
   if (alternateHeadwords.isEmpty) {
     return Container();
   }
@@ -196,7 +200,10 @@ Widget alternateHeadwordLines(BuildContext context,
 }
 
 Widget _namingStandard(
-    BuildContext context, String namingStandard, bool isHeadword) {
+  BuildContext context,
+  String namingStandard,
+  bool isHeadword,
+) {
   assert(namingStandard.isNotEmpty);
   String text = namingStandard;
   if (namingStandard == 'i') {
