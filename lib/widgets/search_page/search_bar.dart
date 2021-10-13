@@ -41,7 +41,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void dispose() {
     _searchModel.entrySearchModel.currSearchString
-        .removeListener(_onTextChanged);
+        .removeListener(_onSearchChanged);
     _controller.dispose();
     super.dispose();
   }

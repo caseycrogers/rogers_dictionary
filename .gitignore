@@ -47,4 +47,4 @@ app.*.map.json
 
 # Custom
 keys/*
-
+google_services.json

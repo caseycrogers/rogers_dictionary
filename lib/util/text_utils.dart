@@ -56,8 +56,10 @@ Text normal1Text(BuildContext context, String text, {Color? color}) => Text(
 
 Text italic1Text(BuildContext context, String text, {Color? color}) => Text(
       text,
-      style:
-          normal1(context).copyWith(color: color, fontStyle: FontStyle.italic),
+      style: normal1(context).copyWith(
+        color: color,
+        fontStyle: FontStyle.italic,
+      ),
     );
 
 Text bold1Text(BuildContext context, String text, {Color? color}) => Text(
@@ -226,8 +228,11 @@ List<Widget> _translationParentheticals(
       .expand((q) => [
             normal1Text(context, ' '),
             DictionaryChip(
-              child: Text(q, style: italic1(context)),
-            )
+              child: Transform.translate(
+                offset: const Offset(0, 1),
+                child: italic1Text(context, q),
+              ),
+            ),
           ])
       .toList();
 }
