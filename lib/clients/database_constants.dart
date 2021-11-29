@@ -19,7 +19,8 @@ const String BOOKMARK_TAG = 'tag';
 
 const String IS_FAVORITE = 'is_favorite';
 
-const String RELATED_TERMS = 'related_terms';
+const String RELATED_TERMS_TRANSITIVE = 'related_terms_transitive';
+const String RELATED_TERMS_INTRANSITIVE = 'related_terms_intransitive';
 const String RUN_ON_TEXT = 'run_on_text';
 const String HEADWORD_ABBREVIATIONS = 'headword_abbreviations';
 const String ALTERNATE_HEADWORDS = 'alternate_headwords';

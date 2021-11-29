@@ -6,7 +6,7 @@ import 'package:implicit_navigator/implicit_navigator.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
 import 'package:rogers_dictionary/widgets/buttons/translation_mode_selector.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/util/constants.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/close_page.dart';
 
 class PageHeader extends StatelessWidget {

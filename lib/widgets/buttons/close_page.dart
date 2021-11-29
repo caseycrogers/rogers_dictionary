@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_icon_button.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
 class ClosePage extends StatelessWidget {
   const ClosePage({Key? key, required this.onClose})

@@ -174,16 +174,14 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder addRelated(List<String> related, bool transitive) {
+  EntryBuilder addRelated(String related, bool transitive) {
     if (related.isEmpty) {
       return this;
     }
     if (transitive) {
-      _transitiveRelated = (_transitiveRelated ?? <String>[])
-        ..addAll(related.where((v) => v.isNotEmpty));
+      _transitiveRelated = (_transitiveRelated ?? <String>[])..add(related);
     } else {
-      _related = (_related ?? <String>[])
-        ..addAll(related.where((v) => v.isNotEmpty));
+      _related = (_related ?? <String>[])..add(related);
     }
     return this;
   }

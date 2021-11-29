@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 
 class DictionaryTabBar extends StatelessWidget {

@@ -24,8 +24,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   final String csvPath = join(
     'lib',
     'scripts',
-    'entry_database-'
-        '${isSpanish ? SPANISH : ENGLISH}.csv',
+    'entry_database-${isSpanish ? SPANISH : ENGLISH}.csv',
   );
   final String versionPath = join('assets', 'database_version.json');
   final DatabaseVersion version = VersionUtils.fromDisk(File(versionPath));
@@ -39,6 +38,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   String? dominantHeadwordParentheticalQualifier;
   var i = 0;
   final Map<String, EntryBuilder> entryBuilders = {};
+  final Map<String, EntryBuilder> entryBuildersByAlt = {};
 
   while (rows.elementAt(i)[HEADWORD] != 'START') {
     if (i == 100) {
@@ -67,7 +67,8 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
             ' Field:\n$str');
     });
     if (row[HEADWORD]!.isNotEmpty) {
-      if ((row[PART_OF_SPEECH]!.isEmpty && row[RELATED_TERMS]!.isEmpty) ||
+      if ((row[PART_OF_SPEECH]!.isEmpty &&
+              row[RELATED_TERMS_TRANSITIVE]!.isEmpty) ||
           row[TRANSLATION]!.isEmpty) {
         print('$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row '
             '${i + 2}, skipping.');
@@ -79,9 +80,9 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         }
         continue;
       }
-      void printParentError(String parent) {
-        print('$WARNING Missing related entry \'$parent\' for entry '
-            '\'${row[HEADWORD]}\' at line ${i + 2}');
+      void printParentError(String parent, String entry) {
+        print('$WARNING Missing related entry \'$parent\' for entry \'$entry\' '
+            'at line ${i + 2}');
       }
 
       final String headword = row[HEADWORD]!;
@@ -89,35 +90,35 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
           headword,
           _split(row[HEADWORD_ABBREVIATIONS]!).get(0, orElse: ''),
           _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!).get(0, orElse: ''));
-
-      List<String> relatedList = <String>[];
-      if (row[RELATED_TERMS]!.isNotEmpty) {
-        relatedList = row[RELATED_TERMS]!.split('|');
-        for (final String parent in relatedList.where((p) => p.isNotEmpty)) {
-          if (parent == relatedList.first) {
-            // Add transitive links for the first element in the related list.
-            for (final String transitiveParent
-                in entryBuilders[parent]?.transitiveRelated ?? []) {
-              entryBuilders[transitiveParent]?.addRelated([headword], true) ??
-                  printParentError(transitiveParent);
-              builder.addRelated([transitiveParent], true);
-            }
-            entryBuilders[parent]?.addRelated([headword], true) ??
-                printParentError(parent);
-            continue;
+      if (row[RELATED_TERMS_TRANSITIVE]!.isNotEmpty) {
+        for (final String parent in row[RELATED_TERMS_TRANSITIVE]!
+            .split('|')
+            .where((p) => p.isNotEmpty)) {
+          // Add transitive links.
+          for (final String transitiveParent
+              in entryBuilders[parent]?.transitiveRelated ?? []) {
+            entryBuilders[transitiveParent]?.addRelated(headword, true) ??
+                printParentError(transitiveParent, headword);
+            builder.addRelated(transitiveParent, true);
           }
-          entryBuilders[parent]?.addRelated([headword], false) ??
-              printParentError(parent);
+          // Add to parent and self
+          entryBuilders[parent]?.addRelated(headword, true) ??
+              printParentError(parent, headword);
+          builder.addRelated(parent, true);
         }
       }
-      // First element in related is always transitive
-      if (relatedList.isNotEmpty) {
-        builder.addRelated(relatedList.sublist(0, 1), true);
-      }
-      if (relatedList.length > 1) {
-        builder.addRelated(relatedList.sublist(1), false);
+      if (row[RELATED_TERMS_INTRANSITIVE]!.isNotEmpty) {
+        for (final String parent in row[RELATED_TERMS_INTRANSITIVE]!
+            .split('|')
+            .where((p) => p.isNotEmpty)) {
+          entryBuilders[parent]?.addRelated(headword, false) ??
+              printParentError(parent, headword);
+          builder.addRelated(parent, false);
+        }
       }
       _split(row[ALTERNATE_HEADWORDS]!)
+          .where((alt) => alt.isNotEmpty)
+          .toList()
           .asMap()
           .forEach((i, alternateHeadwordText) {
         // Start from i + 1 because the first slow was taken by the headword.
@@ -136,6 +137,11 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       if (entryBuilders.keys.contains(row[HEADWORD]))
         print('$WARNING Duplicate headword ${row[HEADWORD]} at line ${i + 2}');
       entryBuilders[row[HEADWORD]!] = builder;
+      if (row[ALTERNATE_HEADWORDS]!.isNotEmpty) {
+        for (final String alt in _split(row[ALTERNATE_HEADWORDS]!)) {
+          entryBuildersByAlt[alt] = builder;
+        }
+      }
       partOfSpeech = '';
       dominantHeadwordParentheticalQualifier = '';
     }
@@ -215,7 +221,7 @@ Future<void> _uploadSqlFlite(
       URL_ENCODED_HEADWORD: entry.headword.urlEncodedHeadword,
       ENTRY_ID: entry.entryId,
       HEADWORD: entry.headword.headwordText.searchable,
-      RELATED_TERMS: entry.related.join(' | ').searchable,
+      RELATED_TERMS_TRANSITIVE: entry.related.join(' | ').searchable,
       HEADWORD_ABBREVIATIONS:
           entry.allHeadwords.map((h) => h.abbreviation).join(' | ').searchable,
       ALTERNATE_HEADWORDS: entry.alternateHeadwords
@@ -230,7 +236,7 @@ Future<void> _uploadSqlFlite(
           .searchable,
       HEADWORD + WITHOUT_OPTIONALS:
           entry.headword.headwordText.withoutOptionals.searchable,
-      RELATED_TERMS + WITHOUT_OPTIONALS:
+      RELATED_TERMS_TRANSITIVE + WITHOUT_OPTIONALS:
           entry.related.map((p) => p.withoutOptionals).join(' | ').searchable,
       HEADWORD_ABBREVIATIONS + WITHOUT_OPTIONALS: entry.allHeadwords
           .map((h) => h.abbreviation.withoutOptionals)
@@ -277,11 +283,11 @@ Future<void> createEntryTable(Database db, String tableName) async {
     $URL_ENCODED_HEADWORD STRING NOT NULL PRIMARY KEY,
     $ENTRY_ID INTEGER NOT NULL,
     $HEADWORD STRING NOT NULL,
-    $RELATED_TERMS STRING,
+    $RELATED_TERMS_TRANSITIVE STRING,
     $HEADWORD_ABBREVIATIONS STRING,
     $ALTERNATE_HEADWORDS String,
     $HEADWORD$WITHOUT_OPTIONALS STRING NOT NULL,
-    $RELATED_TERMS$WITHOUT_OPTIONALS STRING,
+    $RELATED_TERMS_TRANSITIVE$WITHOUT_OPTIONALS STRING,
     $HEADWORD_ABBREVIATIONS$WITHOUT_OPTIONALS STRING,
     $ALTERNATE_HEADWORDS$WITHOUT_OPTIONALS String,
     $IRREGULAR_INFLECTIONS String,

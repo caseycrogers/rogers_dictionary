@@ -9,8 +9,8 @@ import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/util/color_utils.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_icon_button.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/buttons/inline_icon_button.dart';
 import 'package:rogers_dictionary/widgets/on_error_stream_builder.dart';
 
 class PronunciationButton extends StatelessWidget {
@@ -51,8 +51,7 @@ class PronunciationButton extends StatelessWidget {
     );
   }
 
-  double get _size =>
-      (_buttonKey.currentContext!.findRenderObject() as RenderBox).size.height;
+  double get _size => 22;
 }
 
 class _PlayButton extends StatelessWidget {
@@ -69,8 +68,8 @@ class _PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveIconButton(
-      visualDensity: VisualDensity.compact,
+    return InlineIconButton(
+      Icons.volume_up,
       onPressed: () {
         _currPlaybackStream.value =
             DictionaryApp.textToSpeech.playAudio(text, mode);
@@ -82,7 +81,6 @@ class _PlayButton extends StatelessWidget {
           },
         );
       },
-      icon: const Icon(Icons.volume_up),
     );
   }
 }
@@ -114,9 +112,7 @@ class _PlayingButton extends StatelessWidget {
             message = i18n.audioPlaybackTimeoutMsg.get(context);
           }
           DictionaryApp.snackBarNotifier.showErrorMessage(
-            message: message,
-            extraText: snap.error.toString()
-          );
+              message: message, extraText: snap.error.toString());
           _onDone();
         }
         if (snap.connectionState == ConnectionState.done) {
@@ -155,15 +151,16 @@ class _StopButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      visualDensity: VisualDensity.compact,
+    return InlineIconButton(
+      Icons.stop,
+      // We need to make this opaque as it should fully occlude the indicator
+      // under it
+      color: AdaptiveMaterial.secondaryOnColorOf(context)!
+          .bake(Theme.of(context).cardColor),
       onPressed: () {
         _onDone();
         DictionaryApp.textToSpeech.stopIfPlaying(text, mode);
       },
-      icon: const Icon(Icons.stop),
-      color: AdaptiveMaterial.secondaryOnColorOf(context)!
-          .bake(Theme.of(context).cardColor),
     );
   }
 }
@@ -180,7 +177,7 @@ class _LoadingIndicator extends StatelessWidget {
       child: Container(
         height: size,
         width: size,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(4),
         child: CircularProgressIndicator(
           strokeWidth: 3,
           color: AdaptiveMaterial.secondaryOnColorOf(context)!,
