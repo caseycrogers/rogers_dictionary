@@ -72,6 +72,10 @@ class _EntryListSwitcherState extends State<_EntryListSwitcher> {
           searchResults: _SearchResults(context, searchString),
         );
       },
+      // We need to reset the cached entries.
+      onPop: (poppedValue, currentValue) {
+        searchModel.entrySearchModel.entries = [];
+      },
     );
   }
 }

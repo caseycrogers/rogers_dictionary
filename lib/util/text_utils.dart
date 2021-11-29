@@ -341,7 +341,7 @@ Widget irregularInflectionsTable(
     return Container();
   }
   return Padding(
-    padding: const EdgeInsets.only(top: kPad / 2),
+    padding: const EdgeInsets.only(top: kPad / 2, bottom: kPad / 2),
     child: DictionaryChip(
       childPadding: const EdgeInsets.all(kPad / 2),
       color: Colors.grey.shade200,

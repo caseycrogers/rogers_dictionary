@@ -25,7 +25,6 @@ class PronunciationButton extends StatelessWidget {
 
   final ValueNotifier<Stream<PlaybackInfo>?> _currPlaybackStream =
       ValueNotifier(null);
-  final GlobalKey _buttonKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +34,18 @@ class PronunciationButton extends StatelessWidget {
         late final Widget currButton;
         if (playbackStream == null) {
           currButton =
-              _PlayButton(text, mode, _currPlaybackStream, key: _buttonKey);
+              _PlayButton(text, mode, _currPlaybackStream);
         } else {
-          currButton = _PlayingButton(text, mode, _size, playbackStream, () {
-            WidgetsBinding.instance!.addPostFrameCallback((_) {
-              _currPlaybackStream.value = null;
-            });
-          });
+          currButton = Container(
+            height: 22,
+            width: 30,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: _PlayingButton(text, mode, playbackStream, () {
+              WidgetsBinding.instance!.addPostFrameCallback((_) {
+                _currPlaybackStream.value = null;
+              });
+            }),
+          );
         }
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 20),
@@ -50,8 +54,6 @@ class PronunciationButton extends StatelessWidget {
       },
     );
   }
-
-  double get _size => 22;
 }
 
 class _PlayButton extends StatelessWidget {
@@ -89,7 +91,6 @@ class _PlayingButton extends StatelessWidget {
   const _PlayingButton(
     this.text,
     this.mode,
-    this.size,
     this._playbackStream,
     this._onDone, {
     Key? key,
@@ -97,7 +98,6 @@ class _PlayingButton extends StatelessWidget {
 
   final String text;
   final TranslationMode mode;
-  final double size;
   final Stream<PlaybackInfo> _playbackStream;
   final VoidCallback _onDone;
 
@@ -119,7 +119,7 @@ class _PlayingButton extends StatelessWidget {
           _onDone();
         }
         if (snap.data == null) {
-          return _LoadingIndicator(size);
+          return const _LoadingIndicator(22);
         }
         final PlaybackInfo info = snap.data!;
         // Currently playing.
