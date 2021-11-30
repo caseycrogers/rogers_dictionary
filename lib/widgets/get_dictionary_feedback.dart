@@ -96,7 +96,7 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                   ],
                 ),
                 TextField(
-                  minLines: 2,
+                  minLines: 1,
                   maxLines: 10,
                   decoration: InputDecoration(
                     helperText: i18n.feedback.cap.get(context),

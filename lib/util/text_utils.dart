@@ -95,16 +95,20 @@ List<Widget> highlightedText(
   bool isHeadword = false,
   required String searchString,
   bool forWrap = true,
+  double? size,
 }) {
   final overrides = _highlightSearchMatch(
     context,
     text,
     preview,
     searchString.withoutDiacriticalMarks.toLowerCase(),
+    size: size,
   );
   final OverflowMarkdown md = OverflowMarkdown(
     text,
-    defaultStyle: !preview && isHeadword ? headline1(context) : bold1(context),
+    defaultStyle: !preview && isHeadword
+        ? headline1(context)
+        : bold1(context).copyWith(fontSize: size),
     overrideRules: overrides.keys.toList(),
     overrideStyles: overrides.values.toList(),
   );
@@ -118,8 +122,9 @@ LinkedHashMap<OverrideRule, TextStyle> _highlightSearchMatch(
   BuildContext context,
   String text,
   bool preview,
-  String searchString,
-) {
+  String searchString, {
+  double? size,
+}) {
   if (!preview || searchString.isEmpty) {
     // ignore: prefer_collection_literals
     return LinkedHashMap();
@@ -149,6 +154,7 @@ LinkedHashMap<OverrideRule, TextStyle> _highlightSearchMatch(
           TextStyle(
             backgroundColor:
                 Theme.of(context).colorScheme.primary.withOpacity(.25),
+            fontSize: size,
           ),
         );
       },
@@ -162,6 +168,7 @@ Widget alternateHeadwordLines(
   bool preview,
   String searchString,
 ) {
+  final double? size = preview ? null : 22;
   if (alternateHeadwords.isEmpty) {
     return Container();
   }
@@ -177,21 +184,30 @@ Widget alternateHeadwordLines(
               // Only display the alt header for the first entry.
               Opacity(
                 opacity: alt == alternateHeadwords.first ? 1.0 : 0.0,
-                child: italic1Text(context, 'alt. '),
+                child: Text(
+                  'alt. ',
+                  style: italic1(context).copyWith(fontSize: size),
+                ),
               ),
-              ...highlightedText(context, alt.headwordText, preview,
-                  searchString: searchString),
-              if (alt.abbreviation.isNotEmpty) normal1Text(context, ' '),
+              ...highlightedText(
+                context,
+                alt.headwordText,
+                preview,
+                searchString: searchString,
+                size: size,
+              ),
+              if (alt.abbreviation.isNotEmpty)
+                Text(' ', style: normal1(context).copyWith(fontSize: size)),
               if (alt.abbreviation.isNotEmpty)
                 ...highlightedText(context, '(${alt.abbreviation})', preview,
-                    searchString: searchString, forWrap: false),
+                    searchString: searchString, forWrap: false, size: size),
               if (alt.namingStandard.isNotEmpty)
-                _namingStandard(context, alt.namingStandard, true),
+                _namingStandard(context, alt.namingStandard, true, size: size),
               ...parentheticalTexts(
                 context,
                 alt.parentheticalQualifier,
                 true,
-                size: Theme.of(context).textTheme.bodyText2!.fontSize,
+                size: size,
               ),
             ],
           );
@@ -204,8 +220,9 @@ Widget alternateHeadwordLines(
 Widget _namingStandard(
   BuildContext context,
   String namingStandard,
-  bool isHeadword,
-) {
+  bool isHeadword, {
+  double? size,
+}) {
   assert(namingStandard.isNotEmpty);
   String text = namingStandard;
   if (namingStandard == 'i') {
@@ -214,8 +231,11 @@ Widget _namingStandard(
   if (namingStandard == 'u') {
     text = 'USAN';
   }
-  return OverflowMarkdown(' (*$text* )',
-      defaultStyle: isHeadword ? bold1(context) : null);
+  return OverflowMarkdown(
+    ' (*$text* )',
+    defaultStyle:
+        isHeadword ? bold1(context) : normal1(context).copyWith(fontSize: size),
+  );
 }
 
 List<Widget> _translationParentheticals(

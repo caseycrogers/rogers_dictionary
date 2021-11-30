@@ -63,7 +63,7 @@ class EntrySearchModel {
       return;
     }
     DictionaryApp.analytics.logSearch(searchTerm: newSearchString);
-    if (!isBigEnoughForAdvanced(context)) {
+    if (!isBigEnoughForAdvanced(context) && newSearchString.isNotEmpty) {
       DictionaryModel.instance.onHeadwordSelected(context, '');
     }
     entries = [];

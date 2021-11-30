@@ -22,6 +22,9 @@ class _SearchBarState extends State<SearchBar> {
 
   bool _shouldInit = true;
 
+  // Save the node up here in a stateful widget so that it persists.
+  FocusNode _node = FocusNode();
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -53,7 +56,10 @@ class _SearchBarState extends State<SearchBar> {
       builder: (context, translationPage, child) {
         return child!;
       },
-      child: _SearchBarBase(controller: _controller),
+      child: _SearchBarBase(
+        focusNode: _node,
+        controller: _controller,
+      ),
     );
   }
 
@@ -87,9 +93,14 @@ class _SearchBarState extends State<SearchBar> {
 }
 
 class _SearchBarBase extends StatelessWidget {
-  const _SearchBarBase({Key? key, this.controller}) : super(key: key);
+  const _SearchBarBase({
+    Key? key,
+    required this.focusNode,
+    this.controller,
+  }) : super(key: key);
 
   final TextEditingController? controller;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +112,7 @@ class _SearchBarBase extends StatelessWidget {
         child: Container(
           color: Theme.of(context).colorScheme.surface,
           child: TextField(
+            focusNode: focusNode,
             style: TextStyle(
               fontSize: Theme.of(context).textTheme.bodyText2!.fontSize,
             ),
@@ -111,6 +123,12 @@ class _SearchBarBase extends StatelessWidget {
                   ? IconButton(
                       onPressed: () {
                         controller?.clear();
+                        // Re-request focus after build is done otherwise the
+                        // build takes focus right back.
+                        WidgetsBinding.instance!
+                            .addPostFrameCallback((timeStamp) {
+                          focusNode.requestFocus();
+                        });
                       },
                       icon: const Icon(Icons.clear),
                     )

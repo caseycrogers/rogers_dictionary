@@ -166,7 +166,10 @@ class TextToSpeech {
           'name': isEnglish(mode) ? _enName : _esName,
           'ssmlGender': 'MALE'
         },
-        'audioConfig': {'audioEncoding': 'MP3'}
+        'audioConfig': {
+          'audioEncoding': 'MP3',
+          if (!isEnglish(mode)) 'speakingRate': .9
+        }
       },
     );
   }
