@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/clients/entry_builders.dart';
@@ -181,7 +180,7 @@ Widget alternateHeadwordLines(
           children: [
             if (alt == alternateHeadwords.first)
               Padding(
-                padding: const EdgeInsets.only(bottom: 2),
+                padding: const EdgeInsets.symmetric(vertical: 2),
                 child: Text(
                   'alt. ',
                   style: italic1(context).copyWith(fontSize: size),
@@ -190,7 +189,9 @@ Widget alternateHeadwordLines(
             else
               Container(),
             Padding(
-              padding: const EdgeInsets.only(bottom: 2),
+              padding: (alt.parentheticalQualifier.isNotEmpty)
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.only(top: 2),
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
@@ -210,7 +211,8 @@ Widget alternateHeadwordLines(
                     ),
                   if (alt.abbreviation.isNotEmpty) ...[
                     Text(' ', style: normal1(context).copyWith(fontSize: size)),
-                    ...highlightedText(context, '(${alt.abbreviation})', preview,
+                    ...highlightedText(
+                        context, '(${alt.abbreviation})', preview,
                         searchString: searchString, forWrap: false, size: size),
                   ],
                   if (alt.namingStandard.isNotEmpty)

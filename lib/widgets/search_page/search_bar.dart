@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
@@ -23,7 +22,7 @@ class _SearchBarState extends State<SearchBar> {
   bool _shouldInit = true;
 
   // Save the node up here in a stateful widget so that it persists.
-  FocusNode _node = FocusNode();
+  final FocusNode _node = FocusNode();
 
   @override
   void didChangeDependencies() {

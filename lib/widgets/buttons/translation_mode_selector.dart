@@ -1,8 +1,6 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/dictionary_model.dart';

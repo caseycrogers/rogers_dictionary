@@ -10,7 +10,7 @@ analyzer:
     todo: ignore
     sdk_version_async_exported_from_core: ignore
   exclude:
-    - lib/protobufs
+    - lib/protobufs/**
 
 linter:
   rules:

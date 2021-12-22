@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';

@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/dictionary_app.dart';
 
+import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/text_utils.dart';
 

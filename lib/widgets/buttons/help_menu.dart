@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/about_button.dart';
-
 import 'package:rogers_dictionary/widgets/buttons/drop_down_widget.dart';
 import 'package:rogers_dictionary/widgets/buttons/feedback_button.dart';
 
