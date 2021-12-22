@@ -17,11 +17,13 @@ class PronunciationButton extends StatelessWidget {
   PronunciationButton({
     Key? key,
     required this.text,
+    required this.pronunciation,
     required this.mode,
   }) : super(key: key);
 
   final String text;
   final TranslationMode mode;
+  final String? pronunciation;
 
   final ValueNotifier<Stream<PlaybackInfo>?> _currPlaybackStream =
       ValueNotifier(null);
@@ -33,8 +35,12 @@ class PronunciationButton extends StatelessWidget {
       builder: (context, playbackStream, _) {
         late final Widget currButton;
         if (playbackStream == null) {
-          currButton =
-              _PlayButton(text, mode, _currPlaybackStream);
+          currButton = _PlayButton(
+            text,
+            pronunciation ?? text,
+            mode,
+            _currPlaybackStream,
+          );
         } else {
           currButton = Container(
             height: 22,
@@ -59,12 +65,14 @@ class PronunciationButton extends StatelessWidget {
 class _PlayButton extends StatelessWidget {
   const _PlayButton(
     this.text,
+    this.pronunciationText,
     this.mode,
     this._currPlaybackStream, {
     Key? key,
   }) : super(key: key);
 
   final String text;
+  final String pronunciationText;
   final TranslationMode mode;
   final ValueNotifier<Stream<PlaybackInfo>?> _currPlaybackStream;
 
@@ -74,11 +82,11 @@ class _PlayButton extends StatelessWidget {
       Icons.volume_up,
       onPressed: () {
         _currPlaybackStream.value =
-            DictionaryApp.textToSpeech.playAudio(text, mode);
+            DictionaryApp.textToSpeech.playAudio(text, pronunciationText, mode);
         DictionaryApp.analytics.logEvent(
           name: 'play_audio',
           parameters: {
-            'text': text,
+            'text': pronunciationText,
             'mode': mode.toString().split('.').last,
           },
         );

@@ -14,25 +14,28 @@ message Entry {
 
     message Headword {
         bool is_alternate = 1;
-        string headword_text = 2;
-        string abbreviation = 3;
-        string naming_standard = 4;
-        string parenthetical_qualifier = 5;
+        string gender = 2;
+        string headword_text = 3;
+        string abbreviation = 4;
+        string naming_standard = 5;
+        string parenthetical_qualifier = 6;
     }
 
     message Translation {
         string part_of_speech = 1;
         string content = 2;
-        repeated string irregular_inflections = 3;
-        string dominant_headword_parenthetical_qualifier = 4;
-        string gender_and_plural = 5;
-        string naming_standard = 6;
-        string abbreviation = 7;
-        string parenthetical_qualifier = 8;
-        string editorial_note = 9;
+        string pronunciation_override = 3;
+        repeated string irregular_inflections = 4;
+        string dominant_headword_parenthetical_qualifier = 5;
+        string gender_and_plural = 6;
+        string naming_standard = 7;
+        string abbreviation = 8;
+        string parenthetical_qualifier = 9;
+        string disambiguation = 10;
+        string editorial_note = 11;
 
-        repeated string example_phrases = 10;
+        repeated string example_phrases = 12;
 
-        string opposite_headword = 11;
+        string opposite_headword = 13;
     }
 }

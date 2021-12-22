@@ -174,45 +174,60 @@ Widget alternateHeadwordLines(
   }
   return Padding(
     padding: const EdgeInsets.only(bottom: 4),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: alternateHeadwords.map(
-        (alt) {
-          return Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              // Only display the alt header for the first entry.
-              Opacity(
-                opacity: alt == alternateHeadwords.first ? 1.0 : 0.0,
+    child: Table(
+      columnWidths: const {0: IntrinsicColumnWidth()},
+      children: alternateHeadwords.map((alt) {
+        return TableRow(
+          children: [
+            if (alt == alternateHeadwords.first)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   'alt. ',
                   style: italic1(context).copyWith(fontSize: size),
                 ),
+              )
+            else
+              Container(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  ...highlightedText(
+                    context,
+                    alt.headwordText,
+                    preview,
+                    searchString: searchString,
+                    size: size,
+                  ),
+                  if (alt.gender.isNotEmpty)
+                    Text(
+                      ' ${alt.gender}',
+                      style: italic1(context).copyWith(
+                        fontSize: size,
+                      ),
+                    ),
+                  if (alt.abbreviation.isNotEmpty) ...[
+                    Text(' ', style: normal1(context).copyWith(fontSize: size)),
+                    ...highlightedText(context, '(${alt.abbreviation})', preview,
+                        searchString: searchString, forWrap: false, size: size),
+                  ],
+                  if (alt.namingStandard.isNotEmpty)
+                    _namingStandard(context, alt.namingStandard, true,
+                        size: size),
+                  ...parentheticalTexts(
+                    context,
+                    alt.parentheticalQualifier,
+                    true,
+                    size: size != null ? size - 2 : null,
+                  ),
+                ],
               ),
-              ...highlightedText(
-                context,
-                alt.headwordText,
-                preview,
-                searchString: searchString,
-                size: size,
-              ),
-              if (alt.abbreviation.isNotEmpty)
-                Text(' ', style: normal1(context).copyWith(fontSize: size)),
-              if (alt.abbreviation.isNotEmpty)
-                ...highlightedText(context, '(${alt.abbreviation})', preview,
-                    searchString: searchString, forWrap: false, size: size),
-              if (alt.namingStandard.isNotEmpty)
-                _namingStandard(context, alt.namingStandard, true, size: size),
-              ...parentheticalTexts(
-                context,
-                alt.parentheticalQualifier,
-                true,
-                size: size,
-              ),
-            ],
-          );
-        },
-      ).toList(),
+            ),
+          ],
+        );
+      }).toList(),
     ),
   );
 }
@@ -250,7 +265,9 @@ List<Widget> _translationParentheticals(
             DictionaryChip(
               child: Transform.translate(
                 offset: const Offset(0, 1),
-                child: italic1Text(context, q),
+                child: Text(q,
+                    style: italic1(context)
+                        .copyWith(fontSize: italic1(context).fontSize! - 3)),
               ),
             ),
           ])
@@ -300,30 +317,46 @@ Widget translationLine(
   Translation translation,
   int i,
 ) {
-  return _appendWidgets(
-    wraps: [
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
       normal1Text(context, '$i. '),
-      ...OverflowMarkdown(translation.content).forWrap(context),
-      if (translation.genderAndPlural.isNotEmpty)
-        OverflowMarkdown(' *${translation.genderAndPlural}*'),
-      if (translation.abbreviation.isNotEmpty) ...[
-        normal1Text(context, ' '),
-        OverflowMarkdown('(${translation.abbreviation})'),
-      ],
-      if (translation.namingStandard.isNotEmpty)
-        _namingStandard(context, translation.namingStandard, false),
-      ..._translationParentheticals(
-        context,
-        translation.parentheticalQualifier,
+      Expanded(
+        child: _appendWidgets(
+          wraps: [
+            ...OverflowMarkdown(translation.content).forWrap(context),
+            if (translation.genderAndPlural.isNotEmpty)
+              OverflowMarkdown(' *${translation.genderAndPlural}*'),
+            if (translation.abbreviation.isNotEmpty) ...[
+              normal1Text(context, ' '),
+              OverflowMarkdown('(${translation.abbreviation})'),
+            ],
+            if (translation.disambiguation.isNotEmpty)
+              ...OverflowMarkdown(
+                ' (${translation.disambiguation})',
+              ).forWrap(context),
+            if (translation.namingStandard.isNotEmpty)
+              _namingStandard(context, translation.namingStandard, false),
+            ..._translationParentheticals(
+              context,
+              translation.parentheticalQualifier,
+            ),
+          ],
+          suffixes: [
+            PronunciationButton(
+              text: translation.content.pronounceable,
+              pronunciation: translation.pronunciationOverride
+                  .split('|')
+                  .join(
+                      ' <break time="350ms"/>${i18n.or.get(context)}<break time="150ms"/> ')
+                  .emptyToNull,
+              mode: oppositeMode(SearchModel.of(context).mode),
+            ),
+            if (translation.oppositeHeadword.isNotEmpty)
+              OppositeHeadwordButton(translation: translation),
+          ],
+        ),
       ),
-    ],
-    suffixes: [
-      PronunciationButton(
-        text: translation.content.pronounceable,
-        mode: oppositeMode(SearchModel.of(context).mode),
-      ),
-      if (translation.oppositeHeadword.isNotEmpty)
-        OppositeHeadwordButton(translation: translation),
     ],
   );
 }
@@ -340,7 +373,6 @@ List<Widget> parentheticalTexts(
           (t) => [
             if (t != text.split(';').first) normal1Text(context, ' '),
             DictionaryChip(
-              padding: const EdgeInsets.only(top: 4),
               child: Text(t, style: italic1(context).copyWith(fontSize: size)),
               color: Colors.cyan.shade100.withOpacity(.6),
             ),

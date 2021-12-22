@@ -17,7 +17,7 @@ import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 class FeedbackSender {
   FeedbackSender({
     required this.locale,
-    required this.betterFeedback,
+    required this.feedbackController,
   });
 
   final http.Client _client = http.Client();
@@ -27,13 +27,13 @@ class FeedbackSender {
       Uri.parse('https://firebasestorage.googleapis.com/'
           'v0/b/rogers-dictionary.appspot.com/o/');
 
-  final FeedbackData betterFeedback;
+  final FeedbackController feedbackController;
   final Locale locale;
 
   void showFeedback({
     String? extraText,
   }) {
-    betterFeedback.controller.show(
+    feedbackController.show(
       (userFeedback) async {
         await _onFeedback(userFeedback, locale, extraText);
       },

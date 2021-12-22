@@ -89,20 +89,19 @@ class EntryView extends StatelessWidget {
         bold1Text(context, i18n.related.get(context)),
         const Divider(),
         ..._entry.related.where((r) => r.isNotEmpty).map(
-              (headword) => TextButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.zero),
-                  minimumSize: MaterialStateProperty.all(Size.zero),
-                  visualDensity: VisualDensity.compact,
+              (headword) => InkWell(
+                borderRadius: BorderRadius.circular(kPad),
+                child: Padding(
+                  padding: const EdgeInsets.all(kPad),
+                  child: OverflowMarkdown(
+                    headword,
+                    defaultStyle: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(color: Colors.blue),
+                  ),
                 ),
-                child: OverflowMarkdown(
-                  headword,
-                  defaultStyle: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(color: Colors.blue),
-                ),
-                onPressed: () {
+                onTap: () {
                   DictionaryModel.instance.onHeadwordSelected(
                     context,
                     EntryUtils.urlEncode(headword),
@@ -197,36 +196,46 @@ class EntryView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            partOfSpeechText(context, partOfSpeech, _preview),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: partOfSpeechText(context, partOfSpeech, _preview),
+            ),
             irregularInflectionsTable(context, inflections),
             Indent(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: translations.map((t) {
-                  final bool parentheticalChanged =
-                      t.dominantHeadwordParentheticalQualifier != parenthetical;
-                  parenthetical = t.dominantHeadwordParentheticalQualifier;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (parentheticalChanged)
-                        Wrap(
-                          children: parentheticalTexts(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: translations.map((t) {
+                    final bool parentheticalChanged =
+                        t.dominantHeadwordParentheticalQualifier !=
+                            parenthetical;
+                    parenthetical = t.dominantHeadwordParentheticalQualifier;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (parentheticalChanged)
+                            Wrap(
+                              children: parentheticalTexts(
+                                context,
+                                parenthetical,
+                                false,
+                              ),
+                            ),
+                          _translationContent(
                             context,
-                            parenthetical,
-                            false,
+                            t,
+                            hasParenthetical && parenthetical != '',
+                            translations.indexOf(t) + 1,
                           ),
-                        ),
-                      _translationContent(
-                        context,
-                        t,
-                        hasParenthetical && parenthetical != '',
-                        translations.indexOf(t) + 1,
+                        ],
                       ),
-                    ],
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ],

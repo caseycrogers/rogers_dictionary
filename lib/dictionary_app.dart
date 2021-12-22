@@ -63,7 +63,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
             DictionaryApp._snackBarNotifier = SnackBarNotifier(context);
             DictionaryApp._feedback = FeedbackSender(
               locale: Localizations.localeOf(context),
-              betterFeedback: BetterFeedback.of(context),
+              feedbackController: BetterFeedback.of(context),
             );
             return DictionaryPage();
           }),

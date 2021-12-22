@@ -24,6 +24,7 @@ const String RELATED_TERMS_INTRANSITIVE = 'related_terms_intransitive';
 const String RUN_ON_TEXT = 'run_on_text';
 const String HEADWORD_ABBREVIATIONS = 'headword_abbreviations';
 const String ALTERNATE_HEADWORDS = 'alternate_headwords';
+const String ALTERNATE_HEADWORD_GENDERS = 'alternate_headword_genders';
 const String ALTERNATE_HEADWORD_NAMING_STANDARDS =
     'alternate_headword_naming_standards';
 const String IRREGULAR_INFLECTIONS = 'irregular_inflections';
@@ -35,12 +36,14 @@ const String HEADWORD_PARENTHETICAL_QUALIFIERS =
 const String DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER =
     'dominant_headword_parenthetical_qualifier';
 const String TRANSLATION = 'translation';
+const String PRONUNCIATION_OVERRIDE = 'pronunciation_override';
 const String SHOULD_BE_KEY_PHRASE = 'should_be_key_phrase';
 const String GENDER_AND_PLURAL = 'gender_and_plural';
 const String TRANSLATION_NAMING_STANDARD = 'translation_naming_standard';
 const String TRANSLATION_ABBREVIATION = 'translation_abbreviation';
 const String TRANSLATION_PARENTHETICAL_QUALIFIER =
     'translation_parenthetical_qualifier';
+const String DISAMBIGUATION = 'disambiguation';
 const String EXAMPLE_PHRASES = 'example_phrases';
 const String EDITORIAL_NOTE = 'editorial_note';
 const String OPPOSITE_HEADWORD = 'opposite_headword';

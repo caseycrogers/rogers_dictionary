@@ -97,11 +97,15 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
           // Add transitive links.
           for (final String transitiveParent
               in entryBuilders[parent]?.transitiveRelated ?? []) {
+            // If related words form a cycle, skip.
+            if (transitiveParent == headword) {
+              continue;
+            }
             entryBuilders[transitiveParent]?.addRelated(headword, true) ??
                 printParentError(transitiveParent, headword);
             builder.addRelated(transitiveParent, true);
           }
-          // Add to parent and self
+          // Add to parent and self.
           entryBuilders[parent]?.addRelated(headword, true) ??
               printParentError(parent, headword);
           builder.addRelated(parent, true);
@@ -120,15 +124,17 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
           .where((alt) => alt.isNotEmpty)
           .toList()
           .asMap()
-          .forEach((i, alternateHeadwordText) {
-        // Start from i + 1 because the first slow was taken by the headword.
-        final int index = i + 1;
+          .forEach((j, alternateHeadwordText) {
+        // Start from j + 1 because the first was taken by the headword.
+        final int index = j + 1;
         builder!.addAlternateHeadword(
           headwordText: alternateHeadwordText,
+          gender:
+              _split(row[ALTERNATE_HEADWORD_GENDERS]!).get(j, orElse: ''),
           abbreviation:
               _split(row[HEADWORD_ABBREVIATIONS]!).get(index, orElse: ''),
           namingStandard: _split(row[ALTERNATE_HEADWORD_NAMING_STANDARDS]!)
-              .get(i, orElse: ''),
+              .get(j, orElse: ''),
           parentheticalQualifier:
               _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!)
                   .get(index, orElse: ''),
@@ -162,10 +168,12 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
       dominantHeadwordParentheticalQualifier:
           dominantHeadwordParentheticalQualifier!,
       translation: row[TRANSLATION]!,
+      pronunciationOverride: row[PRONUNCIATION_OVERRIDE]!,
       genderAndPlural: row[GENDER_AND_PLURAL]!,
       namingStandard: row[TRANSLATION_NAMING_STANDARD]!,
       abbreviation: row[TRANSLATION_ABBREVIATION]!,
       parentheticalQualifier: row[TRANSLATION_PARENTHETICAL_QUALIFIER]!,
+      disambiguation: row[DISAMBIGUATION]!,
       examplePhrases: _split(row[EXAMPLE_PHRASES]!),
       editorialNote: row[EDITORIAL_NOTE]!,
       oppositeHeadword: row[OPPOSITE_HEADWORD]!,

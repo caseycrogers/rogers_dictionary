@@ -87,6 +87,8 @@ Message masculineFeminineNoun =
     Message('masculine/feminine noun', 'nombre masculino/femenino');
 Message masculinePluralNoun =
     Message('masculine plural noun', 'nombre masculino plural');
+Message masculineFemininePluralNoun =
+    Message('masculine/feminine plural noun', 'nombre masculino/femenino plural');
 Message masculinePluralNounParen =
     Message('masculine (plural) noun', 'nombre masculino (plural)');
 Message noun = Message('noun', 'nombre');
@@ -125,6 +127,7 @@ Message masculinePluralNounPhraseParen =
 // Misc.
 _CapMessage loading = _CapMessage('loading', 'cargando');
 _CapMessage dismiss = _CapMessage('dismiss', 'despedir');
+_CapMessage or = _CapMessage('or', 'o');
 
 Message audioPlaybackTimeoutMsg = Message(
   'Audio playback timed out, check internet connection.',

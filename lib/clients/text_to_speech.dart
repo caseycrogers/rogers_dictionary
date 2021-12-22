@@ -53,8 +53,13 @@ class TextToSpeech {
 
   static const _timeoutDuration = Duration(seconds: 2);
 
-  Stream<PlaybackInfo> playAudio(String text, TranslationMode mode) async* {
-    final AudioSource? source = await _getSource(text, mode).timeout(
+  Stream<PlaybackInfo> playAudio(
+    String text,
+    String pronunciation,
+    TranslationMode mode,
+  ) async* {
+    final AudioSource? source =
+        await _getSource(text, pronunciation, mode).timeout(
       _timeoutDuration,
       onTimeout: () {
         return null;
@@ -69,11 +74,15 @@ class TextToSpeech {
     await _player.setAudioSource(source);
     await _player.play();
 
-    yield* _getStream(text, mode);
+    yield* _getStream(text, pronunciation, mode);
   }
 
   // Need to return nullable because `Future.timeout` sucks.
-  Future<AudioSource?> _getSource(String text, TranslationMode mode) async {
+  Future<AudioSource?> _getSource(
+    String text,
+    String pronunciation,
+    TranslationMode mode,
+  ) async {
     final Directory tmpDir = await getTemporaryDirectory();
     final File mp3 = File(
       join(
@@ -83,7 +92,7 @@ class TextToSpeech {
     );
     await mp3.parent.create();
     if (!mp3.existsSync()) {
-      await mp3.writeAsBytes(await _getMp3(text, mode));
+      await mp3.writeAsBytes(await _downloadMp3(pronunciation, mode));
     }
     await _session;
     return ProgressiveAudioSource(mp3.uri);
@@ -116,7 +125,11 @@ class TextToSpeech {
     return _player.dispose();
   }
 
-  Stream<PlaybackInfo> _getStream(String text, TranslationMode mode) async* {
+  Stream<PlaybackInfo> _getStream(
+    String text,
+    String pronunciation,
+    TranslationMode mode,
+  ) async* {
     // Ensure duration is initialized before we emit events.
     final Duration duration = (await _player.durationFuture)!;
     PlaybackInfo _currentPlaybackInfo() {
@@ -155,11 +168,12 @@ class TextToSpeech {
     );
   }
 
-  String _data(String text, TranslationMode mode) {
+  String _data(String pronunciation, TranslationMode mode) {
+    print(pronunciation);
     return json.encode(
       {
         'input': {
-          'text': text,
+          'ssml': '<speak>$pronunciation</speak>',
         },
         'voice': {
           'languageCode': isEnglish(mode) ? _enCode : _esCode,
@@ -181,7 +195,10 @@ class TextToSpeech {
     );
   }
 
-  Future<Uint8List> _getMp3(String text, TranslationMode mode) async {
+  Future<Uint8List> _downloadMp3(
+    String pronunciationText,
+    TranslationMode mode,
+  ) async {
     final http.Response response = await _client.post(
       _textToSpeechUrl,
       headers: {
@@ -189,7 +206,7 @@ class TextToSpeech {
         'Content-Type': 'application/json; charset=utf-8',
         'X-Goog-Api-Key': await _apiKey,
       },
-      body: _data(text, mode),
+      body: _data(pronunciationText, mode),
     );
     return _extractAudio(response);
   }
