@@ -180,7 +180,9 @@ Widget alternateHeadwordLines(
           children: [
             if (alt == alternateHeadwords.first)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
+                padding: preview && alt.parentheticalQualifier.isNotEmpty
+                    ? const EdgeInsets.only(top: 2)
+                    : EdgeInsets.zero,
                 child: Text(
                   'alt. ',
                   style: italic1(context).copyWith(fontSize: size),
@@ -188,44 +190,38 @@ Widget alternateHeadwordLines(
               )
             else
               Container(),
-            Padding(
-              padding: (alt.parentheticalQualifier.isNotEmpty)
-                  ? EdgeInsets.zero
-                  : const EdgeInsets.only(top: 2),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  ...highlightedText(
-                    context,
-                    alt.headwordText,
-                    preview,
-                    searchString: searchString,
-                    size: size,
-                  ),
-                  if (alt.gender.isNotEmpty)
-                    Text(
-                      ' ${alt.gender}',
-                      style: italic1(context).copyWith(
-                        fontSize: size,
-                      ),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ...highlightedText(
+                  context,
+                  alt.headwordText,
+                  preview,
+                  searchString: searchString,
+                  size: size,
+                ),
+                if (alt.gender.isNotEmpty)
+                  Text(
+                    ' ${alt.gender}',
+                    style: italic1(context).copyWith(
+                      fontSize: size,
                     ),
-                  if (alt.abbreviation.isNotEmpty) ...[
-                    Text(' ', style: normal1(context).copyWith(fontSize: size)),
-                    ...highlightedText(
-                        context, '(${alt.abbreviation})', preview,
-                        searchString: searchString, forWrap: false, size: size),
-                  ],
-                  if (alt.namingStandard.isNotEmpty)
-                    _namingStandard(context, alt.namingStandard, true,
-                        size: size),
-                  ...parentheticalTexts(
-                    context,
-                    alt.parentheticalQualifier,
-                    true,
-                    size: size != null ? size - 2 : null,
                   ),
+                if (alt.abbreviation.isNotEmpty) ...[
+                  Text(' ', style: normal1(context).copyWith(fontSize: size)),
+                  ...highlightedText(context, '(${alt.abbreviation})', preview,
+                      searchString: searchString, forWrap: false, size: size),
                 ],
-              ),
+                if (alt.namingStandard.isNotEmpty)
+                  _namingStandard(context, alt.namingStandard, true,
+                      size: size),
+                ...parentheticalTexts(
+                  context,
+                  alt.parentheticalQualifier,
+                  true,
+                  size: size != null ? size - 2 : null,
+                ),
+              ],
             ),
           ],
         );
@@ -354,7 +350,7 @@ Widget translationLine(
                   .emptyToNull,
               mode: oppositeMode(SearchModel.of(context).mode),
             ),
-            if (translation.oppositeHeadword.isNotEmpty)
+            if (translation.getOppositeHeadword.isNotEmpty)
               OppositeHeadwordButton(translation: translation),
           ],
         ),

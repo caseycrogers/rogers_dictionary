@@ -91,7 +91,7 @@ extension EntryUtils on Entry {
     'vt': i18n.transitiveVerb,
     '-': i18n.phrase,
     '': i18n.blank,
-    'adjphrase': i18n.blank,
+    'adjphrase': i18n.adjectivePhrase,
     'advphrase': i18n.adverbPhrase,
     'degphrase': i18n.degreePhrase,
     'nphrase': i18n.nounPhrase,
@@ -112,10 +112,11 @@ extension EntryUtils on Entry {
   ) {
     return partOfSpeech.replaceAll(' ', '').splitMapJoin(
           RegExp('[&,]'),
-          onNonMatch: (String partOfSpeechComponent) =>
-              _partOfSpeechAbbreviationMap[partOfSpeechComponent]
+          onNonMatch: (String partOfSpeechComponent) {
+            return _partOfSpeechAbbreviationMap[partOfSpeechComponent]
                   ?.getFor(isSpanish) ??
-              '$partOfSpeechComponent*',
+              '$partOfSpeechComponent*';
+          },
           onMatch: (Match separator) {
             //  == '&' ? ' and ' : ', ',
             switch (separator.group(0)) {
