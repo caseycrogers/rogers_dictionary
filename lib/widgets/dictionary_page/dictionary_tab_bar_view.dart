@@ -93,7 +93,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
         updateBackButton();
         return false;
       },
-      child: ImplicitNavigator<DictionaryTab>.fromNotifier(
+      child: ImplicitNavigator.fromValueNotifier<DictionaryTab>(
         key: const PageStorageKey('tab_selector'),
         valueNotifier: currentTab,
         builder: (context, tab, _, __) {

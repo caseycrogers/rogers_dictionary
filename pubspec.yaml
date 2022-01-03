@@ -11,10 +11,11 @@ environment:
 dependencies:
   animations: ^2.0.0
   async: ^2.8.1
-  async_list_view: ^0.0.1-dev.8
+  async_list_view: ^1.0.0
   cupertino_icons: ^1.0.3
-  feedback: ^2.0.0-beta.0
-  firebase_analytics: ^8.1.2
+  feedback:
+    path: ../feedback/feedback
+  firebase_analytics: ^9.0.4
   firebase_core: ^1.1.0
   firebase_crashlytics: ^2.0.7
   flutter:
@@ -24,8 +25,7 @@ dependencies:
   google_fonts: ^2.0.0
   google_mobile_ads: ^1.0.0
   http: ^0.13.3
-  implicit_navigator:
-    path: ../implicit_navigator
+  implicit_navigator: ^1.0.0
   just_audio: ^0.9.7
   package_info: ^2.0.0
   path: ^1.8.0

@@ -118,7 +118,7 @@ Message femininePluralNounPhrase =
 Message masculineFeminineNounPhrase = Message(
     'masculine/feminine noun phrase', 'frase nominal masculina/femenina');
 Message masculineNounPhrase =
-    Message('masculine noun phase', 'frase nominal masculina');
+    Message('masculine noun phrase', 'frase nominal masculina');
 Message masculinePluralNounPhrase =
     Message('masculine plural phrase', 'frase nominal masculina');
 Message masculinePluralNounPhraseParen =

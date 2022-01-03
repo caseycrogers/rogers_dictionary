@@ -25,6 +25,9 @@ TextStyle headline1(BuildContext context) => Theme.of(context)
 TextStyle headline2(BuildContext context) =>
     Theme.of(context).textTheme.headline2!;
 
+TextStyle headline3(BuildContext context) =>
+    Theme.of(context).textTheme.headline3!;
+
 TextStyle normal1(BuildContext context) =>
     Theme.of(context).textTheme.bodyText2!;
 
@@ -46,6 +49,11 @@ Text headline1Text(BuildContext context, String text, {Color? color}) => Text(
 Text headline2Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: headline2(context).copyWith(color: color),
+    );
+
+Text headline3Text(BuildContext context, String text, {Color? color}) => Text(
+      text,
+      style: headline3(context).copyWith(color: color),
     );
 
 Text normal1Text(BuildContext context, String text, {Color? color}) => Text(
@@ -91,7 +99,6 @@ List<Widget> highlightedText(
   BuildContext context,
   String text,
   bool preview, {
-  bool isHeadword = false,
   required String searchString,
   bool forWrap = true,
   double? size,
@@ -105,9 +112,7 @@ List<Widget> highlightedText(
   );
   final OverflowMarkdown md = OverflowMarkdown(
     text,
-    defaultStyle: !preview && isHeadword
-        ? headline1(context)
-        : bold1(context).copyWith(fontSize: size),
+    defaultStyle: headline1(context).copyWith(fontSize: size),
     overrideRules: overrides.keys.toList(),
     overrideStyles: overrides.values.toList(),
   );
@@ -167,7 +172,6 @@ Widget alternateHeadwordLines(
   bool preview,
   String searchString,
 ) {
-  final double? size = preview ? null : 22;
   if (alternateHeadwords.isEmpty) {
     return Container();
   }
@@ -183,10 +187,11 @@ Widget alternateHeadwordLines(
                 padding: preview && alt.parentheticalQualifier.isNotEmpty
                     ? const EdgeInsets.only(top: 2)
                     : EdgeInsets.zero,
-                child: Text(
-                  'alt. ',
-                  style: italic1(context).copyWith(fontSize: size),
-                ),
+                child: Text('alt. ',
+                    style: headline3(context).copyWith(
+                      fontWeight: FontWeight.normal,
+                      fontStyle: FontStyle.italic,
+                    )),
               )
             else
               Container(),
@@ -198,28 +203,29 @@ Widget alternateHeadwordLines(
                   alt.headwordText,
                   preview,
                   searchString: searchString,
-                  size: size,
+                  size: headline3(context).fontSize!,
                 ),
+                if (alt.abbreviation.isNotEmpty) ...[
+                  Text(' ', style: headline3(context)),
+                  ...highlightedText(context, '(${alt.abbreviation})', preview,
+                      searchString: searchString,
+                      forWrap: false,
+                      size: headline3(context).fontSize!),
+                ],
                 if (alt.gender.isNotEmpty)
                   Text(
                     ' ${alt.gender}',
-                    style: italic1(context).copyWith(
-                      fontSize: size,
-                    ),
+                    style: headline3(context)
+                        .copyWith(fontStyle: FontStyle.italic),
                   ),
-                if (alt.abbreviation.isNotEmpty) ...[
-                  Text(' ', style: normal1(context).copyWith(fontSize: size)),
-                  ...highlightedText(context, '(${alt.abbreviation})', preview,
-                      searchString: searchString, forWrap: false, size: size),
-                ],
                 if (alt.namingStandard.isNotEmpty)
                   _namingStandard(context, alt.namingStandard, true,
-                      size: size),
+                      size: headline3(context).fontSize!),
                 ...parentheticalTexts(
                   context,
                   alt.parentheticalQualifier,
                   true,
-                  size: size != null ? size - 2 : null,
+                  size: headline3(context).fontSize! - 2,
                 ),
               ],
             ),
@@ -243,6 +249,9 @@ Widget _namingStandard(
   }
   if (namingStandard == 'u') {
     text = 'USAN';
+  }
+  if (namingStandard == 'i, u') {
+    text = 'INN & USAN';
   }
   return OverflowMarkdown(
     ' (*$text* )',
@@ -331,7 +340,7 @@ Widget translationLine(
             ],
             if (translation.disambiguation.isNotEmpty)
               ...OverflowMarkdown(
-                ' (${translation.disambiguation})',
+                ' (*${translation.disambiguation}*)',
               ).forWrap(context),
             if (translation.namingStandard.isNotEmpty)
               _namingStandard(context, translation.namingStandard, false),
@@ -426,7 +435,7 @@ Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
     return Container();
   }
   return Padding(
-    padding: const EdgeInsets.only(bottom: kPad),
+    padding: const EdgeInsets.only(top: 4, bottom: kPad),
     child: DictionaryChip(
       childPadding: const EdgeInsets.all(kPad / 2),
       color: Colors.grey.shade200,
@@ -448,7 +457,7 @@ Widget examplePhraseText(BuildContext context, List<String> examplePhrases) {
   );
 }
 
-Widget headwordLine(
+Widget headwordContent(
     BuildContext context, Entry entry, bool preview, String searchString) {
   final List<Widget> wraps = [
     ...highlightedText(
@@ -456,7 +465,6 @@ Widget headwordLine(
       entry.headword.headwordText,
       preview,
       searchString: searchString,
-      isHeadword: true,
     ),
     if (entry.headword.abbreviation.isNotEmpty) headline1Text(context, ' '),
     if (entry.headword.abbreviation.isNotEmpty)
@@ -465,13 +473,13 @@ Widget headwordLine(
         '(${entry.headword.abbreviation})',
         preview,
         searchString: searchString,
-        isHeadword: true,
         forWrap: false,
       ),
     ...parentheticalTexts(
       context,
       entry.headword.parentheticalQualifier,
       true,
+      size: headline1(context).fontSize,
     ),
   ];
   return Column(

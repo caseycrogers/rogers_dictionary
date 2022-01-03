@@ -18,7 +18,7 @@ class HelpMenu extends StatelessWidget {
           AboutButton(onPressed: closeMenu),
         ],
       ),
-      icon: const AdaptiveIcon(Icons.more_vert, forcePrimary: true),
+      child: const AdaptiveIcon(Icons.more_vert, forcePrimary: true),
       selectedColor: Colors.black12,
     );
   }

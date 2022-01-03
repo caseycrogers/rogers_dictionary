@@ -40,7 +40,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
 
   @override
   Widget build(BuildContext context) {
-    return ImplicitNavigator<SelectedEntry?>.fromNotifier(
+    return ImplicitNavigator.fromValueNotifier<SelectedEntry?>(
       // Used to ensure the navigator knows when to display an animation.
       key: _getKey(context),
       valueNotifier: SearchModel.of(context).currSelectedEntry,

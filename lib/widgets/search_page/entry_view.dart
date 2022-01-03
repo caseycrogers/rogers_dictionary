@@ -42,7 +42,7 @@ class EntryView extends StatelessWidget {
                 );
               final Entry entry = snap.data!;
               return PageHeader(
-                header: headwordLine(
+                header: headwordContent(
                   context,
                   entry,
                   false,
@@ -59,21 +59,38 @@ class EntryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (_preview)
-          headwordLine(
-            context,
-            _entry,
-            _preview,
-            SearchModel.of(context).searchString,
-          ),
-        if (!_preview) const SizedBox(height: kPad),
-        _buildTable(context),
-        if (!_preview) _buildEditorialNotes(context),
-        if (!_preview) _buildRelated(context),
-      ],
+    return Theme(
+      data: ThemeData(
+        // In preview mode, we want to override all the headline text styles.
+        textTheme: _preview
+            ? Theme.of(context).textTheme.copyWith(
+                  headline1: bold1(context),
+                  headline2: bold1(context),
+                  headline3: bold1(context),
+                )
+            : Theme.of(context).textTheme,
+      ),
+      // Add the builder so that the widget below will pick up the new theme.
+      child: Builder(
+        builder: (context) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_preview)
+                headwordContent(
+                  context,
+                  _entry,
+                  _preview,
+                  SearchModel.of(context).searchString,
+                ),
+              if (!_preview) const SizedBox(height: kPad),
+              _buildTable(context),
+              if (!_preview) _buildEditorialNotes(context),
+              if (!_preview) _buildRelated(context),
+            ],
+          );
+        }
+      ),
     );
   }
 

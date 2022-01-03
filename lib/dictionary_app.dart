@@ -1,6 +1,5 @@
 import 'package:feedback/feedback.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,7 +18,7 @@ class DictionaryApp extends StatefulWidget {
   static final DictionaryDatabase db = SqfliteDatabase();
   static final TextToSpeech textToSpeech = TextToSpeech();
   static final Future<PackageInfo> packageInfo = PackageInfo.fromPlatform();
-  static final FirebaseAnalytics analytics = FirebaseAnalytics();
+  static final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static late SnackBarNotifier _snackBarNotifier;
   static late FeedbackSender _feedback;
 
@@ -54,8 +53,9 @@ class _DictionaryAppState extends State<DictionaryApp> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        feedbackBuilder: (BuildContext context, OnSubmit onSubmit) =>
-            GetDictionaryFeedback(onSubmit),
+        feedbackBuilder: (context, onSubmit, controller) {
+          return GetDictionaryFeedback(onSubmit, controller!);
+        },
         child: MaterialApp(
           title: 'Rogers Dictionary',
           home: Builder(builder: (context) {
@@ -77,6 +77,11 @@ class _DictionaryAppState extends State<DictionaryApp> {
               headline2: GoogleFonts.roboto(
                 color: Colors.black,
                 fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              headline3: GoogleFonts.roboto(
+                color: Colors.black,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
               bodyText2: GoogleFonts.roboto(

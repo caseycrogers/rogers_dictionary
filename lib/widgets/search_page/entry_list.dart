@@ -47,7 +47,7 @@ class _EntryListSwitcherState extends State<_EntryListSwitcher> {
     // We need access to this below to ensure entries are cached to the write
     // page storage.
     final SearchModel searchModel = SearchModel.of(context);
-    return ImplicitNavigator<String>.fromNotifier(
+    return ImplicitNavigator.fromValueNotifier<String>(
       key: const PageStorageKey('search_string_navigator'),
       valueNotifier: searchModel.entrySearchModel.currSearchString,
       getDepth: (searchString) {

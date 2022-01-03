@@ -6,13 +6,13 @@ import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 class DropDownWidget extends StatefulWidget {
   const DropDownWidget({
     required this.builder,
-    required this.icon,
+    required this.child,
     this.padding,
     this.selectedColor,
   });
 
   final Widget Function(BuildContext, VoidCallback) builder;
-  final Widget icon;
+  final Widget child;
   final EdgeInsets? padding;
   final Color? selectedColor;
 
@@ -61,7 +61,7 @@ class _DropDownWidgetState extends State<DropDownWidget>
         child: AdaptiveIconButton(
           splashColor: widget.selectedColor,
           highlightColor: widget.selectedColor,
-          icon: widget.icon,
+          icon: widget.child,
           onPressed: () => _toggle(),
         ),
       ),

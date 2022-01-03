@@ -2,7 +2,6 @@ import 'package:feedback/feedback.dart';
 
 import 'package:flutter/material.dart';
 
-
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/string_utils.dart';
 
@@ -48,9 +47,11 @@ String typeToString(Locale locale, DictionaryFeedbackType type) {
 }
 
 class GetDictionaryFeedback extends StatefulWidget {
-  const GetDictionaryFeedback(this.onSubmit, {Key? key}) : super(key: key);
+  const GetDictionaryFeedback(this.onSubmit, this.controller, {Key? key})
+      : super(key: key);
 
   final OnSubmit onSubmit;
+  final ScrollController controller;
 
   @override
   _GetDictionaryFeedbackState createState() => _GetDictionaryFeedbackState();
@@ -61,63 +62,67 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                Row(
-                  children: [
-                    Text('${i18n.feedbackType.cap.get(context)}: '),
-                    DropdownButton<DictionaryFeedbackType>(
-                      value: _feedbackBuilder.type,
-                      items: DictionaryFeedbackType.values
-                          .map(
-                            (type) => DropdownMenuItem<DictionaryFeedbackType>(
-                              child: Text(
-                                typeToString(
-                                  Localizations.localeOf(context),
-                                  type,
+    return Column(
+      children: [
+        Expanded(
+          child: Stack(
+            children: [
+              ListView(
+                // 20 is the radius of feedback's rounded corners.
+                padding: const EdgeInsets.all(20),
+                controller: widget.controller,
+                children: [
+                  Row(
+                    children: [
+                      Text('${i18n.feedbackType.cap.get(context)}: '),
+                      DropdownButton<DictionaryFeedbackType>(
+                        value: _feedbackBuilder.type,
+                        items: DictionaryFeedbackType.values
+                            .map(
+                              (type) => DropdownMenuItem<DictionaryFeedbackType>(
+                                child: Text(
+                                  typeToString(
+                                    Localizations.localeOf(context),
+                                    type,
+                                  ),
                                 ),
+                                value: type,
                               ),
-                              value: type,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (type) {
-                        setState(() => _feedbackBuilder.type = type);
-                      },
-                    ),
-                    const Text(' *'),
-                  ],
-                ),
-                TextField(
-                  minLines: 1,
-                  maxLines: 10,
-                  decoration: InputDecoration(
-                    helperText: i18n.feedback.cap.get(context),
+                            )
+                            .toList(),
+                        onChanged: (type) {
+                          setState(() => _feedbackBuilder.type = type);
+                        },
+                      ),
+                      const Text(' *'),
+                    ],
                   ),
-                  onChanged: (value) => _feedbackBuilder.body = value,
-                ),
-              ],
-            ),
+                  TextField(
+                    minLines: 1,
+                    maxLines: 10,
+                    decoration: InputDecoration(
+                      helperText: i18n.feedback.cap.get(context),
+                    ),
+                    onChanged: (value) => _feedbackBuilder.body = value,
+                  ),
+                ],
+              ),
+              const FeedbackSheetDragHandle(),
+            ],
           ),
-          TextButton(
-            onPressed: _feedbackBuilder.type != null
-                ? () => widget.onSubmit(
-                      '',
-                      extras: <String, DictionaryFeedback>{
-                        'feedback': _feedbackBuilder.build()
-                      },
-                    )
-                : null,
-            child: Text(i18n.submit.cap.get(context)),
-          ),
-        ],
-      ),
+        ),
+        TextButton(
+          onPressed: _feedbackBuilder.type != null
+              ? () => widget.onSubmit(
+                    '',
+                    extras: <String, DictionaryFeedback>{
+                      'feedback': _feedbackBuilder.build()
+                    },
+                  )
+              : null,
+          child: Text(i18n.submit.cap.get(context)),
+        ),
+      ],
     );
   }
 }
