@@ -95,6 +95,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
       },
       child: ImplicitNavigator.fromValueNotifier<DictionaryTab>(
         key: const PageStorageKey('tab_selector'),
+        maintainHistory: true,
         valueNotifier: currentTab,
         builder: (context, tab, _, __) {
           // Save a reference earlier so that the listener can reference it.

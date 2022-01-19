@@ -13,89 +13,100 @@ import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
+import 'package:rogers_dictionary/widgets/search_page/headword_view.dart';
+import 'package:rogers_dictionary/widgets/search_page/search_page_utils.dart';
 
-class EntryView extends StatelessWidget {
-  EntryView._instance(this._entry, this._preview) {
-    if (_entry.isNotFound) {
-      FirebaseCrashlytics.instance.recordError(
-        'Invalid headword ${_entry.headword}',
-        null,
-      );
-    }
-  }
+class EntryViewPage extends StatelessWidget {
+  const EntryViewPage({required this.selectedEntry, Key? key})
+      : super(key: key);
 
-  final Entry _entry;
-  final bool _preview;
+  final SelectedEntry selectedEntry;
 
-  static Widget asPage(SelectedEntry selectedEntry) => Builder(
-        key: ValueKey(selectedEntry.urlEncodedHeadword),
-        builder: (context) {
-          return FutureBuilder(
-            future: selectedEntry.entry,
-            builder: (context, AsyncSnapshot<Entry> snap) {
-              if (!snap.hasData || snap.data == null)
-                // Only display if loading is slow.
-                return Delayed(
-                  initialChild: Container(),
-                  child: Container(),
-                  delay: const Duration(milliseconds: 50),
-                );
-              final Entry entry = snap.data!;
-              return PageHeader(
-                header: headwordContent(
-                  context,
-                  entry,
-                  false,
-                  SearchModel.of(context).searchString,
-                ),
-                child: EntryView._instance(entry, false),
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      key: ValueKey(selectedEntry.urlEncodedHeadword),
+      builder: (context) {
+        return FutureBuilder(
+          future: selectedEntry.entry,
+          builder: (context, AsyncSnapshot<Entry> snap) {
+            if (!snap.hasData || snap.data == null)
+              // Only display if loading is slow.
+              return Delayed(
+                initialChild: Container(),
+                child: Container(),
+                delay: const Duration(milliseconds: 50),
               );
-            },
-          );
-        },
-      );
+            final Entry entry = snap.data!;
+            return PageHeader(
+              header: headwordContent(
+                context,
+                entry,
+                false,
+                SearchModel.of(context).searchString,
+              ),
+              child: EntryViewBase._(entry, false),
+            );
+          },
+        );
+      },
+    );
+  }
+}
 
-  static Widget asPreview(Entry entry) => EntryView._instance(entry, true);
+class EntryViewPreview extends StatelessWidget {
+  const EntryViewPreview({required this.entry, Key? key}) : super(key: key);
+
+  final Entry entry;
 
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData(
-        // In preview mode, we want to override all the headline text styles.
-        textTheme: _preview
-            ? Theme.of(context).textTheme.copyWith(
-                  headline1: bold1(context),
-                  headline2: bold1(context),
-                  headline3: bold1(context),
-                )
-            : Theme.of(context).textTheme,
+        textTheme: Theme.of(context).textTheme.copyWith(
+              headline1: bold1(context),
+              headline2: bold1(context),
+              headline3: bold1(context),
+            ),
       ),
-      // Add the builder so that the widget below will pick up the new theme.
-      child: Builder(
-        builder: (context) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (_preview)
-                headwordContent(
-                  context,
-                  _entry,
-                  _preview,
-                  SearchModel.of(context).searchString,
-                ),
-              if (!_preview) const SizedBox(height: kPad),
-              _buildTable(context),
-              if (!_preview) _buildEditorialNotes(context),
-              if (!_preview) _buildRelated(context),
-            ],
-          );
-        }
+      child: EntryViewBase._(entry, true),
+    );
+  }
+}
+
+class EntryViewBase extends StatelessWidget {
+  EntryViewBase._(this.entry, this.preview) {
+    if (entry.isNotFound) {
+      FirebaseCrashlytics.instance.recordError(
+        'Invalid headword ${entry.headword}',
+        null,
+      );
+    }
+  }
+
+  final Entry entry;
+  final bool preview;
+
+  @override
+  Widget build(BuildContext context) {
+    return EntryView(
+      entry: entry,
+      preview: preview,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (preview) const HeadwordView(),
+          if (!preview) const SizedBox(height: kPad),
+          _buildTable(context),
+          if (!preview) _buildEditorialNotes(context),
+          if (!preview) _buildRelated(context),
+        ],
       ),
     );
   }
 
   Widget _buildRelated(BuildContext context) {
-    if (_entry.related.isEmpty) {
+    if (entry.related.isEmpty) {
       return Container();
     }
     return Column(
@@ -104,7 +115,7 @@ class EntryView extends StatelessWidget {
         Container(height: kSectionSpacer),
         bold1Text(context, i18n.related.get(context)),
         const Divider(),
-        ..._entry.related.where((r) => r.isNotEmpty).map(
+        ...entry.related.where((r) => r.isNotEmpty).map(
               (headword) => InkWell(
                 borderRadius: BorderRadius.circular(kPad),
                 child: Padding(
@@ -131,7 +142,7 @@ class EntryView extends StatelessWidget {
   }
 
   Widget _buildEditorialNotes(BuildContext context) {
-    final Iterable<Widget> notes = _entry.translations
+    final Iterable<Widget> notes = entry.translations
         .where((t) => t.editorialNote.isNotEmpty)
         .map((t) => editorialText(context, t.editorialNote));
     if (notes.isEmpty) {
@@ -153,7 +164,7 @@ class EntryView extends StatelessWidget {
         columnWidths: const {
           0: IntrinsicColumnWidth(),
         },
-        defaultVerticalAlignment: _preview
+        defaultVerticalAlignment: preview
             ? TableCellVerticalAlignment.middle
             : TableCellVerticalAlignment.top,
         children: _buildTranslations(context));
@@ -163,7 +174,7 @@ class EntryView extends StatelessWidget {
   List<TableRow> _buildTranslations(
     BuildContext context,
   ) {
-    return _entry.translations
+    return entry.translations
         .groupListsBy((t) => t.partOfSpeech)
         .values
         .map((translations) {
@@ -187,14 +198,14 @@ class EntryView extends StatelessWidget {
     String parenthetical = '';
     final hasParenthetical = translations
         .any((t) => t.dominantHeadwordParentheticalQualifier.isNotEmpty);
-    if (_preview)
+    if (preview)
       return TableRow(
         children: [
           Container(
-            padding: translations.first != _entry.translations.first
+            padding: translations.first != entry.translations.first
                 ? const EdgeInsets.only(top: kPad / 2)
                 : null,
-            child: partOfSpeechText(context, partOfSpeech, _preview),
+            child: partOfSpeechText(context, partOfSpeech, preview),
             alignment: Alignment.topRight,
           ),
           Container(
@@ -214,7 +225,7 @@ class EntryView extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 2),
-              child: partOfSpeechText(context, partOfSpeech, _preview),
+              child: partOfSpeechText(context, partOfSpeech, preview),
             ),
             irregularInflectionsTable(context, inflections),
             Indent(
@@ -272,4 +283,36 @@ class EntryView extends StatelessWidget {
       ],
     );
   }
+}
+
+class EntryView extends InheritedWidget {
+  EntryView({
+    required Entry entry,
+    required bool preview,
+    required Widget child,
+  })  : entryData = EntryViewData(entry: entry, isPreview: preview),
+        super(child: child);
+
+  final EntryViewData entryData;
+
+  Entry get entry => entryData.entry;
+
+  bool get preview => entryData.isPreview;
+
+  @override
+  bool updateShouldNotify(covariant EntryView oldWidget) {
+    return oldWidget.entryData.isPreview != entryData.isPreview ||
+        oldWidget.entryData.entry != entryData.entry;
+  }
+
+  static EntryViewData of(BuildContext context) {
+    return context.findAncestorWidgetOfExactType<EntryView>()!.entryData;
+  }
+}
+
+class EntryViewData {
+  EntryViewData({required this.entry, required this.isPreview});
+
+  final Entry entry;
+  final bool isPreview;
 }

@@ -43,6 +43,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
     return ImplicitNavigator.fromValueNotifier<SelectedEntry?>(
       // Used to ensure the navigator knows when to display an animation.
       key: _getKey(context),
+      maintainHistory: true,
       valueNotifier: SearchModel.of(context).currSelectedEntry,
       // Ensure that a base page is in the history on opposite headword.
       initialHistory: const [
@@ -62,7 +63,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
                 '_entry_list'),
           );
         }
-        return EntryView.asPage(selectedEntry);
+        return EntryViewPage(selectedEntry: selectedEntry);
       },
       getDepth: (selectedEntry) {
         if (selectedEntry == null) {

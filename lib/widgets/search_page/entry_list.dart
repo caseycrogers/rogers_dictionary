@@ -44,11 +44,12 @@ class _EntryListSwitcherState extends State<_EntryListSwitcher> {
 
   @override
   Widget build(BuildContext context) {
-    // We need access to this below to ensure entries are cached to the write
+    // We need access to this below to ensure entries are cached to the right
     // page storage.
     final SearchModel searchModel = SearchModel.of(context);
     return ImplicitNavigator.fromValueNotifier<String>(
       key: const PageStorageKey('search_string_navigator'),
+      maintainHistory: true,
       valueNotifier: searchModel.entrySearchModel.currSearchString,
       getDepth: (searchString) {
         return searchString.isEmpty ? 0 : 1;
@@ -180,7 +181,7 @@ class _EntryRow extends StatelessWidget {
                         ).subtract(
                           const EdgeInsets.only(top: (2 * kPad) - 1),
                         ),
-                        child: EntryView.asPreview(entry),
+                        child: EntryViewPreview(entry: entry),
                       ),
                     ),
                     Padding(

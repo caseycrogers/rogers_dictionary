@@ -14,6 +14,7 @@ class SelectedDialogueSwitcher extends StatelessWidget {
     final dialoguesModel = TranslationModel.of(context).dialoguesPageModel;
     return ImplicitNavigator.fromValueNotifier<DialogueChapter?>(
       key: const PageStorageKey('dialogue_listenable_navigator'),
+      maintainHistory: true,
       valueNotifier: dialoguesModel.selectedChapterNotifier,
       builder: (context, selectedChapter, _, __) => selectedChapter == null
           ? ChapterList()

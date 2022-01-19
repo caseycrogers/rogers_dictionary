@@ -13,8 +13,7 @@ dependencies:
   async: ^2.8.1
   async_list_view: ^1.0.0
   cupertino_icons: ^1.0.3
-  feedback:
-    path: ../feedback/feedback
+  feedback: ^2.3.1
   firebase_analytics: ^9.0.4
   firebase_core: ^1.1.0
   firebase_crashlytics: ^2.0.7
@@ -54,9 +53,9 @@ flutter:
 flutter_icons:
   ios: true
   android: true
-  image_path: "assets/images/r_logo_flat_full.png"
-  adaptive_icon_background: "assets/images/r_logo_flat_full.png"
-  adaptive_icon_foreground: "assets/images/r_logo_flat_full.png"
+  image_path: "assets/images/staff_logo_gradient.png"
+  adaptive_icon_background: "assets/images/staff_logo_gradient.png"
+  adaptive_icon_foreground: "assets/images/staff_logo_gradient.png"
 
 flutter_native_splash:
   color: "ffffff"
