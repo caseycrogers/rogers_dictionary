@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/clients/entry_builders.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
+import 'package:rogers_dictionary/util/text_utils.dart';
+
+import 'inline_icon_button.dart';
 
 class BookmarksButton extends StatefulWidget {
   const BookmarksButton({required this.entry});
@@ -19,9 +21,8 @@ class _BookmarksButtonState extends State<BookmarksButton> {
   @override
   Widget build(BuildContext context) {
     final translationMode = TranslationModel.of(context).translationMode;
-    return AdaptiveIconButton(
-      visualDensity: VisualDensity.compact,
-      icon: _icon,
+    return InlineIconButton(
+      _icon,
       onPressed: () async {
         final bool newIsBookmarked = !DictionaryApp.db.isBookmarked(
             translationMode, widget.entry.headword.urlEncodedHeadword);
@@ -39,16 +40,15 @@ class _BookmarksButtonState extends State<BookmarksButton> {
         );
         setState(() {});
       },
+      size: headline1(context).fontSize,
     );
   }
 
-  Widget get _icon {
-    return Icon(
-      DictionaryApp.db.isBookmarked(
-              TranslationModel.of(context).translationMode,
-              widget.entry.headword.urlEncodedHeadword)
-          ? Icons.bookmark
-          : Icons.bookmark_border,
-    );
+  IconData get _icon {
+    return DictionaryApp.db.isBookmarked(
+            TranslationModel.of(context).translationMode,
+            widget.entry.headword.urlEncodedHeadword)
+        ? Icons.bookmark
+        : Icons.bookmark_border;
   }
 }

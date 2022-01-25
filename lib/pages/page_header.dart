@@ -37,7 +37,7 @@ class PageHeader extends StatelessWidget {
             ),
           ),
         ),
-        if (divider) Divider(indent: padding, endIndent: padding, height: 0),
+        if (divider) Divider(indent: padding, endIndent: padding, height: 1),
         if (scrollable)
           Expanded(
             child: SingleChildScrollView(

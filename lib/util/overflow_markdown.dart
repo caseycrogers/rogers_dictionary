@@ -22,6 +22,39 @@ class OverflowMarkdown extends StatelessWidget {
   final List<TextStyle>? overrideStyles;
   final MarkdownBase base;
 
+  List<InlineSpan> asSpans(BuildContext context) {
+    final List<TextSpan> spans = [];
+    base.constructSpans().forEach(
+          (entry) {
+        final s = entry.value;
+        final textStyle = getTextStyle(context, entry.key);
+        if (!entry.key.canWrap) {
+          spans.add(TextSpan(text: s, style: textStyle));
+          return;
+        }
+        if (entry.key.isSubscript && spans.isNotEmpty) {
+          // Subscript should not be wrapped
+          spans[spans.length - 1] = TextSpan(
+              children: [spans.last, TextSpan(text: s, style: textStyle)]);
+          return;
+        }
+        final List<String> words = s.split(' ').toList();
+        words.asMap().forEach(
+              (i, word) {
+            spans.add(
+              TextSpan(
+                // Add space back in for all but last word
+                text: i == words.length - 1 ? word : '$word ',
+                style: textStyle,
+              ),
+            );
+          },
+        );
+      },
+    );
+    return spans;
+  }
+
   List<Widget> forWrap(BuildContext context) {
     final List<TextSpan> spans = [];
     base.constructSpans().forEach(

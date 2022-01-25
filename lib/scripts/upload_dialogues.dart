@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/clients/dialogue_builders.dart';
-import 'package:rogers_dictionary/clients/entry_builders.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 

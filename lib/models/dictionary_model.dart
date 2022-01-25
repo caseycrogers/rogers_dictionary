@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 
-import 'package:rogers_dictionary/clients/entry_builders.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';

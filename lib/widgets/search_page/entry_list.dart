@@ -4,7 +4,7 @@ import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 
-import 'package:rogers_dictionary/clients/entry_builders.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
@@ -176,17 +176,15 @@ class _EntryRow extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 2 * kPad,
-                        ).subtract(
-                          const EdgeInsets.only(top: (2 * kPad) - 1),
+                        padding: const EdgeInsets.only(
+                          top: kPad,
                         ),
                         child: EntryViewPreview(entry: entry),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        vertical: 2 * kPad,
+                        vertical: kPad,
                       ),
                       child: OpenPage(),
                     ),

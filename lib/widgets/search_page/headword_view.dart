@@ -1,63 +1,54 @@
-import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/clients/entry_builders.dart';
+import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
+
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
+import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/overflow_markdown.dart';
+import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/bookmarks_button.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/search_page_utils.dart';
-
-
 
 class HeadwordView extends StatelessWidget {
   const HeadwordView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final EntryViewData view = EntryView.of(context);
-    final String searchString = SearchModel.of(context).searchString;
-    final List<Widget> wraps = [
-      ...highlightedText(
-        context,
-        view.entry.headword.headwordText,
-        view.isPreview,
-        searchString: searchString,
-      ),
-      if (view.entry.headword.abbreviation.isNotEmpty)
-        headline1Text(context, ' '),
-      if (view.entry.headword.abbreviation.isNotEmpty)
-        ...highlightedText(
-          context,
-          '(${view.entry.headword.abbreviation})',
-          view.isPreview,
-          searchString: searchString,
-          forWrap: false,
-        ),
-      ...parentheticalTexts(
-        context,
-        view.entry.headword.parentheticalQualifier,
-        true,
-        size: headline1(context).fontSize,
-      ),
-    ];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            ...wraps.getRange(0, wraps.length - 1),
-            Row(
-              mainAxisSize: MainAxisSize.min,
+    final EntryViewModel model = EntryViewModel.of(context);
+    return Padding(
+      padding: EdgeInsets.only(bottom: model.isPreview ? 0 : kPad / 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text.rich(
+            TextSpan(
               children: [
-                wraps[wraps.length - 1],
-                BookmarksButton(entry: view.entry),
+                ...HighlightedText(
+                  text: model.entry.headword.headwordText,
+                ).asSpans(context),
+                if (model.entry.headword.abbreviation.isNotEmpty) ...[
+                  TextSpan(text: ' ', style: headline1(context)),
+                  ...HighlightedText(
+                    text: '(${model.entry.headword.abbreviation})',
+                  ).asSpans(context),
+                ],
+                ...parentheticalSpans(
+                  context,
+                  model.entry.headword.parentheticalQualifier,
+                ),
+                WidgetSpan(
+                  child: BookmarksButton(entry: model.entry),
+                ),
               ],
             ),
-          ],
-        ),
-        const _AlternateHeadwordView(),
-      ],
+          ),
+          const _AlternateHeadwordView(),
+        ],
+      ),
     );
   }
 }
@@ -67,75 +58,198 @@ class _AlternateHeadwordView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final EntryViewData view = EntryView.of(context);
-    final List<Headword> alternateHeadwords = view.entry.alternateHeadwords;
-    final String searchString = SearchModel.of(context).searchString;
+    final EntryViewModel model = EntryViewModel.of(context);
+    final List<Headword> alternateHeadwords = model.entry.alternateHeadwords;
 
     if (alternateHeadwords.isEmpty) {
       return Container();
     }
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Table(
-        columnWidths: const {0: IntrinsicColumnWidth()},
-        children: alternateHeadwords.map((alt) {
-          return TableRow(
-            children: [
-              if (alt == alternateHeadwords.first)
-                Padding(
-                  padding:
-                  view.isPreview && alt.parentheticalQualifier.isNotEmpty
-                      ? const EdgeInsets.only(top: 2)
-                      : EdgeInsets.zero,
-                  child: Text('alt. ',
-                      style: headline3(context).copyWith(
-                        fontWeight: FontWeight.normal,
-                        fontStyle: FontStyle.italic,
-                      )),
-                )
-              else
-                Container(),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  ...highlightedText(
-                    context,
-                    alt.headwordText,
-                    view.isPreview,
-                    searchString: searchString,
-                    size: headline3(context).fontSize!,
-                  ),
-                  if (alt.abbreviation.isNotEmpty) ...[
-                    Text(' ', style: headline3(context)),
-                    ...highlightedText(
-                        context, '(${alt.abbreviation})', view.isPreview,
-                        searchString: searchString,
-                        forWrap: false,
-                        size: headline3(context).fontSize!),
-                  ],
-                  if (alt.gender.isNotEmpty)
-                    Text(
-                      ' ${alt.gender}',
-                      style: headline3(context)
-                          .copyWith(fontStyle: FontStyle.italic),
-                    ),
-                  if (alt.namingStandard.isNotEmpty)
-                    NamingStandard(
-                      isHeadword: true,
-                      namingStandard: alt.namingStandard,
-                      size: headline3(context).fontSize!,
-                    ),
-                  ...parentheticalTexts(
-                    context,
-                    alt.parentheticalQualifier,
-                    true,
-                    size: headline3(context).fontSize! - 2,
-                  ),
-                ],
+    return _AlternateHeadwordTextTheme(
+      child: Builder(builder: (context) {
+        return Text.rich(
+          TextSpan(
+              text: 'alt. ',
+              style: headline1(context).copyWith(
+                fontWeight: FontWeight.normal,
+                fontStyle: FontStyle.italic,
               ),
-            ],
+              children: [
+                WidgetSpan(
+                  child: Column(
+                    children: alternateHeadwords.map((alt) {
+                      return Text.rich(
+                        TextSpan(
+                          children: [
+                            ...HighlightedText(text: alt.headwordText)
+                                .asSpans(context),
+                            if (alt.abbreviation.isNotEmpty) ...[
+                              TextSpan(text: ' ', style: headline3(context)),
+                              ...HighlightedText(text: '(${alt.abbreviation})')
+                                  .asSpans(context),
+                            ],
+                            if (alt.gender.isNotEmpty)
+                              TextSpan(
+                                text: ' ${alt.gender}',
+                                style: headline3(context)
+                                    .copyWith(fontStyle: FontStyle.italic),
+                              ),
+                            NamingStandard(
+                              namingStandard: alt.namingStandard,
+                            ).asSpan(context),
+                            ...parentheticalSpans(
+                              context,
+                              alt.parentheticalQualifier,
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ]),
+        );
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'alt. ',
+              style: headline1(context).copyWith(
+                fontWeight: FontWeight.normal,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            Column(
+              children: alternateHeadwords.map((alt) {
+                return Text.rich(
+                  TextSpan(
+                    children: [
+                      ...HighlightedText(text: alt.headwordText)
+                          .asSpans(context),
+                      if (alt.abbreviation.isNotEmpty) ...[
+                        TextSpan(text: ' ', style: headline3(context)),
+                        ...HighlightedText(text: '(${alt.abbreviation})')
+                            .asSpans(context),
+                      ],
+                      if (alt.gender.isNotEmpty)
+                        TextSpan(
+                          text: ' ${alt.gender}',
+                          style: headline3(context)
+                              .copyWith(fontStyle: FontStyle.italic),
+                        ),
+                        NamingStandard(
+                          namingStandard: alt.namingStandard,
+                        ).asSpan(context),
+                      ...parentheticalSpans(
+                        context,
+                        alt.parentheticalQualifier,
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+}
+
+/// Overrides all text with headline3.
+class _AlternateHeadwordTextTheme extends StatelessWidget {
+  const _AlternateHeadwordTextTheme({required this.child, Key? key})
+      : super(key: key);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: ThemeData(
+        textTheme: Theme.of(context).textTheme.copyWith(
+              headline1: headline3(context),
+              bodyText1: headline3(context),
+              bodyText2: headline3(context),
+            ),
+      ),
+      child: child,
+    );
+  }
+}
+
+class HighlightedText extends StatelessWidget {
+  const HighlightedText({
+    required this.text,
+    Key? key,
+  }) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return _markdown(context);
+  }
+
+  List<InlineSpan> asSpans(BuildContext context) {
+    return _markdown(context).asSpans(context);
+  }
+
+  OverflowMarkdown _markdown(BuildContext context) {
+    final overrides = _highlightSearchMatch(
+      context,
+      text,
+      EntryViewModel.of(context).isPreview,
+      SearchModel.of(context)
+          .searchString
+          .withoutDiacriticalMarks
+          .toLowerCase(),
+    );
+    return OverflowMarkdown(
+      text,
+      defaultStyle: headline1(context),
+      overrideRules: overrides.keys.toList(),
+      overrideStyles: overrides.values.toList(),
+    );
+  }
+
+  LinkedHashMap<OverrideRule, TextStyle> _highlightSearchMatch(
+    BuildContext context,
+    String text,
+    bool preview,
+    String searchString,
+  ) {
+    if (!preview || searchString.isEmpty) {
+      // ignore: prefer_collection_literals
+      return LinkedHashMap();
+    }
+    // Prepend `text` and `searchString` with spaces to rule out matches that are
+    // in the middle of a word.
+    Iterable<Match> overrideMatches =
+        ' $searchString'.allMatches(' ${text.searchable}');
+    bool isOptionalMatch = false;
+    if (overrideMatches.isEmpty) {
+      overrideMatches =
+          ' $searchString'.allMatches(' ${text.withoutOptionals.searchable}');
+      isOptionalMatch = true;
+    }
+    return LinkedHashMap.fromEntries(
+      overrideMatches.toList().asMap().entries.map(
+        (e) {
+          final int start = e.value.start;
+          int stop = e.value.end - 1;
+          if (isOptionalMatch) {
+            // Add the length of the optional back in
+            stop += text.searchable.length -
+                text.withoutOptionals.searchable.length;
+          }
+          return MapEntry(
+            OverrideRule(styleIndex: e.key, start: start, stop: stop),
+            TextStyle(
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withOpacity(.25),
+            ),
           );
-        }).toList(),
+        },
       ),
     );
   }

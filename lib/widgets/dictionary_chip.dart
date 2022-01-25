@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 
 class DictionaryChip extends StatelessWidget {
   const DictionaryChip({
@@ -6,24 +7,31 @@ class DictionaryChip extends StatelessWidget {
     this.color,
     this.padding,
     this.childPadding,
+    this.borderRadius,
   });
 
   final Widget child;
   final Color? color;
   final EdgeInsets? padding;
   final EdgeInsets? childPadding;
+  final double? borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2)
-            .add(childPadding ?? EdgeInsets.zero),
-        child: child,
+        padding: const EdgeInsets.only(
+          left: kPad,
+          right: kPad + 2,
+        ),
+        child: Padding(
+          padding: childPadding ?? EdgeInsets.zero,
+          child: child,
+        ),
         decoration: BoxDecoration(
           color: color ?? Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(borderRadius ?? 18),
         ),
       ),
     );

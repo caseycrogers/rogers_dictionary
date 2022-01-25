@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
+
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/i18n_base.dart' as i18n;
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
@@ -35,6 +37,10 @@ extension VersionUtils on DatabaseVersion {
 
 extension EntryUtils on Entry {
   List<Headword> get allHeadwords => [headword, ...alternateHeadwords];
+
+  Map<String, List<Translation>> get translationMap {
+    return translations.groupListsBy((t) => t.partOfSpeech);
+  }
 
   bool get isNotFound =>
       headword.urlEncodedHeadword.startsWith('Invalid headword ');
@@ -111,24 +117,24 @@ extension EntryUtils on Entry {
     bool isSpanish,
   ) {
     return partOfSpeech.replaceAll(' ', '').splitMapJoin(
-          RegExp('[&,]'),
-          onNonMatch: (String partOfSpeechComponent) {
-            return _partOfSpeechAbbreviationMap[partOfSpeechComponent]
-                  ?.getFor(isSpanish) ??
-              '$partOfSpeechComponent*';
-          },
-          onMatch: (Match separator) {
-            //  == '&' ? ' and ' : ', ',
-            switch (separator.group(0)) {
-              case '&':
-                return ' and ';
-              case ',':
-                return ', ';
-              default:
-                return separator.group(0)!;
-            }
-          },
-        );
+      RegExp('[&,]'),
+      onNonMatch: (String partOfSpeechComponent) {
+        return _partOfSpeechAbbreviationMap[partOfSpeechComponent]
+                ?.getFor(isSpanish) ??
+            '$partOfSpeechComponent*';
+      },
+      onMatch: (Match separator) {
+        //  == '&' ? ' and ' : ', ',
+        switch (separator.group(0)) {
+          case '&':
+            return ' and ';
+          case ',':
+            return ', ';
+          default:
+            return separator.group(0)!;
+        }
+      },
+    );
   }
 }
 
