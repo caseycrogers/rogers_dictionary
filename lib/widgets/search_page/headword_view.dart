@@ -180,8 +180,8 @@ class HighlightedText extends StatelessWidget {
       // ignore: prefer_collection_literals
       return LinkedHashMap();
     }
-    // Prepend `text` and `searchString` with spaces to rule out matches that are
-    // in the middle of a word.
+    // Prepend `text` and `searchString` with spaces to rule out matches that
+    // are in the middle of a word.
     Iterable<Match> overrideMatches =
         ' $searchString'.allMatches(' ${text.searchable}');
     bool isOptionalMatch = false;

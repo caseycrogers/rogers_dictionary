@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/inline_icon_button.dart';
 

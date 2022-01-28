@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
@@ -22,8 +20,7 @@ class TranslationTableView extends StatelessWidget {
       return const _PreviewTranslationTable();
     }
     return Column(
-      children: model.entry.translationMap.entries
-          .map((entry) {
+      children: model.entry.translationMap.entries.map((entry) {
         return _PartOfSpeechView(
           translations: entry.value,
           inflections: entry.value.first.irregularInflections,
@@ -40,7 +37,7 @@ class _PreviewTranslationTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final EntryViewModel model = EntryViewModel.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: kPad/2),
+      padding: const EdgeInsets.symmetric(vertical: kPad / 2),
       child: Table(
         columnWidths: const {
           0: IntrinsicColumnWidth(),
@@ -106,10 +103,11 @@ class _PartOfSpeechView extends StatelessWidget {
                   children: [
                     if (parentheticalChanged)
                       Padding(
-                        padding: const EdgeInsets.only(top: kPad/2),
+                        padding: const EdgeInsets.only(top: kPad / 2),
                         child: Text.rich(
                           TextSpan(
-                            children: parentheticalSpans(context, parenthetical),
+                            children:
+                                parentheticalSpans(context, parenthetical),
                           ),
                         ),
                       ),

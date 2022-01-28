@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
@@ -28,7 +28,7 @@ class RelatedView extends StatelessWidget {
               (headword) => InkWell(
             borderRadius: BorderRadius.circular(kPad),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: kPad/2),
+              padding: const EdgeInsets.symmetric(horizontal: kPad/2),
               child: OverflowMarkdown(
                 headword,
                 defaultStyle: Theme.of(context)

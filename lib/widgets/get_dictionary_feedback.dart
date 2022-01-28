@@ -77,19 +77,19 @@ class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
                       Text('${i18n.feedbackType.cap.get(context)}: '),
                       DropdownButton<DictionaryFeedbackType>(
                         value: _feedbackBuilder.type,
-                        items: DictionaryFeedbackType.values
-                            .map(
-                              (type) => DropdownMenuItem<DictionaryFeedbackType>(
-                                child: Text(
-                                  typeToString(
-                                    Localizations.localeOf(context),
-                                    type,
-                                  ),
+                        items: DictionaryFeedbackType.values.map(
+                          (type) {
+                            return DropdownMenuItem<DictionaryFeedbackType>(
+                              child: Text(
+                                typeToString(
+                                  Localizations.localeOf(context),
+                                  type,
                                 ),
-                                value: type,
                               ),
-                            )
-                            .toList(),
+                              value: type,
+                            );
+                          },
+                        ).toList(),
                         onChanged: (type) {
                           setState(() => _feedbackBuilder.type = type);
                         },

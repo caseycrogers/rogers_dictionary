@@ -4,10 +4,10 @@ import 'package:async_list_view/async_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
