@@ -10,9 +10,10 @@ import 'package:rogers_dictionary/util/dialogue_extensions.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/indent_icon.dart';
+import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
-class ChapterList extends StatelessWidget {
+class TableOfContentsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TranslationModel dialoguesModel = TranslationModel.of(context);
@@ -77,6 +78,7 @@ class ChapterList extends StatelessWidget {
     final DialoguesPageModel dialoguesModel =
         TranslationModel.of(context).dialoguesPageModel;
     return ListTile(
+      visualDensity: VisualDensity.compact,
       minLeadingWidth: 0,
       leading: isSubHeader ? const IndentIcon() : null,
       title: bold1Text(
@@ -85,6 +87,7 @@ class ChapterList extends StatelessWidget {
       ),
       subtitle: Text(
           subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context)),
+      trailing: OpenPage(),
       onTap: () =>
           dialoguesModel.onChapterSelected(context, chapter, subChapter),
     );

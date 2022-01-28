@@ -52,46 +52,53 @@ class _TranslationLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        text: '$index. ',
-        children: [
-          ...OverflowMarkdown(translation.content).asSpans(context),
-          if (translation.genderAndPlural.isNotEmpty)
-            ...OverflowMarkdown(' *${translation.genderAndPlural}*')
-                .asSpans(context),
-          if (translation.abbreviation.isNotEmpty) ...[
-            const TextSpan(text: ' '),
-            ...OverflowMarkdown('(${translation.abbreviation})')
-                .asSpans(context),
-          ],
-          if (translation.disambiguation.isNotEmpty)
-            ...OverflowMarkdown(
-              ' (*${translation.disambiguation}*)',
-            ).asSpans(context),
-          NamingStandard(namingStandard: translation.namingStandard)
-              .asSpan(context),
-          ..._translationParentheticals(
-            context,
-            translation.parentheticalQualifier,
-          ),
-          WidgetSpan(
-            child: PronunciationButton(
-              text: translation.content.pronounceable,
-              pronunciation: translation.pronunciationOverride
-                  .split('|')
-                  .join(
-                      ' <break time="350ms"/>${i18n.or.get(context)}<break time="150ms"/> ')
-                  .emptyToNull,
-              mode: oppositeMode(SearchModel.of(context).mode),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$index. '),
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                ...OverflowMarkdown(translation.content).asSpans(context),
+                if (translation.genderAndPlural.isNotEmpty)
+                  ...OverflowMarkdown(' *${translation.genderAndPlural}*')
+                      .asSpans(context),
+                if (translation.abbreviation.isNotEmpty) ...[
+                  const TextSpan(text: ' '),
+                  ...OverflowMarkdown('(${translation.abbreviation})')
+                      .asSpans(context),
+                ],
+                if (translation.disambiguation.isNotEmpty)
+                  ...OverflowMarkdown(
+                    ' (*${translation.disambiguation}*)',
+                  ).asSpans(context),
+                NamingStandard(namingStandard: translation.namingStandard)
+                    .asSpan(context),
+                ..._translationParentheticals(
+                  context,
+                  translation.parentheticalQualifier,
+                ),
+                WidgetSpan(
+                  child: PronunciationButton(
+                    text: translation.content.pronounceable,
+                    pronunciation: translation.pronunciationOverride
+                        .split('|')
+                        .join(
+                            ' <break time="350ms"/>${i18n.or.get(context)}<break time="150ms"/> ')
+                        .emptyToNull,
+                    mode: oppositeMode(SearchModel.of(context).mode),
+                  ),
+                ),
+                if (translation.getOppositeHeadword.isNotEmpty)
+                  WidgetSpan(
+                    child: OppositeHeadwordButton(translation: translation),
+                  ),
+              ],
             ),
           ),
-          if (translation.getOppositeHeadword.isNotEmpty)
-            WidgetSpan(
-              child: OppositeHeadwordButton(translation: translation),
-            ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

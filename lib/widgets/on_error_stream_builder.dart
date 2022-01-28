@@ -21,9 +21,6 @@ class LoggingStreamBuilder<T> extends StatelessWidget {
       stream: stream,
       builder: (context, snap) {
         if (snap.hasError) {
-          if (snap is Error) {
-
-          }
           FirebaseCrashlytics.instance.recordFlutterError(
             FlutterErrorDetails(
               exception: snap.error!,

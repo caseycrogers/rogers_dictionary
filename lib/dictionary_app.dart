@@ -70,8 +70,8 @@ class _DictionaryAppState extends State<DictionaryApp> {
             selectedRowColor: Colors.grey.shade200,
             textTheme: TextTheme(
               headline1: GoogleFonts.roboto(
-                fontSize: 30,
                 color: Colors.black,
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
               ),
               headline2: GoogleFonts.roboto(
@@ -79,16 +79,22 @@ class _DictionaryAppState extends State<DictionaryApp> {
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
+              // This should really be bold but google fonts has a bug where
+              // bolded styles can't be un-bolded:
+              // https://github.com/material-foundation/google-fonts-flutter/issues/141
               headline3: GoogleFonts.roboto(
                 color: Colors.black,
                 fontSize: 22,
-                fontWeight: FontWeight.bold,
               ),
               bodyText2: GoogleFonts.roboto(
+                color: Colors.black,
                 fontSize: 18,
-                fontWeight: FontWeight.normal,
+                // Pad the top height so that a line of text is the exact same
+                // height as an icon.
+                height: 24 / 18,
               ),
             ),
+            iconTheme: const IconThemeData(size: 24),
           ),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,

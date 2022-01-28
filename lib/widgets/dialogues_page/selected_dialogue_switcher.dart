@@ -5,8 +5,8 @@ import 'package:implicit_navigator/implicit_navigator.dart';
 
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
-import 'package:rogers_dictionary/widgets/dialogues_page/chapter_list.dart';
 import 'package:rogers_dictionary/widgets/dialogues_page/chapter_view.dart';
+import 'package:rogers_dictionary/widgets/dialogues_page/table_of_contents_view.dart';
 
 class SelectedDialogueSwitcher extends StatelessWidget {
   @override
@@ -17,7 +17,7 @@ class SelectedDialogueSwitcher extends StatelessWidget {
       maintainHistory: true,
       valueNotifier: dialoguesModel.selectedChapterNotifier,
       builder: (context, selectedChapter, _, __) => selectedChapter == null
-          ? ChapterList()
+          ? TableOfContentsView()
           : ChapterView(
               chapter: selectedChapter,
               initialSubChapter: dialoguesModel.selectedSubChapter,

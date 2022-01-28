@@ -28,7 +28,7 @@ class RelatedView extends StatelessWidget {
               (headword) => InkWell(
             borderRadius: BorderRadius.circular(kPad),
             child: Padding(
-              padding: const EdgeInsets.all(kPad),
+              padding: EdgeInsets.symmetric(horizontal: kPad/2),
               child: OverflowMarkdown(
                 headword,
                 defaultStyle: Theme.of(context)

@@ -4,14 +4,14 @@ import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry_utils.dart';
-import 'package:rogers_dictionary/util/text_utils.dart';
 
 import 'inline_icon_button.dart';
 
 class BookmarksButton extends StatefulWidget {
-  const BookmarksButton({required this.entry});
+  const BookmarksButton({required this.entry, this.size});
 
   final Entry entry;
+  final double? size;
 
   @override
   _BookmarksButtonState createState() => _BookmarksButtonState();
@@ -23,6 +23,7 @@ class _BookmarksButtonState extends State<BookmarksButton> {
     final translationMode = TranslationModel.of(context).translationMode;
     return InlineIconButton(
       _icon,
+      size: widget.size,
       onPressed: () async {
         final bool newIsBookmarked = !DictionaryApp.db.isBookmarked(
             translationMode, widget.entry.headword.urlEncodedHeadword);
@@ -40,7 +41,6 @@ class _BookmarksButtonState extends State<BookmarksButton> {
         );
         setState(() {});
       },
-      size: headline1(context).fontSize,
     );
   }
 

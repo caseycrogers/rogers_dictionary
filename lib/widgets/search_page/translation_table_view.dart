@@ -105,9 +105,12 @@ class _PartOfSpeechView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (parentheticalChanged)
-                      Text.rich(
-                        TextSpan(
-                          children: parentheticalSpans(context, parenthetical),
+                      Padding(
+                        padding: const EdgeInsets.only(top: kPad/2),
+                        child: Text.rich(
+                          TextSpan(
+                            children: parentheticalSpans(context, parenthetical),
+                          ),
                         ),
                       ),
                     TranslationView(

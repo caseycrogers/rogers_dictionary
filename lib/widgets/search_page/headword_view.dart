@@ -19,37 +19,56 @@ class HeadwordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final EntryViewModel model = EntryViewModel.of(context);
-    return Padding(
-      padding: EdgeInsets.only(bottom: model.isPreview ? 0 : kPad / 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text.rich(
-            TextSpan(
-              children: [
-                ...HighlightedText(
-                  text: model.entry.headword.headwordText,
-                ).asSpans(context),
-                if (model.entry.headword.abbreviation.isNotEmpty) ...[
-                  TextSpan(text: ' ', style: headline1(context)),
+    return Builder(builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(bottom: model.isPreview ? 0 : kPad / 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text.rich(
+              TextSpan(
+                children: [
                   ...HighlightedText(
-                    text: '(${model.entry.headword.abbreviation})',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    text: model.entry.headword.headwordText,
                   ).asSpans(context),
+                  if (model.entry.headword.abbreviation.isNotEmpty) ...[
+                    const WidgetSpan(child: SizedBox(width: kPad)),
+                    ...HighlightedText(
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      text: '(${model.entry.headword.abbreviation})',
+                    ).asSpans(context),
+                  ],
+                  ...parentheticalSpans(
+                    context,
+                    model.entry.headword.parentheticalQualifier,
+                  ),
+                  WidgetSpan(
+                    child: BookmarksButton(
+                      // If this is in the headword we need to manually up-size
+                      // the icon.
+                      // Make the icon the same amount larger than the headline
+                      // text as the default icon size is larger than the
+                      // default text size.
+                      size: model.isPreview
+                          ? null
+                          : Theme.of(context).textTheme.headline1!.fontSize! +
+                              (IconTheme.of(context).size! -
+                                  Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .fontSize!),
+                      entry: model.entry,
+                    ),
+                  ),
                 ],
-                ...parentheticalSpans(
-                  context,
-                  model.entry.headword.parentheticalQualifier,
-                ),
-                WidgetSpan(
-                  child: BookmarksButton(entry: model.entry),
-                ),
-              ],
+              ),
             ),
-          ),
-          const _AlternateHeadwordView(),
-        ],
-      ),
-    );
+            const _AlternateHeadwordView(),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -64,58 +83,18 @@ class _AlternateHeadwordView extends StatelessWidget {
     if (alternateHeadwords.isEmpty) {
       return Container();
     }
-    return _AlternateHeadwordTextTheme(
+    return DefaultTextStyle(
+      style: Theme.of(context).textTheme.headline3!.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
       child: Builder(builder: (context) {
-        return Text.rich(
-          TextSpan(
-              text: 'alt. ',
-              style: headline1(context).copyWith(
-                fontWeight: FontWeight.normal,
-                fontStyle: FontStyle.italic,
-              ),
-              children: [
-                WidgetSpan(
-                  child: Column(
-                    children: alternateHeadwords.map((alt) {
-                      return Text.rich(
-                        TextSpan(
-                          children: [
-                            ...HighlightedText(text: alt.headwordText)
-                                .asSpans(context),
-                            if (alt.abbreviation.isNotEmpty) ...[
-                              TextSpan(text: ' ', style: headline3(context)),
-                              ...HighlightedText(text: '(${alt.abbreviation})')
-                                  .asSpans(context),
-                            ],
-                            if (alt.gender.isNotEmpty)
-                              TextSpan(
-                                text: ' ${alt.gender}',
-                                style: headline3(context)
-                                    .copyWith(fontStyle: FontStyle.italic),
-                              ),
-                            NamingStandard(
-                              namingStandard: alt.namingStandard,
-                            ).asSpan(context),
-                            ...parentheticalSpans(
-                              context,
-                              alt.parentheticalQualifier,
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ]),
-        );
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'alt. ',
-              style: headline1(context).copyWith(
-                fontWeight: FontWeight.normal,
+              style: TextStyle(
                 fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.normal,
               ),
             ),
             Column(
@@ -123,22 +102,21 @@ class _AlternateHeadwordView extends StatelessWidget {
                 return Text.rich(
                   TextSpan(
                     children: [
-                      ...HighlightedText(text: alt.headwordText)
-                          .asSpans(context),
+                      WidgetSpan(
+                          child: HighlightedText(text: alt.headwordText)),
                       if (alt.abbreviation.isNotEmpty) ...[
-                        TextSpan(text: ' ', style: headline3(context)),
-                        ...HighlightedText(text: '(${alt.abbreviation})')
+                        const TextSpan(text: ' '),
+                        ...HighlightedText(text: ' (${alt.abbreviation})')
                             .asSpans(context),
                       ],
                       if (alt.gender.isNotEmpty)
                         TextSpan(
                           text: ' ${alt.gender}',
-                          style: headline3(context)
-                              .copyWith(fontStyle: FontStyle.italic),
+                          style: const TextStyle(fontStyle: FontStyle.italic),
                         ),
-                        NamingStandard(
-                          namingStandard: alt.namingStandard,
-                        ).asSpan(context),
+                      NamingStandard(
+                        namingStandard: alt.namingStandard,
+                      ).asSpan(context),
                       ...parentheticalSpans(
                         context,
                         alt.parentheticalQualifier,
@@ -155,46 +133,26 @@ class _AlternateHeadwordView extends StatelessWidget {
   }
 }
 
-/// Overrides all text with headline3.
-class _AlternateHeadwordTextTheme extends StatelessWidget {
-  const _AlternateHeadwordTextTheme({required this.child, Key? key})
-      : super(key: key);
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData(
-        textTheme: Theme.of(context).textTheme.copyWith(
-              headline1: headline3(context),
-              bodyText1: headline3(context),
-              bodyText2: headline3(context),
-            ),
-      ),
-      child: child,
-    );
-  }
-}
-
 class HighlightedText extends StatelessWidget {
   const HighlightedText({
     required this.text,
+    this.style,
     Key? key,
   }) : super(key: key);
 
   final String text;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
-    return _markdown(context);
+    return _markdown(context, style);
   }
 
   List<InlineSpan> asSpans(BuildContext context) {
-    return _markdown(context).asSpans(context);
+    return _markdown(context, style).asSpans(context);
   }
 
-  OverflowMarkdown _markdown(BuildContext context) {
+  OverflowMarkdown _markdown(BuildContext context, TextStyle? style) {
     final overrides = _highlightSearchMatch(
       context,
       text,
@@ -206,7 +164,7 @@ class HighlightedText extends StatelessWidget {
     );
     return OverflowMarkdown(
       text,
-      defaultStyle: headline1(context),
+      defaultStyle: style,
       overrideRules: overrides.keys.toList(),
       overrideStyles: overrides.values.toList(),
     );

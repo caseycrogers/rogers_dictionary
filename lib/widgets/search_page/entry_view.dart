@@ -34,7 +34,10 @@ class EntryViewPage extends StatelessWidget {
           preview: false,
           entry: entry,
           child: PageHeader(
-            header: const HeadwordView(),
+            header: DefaultTextStyle.merge(
+              style: Theme.of(context).textTheme.headline1!,
+              child: const HeadwordView(),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [

@@ -1,9 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:rogers_dictionary/i18n.dart' as i18n;
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
-import 'package:rogers_dictionary/util/overflow_markdown.dart';
-import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
 
 import 'constants.dart';
@@ -35,16 +32,6 @@ TextStyle italic1(BuildContext context) => Theme.of(context)
 Text headline1Text(BuildContext context, String text, {Color? color}) => Text(
       text,
       style: headline1(context).copyWith(color: color),
-    );
-
-Text headline2Text(BuildContext context, String text, {Color? color}) => Text(
-      text,
-      style: headline2(context).copyWith(color: color),
-    );
-
-Text headline3Text(BuildContext context, String text, {Color? color}) => Text(
-      text,
-      style: headline3(context).copyWith(color: color),
     );
 
 Text normal1Text(BuildContext context, String text, {Color? color}) => Text(
@@ -97,17 +84,43 @@ List<InlineSpan> parentheticalSpans(
     const WidgetSpan(child: SizedBox(width: kPad / 2)),
     ...text.split(';').expand(
           (t) => [
-            if (t != text.split(';').first) const TextSpan(text: ' '),
             WidgetSpan(
-              child: Padding(
-                padding: const EdgeInsets.only(left: kPad / 4),
-                child: DictionaryChip(
-                  child: Text(t, style: italic1(context)),
-                  color: Colors.cyan.shade100.withOpacity(.6),
+              child: DictionaryChip(
+                child: Text(
+                  t,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
+                color: Colors.cyan.shade100.withOpacity(.6),
               ),
             ),
           ],
         ),
   ];
+}
+
+/// Overrides the text theme's base text style with the specified style. Used
+/// instead of `DefaultTextStyle` because default styles are really buggy when
+/// used with `Text.rich` and text spans.
+class BaseTextStyle extends StatelessWidget {
+  const BaseTextStyle(
+      {required this.style, required this.child, Key? key})
+      : super(key: key);
+
+  final Widget child;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: ThemeData(
+        textTheme: Theme.of(context).textTheme.copyWith(
+          bodyText2: style,
+        ),
+      ),
+      child: child,
+    );
+  }
 }

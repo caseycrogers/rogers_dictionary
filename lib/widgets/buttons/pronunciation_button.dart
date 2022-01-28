@@ -7,6 +7,7 @@ import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/util/color_utils.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/inline_icon_button.dart';
@@ -41,16 +42,11 @@ class PronunciationButton extends StatelessWidget {
             _currPlaybackStream,
           );
         } else {
-          currButton = Container(
-            height: 22,
-            width: 30,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: _PlayingButton(text, mode, playbackStream, () {
-              WidgetsBinding.instance!.addPostFrameCallback((_) {
-                _currPlaybackStream.value = null;
-              });
-            }),
-          );
+          currButton = _PlayingButton(text, mode, playbackStream, () {
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
+              _currPlaybackStream.value = null;
+            });
+          });
         }
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 20),
@@ -126,7 +122,14 @@ class _PlayingButton extends StatelessWidget {
           _onDone();
         }
         if (snap.data == null) {
-          return const _LoadingIndicator(22);
+          return Container(
+            // Copied from the inline icon button implementation.
+            margin: const EdgeInsets.symmetric(horizontal: kPad/2),
+            width: IconTheme.of(context).size!,
+            height: IconTheme.of(context).size,
+            padding: const EdgeInsets.all(4),
+            child: const _LoadingIndicator(),
+          );
         }
         final PlaybackInfo info = snap.data!;
         // Currently playing.
@@ -137,7 +140,8 @@ class _PlayingButton extends StatelessWidget {
             mode,
           ),
           style: IndicatorStyle.circular,
-          progress: info.position.inMilliseconds / info.duration.inMilliseconds,
+          progress:
+              info.position.inMilliseconds / info.duration.inMilliseconds,
         );
       },
     );
@@ -173,18 +177,13 @@ class _StopButton extends StatelessWidget {
 }
 
 class _LoadingIndicator extends StatelessWidget {
-  const _LoadingIndicator(this.size, {Key? key}) : super(key: key);
-
-  final double size;
+  const _LoadingIndicator({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {},
       child: Container(
-        height: size,
-        width: size,
-        padding: const EdgeInsets.all(4),
         child: CircularProgressIndicator(
           strokeWidth: 3,
           color: AdaptiveMaterial.secondaryOnColorOf(context)!,

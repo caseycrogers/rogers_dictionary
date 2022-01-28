@@ -75,6 +75,7 @@ class _ChapterViewState extends State<ChapterView> {
         padding: const EdgeInsets.symmetric(horizontal: kPad),
         color: Theme.of(context).cardColor,
         child: ListTile(
+          visualDensity: VisualDensity.compact,
           contentPadding: EdgeInsets.zero,
           title: headline1Text(context, widget.chapter.title(context)),
           subtitle: Text(widget.chapter.oppositeTitle(context)),
@@ -86,7 +87,9 @@ class _ChapterViewState extends State<ChapterView> {
             children: [
               // Ghost tile to push down the scrolling view.
               if (widget.chapter.hasSubChapters)
-                _subchapterTile(context, _currentSubChapter.value),
+                _SubChapterTile(
+                  subChapter: _currentSubChapter.value,
+                ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
@@ -139,12 +142,15 @@ class _ChapterViewState extends State<ChapterView> {
                 isExpanded: _isExpanded,
                 canTapOnHeader: true,
                 headerBuilder: (context, isOpen) => ListTile(
+                  visualDensity: VisualDensity.compact,
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 2 * kPad),
                   title: _isExpanded
                       ? Container()
-                      : headline2Text(
-                          context, _currentSubChapter.value.title(context)),
+                      : Text(
+                          _currentSubChapter.value.title(context),
+                          style: Theme.of(context).textTheme.headline2,
+                        ),
                   subtitle: _isExpanded
                       ? Container()
                       : Text(_currentSubChapter.value.oppositeTitle(context)),
@@ -152,9 +158,8 @@ class _ChapterViewState extends State<ChapterView> {
                 body: Column(
                   children: widget.chapter.dialogueSubChapters
                       .map(
-                        (subChapter) => _subchapterTile(
-                          context,
-                          subChapter,
+                        (subChapter) => _SubChapterTile(
+                          subChapter: subChapter,
                           isSelected: subChapter == _currentSubChapter.value,
                           onTap: () {
                             _inProgrammaticScroll = true;
@@ -200,6 +205,7 @@ class _ChapterViewState extends State<ChapterView> {
           final DialogueChapter_Dialogue dialogue =
               _subChapterAndDialogueIndex[index].key.dialogues[dialogueIndex];
           final ListTile dialogueTile = ListTile(
+            visualDensity: VisualDensity.compact,
             title: bold1Text(context, dialogue.content(context)),
             subtitle: Text(dialogue.oppositeContent(context)),
             tileColor: dialogueIndex % 2 == 0
@@ -212,8 +218,10 @@ class _ChapterViewState extends State<ChapterView> {
             return Column(
               children: [
                 dialogueTile,
-                _subchapterTile(context, _nextSubChapter(subChapter),
-                    padding: 0),
+                _SubChapterTile(
+                  subChapter: _nextSubChapter(subChapter),
+                  horizontalPadding: 0,
+                ),
               ],
             );
           return dialogueTile;
@@ -221,23 +229,6 @@ class _ChapterViewState extends State<ChapterView> {
       ),
     );
   }
-
-  Widget _subchapterTile(
-    BuildContext context,
-    DialogueSubChapter subChapter, {
-    bool isSelected = false,
-    double padding = 2 * kPad,
-    VoidCallback? onTap,
-  }) =>
-      Container(
-        color: isSelected ? Theme.of(context).selectedRowColor : null,
-        child: ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: padding),
-          title: headline2Text(context, subChapter.title(context)),
-          subtitle: Text(subChapter.oppositeTitle(context)),
-          onTap: onTap,
-        ),
-      );
 
   MapEntry<DialogueSubChapter, double> _subChapterAndProgress(
       ItemPosition first, ItemPosition last) {
@@ -289,5 +280,38 @@ class _ChapterViewState extends State<ChapterView> {
     assert(subChapter != widget.chapter.dialogueSubChapters.last);
     return widget.chapter.dialogueSubChapters[
         widget.chapter.dialogueSubChapters.indexOf(subChapter) + 1];
+  }
+}
+
+class _SubChapterTile extends StatelessWidget {
+  const _SubChapterTile({
+    required this.subChapter,
+    this.isSelected = false,
+    this.onTap,
+    this.horizontalPadding = 2*kPad,
+    Key? key,
+  }) : super(key: key);
+
+  final DialogueSubChapter subChapter;
+  final bool isSelected;
+  final VoidCallback? onTap;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTextStyle(
+      style: Theme.of(context).textTheme.headline2!,
+      child: Container(
+        color: isSelected ? Theme.of(context).selectedRowColor : null,
+        child: ListTile(
+          visualDensity: VisualDensity.compact,
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: horizontalPadding),
+          title: Text(subChapter.title(context)),
+          subtitle: Text(subChapter.oppositeTitle(context)),
+          onTap: onTap,
+        ),
+      ),
+    );
   }
 }
