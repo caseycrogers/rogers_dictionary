@@ -147,9 +147,12 @@ class _PartOfSpeechChip extends StatelessWidget {
       );
     }
     return DictionaryChip(
-      child: Text(
-        pos,
-        style: italic1(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: Text(
+          pos,
+          style: italic1(context),
+        ),
       ),
     );
   }

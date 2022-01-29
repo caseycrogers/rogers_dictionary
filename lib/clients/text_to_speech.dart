@@ -169,7 +169,6 @@ class TextToSpeech {
   }
 
   String _data(String pronunciation, TranslationMode mode) {
-    print(pronunciation);
     return json.encode(
       {
         'input': {

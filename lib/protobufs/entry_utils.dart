@@ -107,6 +107,7 @@ extension EntryUtils on Entry {
     'fphrase': i18n.feminineNounPhrase,
     'fplphrase': i18n.femininePluralNounPhrase,
     'mfphrase': i18n.masculineFeminineNounPhrase,
+    'mfplphrase': i18n.masculineFeminineNounPhrase,
     'mphrase': i18n.masculineNounPhrase,
     'mplphrase': i18n.masculinePluralNounPhrase,
     'm(pl)phrase': i18n.masculinePluralNounPhraseParen,

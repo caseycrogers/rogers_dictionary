@@ -73,7 +73,7 @@ class _TranslationLine extends StatelessWidget {
                   ...OverflowMarkdown(
                     ' (*${translation.disambiguation}*)',
                   ).asSpans(context),
-                NamingStandard(namingStandard: translation.namingStandard)
+                NamingStandardView(namingStandard: translation.namingStandard)
                     .asSpan(context),
                 ..._translationParentheticals(
                   context,

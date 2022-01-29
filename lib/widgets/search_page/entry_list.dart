@@ -1,6 +1,7 @@
 import 'dart:core';
 
 import 'package:async_list_view/async_list_view.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 
@@ -115,14 +116,19 @@ class _EntryList extends StatelessWidget {
           child: LoadingText(),
         ),
       ),
-      itemBuilder: (context, snapshot, index) {
-        if (snapshot.hasError) {
-          print(snapshot.error);
+      itemBuilder: (context, snap, index) {
+        if (snap.hasError) {
+          FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(
+              exception: snap.error!,
+              stack: StackTrace.current,
+            ),
+          );
         }
-        if (!snapshot.hasData) {
+        if (!snap.hasData) {
           return const LoadingText();
         }
-        _onEntriesUpdated(context, searchResults, snapshot.data!);
+        _onEntriesUpdated(context, searchResults, snap.data!);
         return Column(
           children: [
             // Put the no results widget at the top if applicable.
@@ -133,9 +139,9 @@ class _EntryList extends StatelessWidget {
               const CollapsingNoResultsWidget(),
               const Divider(height: 0),
             ],
-            _EntryRow(entry: snapshot.data![index]),
+            _EntryRow(entry: snap.data![index]),
             // Put no results widget at top
-            if (index != snapshot.data!.length)
+            if (index != snap.data!.length)
               const Divider(
                 thickness: 1,
                 height: 1,

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 
-class NamingStandard extends StatelessWidget {
-  const NamingStandard({
+class NamingStandardView extends StatelessWidget {
+  const NamingStandardView({
     required this.namingStandard,
     Key? key,
   }) : super(key: key);
@@ -30,6 +30,9 @@ class NamingStandard extends StatelessWidget {
     if (namingStandard == 'i, u') {
       text = 'INN & USAN';
     }
+    if (namingStandard == 'i & u') {
+      text = 'INN & USAN';
+    }
     return ' (*$text* )';
   }
 
@@ -37,7 +40,7 @@ class NamingStandard extends StatelessWidget {
     if (namingStandard.isEmpty) {
       return const TextSpan();
     }
-    return _md(context).asSpans(context).single;
+    return TextSpan(children: _md(context).asSpans(context));
   }
 
   OverflowMarkdown _md(BuildContext context) {

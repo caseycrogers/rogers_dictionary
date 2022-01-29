@@ -89,6 +89,7 @@ class _AlternateHeadwordView extends StatelessWidget {
           ),
       child: Builder(builder: (context) {
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'alt. ',
@@ -97,34 +98,44 @@ class _AlternateHeadwordView extends StatelessWidget {
                 fontWeight: FontWeight.normal,
               ),
             ),
-            Column(
-              children: alternateHeadwords.map((alt) {
-                return Text.rich(
-                  TextSpan(
-                    children: [
-                      WidgetSpan(
-                          child: HighlightedText(text: alt.headwordText)),
-                      if (alt.abbreviation.isNotEmpty) ...[
-                        const TextSpan(text: ' '),
-                        ...HighlightedText(text: ' (${alt.abbreviation})')
-                            .asSpans(context),
-                      ],
-                      if (alt.gender.isNotEmpty)
-                        TextSpan(
-                          text: ' ${alt.gender}',
-                          style: const TextStyle(fontStyle: FontStyle.italic),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: alternateHeadwords.map((alt) {
+                  return Text.rich(
+                    TextSpan(
+                      children: [
+                        WidgetSpan(
+                          child: HighlightedText(
+                            text: alt.headwordText,
+                          ),
                         ),
-                      NamingStandard(
-                        namingStandard: alt.namingStandard,
-                      ).asSpan(context),
-                      ...parentheticalSpans(
-                        context,
-                        alt.parentheticalQualifier,
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+                        if (alt.abbreviation.isNotEmpty) ...[
+                          const TextSpan(text: ' '),
+                          ...HighlightedText(text: ' (${alt.abbreviation})')
+                              .asSpans(context),
+                        ],
+                        if (true)
+                          TextSpan(
+                            text: ' ${alt.gender}',
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        NamingStandardView(
+                          namingStandard: alt.namingStandard,
+                        ).asSpan(context),
+                        ...parentheticalSpans(
+                          context,
+                          alt.parentheticalQualifier,
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ],
         );
