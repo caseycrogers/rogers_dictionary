@@ -44,7 +44,10 @@ class TableOfContentsView extends StatelessWidget {
           }
           if (chapter.hasSubChapters)
             return ExpansionTile(
-              title: bold1Text(context, chapter.title(context)),
+              title: Text(
+                chapter.title(context),
+                style: const TextStyle().asBold,
+              ),
               subtitle: Text(
                 chapter.oppositeTitle(context),
                 style: TextStyle(color: Colors.grey.shade700),
@@ -81,9 +84,9 @@ class TableOfContentsView extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       minLeadingWidth: 0,
       leading: isSubHeader ? const IndentIcon() : null,
-      title: bold1Text(
-        context,
+      title: Text(
         subChapter?.title(context) ?? chapter.title(context),
+        style: const TextStyle().asBold,
       ),
       subtitle: Text(
           subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context)),

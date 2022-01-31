@@ -77,7 +77,12 @@ class _ChapterViewState extends State<ChapterView> {
         child: ListTile(
           visualDensity: VisualDensity.compact,
           contentPadding: EdgeInsets.zero,
-          title: headline1Text(context, widget.chapter.title(context)),
+          title: DefaultTextStyle(
+            style: Theme.of(context).textTheme.headline1!,
+            child: Text(
+              widget.chapter.title(context),
+            ),
+          ),
           subtitle: Text(widget.chapter.oppositeTitle(context)),
         ),
       ),
@@ -206,7 +211,10 @@ class _ChapterViewState extends State<ChapterView> {
               _subChapterAndDialogueIndex[index].key.dialogues[dialogueIndex];
           final ListTile dialogueTile = ListTile(
             visualDensity: VisualDensity.compact,
-            title: bold1Text(context, dialogue.content(context)),
+            title: Text(
+              dialogue.content(context),
+              style: const TextStyle().asBold,
+            ),
             subtitle: Text(dialogue.oppositeContent(context)),
             tileColor: dialogueIndex % 2 == 0
                 ? Theme.of(context).selectedRowColor
@@ -288,7 +296,7 @@ class _SubChapterTile extends StatelessWidget {
     required this.subChapter,
     this.isSelected = false,
     this.onTap,
-    this.horizontalPadding = 2*kPad,
+    this.horizontalPadding = 2 * kPad,
     Key? key,
   }) : super(key: key);
 
@@ -305,8 +313,7 @@ class _SubChapterTile extends StatelessWidget {
         color: isSelected ? Theme.of(context).selectedRowColor : null,
         child: ListTile(
           visualDensity: VisualDensity.compact,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: horizontalPadding),
+          contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           title: Text(subChapter.title(context)),
           subtitle: Text(subChapter.oppositeTitle(context)),
           onTap: onTap,

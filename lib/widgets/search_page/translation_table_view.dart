@@ -151,7 +151,7 @@ class _PartOfSpeechChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 2),
         child: Text(
           pos,
-          style: italic1(context),
+          style: const TextStyle().asItalic,
         ),
       ),
     );
@@ -180,7 +180,10 @@ class _IrregularInflectionsTable extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            bold1Text(context, '${i18n.irregularInflections.get(context)}:'),
+            Text(
+              '${i18n.irregularInflections.get(context)}:',
+              style: const TextStyle().asBold,
+            ),
             Table(
               defaultColumnWidth: const IntrinsicColumnWidth(),
               children: [

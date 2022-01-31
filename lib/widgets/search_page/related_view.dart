@@ -22,30 +22,33 @@ class RelatedView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(height: kSectionSpacer),
-        bold1Text(context, i18n.related.get(context)),
+        Text(
+          i18n.related.get(context),
+          style: const TextStyle().asBold,
+        ),
         const Divider(),
         ...model.entry.related.where((r) => r.isNotEmpty).map(
               (headword) => InkWell(
-            borderRadius: BorderRadius.circular(kPad),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kPad/2),
-              child: OverflowMarkdown(
-                headword,
-                defaultStyle: Theme.of(context)
-                    .textTheme
-                    .bodyText2!
-                    .copyWith(color: Colors.blue),
+                borderRadius: BorderRadius.circular(kPad),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: kPad / 2),
+                  child: OverflowMarkdown(
+                    headword,
+                    defaultStyle: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(color: Colors.blue),
+                  ),
+                ),
+                onTap: () {
+                  DictionaryModel.instance.onHeadwordSelected(
+                    context,
+                    EntryUtils.urlEncode(headword),
+                    referrer: SelectedEntryReferrer.relatedHeadword,
+                  );
+                },
               ),
             ),
-            onTap: () {
-              DictionaryModel.instance.onHeadwordSelected(
-                context,
-                EntryUtils.urlEncode(headword),
-                referrer: SelectedEntryReferrer.relatedHeadword,
-              );
-            },
-          ),
-        ),
       ],
     );
   }

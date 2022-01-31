@@ -118,7 +118,7 @@ List<InlineSpan> _translationParentheticals(
             padding: EdgeInsets.zero,
             child: Text(
               q,
-              style: italic1(context),
+              style: const TextStyle().asItalic,
             ),
           ),
         ),
@@ -149,13 +149,18 @@ class _ExamplePhraseView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${i18n.examplePhrases.get(context)}:', style: bold1(context)),
+            Text(
+              '${i18n.examplePhrases.get(context)}:',
+              style: const TextStyle().asBold,
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: examplePhrases
-                  .map((example) => OverflowMarkdown(
+                  .map(
+                    (example) => OverflowMarkdown(
                       example.replaceAll('/', ' / '),
-                      defaultStyle: normal1(context).copyWith(height: 1.5)))
+                    ),
+                  )
                   .toList(),
             ),
           ],

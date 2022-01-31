@@ -29,16 +29,14 @@ class HeadwordView extends StatelessWidget {
               TextSpan(
                 children: [
                   ...HighlightedText(
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle().asBold,
                     text: model.entry.headword.headwordText,
                   ).asSpans(context),
-                  if (model.entry.headword.abbreviation.isNotEmpty) ...[
-                    const WidgetSpan(child: SizedBox(width: kPad)),
+                  if (model.entry.headword.abbreviation.isNotEmpty)
                     ...HighlightedText(
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      text: '(${model.entry.headword.abbreviation})',
+                      style: const TextStyle().asBold,
+                      text: ' (${model.entry.headword.abbreviation})',
                     ).asSpans(context),
-                  ],
                   ...parentheticalSpans(
                     context,
                     model.entry.headword.parentheticalQualifier,
@@ -84,62 +82,68 @@ class _AlternateHeadwordView extends StatelessWidget {
       return Container();
     }
     return DefaultTextStyle(
-      style: Theme.of(context).textTheme.headline3!.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-      child: Builder(builder: (context) {
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'alt. ',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.normal,
+      style: Theme.of(context).textTheme.headline3!.asBold,
+      child: Builder(
+        builder: (context) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'alt. ',
+                style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: alternateHeadwords.map((alt) {
-                  return Text.rich(
-                    TextSpan(
-                      children: [
-                        WidgetSpan(
-                          child: HighlightedText(
-                            text: alt.headwordText,
-                          ),
-                        ),
-                        if (alt.abbreviation.isNotEmpty) ...[
-                          const TextSpan(text: ' '),
-                          ...HighlightedText(text: ' (${alt.abbreviation})')
-                              .asSpans(context),
-                        ],
-                        if (true)
-                          TextSpan(
-                            text: ' ${alt.gender}',
-                            style: const TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.normal,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: alternateHeadwords.map((alt) {
+                    return Text.rich(
+                      TextSpan(
+                        // These explicit style argument shouldn't be necessary
+                        // but they are because of unresolvable(?) bugs within
+                        // `HighlightedText`.
+                        style: DefaultTextStyle.of(context).style,
+                        children: [
+                          WidgetSpan(
+                            child: HighlightedText(
+                              style: DefaultTextStyle.of(context).style,
+                              text: alt.headwordText,
                             ),
                           ),
-                        NamingStandardView(
-                          namingStandard: alt.namingStandard,
-                        ).asSpan(context),
-                        ...parentheticalSpans(
-                          context,
-                          alt.parentheticalQualifier,
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                          if (alt.abbreviation.isNotEmpty) ...[
+                            const TextSpan(text: ' '),
+                            ...HighlightedText(text: '(${alt.abbreviation})')
+                                .asSpans(context),
+                          ],
+                          if (alt.gender.isNotEmpty)
+                            TextSpan(
+                              // Extra space on right because the italic text
+                              // takes up too much space on the right.
+                              text: ' ${alt.gender} ',
+                              style: const TextStyle(
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          NamingStandardView(
+                            namingStandard: alt.namingStandard,
+                          ).asSpan(context),
+                          ...parentheticalSpans(
+                            context,
+                            alt.parentheticalQualifier,
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-          ],
-        );
-      }),
+            ],
+          );
+        },
+      ),
     );
   }
 }

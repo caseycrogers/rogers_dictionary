@@ -47,39 +47,42 @@ class _AboutPage extends StatelessWidget {
       color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: PageHeader(
-          header: headline1Text(context, i18n.about.cap.get(context)),
-          onClose: onClose,
-          child: Column(
-            children: [
-              SelectableText(
-                i18n.aboutPassage.get(context),
-                textAlign: TextAlign.center,
-              ),
-              SelectableText(
-                i18n.enjoyTheApp.get(context),
-                textAlign: TextAlign.center,
-              ),
-              const Text(''),
-              Container(
-                height: 130,
-                width: 130,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage(
-                      join('assets', 'images', 'glenn.jpg'),
+        child: DefaultTextStyle(
+          style: Theme.of(context).textTheme.headline1!,
+          child: PageHeader(
+            header: Text(i18n.about.cap.get(context)),
+            onClose: onClose,
+            child: Column(
+              children: [
+                SelectableText(
+                  i18n.aboutPassage.get(context),
+                  textAlign: TextAlign.center,
+                ),
+                SelectableText(
+                  i18n.enjoyTheApp.get(context),
+                  textAlign: TextAlign.center,
+                ),
+                const Text(''),
+                Container(
+                  height: 130,
+                  width: 130,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage(
+                        join('assets', 'images', 'glenn.jpg'),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SelectableText(
-                'Dr. Glenn Rogers',
-                textAlign: TextAlign.center,
-              ),
-              const Divider(),
-              const _DebugInfo(),
-            ],
+                const SelectableText(
+                  'Dr. Glenn Rogers',
+                  textAlign: TextAlign.center,
+                ),
+                const Divider(),
+                const _DebugInfo(),
+              ],
+            ),
           ),
         ),
       ),

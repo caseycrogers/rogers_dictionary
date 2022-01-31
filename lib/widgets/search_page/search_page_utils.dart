@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
-import 'package:rogers_dictionary/util/text_utils.dart';
 
 class NamingStandardView extends StatelessWidget {
   const NamingStandardView({
@@ -44,9 +43,6 @@ class NamingStandardView extends StatelessWidget {
   }
 
   OverflowMarkdown _md(BuildContext context) {
-    return OverflowMarkdown(
-      _getLongText(namingStandard),
-      defaultStyle: headline3(context),
-    );
+    return OverflowMarkdown(_getLongText(namingStandard));
   }
 }

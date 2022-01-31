@@ -11,6 +11,7 @@ import 'package:rogers_dictionary/clients/feedback_sender.dart';
 import 'package:rogers_dictionary/clients/snack_bar_notifier.dart';
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
+import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 
 class DictionaryApp extends StatefulWidget {

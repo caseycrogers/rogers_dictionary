@@ -35,7 +35,11 @@ class OverflowMarkdown extends StatelessWidget {
         if (entry.key.isSubscript && spans.isNotEmpty) {
           // Subscript should not be wrapped
           spans[spans.length - 1] = TextSpan(
-              children: [spans.last, TextSpan(text: s, style: textStyle)]);
+            children: [
+              spans.last,
+              TextSpan(text: s, style: textStyle),
+            ],
+          );
           return;
         }
         spans.add(
@@ -52,19 +56,20 @@ class OverflowMarkdown extends StatelessWidget {
       context,
       base
           .constructSpans()
-          .map((e) =>
-              TextSpan(text: e.value, style: getTextStyle(context, e.key)))
+          .map(
+            (e) => TextSpan(text: e.value, style: getTextStyle(context, e.key)),
+          )
           .toList(),
     );
   }
 
   Widget _constructText(BuildContext context, List<TextSpan> spans) {
-    return RichText(
-      overflow: overflow ?? TextOverflow.visible,
-      text: TextSpan(
-        style: defaultStyle ?? Theme.of(context).textTheme.bodyText2,
+    return Text.rich(
+      TextSpan(
+        style: defaultStyle ?? DefaultTextStyle.of(context).style,
         children: spans,
       ),
+      overflow: overflow ?? TextOverflow.visible,
     );
   }
 
@@ -74,14 +79,16 @@ class OverflowMarkdown extends StatelessWidget {
     if (mdStyle.isDefault) {
       return baseStyle;
     }
-    return baseStyle
-        .merge(mdStyle.overrideStyle == null
-            ? null
-            : overrideStyles?[mdStyle.overrideStyle!].copyWith(inherit: true))
-        .copyWith(
-          fontWeight: mdStyle.isBold ? FontWeight.bold : null,
-          fontStyle: mdStyle.isItalic ? FontStyle.italic : null,
-          fontSize: mdStyle.isSubscript ? baseStyle.fontSize! / 2 : null,
-        );
+    return baseStyle.copyWith(
+      fontWeight: mdStyle.isBold ? FontWeight.bold : null,
+      fontStyle: mdStyle.isItalic ? FontStyle.italic : null,
+      fontSize: mdStyle.isSubscript ? _subscriptHeight(context) : null,
+    );
+  }
+
+  double _subscriptHeight(BuildContext context) {
+    return (defaultStyle?.fontSize ??
+            DefaultTextStyle.of(context).style.fontSize!) /
+        2;
   }
 }

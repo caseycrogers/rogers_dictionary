@@ -22,7 +22,10 @@ class EditorialNotesView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(height: kSectionSpacer),
-        bold1Text(context, i18n.editorialNotes.get(context)),
+        Text(
+          i18n.editorialNotes.get(context),
+          style: const TextStyle().asBold,
+        ),
         const Divider(),
         ...notes,
       ],

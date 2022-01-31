@@ -4,52 +4,19 @@ import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
 
 import 'constants.dart';
 
-TextStyle headline1(BuildContext context) => Theme.of(context)
-    .textTheme
-    .headline1!
-    .copyWith(fontWeight: FontWeight.bold);
+extension UtilStyle on TextStyle {
+  TextStyle get asBold => copyWith(fontWeight: FontWeight.bold);
 
-TextStyle headline2(BuildContext context) =>
-    Theme.of(context).textTheme.headline2!;
+  TextStyle get asNotBold => copyWith(fontWeight: FontWeight.normal);
 
-TextStyle headline3(BuildContext context) =>
-    Theme.of(context).textTheme.headline3!;
+  TextStyle get asItalic => copyWith(fontStyle: FontStyle.italic);
 
-TextStyle normal1(BuildContext context) =>
-    Theme.of(context).textTheme.bodyText2!;
+  TextStyle get asNotItalic => copyWith(fontStyle: FontStyle.normal);
 
-TextStyle bold1(BuildContext context) => Theme.of(context)
-    .textTheme
-    .bodyText2!
-    .copyWith(fontWeight: FontWeight.bold);
+  TextStyle asSize(double size) => copyWith(fontSize: size);
 
-TextStyle italic1(BuildContext context) => Theme.of(context)
-    .textTheme
-    .bodyText2!
-    .copyWith(fontStyle: FontStyle.italic);
-
-Text headline1Text(BuildContext context, String text, {Color? color}) => Text(
-      text,
-      style: headline1(context).copyWith(color: color),
-    );
-
-Text normal1Text(BuildContext context, String text, {Color? color}) => Text(
-      text,
-      style: normal1(context).copyWith(color: color),
-    );
-
-Text italic1Text(BuildContext context, String text, {Color? color}) => Text(
-      text,
-      style: normal1(context).copyWith(
-        color: color,
-        fontStyle: FontStyle.italic,
-      ),
-    );
-
-Text bold1Text(BuildContext context, String text, {Color? color}) => Text(
-      text,
-      style: bold1(context).copyWith(color: color),
-    );
+  TextStyle asColor(Color color) => copyWith(color: color);
+}
 
 const TextStyle kButtonTextStyle = TextStyle(
   color: Colors.black,
@@ -104,8 +71,7 @@ List<InlineSpan> parentheticalSpans(
 /// instead of `DefaultTextStyle` because default styles are really buggy when
 /// used with `Text.rich` and text spans.
 class BaseTextStyle extends StatelessWidget {
-  const BaseTextStyle(
-      {required this.style, required this.child, Key? key})
+  const BaseTextStyle({required this.style, required this.child, Key? key})
       : super(key: key);
 
   final Widget child;
@@ -116,8 +82,8 @@ class BaseTextStyle extends StatelessWidget {
     return Theme(
       data: ThemeData(
         textTheme: Theme.of(context).textTheme.copyWith(
-          bodyText2: style,
-        ),
+              bodyText2: style,
+            ),
       ),
       child: child,
     );

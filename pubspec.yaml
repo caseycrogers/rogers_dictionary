@@ -19,6 +19,7 @@ dependencies:
   firebase_crashlytics: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_cache_manager: ^3.3.0
   flutter_localizations:
     sdk: flutter
   google_fonts: ^2.0.0
