@@ -79,11 +79,17 @@ class OverflowMarkdown extends StatelessWidget {
     if (mdStyle.isDefault) {
       return baseStyle;
     }
-    return baseStyle.copyWith(
-      fontWeight: mdStyle.isBold ? FontWeight.bold : null,
-      fontStyle: mdStyle.isItalic ? FontStyle.italic : null,
-      fontSize: mdStyle.isSubscript ? _subscriptHeight(context) : null,
-    );
+    return baseStyle
+        .merge(
+          mdStyle.overrideStyle == null
+              ? null
+              : overrideStyles?[mdStyle.overrideStyle!],
+        )
+        .copyWith(
+          fontWeight: mdStyle.isBold ? FontWeight.bold : null,
+          fontStyle: mdStyle.isItalic ? FontStyle.italic : null,
+          fontSize: mdStyle.isSubscript ? _subscriptHeight(context) : null,
+        );
   }
 
   double _subscriptHeight(BuildContext context) {

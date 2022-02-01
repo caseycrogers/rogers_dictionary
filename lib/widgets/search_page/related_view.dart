@@ -31,13 +31,13 @@ class RelatedView extends StatelessWidget {
               (headword) => InkWell(
                 borderRadius: BorderRadius.circular(kPad),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: kPad / 2),
+                  padding: const EdgeInsets.all(kPad / 2),
                   child: OverflowMarkdown(
                     headword,
                     defaultStyle: Theme.of(context)
                         .textTheme
                         .bodyText2!
-                        .copyWith(color: Colors.blue),
+                        .asColor(Colors.blue),
                   ),
                 ),
                 onTap: () {

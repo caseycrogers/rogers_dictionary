@@ -39,32 +39,43 @@ class Indent extends StatelessWidget {
   }
 }
 
-List<InlineSpan> parentheticalSpans(
-  BuildContext context,
-  String text,
-) {
-  if (text.isEmpty) {
-    return [];
+class ParentheticalView extends StatelessWidget {
+  const ParentheticalView({required this.text, Key? key}) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    if (text.isEmpty) {
+      return const SizedBox();
+    }
+    return Wrap(children: asWidgets());
   }
-  return [
-    const WidgetSpan(child: SizedBox(width: kPad / 2)),
-    ...text.split(';').expand(
-          (t) => [
-            WidgetSpan(
-              child: DictionaryChip(
-                child: Text(
-                  t,
-                  style: const TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                color: Colors.cyan.shade100.withOpacity(.6),
+
+  List<Widget> asWidgets() {
+    if (text.isEmpty) {
+      return [];
+    }
+    return [
+      const Text(' '),
+      ...text.split(';').map(
+            (t) => DictionaryChip(
+              margin: text.startsWith(t)
+                  ? null
+                  : const EdgeInsets.only(left: kPad / 2),
+              child: Text(
+                t,
+                style: const TextStyle().asNotBold.asItalic,
               ),
+              color: Colors.cyan.shade100.withOpacity(.6),
             ),
-          ],
-        ),
-  ];
+          ),
+    ];
+  }
+
+  List<InlineSpan> asSpans(BuildContext context) {
+    return asWidgets().map((w) => WidgetSpan(child: w)).toList();
+  }
 }
 
 /// Overrides the text theme's base text style with the specified style. Used

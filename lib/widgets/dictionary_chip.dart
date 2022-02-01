@@ -5,21 +5,21 @@ class DictionaryChip extends StatelessWidget {
   const DictionaryChip({
     required this.child,
     this.color,
-    this.padding,
+    this.margin,
     this.childPadding,
     this.borderRadius,
   });
 
   final Widget child;
   final Color? color;
-  final EdgeInsets? padding;
+  final EdgeInsets? margin;
   final EdgeInsets? childPadding;
   final double? borderRadius;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding ?? EdgeInsets.zero,
+      padding: margin ?? EdgeInsets.zero,
       child: Container(
         padding: const EdgeInsets.only(
           left: kPad,

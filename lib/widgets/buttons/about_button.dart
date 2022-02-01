@@ -27,7 +27,7 @@ class AboutButton extends StatelessWidget {
         onPressed();
         showDialog<void>(
           context: context,
-          builder: (overlayContext) => _AboutPage(() {
+          builder: (overlayContext) => _AboutView(() {
             Navigator.of(overlayContext).pop();
           }),
         );
@@ -36,8 +36,8 @@ class AboutButton extends StatelessWidget {
   }
 }
 
-class _AboutPage extends StatelessWidget {
-  const _AboutPage(this.onClose);
+class _AboutView extends StatelessWidget {
+  const _AboutView(this.onClose);
 
   final VoidCallback onClose;
 
@@ -48,9 +48,12 @@ class _AboutPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: DefaultTextStyle(
-          style: Theme.of(context).textTheme.headline1!,
+          style: Theme.of(context).textTheme.headline3!,
           child: PageHeader(
-            header: Text(i18n.about.cap.get(context)),
+            header: Text(
+              i18n.about.cap.get(context),
+              style: Theme.of(context).textTheme.headline1,
+            ),
             onClose: onClose,
             child: Column(
               children: [

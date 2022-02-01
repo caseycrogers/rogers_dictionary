@@ -115,7 +115,7 @@ List<InlineSpan> _translationParentheticals(
           padding: const EdgeInsets.only(left: kPad),
           child: DictionaryChip(
             childPadding: EdgeInsets.zero,
-            padding: EdgeInsets.zero,
+            margin: EdgeInsets.zero,
             child: Text(
               q,
               style: const TextStyle().asItalic,

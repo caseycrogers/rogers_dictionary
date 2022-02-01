@@ -37,10 +37,9 @@ class HeadwordView extends StatelessWidget {
                       style: const TextStyle().asBold,
                       text: ' (${model.entry.headword.abbreviation})',
                     ).asSpans(context),
-                  ...parentheticalSpans(
-                    context,
-                    model.entry.headword.parentheticalQualifier,
-                  ),
+                  ...ParentheticalView(
+                    text: model.entry.headword.parentheticalQualifier,
+                  ).asSpans(context),
                   WidgetSpan(
                     child: BookmarksButton(
                       // If this is in the headword we need to manually up-size
@@ -99,43 +98,31 @@ class _AlternateHeadwordView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: alternateHeadwords.map((alt) {
-                    return Text.rich(
-                      TextSpan(
-                        // These explicit style argument shouldn't be necessary
-                        // but they are because of unresolvable(?) bugs within
-                        // `HighlightedText`.
-                        style: DefaultTextStyle.of(context).style,
-                        children: [
-                          WidgetSpan(
-                            child: HighlightedText(
-                              style: DefaultTextStyle.of(context).style,
-                              text: alt.headwordText,
+                    return Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.start,
+                      children: [
+                        HighlightedText(
+                          style: DefaultTextStyle.of(context).style,
+                          text: alt.headwordText,
+                        ),
+                        ..._AbbreviationView(text: alt.abbreviation)
+                            .asWidgets(),
+                        if (alt.gender.isNotEmpty)
+                          Text(
+                            // Extra space on right because the italic text
+                            // takes up too much space on the right.
+                            ' ${alt.gender} ',
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
-                          if (alt.abbreviation.isNotEmpty) ...[
-                            const TextSpan(text: ' '),
-                            ...HighlightedText(text: '(${alt.abbreviation})')
-                                .asSpans(context),
-                          ],
-                          if (alt.gender.isNotEmpty)
-                            TextSpan(
-                              // Extra space on right because the italic text
-                              // takes up too much space on the right.
-                              text: ' ${alt.gender} ',
-                              style: const TextStyle(
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          NamingStandardView(
-                            namingStandard: alt.namingStandard,
-                          ).asSpan(context),
-                          ...parentheticalSpans(
-                            context,
-                            alt.parentheticalQualifier,
-                          ),
-                        ],
-                      ),
+                        NamingStandardView(
+                          namingStandard: alt.namingStandard,
+                        ),
+                        ...ParentheticalView(text: alt.parentheticalQualifier)
+                            .asWidgets(),
+                      ],
                     );
                   }).toList(),
                 ),
@@ -145,6 +132,32 @@ class _AlternateHeadwordView extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _AbbreviationView extends StatelessWidget {
+  const _AbbreviationView({required this.text, Key? key}) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    if (text.isEmpty) {
+      return const SizedBox();
+    }
+    return Wrap(
+      children: asWidgets(),
+    );
+  }
+
+  List<Widget> asWidgets() {
+    if (text.isEmpty) {
+      return [];
+    }
+    return [
+      const Text(' '),
+      const HighlightedText(text: '(text)'),
+    ];
   }
 }
 

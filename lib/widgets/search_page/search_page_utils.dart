@@ -13,7 +13,7 @@ class NamingStandardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (namingStandard.isEmpty) {
-      return Container();
+      return const SizedBox();
     }
     return _md(context);
   }

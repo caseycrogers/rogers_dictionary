@@ -85,30 +85,50 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
             'at line ${i + 2}');
       }
 
+      void printDuplicativeTransitiveRelatedError(
+        String entry,
+        String transitiveRelated,
+      ) {
+        print('$WARNING Duplicative transitive related entry '
+            '\'$transitiveRelated\' for entry \'$entry\' at line ${i + 2}');
+      }
+
       final String headword = row[HEADWORD]!;
       builder = EntryBuilder().entryId(i + 2).headword(
           headword,
           _split(row[HEADWORD_ABBREVIATIONS]!).get(0, orElse: ''),
           _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!).get(0, orElse: ''));
       if (row[RELATED_TERMS_TRANSITIVE]!.isNotEmpty) {
-        for (final String parent in row[RELATED_TERMS_TRANSITIVE]!
+        for (final String transitiveRelated in row[RELATED_TERMS_TRANSITIVE]!
             .split('|')
             .where((p) => p.isNotEmpty)) {
           // Add transitive links.
-          for (final String transitiveParent
-              in entryBuilders[parent]?.transitiveRelated ?? []) {
+          for (final String secondOrderRelated
+              in entryBuilders[transitiveRelated]?.transitiveRelated ?? []) {
             // If related words form a cycle, skip.
-            if (transitiveParent == headword) {
+            if (secondOrderRelated == headword) {
               continue;
             }
-            entryBuilders[transitiveParent]?.addRelated(headword, true) ??
-                printParentError(transitiveParent, headword);
-            builder.addRelated(transitiveParent, true);
+            if (entryBuilders[secondOrderRelated]
+                    ?.transitiveRelated
+                    .contains(headword) ??
+                false) {
+              printDuplicativeTransitiveRelatedError(
+                secondOrderRelated,
+                headword,
+              );
+              // Relateds are symmetric so no need even checking the other
+              // direction.
+              continue;
+            }
+            entryBuilders[secondOrderRelated]?.addRelated(headword, true) ??
+                printParentError(secondOrderRelated, headword);
+            builder.addRelated(secondOrderRelated, true);
           }
-          // Add to parent and self.
-          entryBuilders[parent]?.addRelated(headword, true) ??
-              printParentError(parent, headword);
-          builder.addRelated(parent, true);
+          // Add to related and to self.
+          entryBuilders[transitiveRelated]?.addRelated(headword, true) ??
+              printParentError(transitiveRelated, headword);
+          builder.addRelated(transitiveRelated, true);
         }
       }
       if (row[RELATED_TERMS_INTRANSITIVE]!.isNotEmpty) {
@@ -129,8 +149,7 @@ Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
         final int index = j + 1;
         builder!.addAlternateHeadword(
           headwordText: alternateHeadwordText,
-          gender:
-              _split(row[ALTERNATE_HEADWORD_GENDERS]!).get(j, orElse: ''),
+          gender: _split(row[ALTERNATE_HEADWORD_GENDERS]!).get(j, orElse: ''),
           abbreviation:
               _split(row[HEADWORD_ABBREVIATIONS]!).get(index, orElse: ''),
           namingStandard: _split(row[ALTERNATE_HEADWORD_NAMING_STANDARDS]!)

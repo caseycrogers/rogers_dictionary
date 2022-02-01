@@ -37,6 +37,7 @@ class _DropDownWidgetState extends State<DropDownWidget>
 
   @override
   void dispose() {
+    _overlayEntry?.remove();
     _controller.dispose();
     super.dispose();
   }
@@ -76,37 +77,44 @@ class _DropDownWidgetState extends State<DropDownWidget>
     if (upperLeft.dx > width / 2) {
       onLeft = false;
     }
+    BoxConstraints? prevConstraints;
     return OverlayEntry(
-      builder: (_) => Stack(
-        children: [
-          FadeTransition(
-            opacity: _curve,
-            child: Container(
-              color: Colors.black38,
-              child: GestureDetector(
-                onTap: _toggle,
+      builder: (_) => LayoutBuilder(builder: (context, constraints) {
+        if (prevConstraints != null && constraints != prevConstraints) {
+          _toggle();
+        }
+        prevConstraints = constraints;
+        return Stack(
+          children: [
+            FadeTransition(
+              opacity: _curve,
+              child: Container(
+                color: Colors.black38,
+                child: GestureDetector(
+                  onTap: _toggle,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            top: upperLeft.dy + renderBox.size.height - kPad/2,
-            left: onLeft ? upperLeft.dx : null,
-            right: onLeft
-                ? null
-                : width - upperLeft.dx - 2 * renderBox.size.width / 3,
-            child: ScaleTransition(
-              alignment: Alignment.topRight,
-              scale: _curve,
-              child: AdaptiveMaterial(
-                adaptiveColor: AdaptiveColor.surface,
-                child: Padding(
-                    padding: widget.padding ?? const EdgeInsets.all(2),
-                    child: widget.builder(context, _toggle)),
+            Positioned(
+              top: upperLeft.dy + renderBox.size.height - kPad / 2,
+              left: onLeft ? upperLeft.dx : null,
+              right: onLeft
+                  ? null
+                  : width - upperLeft.dx - 2 * renderBox.size.width / 3,
+              child: ScaleTransition(
+                alignment: Alignment.topRight,
+                scale: _curve,
+                child: AdaptiveMaterial(
+                  adaptiveColor: AdaptiveColor.surface,
+                  child: Padding(
+                      padding: widget.padding ?? const EdgeInsets.all(2),
+                      child: widget.builder(context, _toggle)),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 

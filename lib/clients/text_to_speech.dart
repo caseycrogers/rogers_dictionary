@@ -9,8 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:rogers_dictionary/models/translation_mode.dart';
 
+import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 
 final Uri _textToSpeechUrl =
