@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:implicit_navigator/implicit_navigator.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
@@ -85,18 +85,18 @@ class DictionaryModel {
   TranslationMode get currTranslationMode =>
       translationModel.value.translationMode;
 
+  TranslationModel get oppTranslationModel =>
+      currTranslationModel.isEnglish ? spanishPageModel : englishPageModel;
+
   bool get isEnglish => translationModel.value.isEnglish;
 
   TranslationModel getPageModel(TranslationMode translationMode) =>
       isEnglish ? englishPageModel : spanishPageModel;
 
-  TranslationModel get _oppModel =>
-      currTranslationModel.isEnglish ? spanishPageModel : englishPageModel;
-
   void onTranslationModeChanged(BuildContext context,
       [TranslationMode? newTranslationMode]) {
-    translationModel.value =
-        translationModelFor(newTranslationMode ?? _oppModel.translationMode);
+    translationModel.value = translationModelFor(
+        newTranslationMode ?? oppTranslationModel.translationMode);
   }
 
   void onEntrySelected(BuildContext context, Entry newEntry) =>
@@ -105,6 +105,19 @@ class DictionaryModel {
         newUrlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
         newEntry: newEntry,
       );
+
+  void clearSelectedEntry(
+    BuildContext context, {
+    SearchModel? searchModel,
+    SelectedEntryReferrer? referrer,
+  }) {
+    _onEntrySelected(
+      context,
+      newUrlEncodedHeadword: '',
+      searchModel: searchModel,
+      referrer: referrer,
+    );
+  }
 
   void onHeadwordSelected(
     BuildContext context,
@@ -122,7 +135,7 @@ class DictionaryModel {
     BuildContext context,
     String newUrlEncodedHeadword,
   ) {
-    translationModel.value = _oppModel;
+    translationModel.value = oppTranslationModel;
     _onEntrySelected(
       context,
       newUrlEncodedHeadword: newUrlEncodedHeadword,
@@ -135,22 +148,22 @@ class DictionaryModel {
     required String newUrlEncodedHeadword,
     SelectedEntryReferrer? referrer,
     Entry? newEntry,
-    SearchModel? pageModel,
+    SearchModel? searchModel,
   }) {
-    pageModel ??= isBookmarksOnly
+    searchModel ??= isBookmarksOnly
         ? currTranslationModel.bookmarksPageModel
         : currTranslationModel.searchModel;
     // Only update if the value has actually changed
-    if (newUrlEncodedHeadword == pageModel.currSelectedHeadword) {
+    if (newUrlEncodedHeadword == searchModel.currSelectedHeadword) {
       return;
     }
     if (newUrlEncodedHeadword.isEmpty) {
-      pageModel.adKeywords.value = [
-        ...pageModel.entrySearchModel.entries
-            .getRange(0, min(pageModel.entrySearchModel.entries.length, 3))
+      searchModel.adKeywords.value = [
+        ...searchModel.entrySearchModel.entries
+            .getRange(0, min(searchModel.entrySearchModel.entries.length, 3))
             .map((e) => e.headword.headwordText),
       ];
-      return pageModel.currSelectedEntry.value = null;
+      return searchModel.currSelectedEntry.value = null;
     }
     unFocus();
     final SelectedEntry selectedEntry = SelectedEntry(
@@ -161,8 +174,8 @@ class DictionaryModel {
           : Future<Entry>.value(newEntry),
       referrer: referrer,
     );
-    pageModel.currSelectedEntry.value = selectedEntry;
-    pageModel.adKeywords.value = [
+    searchModel.currSelectedEntry.value = selectedEntry;
+    searchModel.adKeywords.value = [
       EntryUtils.urlDecode(selectedEntry.urlEncodedHeadword),
     ];
   }

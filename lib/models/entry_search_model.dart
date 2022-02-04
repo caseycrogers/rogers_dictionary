@@ -3,16 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
+import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 
 class EntrySearchModel {
-  EntrySearchModel._(this._translationMode,
-      this._isBookmarkedOnly,);
+  EntrySearchModel._(
+    this._translationMode,
+    this._isBookmarkedOnly,
+  );
 
-  EntrySearchModel.empty(TranslationMode translationMode,
-      bool isBookmarkedOnly,) : this._(translationMode, isBookmarkedOnly);
+  EntrySearchModel.empty(
+    TranslationMode translationMode,
+    bool isBookmarkedOnly,
+  ) : this._(translationMode, isBookmarkedOnly);
 
   // Static so that this is shared between both modes
   static final ValueNotifier<String> _currSearchString = ValueNotifier('');
@@ -42,7 +47,7 @@ class EntrySearchModel {
       startAt: startAt,
     )
         .handleError(
-          (Object error, StackTrace stackTrace) {
+      (Object error, StackTrace stackTrace) {
         print('ERROR (entry stream): $error\n$stackTrace');
       },
     );
@@ -57,15 +62,34 @@ class EntrySearchModel {
     required BuildContext context,
     required String newSearchString,
   }) {
+    _onSearchStringChanged(context: context, newSearchString: newSearchString);
+    // We also need to update the opposite model.
+    DictionaryModel.instance.oppTranslationModel.searchModel.entrySearchModel
+        ._onSearchStringChanged(
+      context: context,
+      newSearchString: newSearchString,
+    );
+    // Update the value notifier last.
+    currSearchString.value = newSearchString;
+  }
+
+  void _onSearchStringChanged({
+    required BuildContext context,
+    required String newSearchString,
+  }) {
     if (newSearchString == currSearchString.value) {
       // Value hasn't changed, don't update.
       return;
     }
     DictionaryApp.analytics.logSearch(searchTerm: newSearchString);
     if (!isBigEnoughForAdvanced(context) && newSearchString.isNotEmpty) {
-      DictionaryModel.instance.onHeadwordSelected(context, '');
+      DictionaryModel.instance.clearSelectedEntry(
+        context,
+        searchModel: DictionaryModel.instance
+            .translationModelFor(_translationMode)
+            .searchModel,
+      );
     }
     entries = [];
-    currSearchString.value = newSearchString;
   }
 }

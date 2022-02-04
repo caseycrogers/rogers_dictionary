@@ -107,16 +107,7 @@ class _AlternateHeadwordView extends StatelessWidget {
                         ),
                         ..._AbbreviationView(text: alt.abbreviation)
                             .asWidgets(),
-                        if (alt.gender.isNotEmpty)
-                          Text(
-                            // Extra space on right because the italic text
-                            // takes up too much space on the right.
-                            ' ${alt.gender} ',
-                            style: const TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
+                        ..._GenderView(text: alt.gender).asWidgets(),
                         NamingStandardView(
                           namingStandard: alt.namingStandard,
                         ),
@@ -132,6 +123,32 @@ class _AlternateHeadwordView extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _GenderView extends StatelessWidget {
+  const _GenderView({required this.text, Key? key}) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    if (text.isEmpty) {
+      return const SizedBox();
+    }
+    return Wrap(
+      children: asWidgets(),
+    );
+  }
+
+  List<Widget> asWidgets() {
+    if (text.isEmpty) {
+      return [];
+    }
+    return [
+      const Text(' '),
+      Text(text, style: const TextStyle().asItalic.asNotBold),
+    ];
   }
 }
 
@@ -156,7 +173,7 @@ class _AbbreviationView extends StatelessWidget {
     }
     return [
       const Text(' '),
-      const HighlightedText(text: '(text)'),
+      HighlightedText(text: '($text)'),
     ];
   }
 }

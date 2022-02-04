@@ -7,6 +7,8 @@ const String VERSION_FILE = 'database_version.json';
 
 const String BOOKMARKS_DB = 'bookmarks';
 
+const String SQL_SCHEMA_TABLE = 'sqlite_master';
+
 // Entry column names.
 const String URL_ENCODED_HEADWORD = 'url_encoded_headword';
 const String HEADWORD = 'headword';

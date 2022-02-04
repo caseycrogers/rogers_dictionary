@@ -44,6 +44,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
       // Used to ensure the navigator knows when to display an animation.
       key: _getKey(context),
       maintainHistory: true,
+      takeFocus: false,
       valueNotifier: SearchModel.of(context).currSelectedEntry,
       // Ensure that a base page is in the history on opposite headword.
       initialHistory: const [

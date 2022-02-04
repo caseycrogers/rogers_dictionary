@@ -17,9 +17,17 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class SqfliteDatabase extends DictionaryDatabase {
-  SqfliteDatabase() {
+  factory SqfliteDatabase() {
+    // The database needs to be a singleton to ensure that `initialize` is only
+    // run once when the app is closed and reopened.
+    return instance;
+  }
+
+  SqfliteDatabase._() {
     _initialize();
   }
+
+  static final instance = SqfliteDatabase._();
 
   late final String _databasesPath;
   late final String _path;
@@ -240,6 +248,7 @@ OFFSET $offset;''';
   @override
   Future<void> dispose() async {
     final Database db = await _dbFuture;
+    await db.execute('''DETACH DATABASE '$BOOKMARKS_DB\'''');
     return db.close();
   }
 
@@ -290,6 +299,15 @@ OFFSET $offset;''';
       db = await databaseFactoryFfi.openDatabase(_path);
     } else {
       db = await databaseFactory.openDatabase(_path);
+    }
+    try {
+      // We have to detach the DB first because when the user backgrounds the
+      // app and reopens it sqlite doesn't properly teardown the attachment.
+      // This is wrapped in a try...catch because it'll always fail on first
+      // launch.
+      await db.execute('''DETACH DATABASE $BOOKMARKS_DB''');
+    } catch (e) {
+      print(e);
     }
     await db.execute('''ATTACH DATABASE '$_bookmarksPath' AS $BOOKMARKS_DB''');
     return db;

@@ -75,10 +75,9 @@ class _TranslationLine extends StatelessWidget {
                   ).asSpans(context),
                 NamingStandardView(namingStandard: translation.namingStandard)
                     .asSpan(context),
-                ..._translationParentheticals(
-                  context,
-                  translation.parentheticalQualifier,
-                ),
+                ...ParentheticalView(
+                  text: translation.parentheticalQualifier,
+                ).asSpans(context),
                 WidgetSpan(
                   child: PronunciationButton(
                     text: translation.content.pronounceable,
@@ -101,30 +100,6 @@ class _TranslationLine extends StatelessWidget {
       ],
     );
   }
-}
-
-List<InlineSpan> _translationParentheticals(
-    BuildContext context, String translationParenthetical) {
-  if (translationParenthetical.isEmpty) {
-    return [];
-  }
-  return translationParenthetical.split(';').map(
-    (q) {
-      return WidgetSpan(
-        child: Padding(
-          padding: const EdgeInsets.only(left: kPad),
-          child: DictionaryChip(
-            childPadding: EdgeInsets.zero,
-            margin: EdgeInsets.zero,
-            child: Text(
-              q,
-              style: const TextStyle().asItalic,
-            ),
-          ),
-        ),
-      );
-    },
-  ).toList();
 }
 
 class _ExamplePhraseView extends StatelessWidget {
