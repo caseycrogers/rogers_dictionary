@@ -15,7 +15,8 @@ class DictionaryBannerAd extends StatefulWidget {
 
 class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
   static const String _testAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String _realAdUnitId = 'ca-app-pub-4592603753721232/8369891839';
+  static const String _androidAdUnitId = 'ca-app-pub-4592603753721232/8369891839';
+  static const String _iosAdUnitId = 'ca-app-pub-4592603753721232/6466849196';
 
   static const List<String> _universalKeywords = [
     'medical',
