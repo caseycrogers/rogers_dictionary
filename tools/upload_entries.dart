@@ -23,7 +23,7 @@ const ERROR = '(ERROR):';
 Future<void> uploadEntries(bool debug, bool verbose, bool isSpanish) async {
   final String csvPath = join(
     'lib',
-    'scripts',
+    'tools',
     'entry_database-${isSpanish ? SPANISH : ENGLISH}.csv',
   );
   final String versionPath = join('assets', 'database_version.json');

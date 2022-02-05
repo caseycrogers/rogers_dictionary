@@ -21,7 +21,7 @@ const ERROR = '(ERROR):';
 Future<void> uploadDialogues(bool debug, bool verbose) async {
   final String filePath = join(
     'lib',
-    'scripts',
+    'tools',
     'dialogue_database.csv',
   );
   print('Uploading: $filePath.');
