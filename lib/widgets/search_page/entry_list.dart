@@ -12,6 +12,7 @@ import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
+import 'package:rogers_dictionary/util/testings/key_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -109,6 +110,7 @@ class _EntryList extends StatelessWidget {
       stream: searchResults.entryStream,
       initialData: searchResults.cachedEntries,
       loadingWidget: Delayed(
+        key: const ValueKey('loading'),
         delay: const Duration(milliseconds: 100),
         initialChild: Container(),
         child: const Padding(

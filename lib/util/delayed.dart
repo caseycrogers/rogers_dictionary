@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 
 class Delayed extends StatefulWidget {
   const Delayed({
+    Key? key,
     required this.initialChild,
     required this.child,
     required this.delay,
-  });
+  }) : super(key: key);
 
   final Widget initialChild;
   final Widget child;

@@ -144,9 +144,9 @@ packages:
   emulators:
     dependency: "direct dev"
     description:
-      name: emulators
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../dart_emulators"
+      relative: true
+    source: path
     version: "0.2.3"
   extra_pedantic:
     dependency: transitive

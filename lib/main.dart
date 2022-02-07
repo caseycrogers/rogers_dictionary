@@ -33,8 +33,7 @@ Future<void> main() async {
   if (!(Platform.isAndroid || Platform.isIOS)) {
     return runApp(DictionaryApp());
   }
-  await Firebase.initializeApp();
-  await MobileAds.instance.initialize();
+  await initialize();
   return runZonedGuarded<void>(
     () async {
       await FirebaseCrashlytics.instance
@@ -45,4 +44,10 @@ Future<void> main() async {
     },
     FirebaseCrashlytics.instance.recordError,
   );
+}
+
+// Exposed so that the screenshot system can access it.
+Future<void> initialize() async {
+  await Firebase.initializeApp();
+  await MobileAds.instance.initialize();
 }

@@ -14,6 +14,11 @@ import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
 
 class DictionaryApp extends StatefulWidget {
+  const DictionaryApp({this.overrideLocale, Key? key}) : super(key: key);
+
+  // Used for testing to override the current locale.
+  final Locale? overrideLocale;
+
   // Client instances.
   static final DictionaryDatabase db = SqfliteDatabase();
   static final TextToSpeech textToSpeech = TextToSpeech();
@@ -36,10 +41,13 @@ class DictionaryApp extends StatefulWidget {
 class _DictionaryAppState extends State<DictionaryApp> {
   @override
   Future<void> dispose() async {
-    await DictionaryApp.textToSpeech.dispose();
-    await DictionaryApp.db.dispose();
-    await DictionaryApp.feedback.dispose();
-    super.dispose();
+    try {
+      await DictionaryApp.textToSpeech.dispose();
+      await DictionaryApp.db.dispose();
+      await DictionaryApp.feedback.dispose();
+    } finally {
+      super.dispose();
+    }
   }
 
   @override
@@ -101,6 +109,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
+          locale: widget.overrideLocale,
           supportedLocales: const [
             Locale('en', ''),
             Locale('es', ''),

@@ -25,15 +25,13 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
   @override
   void initState() {
     super.initState();
-    DictionaryModel.instance
-        .translationModel
+    DictionaryModel.instance.translationModel
         .addListener(_onTranslationModeChanged);
   }
 
   @override
   void dispose() {
-    DictionaryModel.instance
-        .translationModel
+    DictionaryModel.instance.translationModel
         .removeListener(_onTranslationModeChanged);
     super.dispose();
   }
