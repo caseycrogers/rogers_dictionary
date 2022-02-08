@@ -12,31 +12,28 @@ class DictionaryTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveMaterial(
-      adaptiveColor: AdaptiveColor.primary,
-      child: Container(
-        height: kToolbarHeight,
-        alignment: Alignment.topCenter,
-        child: TabBar(
-          labelColor: AdaptiveMaterial.onColorOf(context),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
-          tabs: DictionaryTab.values.asMap().mapDown((index, tab) {
-            return DictionaryTabEntry(
-              index: index,
-              icon: Icon(tabToIcon(tab)),
-              text: tabToText(context, tab),
-            );
-          }).toList(),
-          isScrollable: true,
-          indicator: indicator
-              ? const UnderlineTabIndicator(
-                  borderSide: BorderSide(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                )
-              : const BoxDecoration(),
-        ),
+    return Container(
+      height: kToolbarHeight,
+      alignment: Alignment.topCenter,
+      child: TabBar(
+        labelColor: AdaptiveMaterial.onColorOf(context),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
+        tabs: DictionaryTab.values.asMap().mapDown((index, tab) {
+          return DictionaryTabEntry(
+            index: index,
+            icon: Icon(tabToIcon(tab)),
+            text: tabToText(context, tab),
+          );
+        }).toList(),
+        isScrollable: true,
+        indicator: indicator
+            ? const UnderlineTabIndicator(
+                borderSide: BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              )
+            : const BoxDecoration(),
       ),
     );
   }

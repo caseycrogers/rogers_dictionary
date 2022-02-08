@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -12,20 +13,30 @@ const Locale es = Locale('es', '');
 Future<void> main() async {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
       as IntegrationTestWidgetsFlutterBinding;
-  if (Platform.isAndroid) {
-    await binding.convertFlutterSurfaceToImage();
-  }
   WidgetsApp.debugAllowBannerOverride = false;
+
+  setUpAll(() async {
+    // Hack for android, no-op on other platforms.
+    await binding.convertFlutterSurfaceToImage();
+  });
 
   for (final Locale locale in [en, es]) {
     testWidgets('take screenshot', (WidgetTester tester) async {
-      await tester.pumpWidget(DictionaryApp(overrideLocale: locale));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: DeviceFrame(
+            device: Devices.ios.iPhone12ProMax,
+            screen: Container(color: Colors.blue),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
       final DictionaryModel dictionaryModel = DictionaryModel.instance;
       await pollUntil(tester, () {
         return find.byKey(const ValueKey('loading')).evaluate().isEmpty;
       });
       await binding.takeScreenshot('${locale.languageCode}_01');
+      await Future<void>.delayed(const Duration(milliseconds: 1000));
     });
   }
 }

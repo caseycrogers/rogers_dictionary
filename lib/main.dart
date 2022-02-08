@@ -31,7 +31,7 @@ ColorScheme themeOf(TranslationModel translationModel) {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!(Platform.isAndroid || Platform.isIOS)) {
-    return runApp(DictionaryApp());
+    return runApp(const DictionaryApp());
   }
   await initialize();
   return runZonedGuarded<void>(
@@ -40,7 +40,7 @@ Future<void> main() async {
           .setCustomKey('mode', kDebugMode ? 'debug' : 'release');
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-      runApp(DictionaryApp());
+      runApp(const DictionaryApp());
     },
     FirebaseCrashlytics.instance.recordError,
   );

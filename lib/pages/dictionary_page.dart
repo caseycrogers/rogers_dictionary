@@ -52,7 +52,10 @@ class DictionaryPage extends StatelessWidget {
                 ],
               ),
               bottomNavigationBar: !isBigEnoughForAdvanced(context)
-                  ? const DictionaryTabBar()
+                  ? const AdaptiveMaterial(
+                      adaptiveColor: AdaptiveColor.primary,
+                      child: SafeArea(child: DictionaryTabBar()),
+                    )
                   : null,
             ),
           );
