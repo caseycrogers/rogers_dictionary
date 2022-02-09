@@ -12,7 +12,7 @@ Future<void> main() async {
       headerText: 'Search thousands of terms!',
       background: Container(color: DictionaryApp.englishColorScheme.primary),
       device: Devices.ios.iPhone13,
-      locale: Locale('es'),
+      locale: const Locale('es'),
     ),
   );
 }
