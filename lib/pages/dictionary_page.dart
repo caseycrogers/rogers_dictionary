@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/dictionary_app.dart';
 
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
@@ -29,7 +30,8 @@ class DictionaryPage extends StatelessWidget {
         valueListenable: DictionaryModel.instance.translationModel,
         builder: (context, model, tabBarView) {
           return Theme(
-            data: Theme.of(context).copyWith(colorScheme: themeOf(model)),
+            data: Theme.of(context)
+                .copyWith(colorScheme: DictionaryApp.themeOf(model)),
             child: Scaffold(
               body: Column(
                 children: [

@@ -11,23 +11,6 @@ import 'package:rogers_dictionary/models/translation_model.dart';
 
 import 'dictionary_app.dart';
 
-final ColorScheme englishColorScheme = ColorScheme.fromSwatch(
-  primarySwatch: Colors.indigo,
-  backgroundColor: Colors.grey.shade200,
-);
-
-final ColorScheme spanishColorScheme = ColorScheme.fromSwatch(
-  primarySwatch: Colors.orange,
-  backgroundColor: Colors.grey.shade200,
-).copyWith(onPrimary: Colors.white);
-
-ColorScheme themeOf(TranslationModel translationModel) {
-  if (translationModel.isEnglish) {
-    return englishColorScheme;
-  }
-  return spanishColorScheme;
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!(Platform.isAndroid || Platform.isIOS)) {

@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
+import 'package:rogers_dictionary/screenshot_template.dart';
+import 'package:rogers_dictionary/util/testings/key_utils.dart';
 
 const Locale en = Locale('en', '');
 const Locale es = Locale('es', '');
@@ -16,27 +20,30 @@ Future<void> main() async {
   WidgetsApp.debugAllowBannerOverride = false;
 
   setUpAll(() async {
-    // Hack for android, no-op on other platforms.
     await binding.convertFlutterSurfaceToImage();
   });
 
   for (final Locale locale in [en, es]) {
     testWidgets('take screenshot', (WidgetTester tester) async {
+      final DeviceInfo device = Devices.ios.iPhone13ProMax;
+
       await tester.pumpWidget(
-        MaterialApp(
-          home: DeviceFrame(
-            device: Devices.ios.iPhone12ProMax,
-            screen: Container(color: Colors.blue),
+        ScreenshotTemplate(
+          headerText: 'Search thousands of terms!',
+          background: Container(
+            color: DictionaryApp.englishColorScheme.primary,
           ),
+          device: device,
+          locale: locale,
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
       final DictionaryModel dictionaryModel = DictionaryModel.instance;
-      await pollUntil(tester, () {
-        return find.byKey(const ValueKey('loading')).evaluate().isEmpty;
-      });
-      await binding.takeScreenshot('${locale.languageCode}_01');
-      await Future<void>.delayed(const Duration(milliseconds: 1000));
+      await binding.takeScreenshot(
+        '${locale.languageCode}'
+        '\$${(device.screenSize.width * binding.window.devicePixelRatio).toInt()}'
+        '\$${(device.screenSize.height * binding.window.devicePixelRatio).toInt()}',
+      );
     });
   }
 }
@@ -44,7 +51,7 @@ Future<void> main() async {
 Future<void> pollUntil(
   WidgetTester tester,
   bool Function() test, {
-  Duration timeout = const Duration(seconds: 10),
+  Duration timeout = const Duration(seconds: 5),
 }) async {
   await (() async {
     while (true) {
@@ -56,4 +63,23 @@ Future<void> pollUntil(
     }
   })()
       .timeout(timeout);
+}
+
+Future<void> pumpUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 5),
+}) async {
+  bool timerDone = false;
+  final timer =
+      Timer(timeout, () => throw TimeoutException('Pump until has timed out'));
+  while (timerDone != true) {
+    await tester.pump();
+
+    final found = tester.any(finder);
+    if (found) {
+      timerDone = true;
+    }
+  }
+  timer.cancel();
 }

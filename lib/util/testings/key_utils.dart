@@ -15,6 +15,6 @@ class KeyedForTesting extends StatelessWidget {
 }
 
 class EntryKey extends ValueKey<String> {
-  const EntryKey({required String headword, required bool isPreview})
+  const EntryKey({required String headword, bool isPreview = true})
       : super('${headword}_${isPreview ? 'preview' : 'page'}');
 }

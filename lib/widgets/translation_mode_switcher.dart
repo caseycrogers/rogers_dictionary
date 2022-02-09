@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/dictionary_app.dart';
 
-import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
@@ -15,7 +15,6 @@ class TranslationModeSwitcher extends StatefulWidget {
   final Widget child;
 
   final Widget? header;
-
 
   @override
   _TranslationModeSwitcherState createState() =>
@@ -85,7 +84,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
           children: [
             Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: englishColorScheme,
+                colorScheme: DictionaryApp.englishColorScheme,
               ),
               child: Row(
                 children: [
@@ -103,7 +102,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
             ),
             Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: spanishColorScheme,
+                colorScheme: DictionaryApp.spanishColorScheme,
               ),
               child: Row(
                 children: [
