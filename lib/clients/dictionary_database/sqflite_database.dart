@@ -83,10 +83,13 @@ class SqfliteDatabase extends DictionaryDatabase {
       );
 
   @override
-  Future<Entry> getEntry(TranslationMode translationMode, String uid) async {
+  Future<Entry> getEntry(
+    TranslationMode translationMode,
+    String headword,
+  ) async {
     final Database db = await _dbFuture;
     final Entry entry = _rowToEntry(
-      uid,
+      headword,
       translationMode,
       await db.rawQuery('''
 SELECT *,
@@ -95,10 +98,9 @@ SELECT *,
               WHERE $UID =
                 ${bookmarksTable(translationMode)}.$UID) AS $IS_FAVORITE
  FROM ${entryTable(translationMode)}
- WHERE $UID = '$uid';''').then((List<Map<String, Object?>> value) => value
-              .isEmpty
-          ? null
-          : value.single),
+ WHERE $HEADWORD = '$headword';''').then((List<Map<String, Object?>>
+              value) =>
+          value.isEmpty ? null : value.single),
     );
     return entry;
   }

@@ -101,7 +101,7 @@ class DictionaryModel {
   void onEntrySelected(BuildContext context, Entry newEntry) =>
       _onEntrySelected(
         context,
-        uid: newEntry.uid,
+        headword: newEntry.headword.text,
         newEntry: newEntry,
       );
 
@@ -112,39 +112,39 @@ class DictionaryModel {
   }) {
     _onEntrySelected(
       context,
-      uid: '',
+      headword: '',
       searchModel: searchModel,
       referrer: referrer,
     );
   }
 
-  void onUidSelected(
+  void onHeadwordSelected(
     BuildContext context,
-    String newUid, {
+    String newHeadword, {
     SelectedEntryReferrer? referrer,
   }) {
     _onEntrySelected(
       context,
-      uid: newUid,
+      headword: newHeadword,
       referrer: referrer,
     );
   }
 
-  void onOppositeUidSelected(
+  void onOppositeHeadwordSelected(
     BuildContext context,
-    String newUid,
+    String newHeadword,
   ) {
     translationModel.value = oppTranslationModel;
     _onEntrySelected(
       context,
-      uid: newUid,
-      referrer: SelectedEntryReferrer.oppositeUid,
+      headword: newHeadword,
+      referrer: SelectedEntryReferrer.oppositeHeadword,
     );
   }
 
   void _onEntrySelected(
     BuildContext context, {
-    required String uid,
+    required String headword,
     SelectedEntryReferrer? referrer,
     Entry? newEntry,
     SearchModel? searchModel,
@@ -153,10 +153,10 @@ class DictionaryModel {
         ? currTranslationModel.bookmarksPageModel
         : currTranslationModel.searchModel;
     // Only update if the value has actually changed
-    if (uid == searchModel.currSelectedUid) {
+    if (headword == searchModel.currSelectedHeadword) {
       return;
     }
-    if (uid.isEmpty) {
+    if (headword.isEmpty) {
       searchModel.adKeywords.value = [
         ...searchModel.entrySearchModel.entries
             .getRange(0, min(searchModel.entrySearchModel.entries.length, 3))
@@ -166,10 +166,10 @@ class DictionaryModel {
     }
     unFocus();
     final SelectedEntry selectedEntry = SelectedEntry(
-      uid: uid,
+      headword: headword,
       entry: newEntry == null
           ? DictionaryApp.db.getEntry(
-              currTranslationModel.translationMode, uid)
+              currTranslationModel.translationMode, headword)
           : Future<Entry>.value(newEntry),
       referrer: referrer,
     );
@@ -187,10 +187,10 @@ class DictionaryModel {
     String? thirdTier;
     switch (currentTab.value) {
       case DictionaryTab.search:
-        thirdTier = translationModel.value.searchModel.currSelectedUid;
+        thirdTier = translationModel.value.searchModel.currSelectedHeadword;
         break;
       case DictionaryTab.bookmarks:
-        thirdTier = translationModel.value.searchModel.currSelectedUid;
+        thirdTier = translationModel.value.searchModel.currSelectedHeadword;
         break;
       case DictionaryTab.dialogues:
         thirdTier = translationModel

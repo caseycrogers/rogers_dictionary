@@ -71,7 +71,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
         switch (selectedEntry.referrer) {
           case null:
             return 1;
-          case SelectedEntryReferrer.oppositeUid:
+          case SelectedEntryReferrer.oppositeHeadword:
             return 2;
           case SelectedEntryReferrer.relatedHeadword:
             return null;
@@ -79,7 +79,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
       },
       onPop: (selectedEntry, prevEntry) {
         if (selectedEntry != null &&
-            selectedEntry.referrer == SelectedEntryReferrer.oppositeUid) {
+            selectedEntry.referrer == SelectedEntryReferrer.oppositeHeadword) {
           DictionaryModel.instance.onTranslationModeChanged(context);
         }
       },

@@ -37,6 +37,6 @@ message Entry {
 
         repeated string example_phrases = 12;
 
-        string opposite_uid = 13;
+        string opposite_headword = 13;
     }
 }

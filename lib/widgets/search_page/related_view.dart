@@ -27,12 +27,12 @@ class RelatedView extends StatelessWidget {
         ),
         const Divider(),
         ...model.entry.related.where((r) => r.isNotEmpty).map(
-              (uid) => InkWell(
+              (headword) => InkWell(
                 borderRadius: BorderRadius.circular(kPad),
                 child: Padding(
                   padding: const EdgeInsets.all(kPad / 2),
                   child: OverflowMarkdown(
-                    uid,
+                    headword,
                     defaultStyle: Theme.of(context)
                         .textTheme
                         .bodyText2!
@@ -40,9 +40,9 @@ class RelatedView extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  DictionaryModel.instance.onUidSelected(
+                  DictionaryModel.instance.onHeadwordSelected(
                     context,
-                    model.entry.uid,
+                    headword,
                     referrer: SelectedEntryReferrer.relatedHeadword,
                   );
                 },

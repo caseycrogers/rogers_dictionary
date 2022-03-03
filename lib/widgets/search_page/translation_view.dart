@@ -89,9 +89,9 @@ class _TranslationLine extends StatelessWidget {
                     mode: oppositeMode(SearchModel.of(context).mode),
                   ),
                 ),
-                if (translation.oppositeUid.isNotEmpty)
+                if (translation.oppositeHeadword.isNotEmpty)
                   WidgetSpan(
-                    child: OppositeUidButton(translation: translation),
+                    child: OppositeHeadwordButton(translation: translation),
                   ),
               ],
             ),

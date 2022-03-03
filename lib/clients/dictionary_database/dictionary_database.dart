@@ -56,7 +56,7 @@ abstract class DictionaryDatabase {
   // Get the given entry from the database.
   Future<Entry> getEntry(
     TranslationMode translationMode,
-    String uid,
+    String headword,
   );
 
   @mustCallSuper

@@ -211,11 +211,10 @@ Future<Map<String, EntryBuilder>> _getBuilders(
   return entryBuilders;
 }
 
-void _setOppositeUids(
+void _setOppositeEntries(
   Iterable<EntryBuilder> builders,
   Map<String, EntryBuilder> oppositeBuilders,
 ) {
-  return;
   for (final MapEntry<String, Translation> oppEntry
       in builders.expand((b) => b.rawOppositeHeadwords.entries)) {
     final String oppositeHeadword = oppEntry.key;
@@ -237,7 +236,7 @@ void _setOppositeUids(
           'translation ${translation.text}.');
       continue;
     }
-    translation.oppositeUid = oppositeEntry.getUid;
+    translation.oppositeHeadword = oppositeEntry.getUid;
   }
 }
 
@@ -253,8 +252,8 @@ Future<void> uploadEntries(bool debug, bool verbose) async {
         .then((v) => englishBuilders = v),
     _isolatedGetBuilders(debug, verbose, true).then((v) => spanishBuilders = v),
   ]);
-  _setOppositeUids(englishBuilders.values, spanishBuilders);
-  _setOppositeUids(spanishBuilders.values, englishBuilders);
+  _setOppositeEntries(englishBuilders.values, spanishBuilders);
+  _setOppositeEntries(spanishBuilders.values, englishBuilders);
   await _uploadSqlFlite(
     version,
     TranslationMode.English,

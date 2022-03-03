@@ -140,7 +140,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
     ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disambiguation')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'editorialNote')
     ..pPS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePhrases')
-    ..aOS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'oppositeUid')
+    ..aOS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'oppositeHeadword')
     ..hasRequiredFields = false
   ;
 
@@ -158,7 +158,7 @@ class Entry_Translation extends $pb.GeneratedMessage {
     $core.String? disambiguation,
     $core.String? editorialNote,
     $core.Iterable<$core.String>? examplePhrases,
-    $core.String? oppositeUid,
+    $core.String? oppositeHeadword,
   }) {
     final _result = create();
     if (partOfSpeech != null) {
@@ -197,8 +197,8 @@ class Entry_Translation extends $pb.GeneratedMessage {
     if (examplePhrases != null) {
       _result.examplePhrases.addAll(examplePhrases);
     }
-    if (oppositeUid != null) {
-      _result.oppositeUid = oppositeUid;
+    if (oppositeHeadword != null) {
+      _result.oppositeHeadword = oppositeHeadword;
     }
     return _result;
   }
@@ -320,13 +320,13 @@ class Entry_Translation extends $pb.GeneratedMessage {
   $core.List<$core.String> get examplePhrases => $_getList(11);
 
   @$pb.TagNumber(13)
-  $core.String get oppositeUid => $_getSZ(12);
+  $core.String get oppositeHeadword => $_getSZ(12);
   @$pb.TagNumber(13)
-  set oppositeUid($core.String v) { $_setString(12, v); }
+  set oppositeHeadword($core.String v) { $_setString(12, v); }
   @$pb.TagNumber(13)
-  $core.bool hasOppositeUid() => $_has(12);
+  $core.bool hasOppositeHeadword() => $_has(12);
   @$pb.TagNumber(13)
-  void clearOppositeUid() => clearField(13);
+  void clearOppositeHeadword() => clearField(13);
 }
 
 class Entry extends $pb.GeneratedMessage {

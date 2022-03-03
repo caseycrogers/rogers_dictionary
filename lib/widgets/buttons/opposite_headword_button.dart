@@ -5,8 +5,8 @@ import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/inline_icon_button.dart';
 
-class OppositeUidButton extends StatelessWidget {
-  const OppositeUidButton({
+class OppositeHeadwordButton extends StatelessWidget {
+  const OppositeHeadwordButton({
     Key? key,
     required this.translation,
   }) : super(key: key);
@@ -18,9 +18,9 @@ class OppositeUidButton extends StatelessWidget {
     return InlineIconButton(
       Icons.compare_arrows,
       onPressed: () {
-        DictionaryModel.instance.onOppositeUidSelected(
+        DictionaryModel.instance.onOppositeHeadwordSelected(
           context,
-          translation.oppositeUid,
+          translation.oppositeHeadword,
         );
       },
     );
