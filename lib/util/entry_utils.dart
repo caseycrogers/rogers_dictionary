@@ -42,30 +42,20 @@ extension EntryUtils on Entry {
     return translations.groupListsBy((t) => t.partOfSpeech);
   }
 
-  bool get isNotFound =>
-      headword.urlEncodedHeadword.startsWith('Invalid headword ');
+  bool get isNotFound => uid == '404';
 
-  static String urlDecode(String urlEncodedHeadword) {
-    return Uri.decodeComponent(
-        (urlEncodedHeadword.split('_')..removeAt(0)).join(''));
-  }
-
-  static String urlEncode(String headword) {
-    return Uri.encodeComponent(headword);
-  }
-
-  static Entry notFound(String headword) {
+  static Entry notFound(String uid) {
     return Entry(
-      entryId: 404,
+      uid: '404',
       headword: Headword(
         isAlternate: false,
-        headwordText: 'Invalid headword \'$headword\'',
+        text: 'Invalid entry with id: \'$uid\'',
       ),
+      orderId: 0,
       translations: <Translation>[
         Translation(
           partOfSpeech: '',
-          content:
-              'Please use the help button (upper right) to report this bug!',
+          text: 'Please use the help button (upper right) to report this bug!',
         ),
       ],
     );
@@ -139,38 +129,42 @@ extension EntryUtils on Entry {
   }
 }
 
-extension HeadwordUtils on Headword {
-  String get urlEncodedHeadword => EntryUtils.urlEncode(headwordText);
-}
-
 extension TranslationUtils on Translation {
-  String get getOppositeHeadword =>
-      oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL
-          ? content
-          : oppositeHeadword;
-
   String getLocalizedPartOfSpeech(bool isSpanish) {
     return partOfSpeech.replaceAll('phrase', 'frase');
   }
 }
 
 class EntryBuilder {
+  late String _uid;
   late Headword _headword;
-  late int _entryId;
+  late int _orderId;
   List<Headword>? _alternateHeadwords;
-  List<String>? _transitiveRelated;
-  List<String>? _related;
+  List<EntryBuilder> _childRelateds = [];
+  List<EntryBuilder> _relateds = [];
 
-  List<String> get transitiveRelated =>
-      List.from(_transitiveRelated ?? <String>[], growable: false);
+  // Mapping from raw opposite headwords to the translations they came from.
+  // Used to convert the opposite headwords into UIDs.
+  final Map<String, Translation> rawOppositeHeadwords = {};
+
+  List<EntryBuilder> get related => _relateds + _childRelateds;
 
   final List<Translation> _translations = <Translation>[];
 
+  EntryBuilder uid(String uid) {
+    _uid = uid;
+    return this;
+  }
+
+  String get getUid {
+    return _uid;
+  }
+
   EntryBuilder headword(
-      String headwordText, String abbreviation, String parentheticalQualifier) {
+      String text, String abbreviation, String parentheticalQualifier) {
     _headword = Headword(
       isAlternate: false,
-      headwordText: headwordText,
+      text: text,
       abbreviation: abbreviation,
       namingStandard: null,
       parentheticalQualifier: parentheticalQualifier,
@@ -178,39 +172,72 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder entryId(int entryId) {
-    _entryId = entryId;
+  EntryBuilder orderId(int orderId) {
+    _orderId = orderId;
     return this;
   }
 
-  EntryBuilder addRelated(String related, bool transitive) {
-    if (related.isEmpty) {
-      return this;
+  EntryBuilder addTransitiveRelated(EntryBuilder parent) {
+    // Add `this` to all the existing siblings first.
+    for (final EntryBuilder sibling in parent._childRelateds) {
+      if (sibling._uid == _uid) {
+        // Don't add anything if a loop is found.
+        print('$WARNING Duplicative transitive related entry '
+            '\'${sibling._headword.text}\' for entry '
+            '\'${parent._headword.text}\' originating from line '
+            '$_orderId');
+        continue;
+      }
+      // Siblings are considered regular relateds, not transitive relateds.
+      sibling._addRelated(this);
+      _addRelated(sibling);
     }
-    if (transitive) {
-      _transitiveRelated = (_transitiveRelated ?? <String>[])..add(related);
-    } else {
-      _related = (_related ?? <String>[])..add(related);
-    }
+    _addRelated(parent);
+    // Only the parent gets a special-case transitive related via `_addChild`.
+    parent._addChild(this);
     return this;
+  }
+
+  EntryBuilder addRelated(EntryBuilder related) {
+    _addRelated(related);
+    related._addRelated(this);
+    return this;
+  }
+
+  // One directional.
+  void _addRelated(EntryBuilder related) {
+    assert(
+        !_relateds.contains(related),
+        '$ERROR Attempted to add duplicative related '
+        '\'${related._headword.text}\' to entry \'${_headword.text}\'');
+    _relateds = _relateds..add(related);
+  }
+
+  // One directional.
+  void _addChild(EntryBuilder child) {
+    assert(
+        !_childRelateds.contains(child),
+        '$ERROR Attempted to add duplicative transitive related '
+        '\'${child._headword.text}\' to entry \'${_headword.text}\'');
+    _childRelateds = _childRelateds..add(child);
   }
 
   EntryBuilder addAlternateHeadword({
-    required String headwordText,
+    required String text,
     required String gender,
     required String abbreviation,
     required String namingStandard,
     required String parentheticalQualifier,
   }) {
     assert(
-        headwordText != '',
+        text != '',
         'You must specify a non-empty alternate headword. '
-        'Headword: ${_headword.headwordText}. Line: ${_entryId + 2}');
+        'Headword: ${_headword.text}. Line: ${_orderId + 2}');
     _alternateHeadwords = (_alternateHeadwords ?? <Headword>[])
       ..add(
         Headword(
           isAlternate: true,
-          headwordText: headwordText,
+          text: text,
           gender: gender,
           abbreviation: abbreviation,
           namingStandard: namingStandard,
@@ -233,19 +260,19 @@ class EntryBuilder {
     required String disambiguation,
     required List<String> examplePhrases,
     required String editorialNote,
-    required String oppositeHeadword,
+    required String rawOppositeHeadword,
   }) {
     assert(
         translation != '',
         'You must specify a non-empty translation. '
-        'Headword: ${_headword.headwordText} at line $_entryId');
+        'Headword: ${_headword.text} at line $_orderId');
     _translations.add(
       Translation(
         partOfSpeech: partOfSpeech,
         irregularInflections: irregularInflections,
         dominantHeadwordParentheticalQualifier:
             dominantHeadwordParentheticalQualifier,
-        content: translation,
+        text: translation,
         pronunciationOverride: pronunciationOverride,
         genderAndPlural: genderAndPlural,
         namingStandard: namingStandard,
@@ -254,21 +281,29 @@ class EntryBuilder {
         disambiguation: disambiguation,
         examplePhrases: examplePhrases,
         editorialNote: editorialNote,
-        oppositeHeadword: oppositeHeadword,
       ),
     );
+    if (rawOppositeHeadword.isNotEmpty) {
+      rawOppositeHeadwords[rawOppositeHeadword] = _translations.last;
+    }
     return this;
   }
 
   Entry build() {
     assert(_translations.isNotEmpty,
-        'You must specify one or more translations. Line ${_entryId + 2}.');
+        'You must specify one or more translations. Line ${_orderId + 2}.');
     return Entry(
-      entryId: _entryId,
+      uid: _uid,
+      orderId: _orderId,
       headword: _headword,
-      related: (_related ?? [])..addAll(_transitiveRelated ?? []),
+      related: (_relateds..addAll(_childRelateds)).map((e) => e._uid),
       alternateHeadwords: _alternateHeadwords,
       translations: _translations,
     );
+  }
+
+  @override
+  String toString() {
+    return 'EntryBuilder(uid: $_uid)';
   }
 }

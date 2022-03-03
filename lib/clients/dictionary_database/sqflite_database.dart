@@ -10,7 +10,7 @@ import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
+import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'package:sqflite/sqflite.dart';
@@ -83,23 +83,22 @@ class SqfliteDatabase extends DictionaryDatabase {
       );
 
   @override
-  Future<Entry> getEntry(
-      TranslationMode translationMode, String urlEncodedHeadword) async {
+  Future<Entry> getEntry(TranslationMode translationMode, String uid) async {
     final Database db = await _dbFuture;
     final Entry entry = _rowToEntry(
-      urlEncodedHeadword,
+      uid,
       translationMode,
       await db.rawQuery('''
 SELECT *,
-       EXISTS(SELECT $URL_ENCODED_HEADWORD
+       EXISTS(SELECT $UID
               FROM ${bookmarksTable(translationMode)}
-              WHERE $URL_ENCODED_HEADWORD =
-                ${bookmarksTable(translationMode)}.$URL_ENCODED_HEADWORD) AS $IS_FAVORITE
+              WHERE $UID =
+                ${bookmarksTable(translationMode)}.$UID) AS $IS_FAVORITE
  FROM ${entryTable(translationMode)}
- WHERE $URL_ENCODED_HEADWORD = '$urlEncodedHeadword';''').then((List<
-                  Map<String, Object?>>
-              value) =>
-          value.isEmpty ? null : value.single),
+ WHERE $UID = '$uid';''').then((List<Map<String, Object?>> value) => value
+              .isEmpty
+          ? null
+          : value.single),
     );
     return entry;
   }
@@ -117,41 +116,40 @@ SELECT *,
   }
 
   @override
-  Future<bool> setBookmark(TranslationMode translationMode,
-      String urlEncodedHeadword, bool bookmark) async {
+  Future<bool> setBookmark(
+      TranslationMode translationMode, String uid, bool bookmark) async {
     final Database db = await _dbFuture;
     if (bookmark) {
       await db.insert(
         bookmarksTable(translationMode),
         {
           BOOKMARK_TAG: FAVORITES,
-          URL_ENCODED_HEADWORD: urlEncodedHeadword,
+          UID: uid,
         },
       );
     } else {
       await db.delete(
         bookmarksTable(translationMode),
-        where: '$URL_ENCODED_HEADWORD = \'$urlEncodedHeadword\'',
+        where: '$UID = \'$uid\'',
       );
     }
-    return super.setBookmark(translationMode, urlEncodedHeadword, bookmark);
+    return super.setBookmark(translationMode, uid, bookmark);
   }
 
-  Entry _rowToEntry(String headword, TranslationMode translationMode,
+  Entry _rowToEntry(String uid, TranslationMode translationMode,
       Map<String, Object?>? snapshot) {
     if (snapshot == null) {
-      final Entry notFound = EntryUtils.notFound(headword);
+      final Entry notFound = EntryUtils.notFound(uid);
       super.setBookmark(
         translationMode,
-        notFound.headword.urlEncodedHeadword,
+        notFound.uid,
         false,
       );
       return notFound;
     }
     assert(snapshot.containsKey(IS_FAVORITE));
     final Entry entry = Entry.fromBuffer(snapshot[ENTRY_BLOB] as List<int>);
-    super.setBookmark(translationMode, entry.headword.urlEncodedHeadword,
-        snapshot[IS_FAVORITE] == 1);
+    super.setBookmark(translationMode, entry.uid, snapshot[IS_FAVORITE] == 1);
     return entry;
   }
 
@@ -197,7 +195,7 @@ SELECT *,
     int offset = startAt;
     String searchString = rawSearchString;
     searchString = rawSearchString.withoutDiacriticalMarks;
-    String orderByClause = ENTRY_ID;
+    String orderByClause = ORDER_ID;
     if (searchString.isNotEmpty) {
       orderByClause = '''
   ${_relevancyScore(searchString, HEADWORD)},
@@ -223,10 +221,10 @@ SELECT *,
    OR ${_relevancyScore(searchString, IRREGULAR_INFLECTIONS + WITHOUT_OPTIONALS)} != $NO_MATCH)''';
     while (true) {
       final String query = '''SELECT *,
-       EXISTS(SELECT $BOOKMARK_TAG, $URL_ENCODED_HEADWORD
+       EXISTS(SELECT $BOOKMARK_TAG, $UID
               FROM ${bookmarksTable(translationMode)}
-              WHERE ${entryTable(translationMode)}.$URL_ENCODED_HEADWORD = 
-                ${bookmarksTable(translationMode)}.$URL_ENCODED_HEADWORD) AS $IS_FAVORITE
+              WHERE ${entryTable(translationMode)}.$UID = 
+                ${bookmarksTable(translationMode)}.$UID) AS $IS_FAVORITE
 FROM ${entryTable(translationMode)}
 WHERE $whereClause
 ORDER BY $orderByClause

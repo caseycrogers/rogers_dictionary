@@ -39,8 +39,8 @@ class SearchModel {
 
   String get searchString => entrySearchModel.searchString;
 
-  String? get currSelectedHeadword =>
-      currSelectedEntry.value?.urlEncodedHeadword;
+  String? get currSelectedUid =>
+      currSelectedEntry.value?.uid;
 
   static SearchModel of(BuildContext context) {
     final TranslationModel translationModel = TranslationModel.of(context);
@@ -53,22 +53,22 @@ class SearchModel {
 
 class SelectedEntry {
   SelectedEntry({
-    required this.urlEncodedHeadword,
+    required this.uid,
     required this.entry,
     this.referrer,
   });
 
-  final String urlEncodedHeadword;
+  final String uid;
   final Future<Entry> entry;
   final SelectedEntryReferrer? referrer;
 
   @override
   String toString() {
-    return 'SelectedEntry($urlEncodedHeadword)';
+    return 'SelectedEntry($uid)';
   }
 }
 
 enum SelectedEntryReferrer {
   relatedHeadword,
-  oppositeHeadword,
+  oppositeUid,
 }

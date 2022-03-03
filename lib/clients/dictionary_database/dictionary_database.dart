@@ -11,7 +11,7 @@ import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
+import 'package:rogers_dictionary/util/entry_utils.dart';
 
 // A database interface for fetching dictionary entries.
 abstract class DictionaryDatabase {
@@ -55,18 +55,23 @@ abstract class DictionaryDatabase {
 
   // Get the given entry from the database.
   Future<Entry> getEntry(
-      TranslationMode translationMode, String urlEncodedHeadword);
+    TranslationMode translationMode,
+    String uid,
+  );
 
   @mustCallSuper
-  Future<bool> setBookmark(TranslationMode translationMode,
-      String urlEncodedHeadword, bool bookmark) {
-    final bool? oldValue = _getCache(translationMode)[urlEncodedHeadword];
+  Future<bool> setBookmark(
+    TranslationMode translationMode,
+    String uid,
+    bool bookmark,
+  ) {
+    final bool? oldValue = _getCache(translationMode)[uid];
     if (oldValue != null && oldValue != bookmark) {
       // Only dirty the cache if we're actually changing the value.
       _updateDirtyBookmarks(translationMode, true);
     }
     return Future<bool>.value(
-      _getCache(translationMode)[urlEncodedHeadword] = bookmark,
+      _getCache(translationMode)[uid] = bookmark,
     );
   }
 

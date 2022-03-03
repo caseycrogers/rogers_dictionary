@@ -7,8 +7,6 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import 'package:rogers_dictionary/models/translation_model.dart';
-
 import 'dictionary_app.dart';
 
 Future<void> main() async {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 
 import 'inline_icon_button.dart';
 
@@ -25,18 +24,18 @@ class _BookmarksButtonState extends State<BookmarksButton> {
       _icon,
       size: widget.size,
       onPressed: () async {
-        final bool newIsBookmarked = !DictionaryApp.db.isBookmarked(
-            translationMode, widget.entry.headword.urlEncodedHeadword);
+        final bool newIsBookmarked =
+            !DictionaryApp.db.isBookmarked(translationMode, widget.entry.uid);
         await DictionaryApp.analytics.logEvent(
           name: 'set_bookmark',
           parameters: {
-            'entry': widget.entry.headword.urlEncodedHeadword,
+            'entry': widget.entry.headword.text,
             'value': newIsBookmarked.toString(),
           },
         );
         await DictionaryApp.db.setBookmark(
           translationMode,
-          widget.entry.headword.urlEncodedHeadword,
+          widget.entry.uid,
           newIsBookmarked,
         );
         setState(() {});
@@ -47,7 +46,7 @@ class _BookmarksButtonState extends State<BookmarksButton> {
   IconData get _icon {
     return DictionaryApp.db.isBookmarked(
             TranslationModel.of(context).translationMode,
-            widget.entry.headword.urlEncodedHeadword)
+            widget.entry.uid)
         ? Icons.bookmark
         : Icons.bookmark_border;
   }

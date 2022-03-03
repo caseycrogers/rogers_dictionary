@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
@@ -217,7 +217,7 @@ class PreviewTranslationLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text.rich(
       TextSpan(children: [
-        ...OverflowMarkdown(translation.content).asSpans(context),
+        ...OverflowMarkdown(translation.text).asSpans(context),
         if (translation.genderAndPlural.isNotEmpty)
           ...OverflowMarkdown(' *${translation.genderAndPlural}*')
               .asSpans(context),

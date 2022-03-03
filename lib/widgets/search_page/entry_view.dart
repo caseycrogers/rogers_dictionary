@@ -33,7 +33,7 @@ class EntryViewPage extends StatelessWidget {
         final Entry entry = snap.data!;
         return KeyedForTesting(
           key: EntryKey(
-            headword: entry.headword.headwordText,
+            headword: entry.headword.text,
             isPreview: false,
           ),
           child: EntryViewModelProvider(
@@ -70,7 +70,7 @@ class EntryViewPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextStyle baseStyle = DefaultTextStyle.of(context).style;
     return KeyedForTesting(
-      key: EntryKey(headword: entry.headword.headwordText, isPreview: true),
+      key: EntryKey(headword: entry.headword.text, isPreview: true),
       child: Theme(
         data: ThemeData(
           textTheme: Theme.of(context).textTheme.copyWith(

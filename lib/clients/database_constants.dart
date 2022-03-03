@@ -1,5 +1,8 @@
 import 'package:rogers_dictionary/models/translation_mode.dart';
 
+const WARNING = '(WARN):';
+const ERROR = '(ERROR):';
+
 const String ENGLISH = 'english';
 const String SPANISH = 'spanish';
 const String DICTIONARY_DB = 'dictionary';
@@ -10,9 +13,9 @@ const String BOOKMARKS_DB = 'bookmarks';
 const String SQL_SCHEMA_TABLE = 'sqlite_master';
 
 // Entry column names.
-const String URL_ENCODED_HEADWORD = 'url_encoded_headword';
+const String UID = 'uid';
 const String HEADWORD = 'headword';
-const String ENTRY_ID = 'entry_id';
+const String ORDER_ID = 'order_id';
 const String ENTRY_BLOB = 'entry_blob';
 
 // Bookmarks column names.
@@ -64,6 +67,7 @@ const String SPANISH_CONTENT = 'spanish_content';
 
 // Misc.
 const String WITHOUT_OPTIONALS = '_without_optionals';
+// Used to indicate that an opposite headword is just the translation content.
 const String OPPOSITE_HEADWORD_SENTINEL = '1';
 
 String entryTable(TranslationMode mode) {

@@ -1,21 +1,22 @@
-// Run protoc --dart_out=. lib/protobufs/*.proto to compile.
+// Run `protoc --dart_out=. lib/protobufs/*.proto` to compile.
 
 syntax = "proto3";
 package rogers_dictionary;
 
 message Entry {
-    uint32 entry_id = 1;
-    Headword headword = 2;
+    string uid = 1;
+    uint32 order_id = 2;
+    Headword headword = 3;
 
-    repeated string related = 3;
-    repeated Headword alternate_headwords = 4;
+    repeated string related = 4;
+    repeated Headword alternate_headwords = 5;
 
-    repeated Translation translations = 5;
+    repeated Translation translations = 6;
 
     message Headword {
         bool is_alternate = 1;
         string gender = 2;
-        string headword_text = 3;
+        string text = 3;
         string abbreviation = 4;
         string naming_standard = 5;
         string parenthetical_qualifier = 6;
@@ -23,7 +24,7 @@ message Entry {
 
     message Translation {
         string part_of_speech = 1;
-        string content = 2;
+        string text = 2;
         string pronunciation_override = 3;
         repeated string irregular_inflections = 4;
         string dominant_headword_parenthetical_qualifier = 5;
@@ -36,6 +37,6 @@ message Entry {
 
         repeated string example_phrases = 12;
 
-        string opposite_headword = 13;
+        string opposite_uid = 13;
     }
 }

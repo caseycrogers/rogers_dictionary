@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
@@ -60,7 +60,7 @@ class _TranslationLine extends StatelessWidget {
           child: Text.rich(
             TextSpan(
               children: [
-                ...OverflowMarkdown(translation.content).asSpans(context),
+                ...OverflowMarkdown(translation.text).asSpans(context),
                 if (translation.genderAndPlural.isNotEmpty)
                   ...OverflowMarkdown(' *${translation.genderAndPlural}*')
                       .asSpans(context),
@@ -80,7 +80,7 @@ class _TranslationLine extends StatelessWidget {
                 ).asSpans(context),
                 WidgetSpan(
                   child: PronunciationButton(
-                    text: translation.content.pronounceable,
+                    text: translation.text.pronounceable,
                     pronunciation: translation.pronunciationOverride
                         .split('|')
                         .join(
@@ -89,9 +89,9 @@ class _TranslationLine extends StatelessWidget {
                     mode: oppositeMode(SearchModel.of(context).mode),
                   ),
                 ),
-                if (translation.getOppositeHeadword.isNotEmpty)
+                if (translation.oppositeUid.isNotEmpty)
                   WidgetSpan(
-                    child: OppositeHeadwordButton(translation: translation),
+                    child: OppositeUidButton(translation: translation),
                   ),
               ],
             ),

@@ -10,7 +10,6 @@ import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/focus_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/value_notifier_extension.dart';
@@ -102,7 +101,7 @@ class DictionaryModel {
   void onEntrySelected(BuildContext context, Entry newEntry) =>
       _onEntrySelected(
         context,
-        newUrlEncodedHeadword: newEntry.headword.urlEncodedHeadword,
+        uid: newEntry.uid,
         newEntry: newEntry,
       );
 
@@ -113,39 +112,39 @@ class DictionaryModel {
   }) {
     _onEntrySelected(
       context,
-      newUrlEncodedHeadword: '',
+      uid: '',
       searchModel: searchModel,
       referrer: referrer,
     );
   }
 
-  void onHeadwordSelected(
+  void onUidSelected(
     BuildContext context,
-    String newUrlEncodedHeadword, {
+    String newUid, {
     SelectedEntryReferrer? referrer,
   }) {
     _onEntrySelected(
       context,
-      newUrlEncodedHeadword: newUrlEncodedHeadword,
+      uid: newUid,
       referrer: referrer,
     );
   }
 
-  void onOppositeHeadwordSelected(
+  void onOppositeUidSelected(
     BuildContext context,
-    String newUrlEncodedHeadword,
+    String newUid,
   ) {
     translationModel.value = oppTranslationModel;
     _onEntrySelected(
       context,
-      newUrlEncodedHeadword: newUrlEncodedHeadword,
-      referrer: SelectedEntryReferrer.oppositeHeadword,
+      uid: newUid,
+      referrer: SelectedEntryReferrer.oppositeUid,
     );
   }
 
   void _onEntrySelected(
     BuildContext context, {
-    required String newUrlEncodedHeadword,
+    required String uid,
     SelectedEntryReferrer? referrer,
     Entry? newEntry,
     SearchModel? searchModel,
@@ -154,30 +153,32 @@ class DictionaryModel {
         ? currTranslationModel.bookmarksPageModel
         : currTranslationModel.searchModel;
     // Only update if the value has actually changed
-    if (newUrlEncodedHeadword == searchModel.currSelectedHeadword) {
+    if (uid == searchModel.currSelectedUid) {
       return;
     }
-    if (newUrlEncodedHeadword.isEmpty) {
+    if (uid.isEmpty) {
       searchModel.adKeywords.value = [
         ...searchModel.entrySearchModel.entries
             .getRange(0, min(searchModel.entrySearchModel.entries.length, 3))
-            .map((e) => e.headword.headwordText),
+            .map((e) => e.headword.text),
       ];
       return searchModel.currSelectedEntry.value = null;
     }
     unFocus();
     final SelectedEntry selectedEntry = SelectedEntry(
-      urlEncodedHeadword: newUrlEncodedHeadword,
+      uid: uid,
       entry: newEntry == null
           ? DictionaryApp.db.getEntry(
-              currTranslationModel.translationMode, newUrlEncodedHeadword)
+              currTranslationModel.translationMode, uid)
           : Future<Entry>.value(newEntry),
       referrer: referrer,
     );
     searchModel.currSelectedEntry.value = selectedEntry;
-    searchModel.adKeywords.value = [
-      EntryUtils.urlDecode(selectedEntry.urlEncodedHeadword),
-    ];
+    selectedEntry.entry.then((e) {
+      searchModel!.adKeywords.value = [
+        e.headword.text,
+      ];
+    });
   }
 
   bool get isBookmarksOnly => currentTab.value == DictionaryTab.bookmarks;
@@ -186,10 +187,10 @@ class DictionaryModel {
     String? thirdTier;
     switch (currentTab.value) {
       case DictionaryTab.search:
-        thirdTier = translationModel.value.searchModel.currSelectedHeadword;
+        thirdTier = translationModel.value.searchModel.currSelectedUid;
         break;
       case DictionaryTab.bookmarks:
-        thirdTier = translationModel.value.searchModel.currSelectedHeadword;
+        thirdTier = translationModel.value.searchModel.currSelectedUid;
         break;
       case DictionaryTab.dialogues:
         thirdTier = translationModel

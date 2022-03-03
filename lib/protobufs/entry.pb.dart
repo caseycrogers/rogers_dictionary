@@ -13,7 +13,7 @@ class Entry_Headword extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Entry.Headword', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAlternate')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'gender')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'headwordText')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'text')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'abbreviation')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'namingStandard')
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parentheticalQualifier')
@@ -24,7 +24,7 @@ class Entry_Headword extends $pb.GeneratedMessage {
   factory Entry_Headword({
     $core.bool? isAlternate,
     $core.String? gender,
-    $core.String? headwordText,
+    $core.String? text,
     $core.String? abbreviation,
     $core.String? namingStandard,
     $core.String? parentheticalQualifier,
@@ -36,8 +36,8 @@ class Entry_Headword extends $pb.GeneratedMessage {
     if (gender != null) {
       _result.gender = gender;
     }
-    if (headwordText != null) {
-      _result.headwordText = headwordText;
+    if (text != null) {
+      _result.text = text;
     }
     if (abbreviation != null) {
       _result.abbreviation = abbreviation;
@@ -90,13 +90,13 @@ class Entry_Headword extends $pb.GeneratedMessage {
   void clearGender() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get headwordText => $_getSZ(2);
+  $core.String get text => $_getSZ(2);
   @$pb.TagNumber(3)
-  set headwordText($core.String v) { $_setString(2, v); }
+  set text($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasHeadwordText() => $_has(2);
+  $core.bool hasText() => $_has(2);
   @$pb.TagNumber(3)
-  void clearHeadwordText() => clearField(3);
+  void clearText() => clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get abbreviation => $_getSZ(3);
@@ -129,7 +129,7 @@ class Entry_Headword extends $pb.GeneratedMessage {
 class Entry_Translation extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Entry.Translation', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'partOfSpeech')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'text')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pronunciationOverride')
     ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'irregularInflections')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dominantHeadwordParentheticalQualifier')
@@ -140,14 +140,14 @@ class Entry_Translation extends $pb.GeneratedMessage {
     ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disambiguation')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'editorialNote')
     ..pPS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePhrases')
-    ..aOS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'oppositeHeadword')
+    ..aOS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'oppositeUid')
     ..hasRequiredFields = false
   ;
 
   Entry_Translation._() : super();
   factory Entry_Translation({
     $core.String? partOfSpeech,
-    $core.String? content,
+    $core.String? text,
     $core.String? pronunciationOverride,
     $core.Iterable<$core.String>? irregularInflections,
     $core.String? dominantHeadwordParentheticalQualifier,
@@ -158,14 +158,14 @@ class Entry_Translation extends $pb.GeneratedMessage {
     $core.String? disambiguation,
     $core.String? editorialNote,
     $core.Iterable<$core.String>? examplePhrases,
-    $core.String? oppositeHeadword,
+    $core.String? oppositeUid,
   }) {
     final _result = create();
     if (partOfSpeech != null) {
       _result.partOfSpeech = partOfSpeech;
     }
-    if (content != null) {
-      _result.content = content;
+    if (text != null) {
+      _result.text = text;
     }
     if (pronunciationOverride != null) {
       _result.pronunciationOverride = pronunciationOverride;
@@ -197,8 +197,8 @@ class Entry_Translation extends $pb.GeneratedMessage {
     if (examplePhrases != null) {
       _result.examplePhrases.addAll(examplePhrases);
     }
-    if (oppositeHeadword != null) {
-      _result.oppositeHeadword = oppositeHeadword;
+    if (oppositeUid != null) {
+      _result.oppositeUid = oppositeUid;
     }
     return _result;
   }
@@ -233,13 +233,13 @@ class Entry_Translation extends $pb.GeneratedMessage {
   void clearPartOfSpeech() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get content => $_getSZ(1);
+  $core.String get text => $_getSZ(1);
   @$pb.TagNumber(2)
-  set content($core.String v) { $_setString(1, v); }
+  set text($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasContent() => $_has(1);
+  $core.bool hasText() => $_has(1);
   @$pb.TagNumber(2)
-  void clearContent() => clearField(2);
+  void clearText() => clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get pronunciationOverride => $_getSZ(2);
@@ -320,36 +320,41 @@ class Entry_Translation extends $pb.GeneratedMessage {
   $core.List<$core.String> get examplePhrases => $_getList(11);
 
   @$pb.TagNumber(13)
-  $core.String get oppositeHeadword => $_getSZ(12);
+  $core.String get oppositeUid => $_getSZ(12);
   @$pb.TagNumber(13)
-  set oppositeHeadword($core.String v) { $_setString(12, v); }
+  set oppositeUid($core.String v) { $_setString(12, v); }
   @$pb.TagNumber(13)
-  $core.bool hasOppositeHeadword() => $_has(12);
+  $core.bool hasOppositeUid() => $_has(12);
   @$pb.TagNumber(13)
-  void clearOppositeHeadword() => clearField(13);
+  void clearOppositeUid() => clearField(13);
 }
 
 class Entry extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Entry', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rogers_dictionary'), createEmptyInstance: create)
-    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'entryId', $pb.PbFieldType.OU3)
-    ..aOM<Entry_Headword>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'headword', subBuilder: Entry_Headword.create)
-    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'related')
-    ..pc<Entry_Headword>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'alternateHeadwords', $pb.PbFieldType.PM, subBuilder: Entry_Headword.create)
-    ..pc<Entry_Translation>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translations', $pb.PbFieldType.PM, subBuilder: Entry_Translation.create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'uid')
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'orderId', $pb.PbFieldType.OU3)
+    ..aOM<Entry_Headword>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'headword', subBuilder: Entry_Headword.create)
+    ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'related')
+    ..pc<Entry_Headword>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'alternateHeadwords', $pb.PbFieldType.PM, subBuilder: Entry_Headword.create)
+    ..pc<Entry_Translation>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translations', $pb.PbFieldType.PM, subBuilder: Entry_Translation.create)
     ..hasRequiredFields = false
   ;
 
   Entry._() : super();
   factory Entry({
-    $core.int? entryId,
+    $core.String? uid,
+    $core.int? orderId,
     Entry_Headword? headword,
     $core.Iterable<$core.String>? related,
     $core.Iterable<Entry_Headword>? alternateHeadwords,
     $core.Iterable<Entry_Translation>? translations,
   }) {
     final _result = create();
-    if (entryId != null) {
-      _result.entryId = entryId;
+    if (uid != null) {
+      _result.uid = uid;
+    }
+    if (orderId != null) {
+      _result.orderId = orderId;
     }
     if (headword != null) {
       _result.headword = headword;
@@ -387,32 +392,41 @@ class Entry extends $pb.GeneratedMessage {
   static Entry? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get entryId => $_getIZ(0);
+  $core.String get uid => $_getSZ(0);
   @$pb.TagNumber(1)
-  set entryId($core.int v) { $_setUnsignedInt32(0, v); }
+  set uid($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasEntryId() => $_has(0);
+  $core.bool hasUid() => $_has(0);
   @$pb.TagNumber(1)
-  void clearEntryId() => clearField(1);
+  void clearUid() => clearField(1);
 
   @$pb.TagNumber(2)
-  Entry_Headword get headword => $_getN(1);
+  $core.int get orderId => $_getIZ(1);
   @$pb.TagNumber(2)
-  set headword(Entry_Headword v) { setField(2, v); }
+  set orderId($core.int v) { $_setUnsignedInt32(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasHeadword() => $_has(1);
+  $core.bool hasOrderId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearHeadword() => clearField(2);
-  @$pb.TagNumber(2)
-  Entry_Headword ensureHeadword() => $_ensure(1);
+  void clearOrderId() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<$core.String> get related => $_getList(2);
+  Entry_Headword get headword => $_getN(2);
+  @$pb.TagNumber(3)
+  set headword(Entry_Headword v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasHeadword() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearHeadword() => clearField(3);
+  @$pb.TagNumber(3)
+  Entry_Headword ensureHeadword() => $_ensure(2);
 
   @$pb.TagNumber(4)
-  $core.List<Entry_Headword> get alternateHeadwords => $_getList(3);
+  $core.List<$core.String> get related => $_getList(3);
 
   @$pb.TagNumber(5)
-  $core.List<Entry_Translation> get translations => $_getList(4);
+  $core.List<Entry_Headword> get alternateHeadwords => $_getList(4);
+
+  @$pb.TagNumber(6)
+  $core.List<Entry_Translation> get translations => $_getList(5);
 }
 

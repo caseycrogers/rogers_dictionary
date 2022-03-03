@@ -8,11 +8,9 @@ import 'package:implicit_navigator/implicit_navigator.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
-import 'package:rogers_dictionary/util/testings/key_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -31,7 +29,6 @@ class EntryList extends StatelessWidget {
     return _EntryList(searchResults: _SearchResults(context, ''));
   }
 }
-
 
 class _EntryListSwitcher extends StatefulWidget {
   const _EntryListSwitcher({Key? key}) : super(key: key);
@@ -169,8 +166,7 @@ class _EntryRow extends StatelessWidget {
     return ValueListenableBuilder<SelectedEntry?>(
       valueListenable: SearchModel.of(context).currSelectedEntry,
       builder: (context, selectedEntry, _) {
-        final bool isSelected = entry.headword.urlEncodedHeadword ==
-            selectedEntry?.urlEncodedHeadword;
+        final bool isSelected = entry.uid == selectedEntry?.uid;
         final bool shouldHighlight =
             isBigEnoughForAdvanced(context) && isSelected;
         return InkWell(

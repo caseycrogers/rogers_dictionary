@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/screenshot_template.dart';
-import 'package:rogers_dictionary/util/testings/key_utils.dart';
 
 const Locale en = Locale('en', '');
 const Locale es = Locale('es', '');
@@ -26,6 +24,7 @@ Future<void> main() async {
   for (final Locale locale in [en, es]) {
     testWidgets('take screenshot', (WidgetTester tester) async {
       final DeviceInfo device = Devices.ios.iPhone13ProMax;
+      final double pixelRatio = binding.window.devicePixelRatio;
 
       await tester.pumpWidget(
         ScreenshotTemplate(
@@ -41,8 +40,8 @@ Future<void> main() async {
       final DictionaryModel dictionaryModel = DictionaryModel.instance;
       await binding.takeScreenshot(
         '${locale.languageCode}'
-        '\$${(device.screenSize.width * binding.window.devicePixelRatio).toInt()}'
-        '\$${(device.screenSize.height * binding.window.devicePixelRatio).toInt()}',
+        '\$${(device.screenSize.width * pixelRatio).toInt()}'
+        '\$${(device.screenSize.height * pixelRatio).toInt()}',
       );
     });
   }

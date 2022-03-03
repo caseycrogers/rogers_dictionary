@@ -3,8 +3,8 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 
-import 'package:rogers_dictionary/protobufs/entry_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
@@ -30,7 +30,7 @@ class HeadwordView extends StatelessWidget {
                 children: [
                   ...HighlightedText(
                     style: const TextStyle().asBold,
-                    text: model.entry.headword.headwordText,
+                    text: model.entry.headword.text,
                   ).asSpans(context),
                   if (model.entry.headword.abbreviation.isNotEmpty)
                     ...HighlightedText(
@@ -103,7 +103,7 @@ class _AlternateHeadwordView extends StatelessWidget {
                       children: [
                         HighlightedText(
                           style: DefaultTextStyle.of(context).style,
-                          text: alt.headwordText,
+                          text: alt.text,
                         ),
                         ..._AbbreviationView(text: alt.abbreviation)
                             .asWidgets(),
