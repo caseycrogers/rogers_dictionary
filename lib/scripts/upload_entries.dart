@@ -132,13 +132,13 @@ Future<Map<String, EntryBuilder>> _getBuilders(
             _split(row[HEADWORD_PARENTHETICAL_QUALIFIERS]!).get(0, orElse: ''),
           );
       if (row[RELATED_TERMS_TRANSITIVE]!.isNotEmpty) {
-        for (final String transitiveRelated in row[RELATED_TERMS_TRANSITIVE]!
+        for (final String parent in row[RELATED_TERMS_TRANSITIVE]!
             .split('|')
             .where((p) => p.isNotEmpty)) {
-          if (!entryBuilders.containsKey(transitiveRelated)) {
-            printParentError(transitiveRelated, headword);
+          if (!entryBuilders.containsKey(parent)) {
+            printParentError(parent, headword);
           }
-          builder.addTransitiveRelated(entryBuilders[transitiveRelated]!);
+          builder.addParent(entryBuilders[parent]!);
         }
       }
       if (row[RELATED_TERMS_INTRANSITIVE]!.isNotEmpty) {
@@ -172,7 +172,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       });
       if (entryBuilders.keys.contains(headword))
         print('$WARNING Duplicate headword $headword at line ${i + 2}');
-      if (entryBuilders.values.map((e) => e.build().uid).contains(uid))
+      if (entryBuilders.values.map((e) => e.getUid).contains(uid))
         print('$WARNING Duplicate uid $uid at line ${i + 2}');
       entryBuilders[row[HEADWORD]!] = builder;
       partOfSpeech = '';
@@ -186,9 +186,10 @@ Future<Map<String, EntryBuilder>> _getBuilders(
         print('$WARNING Unrecognized part of speech $partOfSpeech for headword '
             '${row[HEADWORD]} at line ${i + 2}');
     }
-    if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty)
+    if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty) {
       dominantHeadwordParentheticalQualifier =
           row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!;
+    }
     builder!.addTranslation(
       partOfSpeech: partOfSpeech!,
       irregularInflections: _split(row[IRREGULAR_INFLECTIONS]!, pattern: ';'),
@@ -214,6 +215,7 @@ void _setOppositeUids(
   Iterable<EntryBuilder> builders,
   Map<String, EntryBuilder> oppositeBuilders,
 ) {
+  return;
   for (final MapEntry<String, Translation> oppEntry
       in builders.expand((b) => b.rawOppositeHeadwords.entries)) {
     final String oppositeHeadword = oppEntry.key;
@@ -303,7 +305,8 @@ Future<void> _uploadSqlFlite(
   }
 
   final Set<String> seenUids = {};
-  for (final Entry entry in entries.map((e) => e.build())) {
+  for (final EntryBuilder builder in entries) {
+    final Entry entry = builder.build();
     final Map<String, Object> entryRecord = {
       UID: entry.uid.toString(),
       ORDER_ID: entry.orderId,
@@ -339,6 +342,9 @@ Future<void> _uploadSqlFlite(
           .searchable,
       ENTRY_BLOB: entry.writeToBuffer(),
     };
+    if (entry.headword.text.startsWith('abdo')) {
+      //print(entryRecord[ENTRY_BLOB]);
+    }
     if (verbose) {
       print(entryRecord.map((key, value) =>
           MapEntry(key, key == ENTRY_BLOB ? entry.toProto3Json() : value)));
@@ -356,8 +362,8 @@ Future<void> _uploadSqlFlite(
     }
     seenUids.add(uid);
     if (!debug) {
-      //await db.insert(entryTable(mode), entryRecord);
-      batch.insert(entryTable(mode), entryRecord);
+      await db.insert(entryTable(mode), entryRecord);
+      //batch.insert(entryTable(mode), entryRecord);
     }
     await batch.commit();
   }

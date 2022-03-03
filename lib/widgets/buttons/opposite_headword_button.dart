@@ -16,7 +16,7 @@ class OppositeUidButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InlineIconButton(
-      Icons.open_in_new,
+      Icons.compare_arrows,
       onPressed: () {
         DictionaryModel.instance.onOppositeUidSelected(
           context,

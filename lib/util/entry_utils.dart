@@ -177,17 +177,15 @@ class EntryBuilder {
     return this;
   }
 
-  EntryBuilder addTransitiveRelated(EntryBuilder parent) {
+  EntryBuilder addParent(EntryBuilder parent) {
     // Add `this` to all the existing siblings first.
     for (final EntryBuilder sibling in parent._childRelateds) {
-      if (sibling._uid == _uid) {
-        // Don't add anything if a loop is found.
-        print('$WARNING Duplicative transitive related entry '
-            '\'${sibling._headword.text}\' for entry '
-            '\'${parent._headword.text}\' originating from line '
-            '$_orderId');
-        continue;
-      }
+      assert(
+          sibling._uid != _uid,
+          '$ERROR Duplicative transitive related entry '
+          '\'${sibling._headword.text}\' for entry '
+          '\'${parent._headword.text}\' originating from line '
+          '$_orderId');
       // Siblings are considered regular relateds, not transitive relateds.
       sibling._addRelated(this);
       _addRelated(sibling);
@@ -210,7 +208,7 @@ class EntryBuilder {
         !_relateds.contains(related),
         '$ERROR Attempted to add duplicative related '
         '\'${related._headword.text}\' to entry \'${_headword.text}\'');
-    _relateds = _relateds..add(related);
+    _relateds.add(related);
   }
 
   // One directional.
@@ -219,7 +217,7 @@ class EntryBuilder {
         !_childRelateds.contains(child),
         '$ERROR Attempted to add duplicative transitive related '
         '\'${child._headword.text}\' to entry \'${_headword.text}\'');
-    _childRelateds = _childRelateds..add(child);
+    _childRelateds..add(child);
   }
 
   EntryBuilder addAlternateHeadword({
@@ -296,7 +294,9 @@ class EntryBuilder {
       uid: _uid,
       orderId: _orderId,
       headword: _headword,
-      related: (_relateds..addAll(_childRelateds)).map((e) => e._uid),
+      // We use the headword instead of UID because it makes it so we don't have
+      // to do a join to read the data back in.
+      related: (_relateds + _childRelateds).map((e) => e._headword.text),
       alternateHeadwords: _alternateHeadwords,
       translations: _translations,
     );
@@ -304,6 +304,6 @@ class EntryBuilder {
 
   @override
   String toString() {
-    return 'EntryBuilder(uid: $_uid)';
+    return 'EntryBuilder(uid: $_uid, headword: ${_headword.text})';
   }
 }
