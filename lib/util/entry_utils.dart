@@ -44,12 +44,12 @@ extension EntryUtils on Entry {
 
   bool get isNotFound => uid == '404';
 
-  static Entry notFound(String uid) {
+  static Entry notFound(String headword) {
     return Entry(
       uid: '404',
       headword: Headword(
         isAlternate: false,
-        text: 'Invalid entry with id: \'$uid\'',
+        text: headword,
       ),
       orderId: 0,
       translations: <Translation>[
@@ -140,8 +140,8 @@ class EntryBuilder {
   late Headword _headword;
   late int _orderId;
   List<Headword>? _alternateHeadwords;
-  List<EntryBuilder> _childRelateds = [];
-  List<EntryBuilder> _relateds = [];
+  final List<EntryBuilder> _childRelateds = [];
+  final List<EntryBuilder> _relateds = [];
 
   // Mapping from raw opposite headwords to the translations they came from.
   // Used to convert the opposite headwords into UIDs.
@@ -158,6 +158,10 @@ class EntryBuilder {
 
   String get getUid {
     return _uid;
+  }
+
+  String get getHeadword {
+    return _headword.text;
   }
 
   EntryBuilder headword(

@@ -136,6 +136,7 @@ Message audioPlaybackTimeoutMsg = Message(
   'Se agotó el tiempo de reproducción de audio, verifique la conexión a '
       'Internet.',
 );
+Message invalidEntry = Message('Invalid entry', 'Entrada invalida');
 Message reportBug = Message('report bug', 'reporte un error');
 Message retry = Message('retry', 'rever');
 

@@ -1,7 +1,7 @@
 import 'package:rogers_dictionary/models/translation_mode.dart';
 
-const WARNING = '(WARN):';
-const ERROR = '(ERROR):';
+const WARNING = 'WARN:';
+const ERROR = 'ERROR:';
 
 const String ENGLISH = 'english';
 const String SPANISH = 'spanish';
@@ -15,6 +15,7 @@ const String SQL_SCHEMA_TABLE = 'sqlite_master';
 // Entry column names.
 const String UID = 'uid';
 const String HEADWORD = 'headword';
+const String URL_ENCODED_HEADWORD = 'headword';
 const String ORDER_ID = 'order_id';
 const String ENTRY_BLOB = 'entry_blob';
 

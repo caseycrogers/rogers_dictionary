@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:args/args.dart';
 import 'package:df/df.dart';
@@ -18,40 +17,10 @@ import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-class _GetBuildersArgs {
-  const _GetBuildersArgs({
-    required this.sendPort,
-    required this.debug,
-    required this.verbose,
-    required this.isSpanish,
-  });
+const EN = '(EN)';
+const ES = '(ES)';
 
-  final SendPort sendPort;
-  final bool debug;
-  final bool verbose;
-  final bool isSpanish;
-}
-
-Future<void> _runIsolated(_GetBuildersArgs args) async {
-  final Map<String, EntryBuilder> builders =
-      await _getBuilders(args.debug, args.verbose, args.isSpanish);
-  Isolate.exit(args.sendPort, builders);
-}
-
-Future<Map<String, EntryBuilder>> _isolatedGetBuilders(
-    bool debug, bool verbose, bool isSpanish) async {
-  final ReceivePort port = ReceivePort();
-  await Isolate.spawn(
-    _runIsolated,
-    _GetBuildersArgs(
-      sendPort: port.sendPort,
-      debug: debug,
-      verbose: verbose,
-      isSpanish: isSpanish,
-    ),
-  );
-  return await port.first as Map<String, EntryBuilder>;
-}
+String preface(bool isSpanish) => isSpanish ? ES : EN;
 
 Future<Map<String, EntryBuilder>> _getBuilders(
     bool debug, bool verbose, bool isSpanish) async {
@@ -75,7 +44,6 @@ Future<Map<String, EntryBuilder>> _getBuilders(
   String? dominantHeadwordParentheticalQualifier;
   var i = 0;
   final Map<String, EntryBuilder> entryBuilders = {};
-
   while (rows.elementAt(i)[HEADWORD] != 'START') {
     if (i == 100) {
       throw AssertionError(
@@ -87,10 +55,9 @@ Future<Map<String, EntryBuilder>> _getBuilders(
   i++;
   late String uid;
   late String headword;
-  while (i < 2000) {
+  while (i < rows.length) {
     if ((i + 2) % 500 == 0) {
-      print('(${isSpanish ? 'es' : 'en'}): ${i + 2}/${rows.length + 2} '
-          'complete!');
+      print('${preface(isSpanish)} ${i + 2}/${rows.length + 2} complete!');
     }
     Map<String, String> row = rows.elementAt(i);
     if (row.entries
@@ -109,8 +76,8 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       if (row[HEADWORD]!.isEmpty ||
           row[PART_OF_SPEECH]!.isEmpty ||
           row[TRANSLATION]!.isEmpty) {
-        print('$ERROR Invalid empty cells for \'${row[HEADWORD]}\' at row '
-            '${i + 2}, skipping.');
+        print('${preface(isSpanish)} $ERROR Invalid empty cells for '
+            '\'${row[HEADWORD]}\' at row ${i + 2}, skipping.');
         i += 1;
         row = rows.elementAt(i);
         while (row[UID]!.isEmpty) {
@@ -120,8 +87,8 @@ Future<Map<String, EntryBuilder>> _getBuilders(
         continue;
       }
       void printParentError(String parent, String entry) {
-        print('$WARNING Missing related entry \'$parent\' for entry \'$entry\' '
-            'at line ${i + 2}');
+        print('${preface(isSpanish)} $WARNING Missing related entry '
+            '\'$parent\' for entry \'$entry\' at line ${i + 2}');
       }
 
       uid = row[UID]!;
@@ -137,6 +104,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
             .where((p) => p.isNotEmpty)) {
           if (!entryBuilders.containsKey(parent)) {
             printParentError(parent, headword);
+            continue;
           }
           builder.addParent(entryBuilders[parent]!);
         }
@@ -147,6 +115,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
             .where((p) => p.isNotEmpty)) {
           if (!entryBuilders.containsKey(related)) {
             printParentError(related, headword);
+            continue;
           }
           builder.addRelated(entryBuilders[related]!);
         }
@@ -183,8 +152,8 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       // Reset the qualifier
       dominantHeadwordParentheticalQualifier = '';
       if (EntryUtils.longPartOfSpeech(partOfSpeech, false).contains('*'))
-        print('$WARNING Unrecognized part of speech $partOfSpeech for headword '
-            '${row[HEADWORD]} at line ${i + 2}');
+        print('${preface(isSpanish)} $WARNING Unrecognized part of speech '
+            '$partOfSpeech for headword ${row[HEADWORD]} at line ${i + 2}');
     }
     if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty) {
       dominantHeadwordParentheticalQualifier =
@@ -214,6 +183,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
 void _setOppositeEntries(
   Iterable<EntryBuilder> builders,
   Map<String, EntryBuilder> oppositeBuilders,
+  bool isSpanish,
 ) {
   for (final MapEntry<String, Translation> oppEntry
       in builders.expand((b) => b.rawOppositeHeadwords.entries)) {
@@ -224,19 +194,19 @@ void _setOppositeEntries(
     if (oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL) {
       oppositeEntry = oppositeBuilders[translation.text];
       if (oppositeEntry == null) {
-        print('$WARNING Could not find a headword matching translation '
-            '\'${translation.text}\'.');
+        print('${preface(isSpanish)} $WARNING Could not find a headword '
+            'matching translation \'${translation.text}\'.');
         continue;
       }
     } else {
       oppositeEntry = oppositeBuilders[oppositeHeadword];
     }
     if (oppositeEntry == null) {
-      print('$WARNING Invalid opposite headword \'$oppositeHeadword\' for '
-          'translation ${translation.text}.');
+      print('${preface(isSpanish)} $WARNING Invalid opposite headword '
+          '\'$oppositeHeadword\' for translation ${translation.text}.');
       continue;
     }
-    translation.oppositeHeadword = oppositeEntry.getUid;
+    translation.oppositeHeadword = oppositeEntry.getHeadword;
   }
 }
 
@@ -248,12 +218,11 @@ Future<void> uploadEntries(bool debug, bool verbose) async {
   late final Map<String, EntryBuilder> englishBuilders;
   late final Map<String, EntryBuilder> spanishBuilders;
   await Future.wait([
-    _isolatedGetBuilders(debug, verbose, false)
-        .then((v) => englishBuilders = v),
-    _isolatedGetBuilders(debug, verbose, true).then((v) => spanishBuilders = v),
+    _getBuilders(debug, verbose, false).then((v) => englishBuilders = v),
+    _getBuilders(debug, verbose, true).then((v) => spanishBuilders = v),
   ]);
-  _setOppositeEntries(englishBuilders.values, spanishBuilders);
-  _setOppositeEntries(spanishBuilders.values, englishBuilders);
+  _setOppositeEntries(englishBuilders.values, spanishBuilders, false);
+  _setOppositeEntries(spanishBuilders.values, englishBuilders, true);
   await _uploadSqlFlite(
     version,
     TranslationMode.English,
@@ -280,6 +249,7 @@ Future<void> _uploadSqlFlite(
   bool debug,
   bool verbose,
 ) async {
+  final bool isSpanish = mode == TranslationMode.Spanish;
   final path = join(
     Directory.current.path,
     'assets',
@@ -341,9 +311,6 @@ Future<void> _uploadSqlFlite(
           .searchable,
       ENTRY_BLOB: entry.writeToBuffer(),
     };
-    if (entry.headword.text.startsWith('abdo')) {
-      //print(entryRecord[ENTRY_BLOB]);
-    }
     if (verbose) {
       print(entryRecord.map((key, value) =>
           MapEntry(key, key == ENTRY_BLOB ? entry.toProto3Json() : value)));
@@ -351,12 +318,12 @@ Future<void> _uploadSqlFlite(
     }
     final String uid = entryRecord[UID]!.toString();
     if (uid.isEmpty) {
-      print('$ERROR Entry \'${entry.headword.text}\' at line ${entry.orderId} '
-          'has an empty uid.');
+      print('${preface(isSpanish)} $ERROR Entry \'${entry.headword.text}\' at '
+          'line ${entry.orderId} has an empty uid.');
     }
     if (seenUids.contains(uid)) {
-      print('$ERROR Entry \'${entry.headword.text}\' at line ${entry.orderId} '
-          'has non-unique uid \'$uid\'');
+      print('${preface(isSpanish)} $ERROR Entry \'${entry.headword.text}\' at '
+          'line ${entry.orderId} has non-unique uid \'$uid\'');
       continue;
     }
     seenUids.add(uid);

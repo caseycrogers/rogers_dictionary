@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/dictionary_app.dart';
 
+import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/pages/page_header.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
+import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/testings/key_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/search_page/editorial_notes_view.dart';
@@ -31,6 +34,9 @@ class EntryViewPage extends StatelessWidget {
             delay: const Duration(milliseconds: 50),
           );
         final Entry entry = snap.data!;
+        if (entry.isNotFound) {
+          return _EntryNotFoundView(headword: entry.headword.text);
+        }
         return KeyedForTesting(
           key: EntryKey(
             headword: entry.headword.text,
@@ -126,5 +132,38 @@ class EntryViewModel {
     return context
         .findAncestorWidgetOfExactType<EntryViewModelProvider>()!
         .entryData;
+  }
+}
+
+class _EntryNotFoundView extends StatelessWidget {
+  const _EntryNotFoundView({
+    Key? key,
+    required this.headword,
+  }) : super(key: key);
+
+  final String headword;
+
+  @override
+  Widget build(BuildContext context) {
+    return PageHeader(
+      header: DefaultTextStyle.merge(
+        style: Theme.of(context).textTheme.headline1!,
+        child: Text('${i18n.invalidEntry.get(context)}: \'$headword\''),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(kPad),
+        child: Padding(
+          padding: const EdgeInsets.all(kPad / 2),
+          child: Text(
+            i18n.reportBug.get(context),
+            style: const TextStyle(color: Colors.blue),
+          ),
+        ),
+        onTap: () {
+          DictionaryApp.feedback
+              .showFeedback(extraText: 'Invalid Headword: $headword');
+        },
+      ),
+    );
   }
 }

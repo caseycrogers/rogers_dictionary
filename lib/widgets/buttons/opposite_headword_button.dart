@@ -16,7 +16,7 @@ class OppositeHeadwordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InlineIconButton(
-      Icons.compare_arrows,
+      Icons.swap_horiz,
       onPressed: () {
         DictionaryModel.instance.onOppositeHeadwordSelected(
           context,

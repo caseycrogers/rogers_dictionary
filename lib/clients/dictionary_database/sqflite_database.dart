@@ -98,7 +98,8 @@ SELECT *,
               WHERE $UID =
                 ${bookmarksTable(translationMode)}.$UID) AS $IS_FAVORITE
  FROM ${entryTable(translationMode)}
- WHERE $HEADWORD = '$headword';''').then((List<Map<String, Object?>>
+ WHERE $HEADWORD = '${headword.searchable}';''').then((List<
+                  Map<String, Object?>>
               value) =>
           value.isEmpty ? null : value.single),
     );
@@ -138,10 +139,10 @@ SELECT *,
     return super.setBookmark(translationMode, uid, bookmark);
   }
 
-  Entry _rowToEntry(String uid, TranslationMode translationMode,
+  Entry _rowToEntry(String headword, TranslationMode translationMode,
       Map<String, Object?>? snapshot) {
     if (snapshot == null) {
-      final Entry notFound = EntryUtils.notFound(uid);
+      final Entry notFound = EntryUtils.notFound(headword);
       super.setBookmark(
         translationMode,
         notFound.uid,
