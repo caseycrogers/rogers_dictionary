@@ -35,7 +35,16 @@ class EntrySearchModel {
 
   bool get isBookmarkedOnly => _isBookmarkedOnly;
 
-  Stream<Entry> newStream({int startAt = 0}) {
+  // Used to test if the bookmarks has changed.
+  int get pseudoHash =>
+      isBookmarkedOnly ? DictionaryApp.db.pseudoHash(_translationMode) : -1;
+
+  void resetEntries() {
+    entries = [];
+  }
+
+  Stream<Entry> getEntries() {
+    final int startAt = entries.length;
     if (_isBookmarkedOnly) {
       return DictionaryApp.db.getBookmarked(_translationMode, startAt: startAt);
     }
@@ -49,12 +58,10 @@ class EntrySearchModel {
       (Object error, StackTrace stackTrace) {
         print('ERROR (entry stream): $error\n$stackTrace');
       },
-    );
-  }
-
-  bool isDirty() {
-    return _isBookmarkedOnly &&
-        DictionaryApp.db.areBookmarksDirty(_translationMode);
+    ).map((e) {
+      entries.add(e);
+      return e;
+    });
   }
 
   void onSearchStringChanged({

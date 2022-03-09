@@ -42,6 +42,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
       // Used to ensure the navigator knows when to display an animation.
       key: _getKey(context),
       maintainHistory: true,
+      maintainState: false,
       takeFocus: false,
       valueNotifier: SearchModel.of(context).currSelectedEntry,
       // Ensure that a base page is in the history on opposite headword.
@@ -70,9 +71,10 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
         }
         switch (selectedEntry.referrer) {
           case null:
-            return 1;
           case SelectedEntryReferrer.oppositeHeadword:
-            return 2;
+            return 1;
+          // Related headwords are a special case where the back button goes to
+          // the last selected entry.
           case SelectedEntryReferrer.relatedHeadword:
             return null;
         }

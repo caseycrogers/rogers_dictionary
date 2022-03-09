@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
-import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/screenshot_template.dart';
 
 const Locale en = Locale('en', '');
@@ -37,7 +36,6 @@ Future<void> main() async {
         ),
       );
       await tester.pump(const Duration(seconds: 1));
-      final DictionaryModel dictionaryModel = DictionaryModel.instance;
       await binding.takeScreenshot(
         '${locale.languageCode}'
         '\$${(device.screenSize.width * pixelRatio).toInt()}'

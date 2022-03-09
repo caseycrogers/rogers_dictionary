@@ -24,31 +24,32 @@ class EntryList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (DictionaryModel.instance.currentTab.value == DictionaryTab.search) {
       // Only wrap the list in a switcher if this is the search page.
-      return const _EntryListSwitcher();
+      return const _SwitchOnSearchString();
     }
-    return _EntryList(searchResults: _SearchResults(context, ''));
+    return const _EntryList();
   }
 }
 
-class _EntryListSwitcher extends StatefulWidget {
-  const _EntryListSwitcher({Key? key}) : super(key: key);
+class _SwitchOnSearchString extends StatefulWidget {
+  const _SwitchOnSearchString({Key? key}) : super(key: key);
 
   @override
-  _EntryListSwitcherState createState() => _EntryListSwitcherState();
+  _SwitchOnSearchStringState createState() => _SwitchOnSearchStringState();
 }
 
-class _EntryListSwitcherState extends State<_EntryListSwitcher> {
+class _SwitchOnSearchStringState extends State<_SwitchOnSearchString> {
   int _i = 0;
   String _lastSearchString = '';
 
   @override
   Widget build(BuildContext context) {
-    // We need access to this below to ensure entries are cached to the right
+    // We need access to this here to ensure entries are cached to the right
     // page storage.
     final SearchModel searchModel = SearchModel.of(context);
     return ImplicitNavigator.fromValueNotifier<String>(
-      key: const PageStorageKey('search_string_navigator'),
+      maintainState: false,
       maintainHistory: true,
+      key: const PageStorageKey('search_string_navigator'),
       valueNotifier: searchModel.entrySearchModel.currSearchString,
       getDepth: (searchString) {
         return searchString.isEmpty ? 0 : 1;
@@ -69,7 +70,6 @@ class _EntryListSwitcherState extends State<_EntryListSwitcher> {
           // page storage is never reused across changes to search string as
           // this causes weird scroll offsets.
           key: PageStorageKey('entry_list$_i'),
-          searchResults: _SearchResults(context, searchString),
         );
       },
       // We need to reset the cached entries.
@@ -80,32 +80,39 @@ class _EntryListSwitcherState extends State<_EntryListSwitcher> {
   }
 }
 
-class _EntryList extends StatelessWidget {
-  const _EntryList({Key? key, required this.searchResults}) : super(key: key);
+class _EntryList extends StatefulWidget {
+  const _EntryList({Key? key}) : super(key: key);
 
-  final _SearchResults searchResults;
+  @override
+  State<_EntryList> createState() => _EntryListState();
+}
 
-  void _onEntriesUpdated(
-    BuildContext context,
-    _SearchResults results,
-    List<Entry> entries,
-  ) {
-    SearchModel.of(context).entrySearchModel.entries = entries;
-  }
+class _EntryListState extends State<_EntryList> {
+  late Stream<Entry> entryStream =
+      SearchModel.of(context).entrySearchModel.getEntries();
+  late int lastPseudoHash = SearchModel.of(context).entrySearchModel.pseudoHash;
 
   @override
   Widget build(BuildContext context) {
     final SearchModel searchModel = SearchModel.of(context);
+    if (searchModel.isBookmarkedOnly) {
+      // We know the bookmarks have changed since the last build, reset the
+      // entries.
+      searchModel.entrySearchModel.resetEntries();
+      entryStream = searchModel.entrySearchModel.getEntries();
+    }
     return AsyncListView<Entry>(
       padding: EdgeInsets.zero,
-      noResultsWidgetBuilder: (context) => const SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2 * kPad),
-          child: NoResultsWidget(),
-        ),
-      ),
-      stream: searchResults.entryStream,
-      initialData: searchResults.cachedEntries,
+      noResultsWidgetBuilder: (context) {
+        return const SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 2 * kPad),
+            child: NoResultsWidget(),
+          ),
+        );
+      },
+      stream: entryStream,
+      initialData: searchModel.entrySearchModel.entries,
       loadingWidget: Delayed(
         key: const ValueKey('loading'),
         delay: const Duration(milliseconds: 100),
@@ -127,14 +134,12 @@ class _EntryList extends StatelessWidget {
         if (!snap.hasData) {
           return const LoadingText();
         }
-        _onEntriesUpdated(context, searchResults, snap.data!);
         return Column(
           children: [
             // Put the no results widget at the top if applicable.
             if (index == 0 &&
                 searchModel.searchString.isEmpty &&
-                DictionaryModel.instance.currentTab.value ==
-                    DictionaryTab.search) ...[
+                !searchModel.isBookmarkedOnly) ...[
               const CollapsingNoResultsWidget(),
               const Divider(height: 0),
             ],
@@ -205,21 +210,4 @@ class _EntryRow extends StatelessWidget {
       },
     );
   }
-}
-
-class _SearchResults {
-  _SearchResults(BuildContext context, this.searchString) {
-    final SearchModel searchModel = SearchModel.of(context);
-    if (searchModel.entrySearchModel.isDirty()) {
-      cachedEntries = [];
-    } else {
-      cachedEntries = searchModel.entrySearchModel.entries;
-    }
-    entryStream =
-        searchModel.entrySearchModel.newStream(startAt: cachedEntries.length);
-  }
-
-  final String searchString;
-  late final List<Entry> cachedEntries;
-  late final Stream<Entry> entryStream;
 }

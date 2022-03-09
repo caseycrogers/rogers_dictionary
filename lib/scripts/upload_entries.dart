@@ -192,7 +192,8 @@ void _setOppositeEntries(
     assert(oppositeHeadword.isNotEmpty);
     EntryBuilder? oppositeEntry;
     if (oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL) {
-      oppositeEntry = oppositeBuilders[translation.text];
+      oppositeEntry =
+          oppositeBuilders[translation.text.withoutGenderIndicators];
       if (oppositeEntry == null) {
         print('${preface(isSpanish)} $WARNING Could not find a headword '
             'matching translation \'${translation.text}\'.');
@@ -273,7 +274,6 @@ Future<void> _uploadSqlFlite(
     await createBookmarksTable(bookmarksDb, bookmarksTable(mode));
   }
 
-  final Set<String> seenUids = {};
   for (final EntryBuilder builder in entries) {
     final Entry entry = builder.build();
     final Map<String, Object> entryRecord = {
@@ -321,12 +321,6 @@ Future<void> _uploadSqlFlite(
       print('${preface(isSpanish)} $ERROR Entry \'${entry.headword.text}\' at '
           'line ${entry.orderId} has an empty uid.');
     }
-    if (seenUids.contains(uid)) {
-      print('${preface(isSpanish)} $ERROR Entry \'${entry.headword.text}\' at '
-          'line ${entry.orderId} has non-unique uid \'$uid\'');
-      continue;
-    }
-    seenUids.add(uid);
     if (!debug) {
       await db.insert(entryTable(mode), entryRecord);
       //batch.insert(entryTable(mode), entryRecord);

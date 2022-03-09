@@ -69,7 +69,7 @@ class DictionaryModel {
         case DictionaryTab.search:
           return currTranslationModel.searchModel.adKeywords;
         case DictionaryTab.bookmarks:
-          return currTranslationModel.bookmarksPageModel.adKeywords;
+          return currTranslationModel.bookmarksModel.adKeywords;
         case DictionaryTab.dialogues:
           // There are no ad keywords for the dialogues page.
           return ValueNotifier([]);
@@ -96,6 +96,15 @@ class DictionaryModel {
       [TranslationMode? newTranslationMode]) {
     translationModel.value = translationModelFor(
         newTranslationMode ?? oppTranslationModel.translationMode);
+  }
+
+  Future<void> onBookmarkSet(
+    BuildContext context,
+    Entry entry,
+    bool newValue,
+  ) async {
+    final TranslationMode mode = SearchModel.of(context).mode;
+    await DictionaryApp.db.setBookmark(mode, entry, newValue);
   }
 
   void onEntrySelected(BuildContext context, Entry newEntry) =>
@@ -150,7 +159,7 @@ class DictionaryModel {
     SearchModel? searchModel,
   }) {
     searchModel ??= isBookmarksOnly
-        ? currTranslationModel.bookmarksPageModel
+        ? currTranslationModel.bookmarksModel
         : currTranslationModel.searchModel;
     // Only update if the value has actually changed
     if (headword == searchModel.currSelectedHeadword) {
@@ -168,8 +177,8 @@ class DictionaryModel {
     final SelectedEntry selectedEntry = SelectedEntry(
       headword: headword,
       entry: newEntry == null
-          ? DictionaryApp.db.getEntry(
-              currTranslationModel.translationMode, headword)
+          ? DictionaryApp.db
+              .getEntry(currTranslationModel.translationMode, headword)
           : Future<Entry>.value(newEntry),
       referrer: referrer,
     );

@@ -12,13 +12,13 @@ class SearchModel {
   SearchModel({
     required this.mode,
     required bool isBookmarksOnly,
-  })
-      : currSelectedEntry = ValueNotifier<SelectedEntry?>(null),
+  })  : currSelectedEntry = ValueNotifier<SelectedEntry?>(null),
         entrySearchModel = EntrySearchModel.empty(
           mode,
           isBookmarksOnly,
         ),
         adKeywords = ValueNotifier([]);
+
   // Translation mode state.
   final TranslationMode mode;
 
@@ -28,7 +28,7 @@ class SearchModel {
   // Entry search state.
   final EntrySearchModel entrySearchModel;
 
-  // keywords for ads.
+  // Keywords for ads.
   final ValueNotifier<List<String>> adKeywords;
 
   bool get isEnglish => mode == TranslationMode.English;
@@ -39,13 +39,12 @@ class SearchModel {
 
   String get searchString => entrySearchModel.searchString;
 
-  String? get currSelectedHeadword =>
-      currSelectedEntry.value?.headword;
+  String? get currSelectedHeadword => currSelectedEntry.value?.headword;
 
   static SearchModel of(BuildContext context) {
     final TranslationModel translationModel = TranslationModel.of(context);
     if (context.findAncestorWidgetOfExactType<BookmarksPage>() != null) {
-      return translationModel.bookmarksPageModel;
+      return translationModel.bookmarksModel;
     }
     return translationModel.searchModel;
   }

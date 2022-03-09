@@ -15,36 +15,16 @@ import 'package:rogers_dictionary/util/entry_utils.dart';
 
 // A database interface for fetching dictionary entries.
 abstract class DictionaryDatabase {
-  DictionaryDatabase()
-      : _englishBookmarksCache = {},
-        _spanishBookmarksCache = {};
-
   Future<DatabaseVersion> get version => rootBundle
       .loadString(join('assets', '$VERSION_FILE'))
       .then((v) => VersionUtils.fromString(v));
 
-  /// Indicates whether or not the bookmarks list may have changes since it was
-  /// last fetched.
-  bool _englishIsBookmarksDirty = true;
-  bool _spanishIsBookmarksDirty = true;
+  final _BookmarksCache _englishBookmarksCache = _BookmarksCache();
+  final _BookmarksCache _spanishBookmarksCache = _BookmarksCache();
 
-  bool areBookmarksDirty(TranslationMode translationMode) {
-    if (isEnglish(translationMode)) {
-      return _englishIsBookmarksDirty;
-    }
-    return _spanishIsBookmarksDirty;
+  int pseudoHash(TranslationMode translationMode) {
+    return _getCache(translationMode)._pseudoHash;
   }
-
-  void _updateDirtyBookmarks(TranslationMode translationMode, bool isDirty) {
-    if (isEnglish(translationMode)) {
-      _englishIsBookmarksDirty = isDirty;
-      return;
-    }
-    _spanishIsBookmarksDirty = isDirty;
-  }
-
-  final Map<String, bool> _englishBookmarksCache;
-  final Map<String, bool> _spanishBookmarksCache;
 
   // Fetch entries from the database.
   Stream<Entry> getEntries(
@@ -59,46 +39,54 @@ abstract class DictionaryDatabase {
     String headword,
   );
 
+  bool isBookmarked(TranslationMode translationMode, Entry entry) =>
+      _getCache(translationMode).isBookmarked(entry);
+
   @mustCallSuper
-  Future<bool> setBookmark(
+  Future<void> setBookmark(
     TranslationMode translationMode,
-    String uid,
-    bool bookmark,
-  ) {
-    final bool? oldValue = _getCache(translationMode)[uid];
-    if (oldValue != null && oldValue != bookmark) {
-      // Only dirty the cache if we're actually changing the value.
-      _updateDirtyBookmarks(translationMode, true);
-    }
-    return Future<bool>.value(
-      _getCache(translationMode)[uid] = bookmark,
-    );
+    Entry entry,
+    bool newValue,
+  ) async {
+    return _getCache(translationMode).setBookmark(entry, newValue);
   }
 
-  @mustCallSuper
   Stream<Entry> getBookmarked(TranslationMode translationMode,
-      {required int startAt}) {
-    _updateDirtyBookmarks(translationMode, false);
-    return const Stream.empty();
-  }
-
-  bool isBookmarked(
-      TranslationMode translationMode, String urlEncodedHeadword) {
-    assert(
-      _getCache(translationMode).containsKey(urlEncodedHeadword),
-      'Could not find \'$urlEncodedHeadword\' in the favorites cache.',
-    );
-    return _getCache(translationMode)[urlEncodedHeadword]!;
-  }
+      {required int startAt});
 
   Stream<DialogueChapter> getDialogues({
     required int startAt,
   });
 
-  Map<String, bool> _getCache(TranslationMode translationMode) =>
+  _BookmarksCache _getCache(TranslationMode translationMode) =>
       isEnglish(translationMode)
           ? _englishBookmarksCache
           : _spanishBookmarksCache;
 
   Future<void> dispose();
+}
+
+class _BookmarksCache {
+  final Map<String, bool> _cache = {};
+
+  // Changes every time a bookmark is changed.
+  int _pseudoHash = 0;
+
+  bool isBookmarked(Entry entry) {
+    assert(
+      _cache.containsKey(entry.uid),
+      'Could not find \'${entry.headword}\' with uid \'${entry.uid}\' in the '
+      'bookmarks cache.',
+    );
+    return _cache[entry.uid]!;
+  }
+
+  void setBookmark(Entry entry, bool newValue) {
+    final bool? oldValue = _cache[entry.uid];
+    _cache[entry.uid] = newValue;
+    if (oldValue != null && newValue != oldValue) {
+      // Only update if a change has actually been made.
+      _pseudoHash += 1;
+    }
+  }
 }

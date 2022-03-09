@@ -109,7 +109,6 @@ SELECT *,
   @override
   Stream<Entry> getBookmarked(TranslationMode translationMode,
       {required int startAt}) {
-    super.getBookmarked(translationMode, startAt: startAt);
     return _getEntries(
       translationMode,
       rawSearchString: '',
@@ -119,24 +118,24 @@ SELECT *,
   }
 
   @override
-  Future<bool> setBookmark(
-      TranslationMode translationMode, String uid, bool bookmark) async {
+  Future<void> setBookmark(
+      TranslationMode translationMode, Entry entry, bool newValue) async {
     final Database db = await _dbFuture;
-    if (bookmark) {
+    if (newValue) {
       await db.insert(
         bookmarksTable(translationMode),
         {
           BOOKMARK_TAG: FAVORITES,
-          UID: uid,
+          UID: entry.uid,
         },
       );
     } else {
       await db.delete(
         bookmarksTable(translationMode),
-        where: '$UID = \'$uid\'',
+        where: '$UID = \'${entry.uid}\'',
       );
     }
-    return super.setBookmark(translationMode, uid, bookmark);
+    await super.setBookmark(translationMode, entry, newValue);
   }
 
   Entry _rowToEntry(String headword, TranslationMode translationMode,
@@ -145,14 +144,14 @@ SELECT *,
       final Entry notFound = EntryUtils.notFound(headword);
       super.setBookmark(
         translationMode,
-        notFound.uid,
+        notFound,
         false,
       );
       return notFound;
     }
     assert(snapshot.containsKey(IS_FAVORITE));
     final Entry entry = Entry.fromBuffer(snapshot[ENTRY_BLOB] as List<int>);
-    super.setBookmark(translationMode, entry.uid, snapshot[IS_FAVORITE] == 1);
+    super.setBookmark(translationMode, entry, snapshot[IS_FAVORITE] == 1);
     return entry;
   }
 

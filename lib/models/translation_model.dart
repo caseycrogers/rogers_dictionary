@@ -19,7 +19,7 @@ class TranslationModel {
           mode: translationMode,
           isBookmarksOnly: false,
         ),
-        bookmarksPageModel = SearchModel(
+        bookmarksModel = SearchModel(
           mode: translationMode,
           isBookmarksOnly: true,
         ),
@@ -30,7 +30,7 @@ class TranslationModel {
 
   final SearchModel searchModel;
 
-  final SearchModel bookmarksPageModel;
+  final SearchModel bookmarksModel;
 
   final LayerLink layerLink;
 
