@@ -10,6 +10,7 @@ import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/bookmarks_button.dart';
+import 'package:rogers_dictionary/widgets/search_page/abbreviation_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/search_page_utils.dart';
 
@@ -32,11 +33,10 @@ class HeadwordView extends StatelessWidget {
                     style: const TextStyle().asBold,
                     text: model.entry.headword.text,
                   ).asSpans(context),
-                  if (model.entry.headword.abbreviation.isNotEmpty)
-                    ...HighlightedText(
-                      style: const TextStyle().asBold,
-                      text: ' (${model.entry.headword.abbreviation})',
-                    ).asSpans(context),
+                  ...AbbreviationView(
+                    model.entry.headword.abbreviation,
+                    isHeadword: true,
+                  ).asSpans(context),
                   ...ParentheticalView(
                     text: model.entry.headword.parentheticalQualifier,
                   ).asSpans(context),

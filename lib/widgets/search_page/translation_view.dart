@@ -65,7 +65,10 @@ class _TranslationLine extends StatelessWidget {
                 if (translation.genderAndPlural.isNotEmpty)
                   ...OverflowMarkdown(' *${translation.genderAndPlural}*')
                       .asSpans(context),
-                ...AbbreviationView(translation.abbreviation).asSpans(context),
+                ...AbbreviationView(
+                  translation.abbreviation,
+                  isHeadword: false,
+                ).asSpans(context),
                 if (translation.disambiguation.isNotEmpty)
                   ...OverflowMarkdown(
                     ' (*${translation.disambiguation}*)',
