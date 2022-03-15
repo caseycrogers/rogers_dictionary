@@ -1,8 +1,23 @@
 import 'package:rogers_dictionary/util/entry_utils.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 
 import 'package:test/test.dart';
 
 void main() {
+  test('Can replace diacritic characters with non-diacritic characters', () {
+    expect('áÁéÉíÍóÓúÚýÝñÑöÖüÜ'.withoutDiacriticalMarks, 'aAeEiIoOuUyYnNoOuU');
+  });
+
+  test('Can remove combining-accent characters', () {
+    expect('áÁéÉíÍóÓúÚýÝñÑöÖüÜ'.withoutDiacriticalMarks,
+        'aAeEiIoOuUyYnNoOuU');
+  });
+
+  test('Can replace shit diacritics with not-shit diacritics', () {
+    expect('áÁéÉíÍóÓúÚýÝñÑöÖüÜ'.standardizeSpanishDiacritics,
+        'áÁéÉíÍóÓúÚýÝñÑöÖüÜ');
+  });
+
   test('Can add transitive relateds', () {
     final EntryBuilder a = _mockEntryBuilder(uid: 'a');
     final EntryBuilder b = _mockEntryBuilder(uid: 'b');

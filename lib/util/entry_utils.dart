@@ -144,7 +144,7 @@ class EntryBuilder {
   final List<EntryBuilder> _relateds = [];
 
   // Mapping from raw opposite headwords to the translations they came from.
-  // Used to convert the opposite headwords into UIDs.
+  // Used to verify the opposite headwords.
   final Map<String, Translation> rawOppositeHeadwords = {};
 
   List<EntryBuilder> get related => _relateds + _childRelateds;
@@ -184,12 +184,13 @@ class EntryBuilder {
   EntryBuilder addParent(EntryBuilder parent) {
     // Add `this` to all the existing siblings first.
     for (final EntryBuilder sibling in parent._childRelateds) {
-      assert(
-          sibling._uid != _uid,
-          '$ERROR Duplicative transitive related entry '
-          '\'${sibling._headword.text}\' for entry '
-          '\'${parent._headword.text}\' originating from line '
-          '$_orderId');
+      if (sibling._uid == _uid) {
+        print('$WARNING Duplicative transitive related entry '
+            '\'${sibling._headword.text}\' for entry '
+            '\'${parent._headword.text}\' originating from line '
+            '$_orderId');
+        continue;
+      }
       // Siblings are considered regular relateds, not transitive relateds.
       sibling._addRelated(this);
       _addRelated(sibling);
@@ -208,19 +209,21 @@ class EntryBuilder {
 
   // One directional.
   void _addRelated(EntryBuilder related) {
-    assert(
-        !_relateds.contains(related),
-        '$ERROR Attempted to add duplicative related '
-        '\'${related._headword.text}\' to entry \'${_headword.text}\'');
+    if (_relateds.contains(related)) {
+      print('$ERROR Attempted to add duplicative related '
+          '\'${related._headword.text}\' to entry \'${_headword.text}\'');
+      return;
+    }
     _relateds.add(related);
   }
 
   // One directional.
   void _addChild(EntryBuilder child) {
-    assert(
-        !_childRelateds.contains(child),
-        '$ERROR Attempted to add duplicative transitive related '
-        '\'${child._headword.text}\' to entry \'${_headword.text}\'');
+    if (_childRelateds.contains(child)) {
+      print('$ERROR Attempted to add duplicative transitive related '
+          '\'${child._headword.text}\' to entry \'${_headword.text}\'');
+      return;
+    }
     _childRelateds..add(child);
   }
 
@@ -292,15 +295,19 @@ class EntryBuilder {
   }
 
   Entry build() {
-    assert(_translations.isNotEmpty,
-        'You must specify one or more translations. Line ${_orderId + 2}.');
+    assert(
+        _translations.isNotEmpty,
+        'You must specify one or more translations. Headword: '
+        '\'${_headword.text}, Line: ${_orderId + 2}.');
     return Entry(
       uid: _uid,
       orderId: _orderId,
       headword: _headword,
       // We use the headword instead of UID because it makes it so we don't have
       // to do a join to read the data back in.
-      related: (_relateds + _childRelateds).map((e) => e._headword.text),
+      related: (_relateds + _childRelateds)
+          .sorted((a, b) => a._orderId.compareTo(b._orderId))
+          .map((e) => e._headword.text),
       alternateHeadwords: _alternateHeadwords,
       translations: _translations,
     );

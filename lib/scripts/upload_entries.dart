@@ -22,6 +22,17 @@ const ES = '(ES)';
 
 String preface(bool isSpanish) => isSpanish ? ES : EN;
 
+Future<Iterable<Map<String, String>>> _getRows(
+    bool isSpanish, String csvPath) async {
+  final DataFrame df = await DataFrame.fromCsv(csvPath);
+
+  var i = 0;
+  return df.rows.map((row) {
+    final int j = i++;
+    return row.map((k, v) => _parseCell(isSpanish, j, k, v));
+  });
+}
+
 Future<Map<String, EntryBuilder>> _getBuilders(
     bool debug, bool verbose, bool isSpanish) async {
   final String csvPath = join(
@@ -35,15 +46,14 @@ Future<Map<String, EntryBuilder>> _getBuilders(
   if (!isSpanish) {
     print('Uploading version ${version.versionString} from $csvPath.');
   }
-  final DataFrame df = await DataFrame.fromCsv(csvPath);
+  final Iterable<Map<String, String>> rows = await _getRows(isSpanish, csvPath);
 
-  final Iterable<Map<String, String>> rows =
-      df.rows.map((row) => row.map(_parseCell));
   EntryBuilder? builder;
   String? partOfSpeech;
   String? dominantHeadwordParentheticalQualifier;
   var i = 0;
   final Map<String, EntryBuilder> entryBuilders = {};
+  final Set<String> seenUids = {};
   while (rows.elementAt(i)[HEADWORD] != 'START') {
     if (i == 100) {
       throw AssertionError(
@@ -72,12 +82,22 @@ Future<Map<String, EntryBuilder>> _getBuilders(
         print('$WARNING field $key at row ${i + 2} contains a line break.'
             ' Field:\n$str');
     });
-    if (row[UID]!.isNotEmpty) {
-      if (row[HEADWORD]!.isEmpty ||
-          row[PART_OF_SPEECH]!.isEmpty ||
-          row[TRANSLATION]!.isEmpty) {
-        print('${preface(isSpanish)} $ERROR Invalid empty cells for '
-            '\'${row[HEADWORD]}\' at row ${i + 2}, skipping.');
+    if (row[HEADWORD]!.isNotEmpty) {
+      final List<String> invalidEmptyCells = [];
+      if (row[UID]!.isEmpty) {
+        invalidEmptyCells.add('uid');
+      } else if (row[PART_OF_SPEECH]!.isEmpty) {
+        invalidEmptyCells.add('part of speech');
+      }
+      if (invalidEmptyCells.isNotEmpty || seenUids.contains(row[UID])) {
+        if (invalidEmptyCells.isNotEmpty) {
+          print('${preface(isSpanish)} $ERROR Invalid empty cell(s) for '
+              '\'${row[HEADWORD]}\' at row ${i + 2}: '
+              '${invalidEmptyCells.join(', ')}. Skipping.');
+        } else {
+          print('${preface(isSpanish)} $ERROR Duplicate uid \'${row[UID]}\' '
+              'for \'${row[HEADWORD]}\' at row ${i + 2}. Skipping.');
+        }
         i += 1;
         row = rows.elementAt(i);
         while (row[UID]!.isEmpty) {
@@ -86,6 +106,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
         }
         continue;
       }
+      seenUids.add(row[UID]!);
       void printParentError(String parent, String entry) {
         print('${preface(isSpanish)} $WARNING Missing related entry '
             '\'$parent\' for entry \'$entry\' at line ${i + 2}');
@@ -139,10 +160,9 @@ Future<Map<String, EntryBuilder>> _getBuilders(
                   .get(index, orElse: ''),
         );
       });
-      if (entryBuilders.keys.contains(headword))
-        print('$WARNING Duplicate headword $headword at line ${i + 2}');
-      if (entryBuilders.values.map((e) => e.getUid).contains(uid))
-        print('$WARNING Duplicate uid $uid at line ${i + 2}');
+      if (entryBuilders.keys.contains(headword)) {
+        print('$WARNING Duplicate headword $headword at line ${i + 2}.');
+      }
       entryBuilders[row[HEADWORD]!] = builder;
       partOfSpeech = '';
       dominantHeadwordParentheticalQualifier = '';
@@ -153,11 +173,17 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       dominantHeadwordParentheticalQualifier = '';
       if (EntryUtils.longPartOfSpeech(partOfSpeech, false).contains('*'))
         print('${preface(isSpanish)} $WARNING Unrecognized part of speech '
-            '$partOfSpeech for headword ${row[HEADWORD]} at line ${i + 2}');
+            '\'$partOfSpeech\' for headword ${row[HEADWORD]} at line ${i + 2}');
     }
     if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty) {
       dominantHeadwordParentheticalQualifier =
           row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!;
+    }
+    if (row[TRANSLATION]!.isEmpty) {
+      print('${preface(isSpanish)} $ERROR Invalid empty translation at row '
+          '${i + 2}. Skipping.');
+      i++;
+      continue;
     }
     builder!.addTranslation(
       partOfSpeech: partOfSpeech!,
@@ -185,29 +211,31 @@ void _setOppositeEntries(
   Map<String, EntryBuilder> oppositeBuilders,
   bool isSpanish,
 ) {
-  for (final MapEntry<String, Translation> oppEntry
-      in builders.expand((b) => b.rawOppositeHeadwords.entries)) {
-    final String oppositeHeadword = oppEntry.key;
-    final Translation translation = oppEntry.value;
-    assert(oppositeHeadword.isNotEmpty);
-    EntryBuilder? oppositeEntry;
-    if (oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL) {
-      oppositeEntry =
-          oppositeBuilders[translation.text.withoutGenderIndicators];
+  for (final EntryBuilder builder in builders) {
+    for (final MapEntry<String, Translation> rawPair
+        in builder.rawOppositeHeadwords.entries) {
+      final String oppositeHeadword = rawPair.key;
+      final Translation translation = rawPair.value;
+      assert(oppositeHeadword.isNotEmpty);
+      EntryBuilder? oppositeEntry;
+      if (oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL) {
+        oppositeEntry =
+            oppositeBuilders[translation.text.withoutGenderIndicators];
+        if (oppositeEntry == null) {
+          print('${preface(isSpanish)} $WARNING Could not find a headword '
+              'matching translation \'${translation.text}\'.');
+          continue;
+        }
+      } else {
+        oppositeEntry = oppositeBuilders[oppositeHeadword];
+      }
       if (oppositeEntry == null) {
-        print('${preface(isSpanish)} $WARNING Could not find a headword '
-            'matching translation \'${translation.text}\'.');
+        print('${preface(isSpanish)} $WARNING Invalid opposite headword '
+            '\'$oppositeHeadword\' for translation \'${translation.text}.\'');
         continue;
       }
-    } else {
-      oppositeEntry = oppositeBuilders[oppositeHeadword];
+      translation.oppositeHeadword = oppositeEntry.getHeadword;
     }
-    if (oppositeEntry == null) {
-      print('${preface(isSpanish)} $WARNING Invalid opposite headword '
-          '\'$oppositeHeadword\' for translation ${translation.text}.');
-      continue;
-    }
-    translation.oppositeHeadword = oppositeEntry.getHeadword;
   }
 }
 
@@ -366,14 +394,24 @@ Future<void> createBookmarksTable(Database db, String tableName) async {
   return;
 }
 
-MapEntry<String, String> _parseCell(String key, dynamic value) {
+MapEntry<String, String> _parseCell(
+  bool isSpanish,
+  int i,
+  String key,
+  dynamic value,
+) {
   if (!(value is String)) {
     value = '';
   }
   final str = value;
+  final normalizedStr = str.standardizeSpanishDiacritics;
+  if (normalizedStr != str) {
+    //print('${preface(isSpanish)} $WARNING $key at line $i contains a bad '
+    //    'diacritic mark: \'$value\'.');
+  }
   return MapEntry(
       key.trim(),
-      str
+      normalizedStr
           .trim()
           .replaceAll(' | ', '|')
           .replaceAll('| ', '|')

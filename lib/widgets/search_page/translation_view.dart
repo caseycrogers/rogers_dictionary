@@ -11,6 +11,7 @@ import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/opposite_headword_button.dart';
 import 'package:rogers_dictionary/widgets/buttons/pronunciation_button.dart';
 import 'package:rogers_dictionary/widgets/dictionary_chip.dart';
+import 'package:rogers_dictionary/widgets/search_page/abbreviation_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/search_page_utils.dart';
 
 class TranslationView extends StatelessWidget {
@@ -64,11 +65,7 @@ class _TranslationLine extends StatelessWidget {
                 if (translation.genderAndPlural.isNotEmpty)
                   ...OverflowMarkdown(' *${translation.genderAndPlural}*')
                       .asSpans(context),
-                if (translation.abbreviation.isNotEmpty) ...[
-                  const TextSpan(text: ' '),
-                  ...OverflowMarkdown('(${translation.abbreviation})')
-                      .asSpans(context),
-                ],
+                ...AbbreviationView(translation.abbreviation).asSpans(context),
                 if (translation.disambiguation.isNotEmpty)
                   ...OverflowMarkdown(
                     ' (*${translation.disambiguation}*)',
