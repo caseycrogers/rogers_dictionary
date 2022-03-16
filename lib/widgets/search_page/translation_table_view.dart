@@ -104,7 +104,10 @@ class _PartOfSpeechView extends StatelessWidget {
                     if (parentheticalChanged)
                       Padding(
                         padding: const EdgeInsets.only(top: kPad / 2),
-                        child: ParentheticalView(text: parenthetical),
+                        child: ParentheticalView(
+                          text: parenthetical,
+                          addSpace: false,
+                        ),
                       ),
                     TranslationView(
                       index: translations.indexOf(t) + 1,

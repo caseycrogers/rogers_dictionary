@@ -185,6 +185,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       i++;
       continue;
     }
+    final String oppositeHeadword = row[OPPOSITE_HEADWORD]!;
     builder!.addTranslation(
       partOfSpeech: partOfSpeech!,
       irregularInflections: _split(row[IRREGULAR_INFLECTIONS]!, pattern: ';'),
@@ -199,7 +200,11 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       disambiguation: row[DISAMBIGUATION]!,
       examplePhrases: _split(row[EXAMPLE_PHRASES]!),
       editorialNote: row[EDITORIAL_NOTE]!,
-      rawOppositeHeadword: row[OPPOSITE_HEADWORD]!,
+      // If the opposite headword is the sentinel value, use the translation as
+      // the opposite headword as they are one and the same.
+      oppositeHeadword: oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL
+          ? row[TRANSLATION]!.withoutGenderIndicators
+          : oppositeHeadword,
     );
     i++;
   }
@@ -212,29 +217,18 @@ void _setOppositeEntries(
   bool isSpanish,
 ) {
   for (final EntryBuilder builder in builders) {
-    for (final MapEntry<String, Translation> rawPair
-        in builder.rawOppositeHeadwords.entries) {
-      final String oppositeHeadword = rawPair.key;
-      final Translation translation = rawPair.value;
-      assert(oppositeHeadword.isNotEmpty);
-      EntryBuilder? oppositeEntry;
-      if (oppositeHeadword == OPPOSITE_HEADWORD_SENTINEL) {
-        oppositeEntry =
-            oppositeBuilders[translation.text.withoutGenderIndicators];
-        if (oppositeEntry == null) {
-          print('${preface(isSpanish)} $WARNING Could not find a headword '
-              'matching translation \'${translation.text}\'.');
-          continue;
-        }
-      } else {
-        oppositeEntry = oppositeBuilders[oppositeHeadword];
+    for (final Translation translation in builder.getTranslations) {
+      if (translation.oppositeHeadword.isEmpty) {
+        continue;
       }
+      final String oppositeHeadword = translation.oppositeHeadword;
+      final EntryBuilder? oppositeEntry = oppositeBuilders[oppositeHeadword];
       if (oppositeEntry == null) {
         print('${preface(isSpanish)} $WARNING Invalid opposite headword '
             '\'$oppositeHeadword\' for translation \'${translation.text}.\'');
+        translation.oppositeHeadword = '';
         continue;
       }
-      translation.oppositeHeadword = oppositeEntry.getHeadword;
     }
   }
 }
@@ -246,10 +240,8 @@ Future<void> uploadEntries(bool debug, bool verbose) async {
   print('\n\nReading csv\'s!');
   late final Map<String, EntryBuilder> englishBuilders;
   late final Map<String, EntryBuilder> spanishBuilders;
-  await Future.wait([
-    _getBuilders(debug, verbose, false).then((v) => englishBuilders = v),
-    _getBuilders(debug, verbose, true).then((v) => spanishBuilders = v),
-  ]);
+  await _getBuilders(debug, verbose, false).then((v) => englishBuilders = v);
+  await _getBuilders(debug, verbose, true).then((v) => spanishBuilders = v);
   _setOppositeEntries(englishBuilders.values, spanishBuilders, false);
   _setOppositeEntries(spanishBuilders.values, englishBuilders, true);
   await _uploadSqlFlite(

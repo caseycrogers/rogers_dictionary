@@ -79,12 +79,6 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
             return null;
         }
       },
-      onPop: (selectedEntry, prevEntry) {
-        if (selectedEntry != null &&
-            selectedEntry.referrer == SelectedEntryReferrer.oppositeHeadword) {
-          DictionaryModel.instance.onTranslationModeChanged(context);
-        }
-      },
     );
   }
 

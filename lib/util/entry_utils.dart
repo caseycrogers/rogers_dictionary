@@ -7,6 +7,7 @@ import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/i18n_base.dart' as i18n;
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 
 typedef Headword = Entry_Headword;
 typedef Translation = Entry_Translation;
@@ -160,8 +161,8 @@ class EntryBuilder {
     return _uid;
   }
 
-  String get getHeadword {
-    return _headword.text;
+  List<Translation> get getTranslations {
+    return _translations;
   }
 
   EntryBuilder headword(
@@ -265,7 +266,7 @@ class EntryBuilder {
     required String disambiguation,
     required List<String> examplePhrases,
     required String editorialNote,
-    required String rawOppositeHeadword,
+    required String oppositeHeadword,
   }) {
     assert(
         translation != '',
@@ -286,11 +287,9 @@ class EntryBuilder {
         disambiguation: disambiguation,
         examplePhrases: examplePhrases,
         editorialNote: editorialNote,
+        oppositeHeadword: oppositeHeadword,
       ),
     );
-    if (rawOppositeHeadword.isNotEmpty) {
-      rawOppositeHeadwords[rawOppositeHeadword] = _translations.last;
-    }
     return this;
   }
 

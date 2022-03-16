@@ -98,7 +98,7 @@ EntryBuilder _mockEntryBuilder({
       disambiguation: '',
       examplePhrases: [],
       editorialNote: '',
-      rawOppositeHeadword: '',
+      oppositeHeadword: '',
     );
   }
   return builder;

@@ -40,9 +40,14 @@ class Indent extends StatelessWidget {
 }
 
 class ParentheticalView extends StatelessWidget {
-  const ParentheticalView({required this.text, Key? key}) : super(key: key);
+  const ParentheticalView({
+    required this.text,
+    this.addSpace = true,
+    Key? key,
+  }) : super(key: key);
 
   final String text;
+  final bool addSpace;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +62,7 @@ class ParentheticalView extends StatelessWidget {
       return [];
     }
     return [
-      const Text(' '),
+      if (addSpace) const Text(' '),
       ...text.split(';').map(
             (t) => DictionaryChip(
               margin: text.startsWith(t)
