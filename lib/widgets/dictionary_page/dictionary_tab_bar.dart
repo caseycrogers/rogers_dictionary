@@ -6,9 +6,7 @@ import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 
 class DictionaryTabBar extends StatelessWidget {
-  const DictionaryTabBar({Key? key, this.indicator = true}) : super(key: key);
-
-  final bool indicator;
+  const DictionaryTabBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +24,7 @@ class DictionaryTabBar extends StatelessWidget {
           );
         }).toList(),
         isScrollable: true,
-        indicator: indicator
-            ? const UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  color: Colors.white,
-                  width: 2,
-                ),
-              )
-            : const BoxDecoration(),
+        indicator: const BoxDecoration(),
       ),
     );
   }
