@@ -65,6 +65,7 @@ flutter:
 flutter_icons:
   ios: true
   android: true
+  remove_alpha_ios: true
   image_path_android: "assets/images/n_logo_flat.png"
   image_path_ios: "assets/images/n_logo_ios.png"
   adaptive_icon_background: "#ffffff"

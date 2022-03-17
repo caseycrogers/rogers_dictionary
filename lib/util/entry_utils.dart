@@ -160,6 +160,10 @@ class EntryBuilder {
     return _uid;
   }
 
+  String get getHeadword {
+    return _headword.text;
+  }
+
   List<Translation> get getTranslations {
     return _translations;
   }

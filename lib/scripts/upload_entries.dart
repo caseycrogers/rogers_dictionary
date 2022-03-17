@@ -225,7 +225,8 @@ void _setOppositeEntries(
       final EntryBuilder? oppositeEntry = oppositeBuilders[oppositeHeadword];
       if (oppositeEntry == null) {
         print('${preface(isSpanish)} $WARNING Invalid opposite headword '
-            '\'$oppositeHeadword\' for translation \'${translation.text}.\'');
+            '\'$oppositeHeadword\' for translation \'${translation.text}.\' '
+            'under headword \'${builder.getHeadword}');
         translation.oppositeHeadword = '';
         continue;
       }

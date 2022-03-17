@@ -103,6 +103,7 @@ class _ChapterViewState extends State<ChapterView> {
               ),
             ],
           ),
+          // Background tap-to-dismiss scrim.
           IgnorePointer(
             ignoring: !_isExpanded,
             child: GestureDetector(
@@ -115,14 +116,7 @@ class _ChapterViewState extends State<ChapterView> {
               ),
             ),
           ),
-          if (widget.chapter.hasSubChapters)
-            Container(
-              child: DictionaryProgressIndicator(
-                child: _subChapterSelector(),
-                style: IndicatorStyle.linear,
-                progress: _subChapterProgress,
-              ),
-            ),
+          if (widget.chapter.hasSubChapters) _subChapterSelector(),
         ],
       ),
     );
@@ -131,39 +125,51 @@ class _ChapterViewState extends State<ChapterView> {
   Widget _subChapterSelector() => ValueListenableBuilder(
         valueListenable: _currentSubChapter,
         builder: (context, _, child) => SingleChildScrollView(
-          child: ExpansionPanelList(
-            expansionCallback: (index, _) {
-              assert(index == 0,
-                  'There should only ever be a single element in this list');
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            elevation: kGroundElevation,
-            expandedHeaderPadding: EdgeInsets.zero,
-            children: [
-              ExpansionPanel(
-                backgroundColor: Theme.of(context).cardColor,
-                isExpanded: _isExpanded,
-                canTapOnHeader: true,
-                headerBuilder: (context, isOpen) => ListTile(
-                  visualDensity: VisualDensity.compact,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 2 * kPad),
-                  title: _isExpanded
-                      ? Container()
-                      : Text(
+          child: ColoredBox(
+            color: Theme.of(context).cardColor,
+            child: ExpansionPanelList(
+              expansionCallback: (index, _) {
+                assert(index == 0,
+                    'There should only ever be a single element in this list');
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              elevation: kGroundElevation,
+              expandedHeaderPadding: EdgeInsets.zero,
+              children: [
+                ExpansionPanel(
+                  backgroundColor: Colors.transparent,
+                  isExpanded: _isExpanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isOpen) {
+                    return DictionaryProgressIndicator(
+                      child: ListTile(
+                        tileColor: Colors.transparent,
+                        visualDensity: VisualDensity.compact,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 2 * kPad),
+                        title: Text(
                           _currentSubChapter.value.title(context),
                           style: Theme.of(context).textTheme.headline2,
                         ),
-                  subtitle: _isExpanded
-                      ? Container()
-                      : Text(_currentSubChapter.value.oppositeTitle(context)),
-                ),
-                body: Column(
-                  children: widget.chapter.dialogueSubChapters
-                      .map(
-                        (subChapter) => _SubChapterTile(
+                        subtitle: Text(
+                            _currentSubChapter.value.oppositeTitle(context)),
+                      ),
+                      progress: _subChapterProgress,
+                      style: IndicatorStyle.linear,
+                    );
+                  },
+                  body: Column(
+                    children: widget.chapter.dialogueSubChapters.map(
+                      (subChapter) {
+                        if (subChapter == _currentSubChapter.value) {
+                          return Container(
+                            height: kPad,
+                            color: Theme.of(context).selectedRowColor,
+                          );
+                        }
+                        return _SubChapterTile(
                           subChapter: subChapter,
                           isSelected: subChapter == _currentSubChapter.value,
                           onTap: () {
@@ -183,12 +189,13 @@ class _ChapterViewState extends State<ChapterView> {
                               });
                             });
                           },
-                        ),
-                      )
-                      .toList(),
+                        );
+                      },
+                    ).toList(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

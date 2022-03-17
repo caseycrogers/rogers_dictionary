@@ -124,7 +124,7 @@ class _PlayingButton extends StatelessWidget {
         if (snap.data == null) {
           return Container(
             // Copied from the inline icon button implementation.
-            margin: const EdgeInsets.symmetric(horizontal: kPad/2),
+            margin: const EdgeInsets.symmetric(horizontal: kPad / 2),
             width: IconTheme.of(context).size!,
             height: IconTheme.of(context).size,
             padding: const EdgeInsets.all(4),

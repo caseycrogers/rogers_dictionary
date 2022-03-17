@@ -97,7 +97,10 @@ class ProgressGradient extends StatelessWidget {
 }
 
 enum IndicatorStyle {
+  // Left to right bar.
   linear,
+  // Expanding radius.
   radial,
+  // Sweeping circular sector.
   circular,
 }

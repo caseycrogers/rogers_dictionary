@@ -46,11 +46,13 @@ class TableOfContentsView extends StatelessWidget {
             return ExpansionTile(
               title: Text(
                 chapter.title(context),
-                style: const TextStyle().asBold,
+                style: TextStyle(color: AdaptiveMaterial.onColorOf(context))
+                    .asBold,
               ),
               subtitle: Text(
                 chapter.oppositeTitle(context),
-                style: TextStyle(color: Colors.grey.shade700),
+                style: TextStyle(
+                    color: AdaptiveMaterial.secondaryOnColorOf(context)),
               ),
               key: _getKey(context, chapter),
               children: chapter.dialogueSubChapters
