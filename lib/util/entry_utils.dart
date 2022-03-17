@@ -7,7 +7,6 @@ import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/i18n_base.dart' as i18n;
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/util/string_utils.dart';
 
 typedef Headword = Entry_Headword;
 typedef Translation = Entry_Translation;

@@ -83,7 +83,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
   }
 
   void _onTranslationModeChanged() {
-    _navigator!.canPop = isCurrentTranslationPage(context);
+    _navigator!.isEnabled = isCurrentTranslationPage(context);
   }
 }
 

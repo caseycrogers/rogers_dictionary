@@ -96,20 +96,23 @@ class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Theme.of(context).colorScheme.background,
-      child: FutureBuilder<BannerAd>(
-        future: _bannerAd,
-        builder: (context, snap) {
-          if (!snap.hasData || snap.data == null) {
-            return Container();
-          }
-          return Container(
-            height: snap.data!.size.height.toDouble(),
-            width: snap.data!.size.width.toDouble(),
-            child: AdWidget(
-              ad: snap.data!,
-            ),
-          );
-        },
+      child: SafeArea(
+        top: false,
+        child: FutureBuilder<BannerAd>(
+          future: _bannerAd,
+          builder: (context, snap) {
+            if (!snap.hasData || snap.data == null) {
+              return Container();
+            }
+            return Container(
+              height: snap.data!.size.height.toDouble(),
+              width: snap.data!.size.width.toDouble(),
+              child: AdWidget(
+                ad: snap.data!,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -26,11 +26,7 @@ class DictionaryAppBar extends StatelessWidget {
         leadingWidth: 0,
         elevation: kGroundElevation,
         titleSpacing: 0,
-        title: Column(
-          children: const [
-            _DictionaryTopBar(),
-          ],
-        ),
+        title: const _DictionaryTopBar(),
       ),
     );
   }
@@ -43,14 +39,15 @@ class _DictionaryTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!isBigEnoughForAdvanced(context)) {
       return Row(
-        children: const [
-          SizedBox(width: kToolbarHeight, child: ImplicitNavigatorBackButton()),
-          Padding(
-            padding: EdgeInsets.all(kPad / 2),
-            child: TranslationModeSelector(),
+        children: [
+          Container(
+            constraints: const BoxConstraints(minWidth: kPad),
+            alignment: Alignment.centerLeft,
+            child: const ImplicitNavigatorBackButton(),
           ),
-          Spacer(),
-          HelpMenu(),
+          const TranslationModeSelector(),
+          const Spacer(),
+          const HelpMenu(),
         ],
       );
     }
@@ -60,7 +57,6 @@ class _DictionaryTopBar extends StatelessWidget {
           children: [
             Row(
               children: const [
-                SizedBox(width: kPad),
                 _TopSearchBarAndBackButton(),
                 SizedBox(width: kPad),
               ],
@@ -90,9 +86,7 @@ class _TopSearchBarAndBackButton extends StatelessWidget {
 
   double _width(BuildContext context) {
     if (!_shouldDisplaySearchBar(context)) {
-      return DictionaryModel.instance.displayBackButton.value
-          ? kToolbarHeight
-          : 0;
+      return 0;
     }
     return MediaQuery.of(context).size.width *
             kLandscapeLeftFlex /
@@ -113,7 +107,10 @@ class _TopSearchBarAndBackButton extends StatelessWidget {
                 width: _width(context),
                 child: Row(
                   children: [
-                    const ImplicitNavigatorBackButton(),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: kPad),
+                      child: const ImplicitNavigatorBackButton(),
+                    ),
                     Expanded(
                       child: AnimatedSwitcher(
                         child: _shouldDisplaySearchBar(context)
