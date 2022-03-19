@@ -14,7 +14,6 @@ import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning.dart';
 
-
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -198,7 +197,8 @@ SELECT *,
     final Database db = await _dbFuture;
     int offset = startAt;
     String searchString = rawSearchString;
-    searchString = rawSearchString.withoutDiacriticalMarks.sqlSanitized;
+    searchString =
+        rawSearchString.withoutDiacriticalMarks.sqlSanitized.trimRight();
     String orderByClause = ORDER_ID;
     if (searchString.isNotEmpty) {
       orderByClause = '''

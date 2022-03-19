@@ -11,13 +11,15 @@ class HelpMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropDownWidget(
-      builder: (_, closeMenu) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FeedbackButton(onPressed: closeMenu),
-          AboutButton(onPressed: closeMenu),
-        ],
-      ),
+      builder: (_, closeMenu) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FeedbackButton(onPressed: closeMenu),
+            AboutButton(onPressed: closeMenu),
+          ],
+        );
+      },
       child: const AdaptiveIcon(Icons.more_vert, forcePrimary: true),
       selectedColor: Colors.black12,
     );

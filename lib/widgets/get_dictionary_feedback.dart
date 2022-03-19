@@ -20,10 +20,12 @@ class _DictionaryFeedbackBuilder {
   String? body;
   DictionaryFeedbackType? type;
 
-  DictionaryFeedback build() => DictionaryFeedback(
-        body ?? '',
-        type!,
-      );
+  DictionaryFeedback build() {
+    return DictionaryFeedback(
+      body ?? '',
+      type!,
+    );
+  }
 }
 
 enum DictionaryFeedbackType {
@@ -46,18 +48,18 @@ String typeToString(Locale locale, DictionaryFeedbackType type) {
   }
 }
 
-class GetDictionaryFeedback extends StatefulWidget {
-  const GetDictionaryFeedback(this.onSubmit, this.controller, {Key? key})
+class DictionaryFeedbackView extends StatefulWidget {
+  const DictionaryFeedbackView(this.onSubmit, this.controller, {Key? key})
       : super(key: key);
 
   final OnSubmit onSubmit;
   final ScrollController controller;
 
   @override
-  _GetDictionaryFeedbackState createState() => _GetDictionaryFeedbackState();
+  _DictionaryFeedbackViewState createState() => _DictionaryFeedbackViewState();
 }
 
-class _GetDictionaryFeedbackState extends State<GetDictionaryFeedback> {
+class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
   final _feedbackBuilder = _DictionaryFeedbackBuilder();
 
   @override

@@ -81,7 +81,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
             GlobalCupertinoLocalizations.delegate,
           ],
           feedbackBuilder: (context, onSubmit, controller) {
-            return GetDictionaryFeedback(onSubmit, controller!);
+            return DictionaryFeedbackView(onSubmit, controller!);
           },
           child: Builder(
             builder: (context) {
