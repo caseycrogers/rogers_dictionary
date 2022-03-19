@@ -12,6 +12,8 @@ import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
+import 'package:rogers_dictionary/versioning/versioning.dart';
+
 
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -41,7 +43,7 @@ class SqfliteDatabase extends DictionaryDatabase {
     _databasesPath = await _getDatabasePath();
 
     // Manually inject proper slash, don't use join it breaks on Windows.
-    _version = VersionUtils.fromString(
+    _version = DatabaseVersionUtils.fromString(
       await rootBundle.loadString('assets/$VERSION_FILE'),
     );
     _path = join(
@@ -98,7 +100,7 @@ SELECT *,
               WHERE $UID =
                 ${bookmarksTable(translationMode)}.$UID) AS $IS_FAVORITE
  FROM ${entryTable(translationMode)}
- WHERE $HEADWORD = '${headword.searchable}';''').then((List<
+ WHERE $HEADWORD = '${headword.searchable.sqlSanitized}';''').then((List<
                   Map<String, Object?>>
               value) =>
           value.isEmpty ? null : value.single),
@@ -196,7 +198,7 @@ SELECT *,
     final Database db = await _dbFuture;
     int offset = startAt;
     String searchString = rawSearchString;
-    searchString = rawSearchString.withoutDiacriticalMarks;
+    searchString = rawSearchString.withoutDiacriticalMarks.sqlSanitized;
     String orderByClause = ORDER_ID;
     if (searchString.isNotEmpty) {
       orderByClause = '''

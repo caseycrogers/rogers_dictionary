@@ -6,7 +6,6 @@ import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
-import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
 import 'entry_list.dart';
 import 'entry_view.dart';

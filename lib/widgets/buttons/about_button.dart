@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
@@ -5,9 +6,9 @@ import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/pages/page_header.dart';
 import 'package:rogers_dictionary/util/collection_utils.dart';
-import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
+import 'package:rogers_dictionary/versioning/versioning.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
 class AboutButton extends StatelessWidget {
@@ -26,10 +27,16 @@ class AboutButton extends StatelessWidget {
         DictionaryApp.analytics.logEvent(name: 'about_pressed');
         onPressed();
         showDialog<void>(
+          useSafeArea: false,
+          useRootNavigator: false,
           context: context,
-          builder: (overlayContext) => _AboutView(() {
-            Navigator.of(overlayContext).pop();
-          }),
+          builder: (overlayContext) {
+            return _AboutView(
+              () {
+                Navigator.of(overlayContext).pop();
+              },
+            );
+          },
         );
       },
     );
@@ -43,48 +50,56 @@ class _AboutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).cardColor,
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: DefaultTextStyle(
-          style: Theme.of(context).textTheme.headline3!,
-          child: PageHeader(
-            header: Text(
-              i18n.about.cap.get(context),
-              style: Theme.of(context).textTheme.headline1,
-            ),
-            onClose: onClose,
-            child: Column(
-              children: [
-                SelectableText(
-                  i18n.aboutPassage.get(context),
-                  textAlign: TextAlign.center,
+    return WillPopScope(
+      onWillPop: () async {
+        onClose();
+        return true;
+      },
+      child: Material(
+        color: Theme.of(context).cardColor,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.headline3!,
+              child: PageHeader(
+                header: Text(
+                  i18n.about.cap.get(context),
+                  style: Theme.of(context).textTheme.headline1,
                 ),
-                SelectableText(
-                  i18n.enjoyTheApp.get(context),
-                  textAlign: TextAlign.center,
-                ),
-                const Text(''),
-                Container(
-                  height: 130,
-                  width: 130,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(
-                        join('assets', 'images', 'glenn.jpg'),
+                onClose: onClose,
+                child: Column(
+                  children: [
+                    SelectableText(
+                      i18n.aboutPassage.get(context),
+                      textAlign: TextAlign.center,
+                    ),
+                    SelectableText(
+                      i18n.enjoyTheApp.get(context),
+                      textAlign: TextAlign.center,
+                    ),
+                    const Text(''),
+                    Container(
+                      height: 130,
+                      width: 130,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage(
+                            join('assets', 'images', 'glenn.jpg'),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SelectableText(
+                      'Dr. Glenn Rogers',
+                      textAlign: TextAlign.center,
+                    ),
+                    const Divider(),
+                    const _DebugInfo(),
+                  ],
                 ),
-                const SelectableText(
-                  'Dr. Glenn Rogers',
-                  textAlign: TextAlign.center,
-                ),
-                const Divider(),
-                const _DebugInfo(),
-              ],
+              ),
             ),
           ),
         ),
@@ -103,24 +118,32 @@ class _DebugInfo extends StatelessWidget {
       child: Column(
         children: <String, Future<String>>{
           '': Future.value(Theme.of(context).platform.toString().enumString),
-          'app v': DictionaryApp.packageInfo.then((p) => p.version),
-          'database v': DictionaryApp.db.version.then((v) => v.versionString),
+          'app: v': DictionaryApp.packageInfo.then((p) => p.version),
+          'database: v': DictionaryApp.db.version.then((v) => v.versionString),
+          'database hash: ': getDatabaseHash(),
+          'git commit: ': getGitCommit(),
         }
             .mapDown(
-              (label, future) => Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(label),
-                  FutureBuilder<String>(
-                    future: future,
-                    builder: (_, snap) {
-                      if (!snap.hasData) {
-                        return const LoadingText();
-                      }
-                      return Text(snap.data!);
-                    },
-                  ),
-                ],
+              (label, future) => FutureBuilder<String>(
+                future: future,
+                builder: (_, snap) {
+                  if (snap.hasError) {
+                    FirebaseCrashlytics.instance.recordFlutterError(
+                      FlutterErrorDetails(
+                        exception: snap.error!,
+                        stack: StackTrace.current,
+                      ),
+                    );
+                    return const Text(' error');
+                  }
+                  if (!snap.hasData) {
+                    return const LoadingText();
+                  }
+                  return Text(
+                    '$label${snap.data!.truncated(10)}',
+                    overflow: TextOverflow.clip,
+                  );
+                },
               ),
             )
             .toList(),

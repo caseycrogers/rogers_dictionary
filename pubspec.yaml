@@ -13,7 +13,6 @@ dependencies:
   async: ^2.8.1
   async_list_view: ^1.0.0
   cupertino_icons: ^1.0.3
-  device_frame: ^1.0.0
   feedback:
     path: ../feedback/feedback
   firebase_analytics: ^9.0.4

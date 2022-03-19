@@ -135,7 +135,7 @@ packages:
     source: hosted
     version: "1.0.4"
   device_frame:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: device_frame
       url: "https://pub.dartlang.org"

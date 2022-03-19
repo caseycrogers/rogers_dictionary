@@ -101,6 +101,10 @@ extension NotShittyString on String {
         onNonMatch: (char) => symbols.contains(char) ? '' : char,
       );
 
+  // Sql `'` escapes the search string, so we need to escape it by turning it
+  // into two apostrophes.
+  String get sqlSanitized => replaceAll('\'', '\'\'');
+
   String get withoutOptionals => replaceAll(RegExp(r'\(.*?\) ?'), '').trim();
 
   String get withoutHyphenateds => replaceAll(RegExp(r' -.[^ ]+'), '').trim();

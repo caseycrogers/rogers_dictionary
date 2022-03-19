@@ -11,13 +11,13 @@ import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-import 'package:rogers_dictionary/util/entry_utils.dart';
+import 'package:rogers_dictionary/versioning/versioning.dart';
 
 // A database interface for fetching dictionary entries.
 abstract class DictionaryDatabase {
   Future<DatabaseVersion> get version => rootBundle
       .loadString(join('assets', '$VERSION_FILE'))
-      .then((v) => VersionUtils.fromString(v));
+      .then((v) => DatabaseVersionUtils.fromString(v));
 
   final _BookmarksCache _englishBookmarksCache = _BookmarksCache();
   final _BookmarksCache _spanishBookmarksCache = _BookmarksCache();
