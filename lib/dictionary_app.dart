@@ -113,7 +113,7 @@ class DictionaryAppBase extends StatelessWidget {
         useInheritedMediaQuery: true,
         home: Builder(builder: (context) {
           DictionaryApp._snackBarNotifier = SnackBarNotifier(context);
-          return DictionaryPage();
+          return const DictionaryPage();
         }),
         theme: ThemeData(
           selectedRowColor: Colors.grey.shade200,

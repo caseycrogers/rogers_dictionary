@@ -13,8 +13,6 @@ import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
 
 import 'dictionary_tab_bar.dart';
 
-const Duration _animationSpeed = Duration(milliseconds: 200);
-
 class DictionaryAppBar extends StatelessWidget {
   const DictionaryAppBar({Key? key}) : super(key: key);
 
@@ -39,15 +37,11 @@ class _DictionaryTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!isBigEnoughForAdvanced(context)) {
       return Row(
-        children: [
-          Container(
-            constraints: const BoxConstraints(minWidth: kPad),
-            alignment: Alignment.centerLeft,
-            child: const ImplicitNavigatorBackButton(),
-          ),
-          const TranslationModeSelector(),
-          const Spacer(),
-          const HelpMenu(),
+        children: const [
+          _DictionaryBackButton(),
+          TranslationModeSelector(),
+          Spacer(),
+          HelpMenu(),
         ],
       );
     }
@@ -55,12 +49,7 @@ class _DictionaryTopBar extends StatelessWidget {
         height: kToolbarHeight,
         child: Row(
           children: [
-            Row(
-              children: const [
-                _TopSearchBarAndBackButton(),
-                SizedBox(width: kPad),
-              ],
-            ),
+            const _LandscapeBackAndSearch(),
             const SizedBox(width: kPad),
             const TranslationModeSelector(),
             const Spacer(),
@@ -81,54 +70,52 @@ class _DictionaryTopBar extends StatelessWidget {
   }
 }
 
-class _TopSearchBarAndBackButton extends StatelessWidget {
-  const _TopSearchBarAndBackButton({Key? key}) : super(key: key);
-
-  double _width(BuildContext context) {
-    if (!_shouldDisplaySearchBar(context)) {
-      return 0;
-    }
-    return MediaQuery.of(context).size.width *
-            kLandscapeLeftFlex /
-            (kLandscapeLeftFlex + kLandscapeRightFlex) -
-        2 * kPad;
-  }
+class _LandscapeBackAndSearch extends StatelessWidget {
+  const _LandscapeBackAndSearch({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-        child: const SearchBar(),
-        valueListenable: DictionaryModel.instance.displayBackButton,
-        builder: (context, displayBack, child) {
-          return ValueListenableBuilder<DictionaryTab>(
-            valueListenable: DictionaryModel.instance.currentTab,
-            builder: (context, tab, _) {
-              return Container(
-                width: _width(context),
-                child: Row(
-                  children: [
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: kPad),
-                      child: const ImplicitNavigatorBackButton(),
-                    ),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        child: _shouldDisplaySearchBar(context)
-                            ? child!
-                            : const SizedBox(),
-                        duration: _animationSpeed,
-                      ),
-                    ),
-                  ],
-                ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: _width(context)),
+      child: ValueListenableBuilder<DictionaryTab>(
+          valueListenable: DictionaryModel.instance.currentTab,
+          child: const SearchBar(),
+          builder: (context, _, searchBar) {
+            if (_shouldDisplaySearchBar(context)) {
+              return Row(
+                children: [
+                  const _DictionaryBackButton(),
+                  Expanded(child: searchBar!),
+                  const SizedBox(width: kPad),
+                ],
               );
-            },
-          );
-        });
+            }
+            return const _DictionaryBackButton();
+          }),
+    );
+  }
+
+  // Width of the left elements of the screen in landscape mode.
+  double _width(BuildContext context) {
+    return MediaQuery.of(context).size.width *
+        kLandscapeLeftFlex /
+        (kLandscapeLeftFlex + kLandscapeRightFlex);
   }
 
   bool _shouldDisplaySearchBar(BuildContext context) {
     return DictionaryModel.instance.currentTab.value == DictionaryTab.search &&
         isBigEnoughForAdvanced(context);
+  }
+}
+
+class _DictionaryBackButton extends StatelessWidget {
+  const _DictionaryBackButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: kPad),
+      child: const ImplicitNavigatorBackButton(),
+    );
   }
 }

@@ -4,6 +4,7 @@ import 'package:implicit_navigator/implicit_navigator.dart';
 
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
+import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 
@@ -25,14 +26,14 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
   @override
   void initState() {
     super.initState();
-    DictionaryModel.instance.translationModel
-        .addListener(_onTranslationModeChanged);
+    DictionaryModel.instance.pageOffset
+        .addListener(_maybeToggleNavigatorIsEnabled);
   }
 
   @override
   void dispose() {
-    DictionaryModel.instance.translationModel
-        .removeListener(_onTranslationModeChanged);
+    DictionaryModel.instance.pageOffset
+        .removeListener(_maybeToggleNavigatorIsEnabled);
     super.dispose();
   }
 
@@ -82,8 +83,23 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
     );
   }
 
-  void _onTranslationModeChanged() {
-    _navigator!.isEnabled = isCurrentTranslationPage(context);
+  // This uses the page offset to determine which navigator should currently be
+  // enabled.
+  // Using `currTranslationModel` instead causes the back button to jitter
+  // because the old active navigator will become inactive before the
+  // navigator becomes active when tapping on the `oppositeHeadword` button or
+  // tapping (instead of swiping) on the translation mode selector.
+  // Using the page offset ensures that the navigator is only toggled at the
+  // middle of the page transition when both navigators are visible and thus can
+  // both be toggled at once.
+  void _maybeToggleNavigatorIsEnabled() {
+    // Enable the navigator if it's english and we're viewing the english page
+    // (both sub-clauses true) or it's spanish and we're on the spanish page
+    // (both sub-clauses are spanish).
+    // This will constantly set `isEnabled`, but `isEnabled` is idempotent so
+    // this will only change anything when the value changes.
+    _navigator!.isEnabled = TranslationModel.of(context).isEnglish ==
+        DictionaryModel.instance.pageOffset.value < .5;
   }
 }
 

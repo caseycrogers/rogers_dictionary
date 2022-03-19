@@ -19,6 +19,8 @@ import 'bookmarks_page.dart';
 import 'search_page.dart';
 
 class DictionaryPage extends StatelessWidget {
+  const DictionaryPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
