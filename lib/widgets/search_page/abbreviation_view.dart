@@ -31,7 +31,7 @@ class AbbreviationView extends StatelessWidget {
       processedAbbreviation =
           ' (${_abbreviation.substring(0, _abbreviation.length - 2)})\\*';
     } else {
-      processedAbbreviation = '($_abbreviation)';
+      processedAbbreviation = ' ($_abbreviation)';
     }
     if (isHeadword) {
       // The headword needs to be highlighted if applicable.
