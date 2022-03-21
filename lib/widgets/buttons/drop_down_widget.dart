@@ -23,18 +23,11 @@ class DropDownWidget extends StatefulWidget {
 class _DropDownWidgetState extends State<DropDownWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color:
-            false ? widget.selectedColor ?? Colors.white10 : Colors.transparent,
-      ),
-      child: AdaptiveIconButton(
-        splashColor: widget.selectedColor,
-        highlightColor: widget.selectedColor,
-        icon: widget.child,
-        onPressed: () => _show(),
-      ),
+    return AdaptiveIconButton(
+      splashColor: widget.selectedColor,
+      highlightColor: widget.selectedColor,
+      icon: widget.child,
+      onPressed: () => _show(),
     );
   }
 

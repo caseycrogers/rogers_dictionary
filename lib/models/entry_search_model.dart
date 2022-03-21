@@ -35,10 +35,6 @@ class EntrySearchModel {
 
   bool get isBookmarkedOnly => _isBookmarkedOnly;
 
-  // Used to test if the bookmarks has changed.
-  int get pseudoHash =>
-      isBookmarkedOnly ? DictionaryApp.db.pseudoHash(_translationMode) : -1;
-
   void resetEntries() {
     entries = [];
   }

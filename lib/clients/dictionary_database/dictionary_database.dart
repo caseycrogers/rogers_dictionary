@@ -22,10 +22,6 @@ abstract class DictionaryDatabase {
   final _BookmarksCache _englishBookmarksCache = _BookmarksCache();
   final _BookmarksCache _spanishBookmarksCache = _BookmarksCache();
 
-  int pseudoHash(TranslationMode translationMode) {
-    return _getCache(translationMode)._pseudoHash;
-  }
-
   // Fetch entries from the database.
   Stream<Entry> getEntries(
     TranslationMode translationMode, {
@@ -69,9 +65,6 @@ abstract class DictionaryDatabase {
 class _BookmarksCache {
   final Map<String, bool> _cache = {};
 
-  // Changes every time a bookmark is changed.
-  int _pseudoHash = 0;
-
   bool isBookmarked(Entry entry) {
     assert(
       _cache.containsKey(entry.uid),
@@ -82,11 +75,6 @@ class _BookmarksCache {
   }
 
   void setBookmark(Entry entry, bool newValue) {
-    final bool? oldValue = _cache[entry.uid];
     _cache[entry.uid] = newValue;
-    if (oldValue != null && newValue != oldValue) {
-      // Only update if a change has actually been made.
-      _pseudoHash += 1;
-    }
   }
 }

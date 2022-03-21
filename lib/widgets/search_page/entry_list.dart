@@ -11,6 +11,7 @@ import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/open_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
@@ -90,7 +91,6 @@ class _EntryList extends StatefulWidget {
 class _EntryListState extends State<_EntryList> {
   late Stream<Entry> entryStream =
       SearchModel.of(context).entrySearchModel.getEntries();
-  late int lastPseudoHash = SearchModel.of(context).entrySearchModel.pseudoHash;
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +102,7 @@ class _EntryListState extends State<_EntryList> {
       entryStream = searchModel.entrySearchModel.getEntries();
     }
     return AsyncListView<Entry>(
+      key: PageStorageKey('entry_list_${searchModel.mode.name.enumString}'),
       padding: EdgeInsets.zero,
       noResultsWidgetBuilder: (context) {
         return const SingleChildScrollView(
