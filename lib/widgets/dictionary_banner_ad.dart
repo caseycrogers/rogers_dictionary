@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -6,8 +8,7 @@ import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 class DictionaryBannerAd extends StatefulWidget {
-  const DictionaryBannerAd({Key? key})
-      : super(key: key);
+  const DictionaryBannerAd({Key? key}) : super(key: key);
 
   @override
   _DictionaryBannerAdState createState() => _DictionaryBannerAdState();
@@ -15,7 +16,8 @@ class DictionaryBannerAd extends StatefulWidget {
 
 class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
   static const String _testAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String _androidAdUnitId = 'ca-app-pub-4592603753721232/8369891839';
+  static const String _androidAdUnitId =
+      'ca-app-pub-4592603753721232/8369891839';
   static const String _iosAdUnitId = 'ca-app-pub-4592603753721232/6466849196';
 
   static const List<String> _universalKeywords = [
@@ -93,6 +95,14 @@ class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
 
   @override
   Widget build(BuildContext context) {
+    if (const bool.fromEnvironment('is_screenshot')) {
+      // Google ads make integration tests hang so skip them if we're in a test
+      // environment. Dictionary app uses integration tests to automatically
+      // generate screenshots.
+      // The `is_integration` environment flag must be set from command line
+      // when launching integration tests.
+      return Container(height: 50);
+    }
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Theme.of(context).colorScheme.background,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:image/image.dart';
@@ -8,21 +9,18 @@ Future<void> main() async {
   try {
     await integrationDriver(
       onScreenshot: (String name, List<int> screenshotBytes) async {
-        final String suffix = name.split('\$')[0];
-        final int width = int.parse(name.split('\$')[1]);
-        final int height = int.parse(name.split('\$')[2]);
-        final File imageFile = File(
-          join(
-            'screenshots',
-            Platform.isAndroid ? 'android' : 'ios',
-            '$suffix.png',
-          ),
-        );
+        final ScreenshotIdentifier args = ScreenshotIdentifier.fromJson(
+            jsonDecode(name) as Map<String, dynamic>);
+        final File imageFile = File('${joinAll([
+              'screenshots',
+              ...args.path,
+            ])}.png');
+        await imageFile.create(recursive: true);
         imageFile.writeAsBytesSync(
           _processImage(
             screenshotBytes,
-            width,
-            height,
+            args.width,
+            args.height,
           ),
         );
         return true;
@@ -34,8 +32,34 @@ Future<void> main() async {
 }
 
 List<int> _processImage(List<int> bytes, int width, int height) {
-  print('${width}x$height');
   final Image image = decodeImage(bytes)!;
   final Image cropped = copyCrop(image, 0, 50, width, height);
   return encodePng(cropped);
+}
+
+class ScreenshotIdentifier {
+  const ScreenshotIdentifier({
+    required this.path,
+    required this.width,
+    required this.height,
+  });
+
+  ScreenshotIdentifier.fromJson(Map<String, dynamic> json)
+      : width = json['width'] as int,
+        height = json['height'] as int,
+        path = (json['path'] as List<dynamic>)
+            .map<String>((dynamic v) => v as String)
+            .toList();
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'path': path,
+      'width': width,
+      'height': height,
+    };
+  }
+
+  final List<String> path;
+  final int width;
+  final int height;
 }

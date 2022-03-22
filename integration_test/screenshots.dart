@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:device_frame/device_frame.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,9 @@ import 'package:integration_test/integration_test.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/screenshot_template.dart';
+import 'package:rogers_dictionary/util/string_utils.dart';
+
+import '../test_driver/screenshots_test.dart';
 
 const Locale en = Locale('en', '');
 const Locale es = Locale('es', '');
@@ -20,28 +24,44 @@ Future<void> main() async {
     await binding.convertFlutterSurfaceToImage();
   });
 
-  for (final Locale locale in [en, es]) {
-    testWidgets('take screenshot', (WidgetTester tester) async {
-      final DeviceInfo device = Devices.ios.iPhone13ProMax;
-      final double pixelRatio = binding.window.devicePixelRatio;
+  final double pixelRatio = binding.window.devicePixelRatio;
 
-      await tester.pumpWidget(
-        ScreenshotTemplate(
-          headerText: 'Search thousands of terms!',
-          background: Container(
-            color: DictionaryApp.englishColorScheme.primary,
+  for (final Locale locale in [en, es]) {
+    for (final DeviceInfo device in [
+      Devices.ios.iPhone13ProMax,
+      Devices.android.onePlus8Pro,
+    ]) {
+      String screenshotName(String suffix) {
+        return jsonEncode(
+          ScreenshotIdentifier(
+            path: [
+              device.identifier.platform.name.enumString,
+              device.name,
+              locale.languageCode,
+              suffix,
+            ],
+            width: (device.screenSize.width * pixelRatio).toInt(),
+            height: (device.screenSize.height * pixelRatio).toInt(),
           ),
-          device: device,
-          locale: locale,
-        ),
-      );
-      await tester.pump(const Duration(seconds: 1));
-      await binding.takeScreenshot(
-        '${locale.languageCode}'
-        '\$${(device.screenSize.width * pixelRatio).toInt()}'
-        '\$${(device.screenSize.height * pixelRatio).toInt()}',
-      );
-    });
+        );
+      }
+
+      testWidgets('take screenshot', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          ScreenshotTemplate(
+            headerText: 'Search thousands of terms!',
+            background: Container(
+              color: DictionaryApp.englishColorScheme.primary,
+            ),
+            device: device,
+            child: DictionaryAppBase(overrideLocale: locale),
+          ),
+        );
+        await tester.pump();
+        await tester.pump();
+        await binding.takeScreenshot(screenshotName('01'));
+      });
+    }
   }
 }
 
@@ -55,8 +75,8 @@ Future<void> pollUntil(
       if (test()) {
         return;
       }
-      await tester.pump();
       await Future<void>.delayed(const Duration(milliseconds: 100));
+      await tester.pump();
     }
   })()
       .timeout(timeout);
@@ -72,7 +92,6 @@ Future<void> pumpUntilFound(
       Timer(timeout, () => throw TimeoutException('Pump until has timed out'));
   while (timerDone != true) {
     await tester.pump();
-
     final found = tester.any(finder);
     if (found) {
       timerDone = true;
