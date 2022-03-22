@@ -47,4 +47,6 @@ app.*.map.json
 
 # Custom
 keys/*
-/android/app/google-services.json
+android/app/google-services.json
+android/app/src/main/res
+ios/Runner/Assets.xcassets
