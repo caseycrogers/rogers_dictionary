@@ -12,9 +12,9 @@ Future<void> main() async {
     DictionaryScreenshotTemplate(
       headerText: const i18n.Message(
         'Search thousands of terms!',
-        'buscar por asd;flkj;lkasjdf',
+        'buscar por ',
       ),
-      device: ScreenshotDevice(device: Devices.android.onePlus8Pro),
+      device: ScreenshotDevice(device: Devices.ios.iPhone13ProMax),
       locale: const Locale('es'),
     ),
   );
@@ -70,11 +70,10 @@ class ScreenshotTemplate extends StatelessWidget {
                             child: header,
                           ),
                           Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5),
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
                             child: DeviceFrame(
                               device: device,
-                              screen: child,
+                              screen: _SimulatedNavBar(child: child),
                             ),
                           ),
                         ],
@@ -148,4 +147,39 @@ class ScreenshotDevice {
   final DeviceInfo device;
   final double outputWidth;
   final double outputHeight;
+}
+
+class _SimulatedNavBar extends StatelessWidget {
+  const _SimulatedNavBar({required this.child, Key? key}) : super(key: key);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).padding.bottom == 0) {
+      return child;
+    }
+    return Stack(
+      children: [
+        child,
+        Positioned(
+          bottom: 0,
+          height: MediaQuery.of(context).padding.bottom,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              height: 4,
+              width: 150,
+              decoration: BoxDecoration(
+                color: Colors.white54,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

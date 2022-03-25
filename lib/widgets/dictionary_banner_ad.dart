@@ -4,15 +4,34 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 
-class DictionaryBannerAd extends StatefulWidget {
+class DictionaryBannerAd extends StatelessWidget {
   const DictionaryBannerAd({Key? key}) : super(key: key);
 
   @override
-  _DictionaryBannerAdState createState() => _DictionaryBannerAdState();
+  Widget build(BuildContext context) {
+    if (const bool.fromEnvironment('is_screenshot')) {
+      // Google ads make integration tests hang so skip them if we're in a test
+      // environment. Dictionary app uses integration tests to automatically
+      // generate screenshots.
+      // The `is_integration` environment flag must be set from command line
+      // when launching integration tests.
+      return Container();
+    }
+    return const _DictionaryBannerAdBase();
+  }
 }
 
-class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
+
+class _DictionaryBannerAdBase extends StatefulWidget {
+  const _DictionaryBannerAdBase({Key? key}) : super(key: key);
+
+  @override
+  _DictionaryBannerAdBaseState createState() => _DictionaryBannerAdBaseState();
+}
+
+class _DictionaryBannerAdBaseState extends State<_DictionaryBannerAdBase> {
   static const String _testAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
   static const String _androidAdUnitId =
       'ca-app-pub-4592603753721232/8369891839';
@@ -93,14 +112,6 @@ class _DictionaryBannerAdState extends State<DictionaryBannerAd> {
 
   @override
   Widget build(BuildContext context) {
-    if (const bool.fromEnvironment('is_screenshot')) {
-      // Google ads make integration tests hang so skip them if we're in a test
-      // environment. Dictionary app uses integration tests to automatically
-      // generate screenshots.
-      // The `is_integration` environment flag must be set from command line
-      // when launching integration tests.
-      return Container(height: 50);
-    }
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Theme.of(context).colorScheme.background,
