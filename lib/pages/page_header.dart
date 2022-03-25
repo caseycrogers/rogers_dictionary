@@ -25,16 +25,13 @@ class PageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AdaptiveMaterial(
-          adaptiveColor: AdaptiveColor.surface,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: padding),
-            child: Row(
-              children: [
-                if (onClose != null) ClosePage(onClose: onClose!),
-                if (header != null) Expanded(child: header!),
-              ],
-            ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: padding),
+          child: Row(
+            children: [
+              if (onClose != null) ClosePage(onClose: onClose!),
+              if (header != null) Expanded(child: header!),
+            ],
           ),
         ),
         if (divider) Divider(indent: padding, endIndent: padding, height: 1),

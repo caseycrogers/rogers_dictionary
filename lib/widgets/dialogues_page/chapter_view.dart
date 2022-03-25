@@ -163,12 +163,6 @@ class _ChapterViewState extends State<ChapterView> {
                   body: Column(
                     children: widget.chapter.dialogueSubChapters.map(
                       (subChapter) {
-                        if (subChapter == _currentSubChapter.value) {
-                          return Container(
-                            height: kPad,
-                            color: Theme.of(context).selectedRowColor,
-                          );
-                        }
                         return _SubChapterTile(
                           subChapter: subChapter,
                           isSelected: subChapter == _currentSubChapter.value,

@@ -57,8 +57,6 @@ class DictionaryModel {
 
   final ValueNotifier<double> pageOffset = ValueNotifier(0);
 
-  final ValueNotifier<bool> displayBackButton = ValueNotifier(false);
-
   late ImplicitNavigatorState<DictionaryTab> tabNavigator;
 
   static DictionaryModel get instance => _instance;

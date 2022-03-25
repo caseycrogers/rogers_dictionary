@@ -20,6 +20,11 @@ class DictionaryAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AdaptiveMaterial(
       adaptiveColor: AdaptiveColor.primary,
+      // Let the background color show through to avoid a bug where there's a
+      // mis-colored seam in screenshots.
+      // This is just to ensure that the adaptive widgets on top of this use the
+      // right colors.
+      isVisible: false,
       child: AppBar(
         leadingWidth: 0,
         elevation: kGroundElevation,

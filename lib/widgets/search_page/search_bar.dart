@@ -6,6 +6,7 @@ import 'package:rogers_dictionary/models/entry_search_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
 class SearchBar extends StatefulWidget {
   const SearchBar();
@@ -108,8 +109,8 @@ class _SearchBarBase extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: kPad),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(40),
-        child: Container(
-          color: Theme.of(context).colorScheme.surface,
+        child: AdaptiveMaterial(
+          adaptiveColor: AdaptiveColor.surface,
           child: TextField(
             focusNode: focusNode,
             style: TextStyle(

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/util/animation_utils.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 
 class DictionaryTabBarView extends StatefulWidget {
@@ -81,18 +80,9 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
       }
       return true;
     }());
-    ImplicitNavigatorState? navigator;
-    void updateBackButton() {
-      WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-        if (navigator != null) {
-          DictionaryModel.instance.displayBackButton.value = navigator!.canPop;
-        }
-      });
-    }
 
     return NotificationListener<ImplicitNavigatorNotification<dynamic>>(
       onNotification: (notification) {
-        updateBackButton();
         return false;
       },
       child: ImplicitNavigator.fromValueNotifier<DictionaryTab>(
@@ -102,7 +92,6 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
         valueNotifier: currentTab,
         builder: (context, tab, animation, secondaryAnimation) {
           // Save a reference earlier so that the listener can reference it.
-          navigator = ImplicitNavigator.of<dynamic>(context, root: true);
           return widget.children[tab]!;
         },
         getDepth: (tab) => tab == DictionaryTab.search ? 0 : 1,
@@ -129,16 +118,25 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
         begin: const Offset(0, 1),
         end: Offset.zero,
       ).animate(animation),
-      child: SlideTransition(
-        position: Tween(
-          begin: Offset.zero,
-          end: const Offset(0, 1),
-        ).animate(
-          CurvedAnimation(
-              parent: secondaryAnimation,
-              curve: const InstantOutCurve(atStart: false)),
+      child: Container(
+        // The searchbar's background is transparent to avoid a mis-colored seam
+        // from having two objects of the same color adjacent to each other.
+        // Because of this, we need to temporarily put a primary color
+        // background behind it when it's animating.
+        color: animation.isRunning || secondaryAnimation.isRunning
+            ? Theme.of(context).colorScheme.primary
+            : Colors.transparent,
+        child: SlideTransition(
+          position: Tween(
+            begin: Offset.zero,
+            end: const Offset(0, 1),
+          ).animate(
+            CurvedAnimation(
+                parent: secondaryAnimation,
+                curve: const InstantOutCurve(atStart: false)),
+          ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }

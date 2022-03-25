@@ -11,10 +11,12 @@ class AdaptiveMaterial extends StatelessWidget {
   const AdaptiveMaterial({
     required this.adaptiveColor,
     required this.child,
+    this.isVisible = true,
   });
 
   final AdaptiveColor adaptiveColor;
   final Widget? child;
+  final bool isVisible;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +24,12 @@ class AdaptiveMaterial extends StatelessWidget {
       adaptiveColor,
       _ColorProvider<_Color>(
         adaptiveColor,
-        Material(
-          color: _toColor(context, adaptiveColor),
-          child: child,
-        ),
+        isVisible
+            ? Material(
+                color: _toColor(context, adaptiveColor),
+                child: child,
+              )
+            : Container(child: child),
         _toColor(context, adaptiveColor)!,
       ),
       _toOnColor(context, adaptiveColor)!,

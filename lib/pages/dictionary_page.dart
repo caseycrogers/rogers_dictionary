@@ -30,18 +30,19 @@ class DictionaryPage extends StatelessWidget {
       child: ValueListenableBuilder<TranslationModel>(
         valueListenable: DictionaryModel.instance.translationModel,
         builder: (context, model, tabBarView) {
+          final ColorScheme scheme = DictionaryApp.themeOf(model);
           return Theme(
-            data: Theme.of(context)
-                .copyWith(colorScheme: DictionaryApp.themeOf(model)),
+            data: Theme.of(context).copyWith(colorScheme: scheme),
             child: Scaffold(
-              body: Column(
-                children: [
-                  const DictionaryAppBar(),
-                  // Intentionally don't wrap this in theme, it'll cause excess
-                  // rebuilds.
-                  Expanded(
-                    child: AdaptiveMaterial(
-                      adaptiveColor: AdaptiveColor.surface,
+              backgroundColor: Colors.transparent,
+              body: AdaptiveMaterial(
+                adaptiveColor: AdaptiveColor.primary,
+                child: Column(
+                  children: [
+                    const DictionaryAppBar(),
+                    // Intentionally don't wrap this in theme, it'll cause excess
+                    // rebuilds.
+                    Expanded(
                       child: DictionaryTabBarView(
                         children: LinkedHashMap<DictionaryTab, Widget>.of({
                           DictionaryTab.search: SearchPage(),
@@ -50,9 +51,9 @@ class DictionaryPage extends StatelessWidget {
                         }),
                       ),
                     ),
-                  ),
-                  const DictionaryBannerAd(),
-                ],
+                    const DictionaryBannerAd(),
+                  ],
+                ),
               ),
               bottomNavigationBar: !isBigEnoughForAdvanced(context)
                   ? const AdaptiveMaterial(

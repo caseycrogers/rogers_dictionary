@@ -55,7 +55,7 @@ class ScreenshotTemplate extends StatelessWidget {
             child: Align(
               alignment: Alignment.topLeft,
               child: Material(
-                color: Colors.transparent,
+                type: MaterialType.transparency,
                 child: SizedBox(
                   width: device.screenSize.width,
                   height: device.screenSize.height,

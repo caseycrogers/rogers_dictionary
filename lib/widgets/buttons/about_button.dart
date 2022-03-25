@@ -9,6 +9,7 @@ import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
 class AboutButton extends StatelessWidget {
@@ -55,8 +56,8 @@ class _AboutView extends StatelessWidget {
         onClose();
         return true;
       },
-      child: Material(
-        color: Theme.of(context).cardColor,
+      child: AdaptiveMaterial(
+        adaptiveColor: AdaptiveColor.surface,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(8),

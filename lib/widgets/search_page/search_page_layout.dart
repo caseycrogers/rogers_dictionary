@@ -42,15 +42,15 @@ class _PortraitLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return TranslationModeSwitcher(
       header: _isSearch(context)
-          ? const AdaptiveMaterial(
-              adaptiveColor: AdaptiveColor.primary,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: kPad),
-                child: SearchBar(),
-              ),
+          ? const Padding(
+              padding: EdgeInsets.symmetric(horizontal: kPad),
+              child: SearchBar(),
             )
           : null,
-      child: const SelectedEntrySwitcher(),
+      child: const AdaptiveMaterial(
+        adaptiveColor: AdaptiveColor.surface,
+        child: SelectedEntrySwitcher(),
+      ),
     );
   }
 }
@@ -60,44 +60,43 @@ class _LandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        TranslationModeSwitcher(
-          child: Row(
-            children: [
-              Flexible(
-                flex: kLandscapeLeftFlex,
-                child: Container(
-                  width: double.infinity,
-                  child: Builder(
-                    builder: (context) {
-                      // We need the builder to get [SearchModel] below.
-                      return EntryList(
-                        key: PageStorageKey(
-                          '${SearchModel.of(context).mode}'
-                          '_${SearchModel.of(context).isBookmarkedOnly}'
-                          '_entry_list',
-                        ),
-                      );
-                    },
+    return AdaptiveMaterial(
+      adaptiveColor: AdaptiveColor.surface,
+      child: TranslationModeSwitcher(
+        child: Row(
+          children: [
+            Flexible(
+              flex: kLandscapeLeftFlex,
+              child: Container(
+                width: double.infinity,
+                child: Builder(
+                  builder: (context) {
+                    // We need the builder to get [SearchModel] below.
+                    return EntryList(
+                      key: PageStorageKey(
+                        '${SearchModel.of(context).mode}'
+                        '_${SearchModel.of(context).isBookmarkedOnly}'
+                        '_entry_list',
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Flexible(
+              flex: kLandscapeRightFlex,
+              child: Row(
+                children: const [
+                  VerticalDivider(width: 1),
+                  Expanded(
+                    child: SelectedEntrySwitcher(),
                   ),
-                ),
+                ],
               ),
-              Flexible(
-                flex: kLandscapeRightFlex,
-                child: Row(
-                  children: const [
-                    VerticalDivider(width: 1),
-                    Expanded(
-                      child: SelectedEntrySwitcher(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

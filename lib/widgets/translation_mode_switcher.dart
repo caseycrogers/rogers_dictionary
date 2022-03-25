@@ -4,7 +4,6 @@ import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
-import 'package:rogers_dictionary/util/constants.dart';
 
 class TranslationModeSwitcher extends StatefulWidget {
   const TranslationModeSwitcher({
@@ -59,15 +58,11 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).cardColor,
-      child: Column(
-        children: [
-          if (widget.header != null) widget.header!,
-          Expanded(child: pages(context)),
-        ],
-      ),
-      elevation: kHighElevation,
+    return Column(
+      children: [
+        if (widget.header != null) widget.header!,
+        Expanded(child: pages(context)),
+      ],
     );
   }
 
