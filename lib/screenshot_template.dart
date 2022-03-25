@@ -72,12 +72,9 @@ class ScreenshotTemplate extends StatelessWidget {
                           Container(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 5),
-                            child: Transform.scale(
-                              scale: 1,
-                              child: DeviceFrame(
-                                device: device,
-                                screen: child,
-                              ),
+                            child: DeviceFrame(
+                              device: device,
+                              screen: child,
                             ),
                           ),
                         ],
