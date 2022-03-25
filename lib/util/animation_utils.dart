@@ -14,3 +14,7 @@ class InstantOutCurve extends Curve {
     return 0;
   }
 }
+
+extension AnimationUtils on Animation {
+  bool get isRunning => !isCompleted && !isDismissed;
+}

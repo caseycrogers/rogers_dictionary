@@ -19,8 +19,10 @@ Future<void> main() async {
         imageFile.writeAsBytesSync(
           _processImage(
             screenshotBytes,
-            args.width,
-            args.height,
+            width: args.width,
+            height: args.height,
+            offsetX: args.offsetX,
+            offsetY: args.offsetY,
           ),
         );
         return true;
@@ -31,9 +33,21 @@ Future<void> main() async {
   }
 }
 
-List<int> _processImage(List<int> bytes, int width, int height) {
+List<int> _processImage(
+  List<int> bytes, {
+  required int width,
+  required int height,
+  required int? offsetX,
+  required int? offsetY,
+}) {
   final Image image = decodeImage(bytes)!;
-  final Image cropped = copyCrop(image, 0, 50, width, height);
+  final Image cropped = copyCrop(
+    image,
+    offsetX ?? 0,
+    offsetY ?? 0,
+    width,
+    height,
+  );
   return encodePng(cropped);
 }
 
@@ -42,24 +56,32 @@ class ScreenshotIdentifier {
     required this.path,
     required this.width,
     required this.height,
+    this.offsetX,
+    this.offsetY,
   });
 
   ScreenshotIdentifier.fromJson(Map<String, dynamic> json)
       : width = json['width'] as int,
         height = json['height'] as int,
+        offsetX = json['offsetX'] as int?,
+        offsetY = json['offsetY'] as int?,
         path = (json['path'] as List<dynamic>)
             .map<String>((dynamic v) => v as String)
             .toList();
 
+  final List<String> path;
+  final int width;
+  final int height;
+  final int? offsetX;
+  final int? offsetY;
+
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'path': path,
+      if (offsetX != null) 'offsetX': offsetX,
+      if (offsetY != null) 'offsetY': offsetY,
       'width': width,
       'height': height,
     };
   }
-
-  final List<String> path;
-  final int width;
-  final int height;
 }

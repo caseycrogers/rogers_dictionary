@@ -107,7 +107,7 @@ class _Button extends StatelessWidget {
         onPressed: isSelected
             ? null
             : () {
-              dictionaryModel.onTranslationModeChanged(context, mode);
+              dictionaryModel.onTranslationModeChanged(mode);
             },
         child: Container(
           alignment: Alignment.center,

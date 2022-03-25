@@ -39,7 +39,7 @@ class DictionaryModel {
     });
   }
 
-  static late final DictionaryModel _instance = DictionaryModel();
+  static late DictionaryModel _instance = DictionaryModel();
 
   final TranslationModel englishPageModel;
   final TranslationModel spanishPageModel;
@@ -62,6 +62,9 @@ class DictionaryModel {
   late ImplicitNavigatorState<DictionaryTab> tabNavigator;
 
   static DictionaryModel get instance => _instance;
+
+  @visibleForTesting
+  static void reset() => _instance = DictionaryModel();
 
   ValueNotifier<List<String>> get currentAdKeywords {
     return currentTab.expand<List<String>>((tab) {
@@ -92,8 +95,7 @@ class DictionaryModel {
   TranslationModel getPageModel(TranslationMode translationMode) =>
       isEnglish ? englishPageModel : spanishPageModel;
 
-  void onTranslationModeChanged(BuildContext context,
-      [TranslationMode? newTranslationMode]) {
+  void onTranslationModeChanged([TranslationMode? newTranslationMode]) {
     translationModel.value = translationModelFor(
         newTranslationMode ?? oppTranslationModel.translationMode);
   }

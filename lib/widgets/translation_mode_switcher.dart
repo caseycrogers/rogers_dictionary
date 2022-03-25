@@ -80,7 +80,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
         return PageView(
           controller: _controller,
           onPageChanged: (int index) => DictionaryModel.instance
-              .onTranslationModeChanged(context, indexToTranslationMode(index)),
+              .onTranslationModeChanged(indexToTranslationMode(index)),
           children: [
             Theme(
               data: Theme.of(context).copyWith(

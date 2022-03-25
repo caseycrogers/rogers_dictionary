@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/util/animation_utils.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 
 class DictionaryTabBarView extends StatefulWidget {
@@ -88,6 +89,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
         }
       });
     }
+
     return NotificationListener<ImplicitNavigatorNotification<dynamic>>(
       onNotification: (notification) {
         updateBackButton();
@@ -98,7 +100,7 @@ class _DictionaryTabBarViewState extends State<DictionaryTabBarView> {
         maintainHistory: true,
         maintainState: false,
         valueNotifier: currentTab,
-        builder: (context, tab, _, __) {
+        builder: (context, tab, animation, secondaryAnimation) {
           // Save a reference earlier so that the listener can reference it.
           navigator = ImplicitNavigator.of<dynamic>(context, root: true);
           return widget.children[tab]!;
