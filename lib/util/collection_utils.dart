@@ -16,6 +16,8 @@ extension MapUtils<K, V> on Map<K, V> {
 extension NotShittyList<T> on List<T> {
   T get(int index, {required T orElse}) =>
       index < length ? this[index] : orElse;
+}
 
-  List<T>? get emptyToNull => isEmpty ? null : this;
+extension NotShittIterable<T> on Iterable<T> {
+  Iterable<T>? get emptyToNull => isEmpty ? null : this;
 }

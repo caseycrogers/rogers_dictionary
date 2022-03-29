@@ -8,7 +8,6 @@ import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/delayed.dart';
 import 'package:rogers_dictionary/util/entry_utils.dart';
-import 'package:rogers_dictionary/util/testings/key_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/search_page/editorial_notes_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/headword_view.dart';
@@ -37,28 +36,22 @@ class EntryViewPage extends StatelessWidget {
         if (entry.isNotFound) {
           return _EntryNotFoundView(headword: entry.headword.text);
         }
-        return KeyedForTesting(
-          key: EntryKey(
-            headword: entry.headword.text,
-            isPreview: false,
-          ),
-          child: EntryViewModelProvider(
-            preview: false,
-            entry: entry,
-            child: PageHeader(
-              header: DefaultTextStyle.merge(
-                style: Theme.of(context).textTheme.headline1!,
-                child: const HeadwordView(),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  SizedBox(height: kPad),
-                  TranslationTableView(),
-                  EditorialNotesView(),
-                  RelatedView(),
-                ],
-              ),
+        return EntryViewModelProvider(
+          preview: false,
+          entry: entry,
+          child: PageHeader(
+            header: DefaultTextStyle.merge(
+              style: Theme.of(context).textTheme.headline1!,
+              child: const HeadwordView(),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                SizedBox(height: kPad),
+                TranslationTableView(),
+                EditorialNotesView(),
+                RelatedView(),
+              ],
             ),
           ),
         );
@@ -75,26 +68,23 @@ class EntryViewPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyle baseStyle = DefaultTextStyle.of(context).style;
-    return KeyedForTesting(
-      key: EntryKey(headword: entry.headword.text, isPreview: true),
-      child: Theme(
-        data: ThemeData(
-          textTheme: Theme.of(context).textTheme.copyWith(
-                headline1: baseStyle.asBold,
-                headline2: baseStyle.asBold,
-                headline3: baseStyle.asBold,
-              ),
-        ),
-        child: EntryViewModelProvider(
-          preview: true,
-          entry: entry,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              HeadwordView(),
-              TranslationTableView(),
-            ],
-          ),
+    return Theme(
+      data: ThemeData(
+        textTheme: Theme.of(context).textTheme.copyWith(
+              headline1: baseStyle.asBold,
+              headline2: baseStyle.asBold,
+              headline3: baseStyle.asBold,
+            ),
+      ),
+      child: EntryViewModelProvider(
+        preview: true,
+        entry: entry,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            HeadwordView(),
+            TranslationTableView(),
+          ],
         ),
       ),
     );

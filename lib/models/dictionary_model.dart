@@ -62,7 +62,9 @@ class DictionaryModel {
   static DictionaryModel get instance => _instance;
 
   @visibleForTesting
-  static void reset() => _instance = DictionaryModel();
+  static void reset() {
+    _instance = DictionaryModel();
+  }
 
   ValueNotifier<List<String>> get currentAdKeywords {
     return currentTab.expand<List<String>>((tab) {

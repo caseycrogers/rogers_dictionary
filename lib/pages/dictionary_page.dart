@@ -40,8 +40,8 @@ class DictionaryPage extends StatelessWidget {
                 child: Column(
                   children: [
                     const DictionaryAppBar(),
-                    // Intentionally don't wrap this in theme, it'll cause excess
-                    // rebuilds.
+                    // Intentionally don't wrap this in theme, it'll cause
+                    // excess rebuilds.
                     Expanded(
                       child: DictionaryTabBarView(
                         children: LinkedHashMap<DictionaryTab, Widget>.of({

@@ -4,7 +4,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
-import 'package:rogers_dictionary/util/constants.dart';
 
 class DictionaryBannerAd extends StatelessWidget {
   const DictionaryBannerAd({Key? key}) : super(key: key);

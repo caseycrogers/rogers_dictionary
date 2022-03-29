@@ -28,7 +28,7 @@ class DialoguesPageModel {
 
   DialogueSubChapter? selectedSubChapter;
 
-  List<DialogueChapter> get dialogues => _dialogues.toList();
+  List<DialogueChapter> get dialogues => _dialogues.toList(growable: false);
 
   Stream<DialogueChapter> get dialogueStream => _dialogueStream!;
 

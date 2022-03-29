@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 
 import 'package:rogers_dictionary/util/constants.dart';
@@ -10,6 +11,7 @@ import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/buttons/bookmarks_button.dart';
+import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 import 'package:rogers_dictionary/widgets/search_page/abbreviation_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/entry_view.dart';
 import 'package:rogers_dictionary/widgets/search_page/search_page_utils.dart';
@@ -198,15 +200,19 @@ class HighlightedText extends StatelessWidget {
   }
 
   OverflowMarkdown _markdown(BuildContext context, TextStyle? style) {
-    final overrides = _highlightSearchMatch(
-      context,
-      text,
-      EntryViewModel.of(context).isPreview,
-      SearchModel.of(context)
-          .searchString
-          .withoutDiacriticalMarks
-          .toLowerCase(),
-    );
+    // If this is bookmarks mode don't produce any highlight override rules.
+    final Map<OverrideRule, TextStyle> overrides =
+        DictionaryModel.instance.currentTab.value == DictionaryTab.bookmarks
+            ? <OverrideRule, TextStyle>{}
+            : _highlightSearchMatch(
+                context,
+                text,
+                EntryViewModel.of(context).isPreview,
+                SearchModel.of(context)
+                    .searchString
+                    .withoutDiacriticalMarks
+                    .toLowerCase(),
+              );
     return OverflowMarkdown(
       text,
       defaultStyle: style,

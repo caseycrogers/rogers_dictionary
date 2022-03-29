@@ -84,13 +84,14 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
               child: Row(
                 children: [
                   Expanded(
-                      key: const PageStorageKey<TranslationMode>(
-                        TranslationMode.English,
-                      ),
-                      child: TranslationModelProvider(
-                        translationModel: dictionaryModel.englishPageModel,
-                        child: widget.child,
-                      )),
+                    key: const PageStorageKey<TranslationMode>(
+                      TranslationMode.English,
+                    ),
+                    child: TranslationModelProvider(
+                      translationModel: dictionaryModel.englishPageModel,
+                      child: widget.child,
+                    ),
+                  ),
                   const VerticalDivider(width: .25, thickness: .25),
                 ],
               ),

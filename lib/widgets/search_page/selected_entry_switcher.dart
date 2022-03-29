@@ -53,9 +53,7 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
         _navigator = ImplicitNavigator.of<SelectedEntry?>(context);
         if (selectedEntry == null) {
           if (isBigEnoughForAdvanced(context)) {
-            return Container(
-              color: Theme.of(context).colorScheme.background,
-            );
+            return const NoEntryBackground();
           }
           return EntryList(
             key: PageStorageKey('${SearchModel.of(context).mode}'
@@ -101,6 +99,19 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
         DictionaryModel.instance.pageOffset.value < .5;
   }
 }
+
+@visibleForTesting
+class NoEntryBackground extends StatelessWidget {
+  const NoEntryBackground({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.background,
+    );
+  }
+}
+
 
 PageStorageKey _getKey(BuildContext context) {
   final String tabString =

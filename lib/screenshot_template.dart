@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/dictionary_model.dart';
+import 'package:rogers_dictionary/models/translation_model.dart';
+import 'package:rogers_dictionary/util/layout_picker.dart';
 
 Future<void> main() async {
   WidgetsApp.debugAllowBannerOverride = false;
@@ -14,7 +16,7 @@ Future<void> main() async {
         'Search thousands of terms!',
         'buscar por ',
       ),
-      device: ScreenshotDevice(device: Devices.ios.iPhone13ProMax),
+      config: ScreenshotConfig(device: Devices.ios.iPhone13ProMax),
       locale: const Locale('es'),
     ),
   );
@@ -28,7 +30,7 @@ class ScreenshotTemplate extends StatelessWidget {
     required this.header,
     required this.background,
     required this.child,
-    required ScreenshotDevice device,
+    required ScreenshotConfig device,
   })  : device = device.device,
         outputWidth = device.outputWidth,
         outputHeight = device.outputHeight,
@@ -95,12 +97,12 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
     Key? key,
     required this.headerText,
     required this.locale,
-    required this.device,
+    required this.config,
   }) : super(key: key);
 
   final i18n.Message headerText;
   final Locale locale;
-  final ScreenshotDevice device;
+  final ScreenshotConfig config;
 
   @override
   Widget build(BuildContext context) {
@@ -109,15 +111,18 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
         headerText.getForLocale(locale),
         textAlign: TextAlign.center,
         style: GoogleFonts.roboto(
-          fontWeight: FontWeight.bold,
           color: Colors.white,
           fontSize: 32,
         ),
       ),
-      background: Container(
-        color: _backgroundColor,
-      ),
-      device: device,
+      background: ValueListenableBuilder<TranslationModel>(
+          valueListenable: DictionaryModel.instance.translationModel,
+          builder: (context, translationModel, child) {
+            return Container(
+              color: _backgroundColor,
+            );
+          }),
+      device: config,
       child: DictionaryAppBase(overrideLocale: locale),
     );
   }
@@ -133,8 +138,8 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
   }
 }
 
-class ScreenshotDevice {
-  ScreenshotDevice({
+class ScreenshotConfig {
+  ScreenshotConfig({
     required this.device,
     double? outputWidth,
     double? outputHeight,
@@ -142,11 +147,13 @@ class ScreenshotDevice {
                 (outputHeight ?? device.screenSize.height) ==
             device.screenSize.aspectRatio),
         outputWidth = outputWidth ?? device.screenSize.width,
-        outputHeight = outputHeight ?? device.screenSize.height;
+        outputHeight = outputHeight ?? device.screenSize.height,
+        isLargeScreen = sizeBigEnoughForAdvanced(device.screenSize);
 
   final DeviceInfo device;
   final double outputWidth;
   final double outputHeight;
+  final bool isLargeScreen;
 }
 
 class _SimulatedNavBar extends StatelessWidget {
@@ -171,9 +178,9 @@ class _SimulatedNavBar extends StatelessWidget {
             child: Container(
               margin: const EdgeInsets.only(bottom: 8),
               height: 4,
-              width: 150,
+              width: 175,
               decoration: BoxDecoration(
-                color: Colors.white54,
+                color: Colors.white38,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

@@ -18,8 +18,11 @@ class EntrySearchModel {
     bool isBookmarkedOnly,
   ) : this._(translationMode, isBookmarkedOnly);
 
-  // Static so that this is shared between both modes
+  // Static so that this is shared between both modes.
   static final ValueNotifier<String> _currSearchString = ValueNotifier('');
+
+  @visibleForTesting
+  static void reset() => _currSearchString.value = '';
 
   // Used to expose the current entry list to other widgets.
   List<Entry> entries = [];
@@ -34,6 +37,7 @@ class EntrySearchModel {
   bool get isEmpty => currSearchString.value.isEmpty;
 
   bool get isBookmarkedOnly => _isBookmarkedOnly;
+
 
   void resetEntries() {
     entries = [];
