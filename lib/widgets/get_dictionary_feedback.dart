@@ -84,6 +84,7 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Column(
         children: [
           Expanded(
