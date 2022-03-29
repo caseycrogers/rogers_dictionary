@@ -172,7 +172,7 @@ class _EntryRow extends StatelessWidget {
     return ValueListenableBuilder<SelectedEntry?>(
       valueListenable: SearchModel.of(context).currSelectedEntry,
       builder: (context, selectedEntry, _) {
-        final bool isSelected = entry.uid == selectedEntry?.headword;
+        final bool isSelected = entry.headword.text == selectedEntry?.headword;
         final bool shouldHighlight =
             isBigEnoughForAdvanced(context) && isSelected;
         return InkWell(

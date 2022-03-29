@@ -65,6 +65,11 @@ _CapMessage submit = _CapMessage('submit', 'enviar');
 Message feedbackError = const Message(
     'Unknown error, failed to submit feedback',
     'Error desconocido, no se pudo enviar comentarios');
+_CapMessage email = _CapMessage('email', 'correo electronico');
+_CapMessage emailError =
+    _CapMessage('invalid email', 'correo electronico invalido');
+_CapMessage submitError = _CapMessage(
+    'specify a valid email', 'necesitas un correo electrónico válido');
 
 _CapMessage translationError =
     _CapMessage('translation error', 'error de traducción');

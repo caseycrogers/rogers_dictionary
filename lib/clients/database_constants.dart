@@ -71,6 +71,10 @@ const String WITHOUT_OPTIONALS = '_without_optionals';
 // Used to indicate that an opposite headword is just the translation content.
 const String OPPOSITE_HEADWORD_SENTINEL = '1';
 
+// Shared preferences.
+
+const String feedbackEmail = 'feedback_email';
+
 String entryTable(TranslationMode mode) {
   if (mode == TranslationMode.English) {
     return ENGLISH;
