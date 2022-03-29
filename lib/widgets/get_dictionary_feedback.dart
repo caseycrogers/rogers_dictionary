@@ -129,6 +129,7 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
                       onChanged: (value) => _feedbackBuilder.body = value,
                     ),
                     TextField(
+                      keyboardType: TextInputType.emailAddress,
                       controller: _emailController,
                       decoration: InputDecoration(
                         errorText: _feedbackBuilder.email == null ||
