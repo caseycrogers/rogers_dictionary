@@ -104,6 +104,9 @@ class FeedbackSender {
         ),
       );
     }
+    DictionaryApp.snackBarNotifier.showDismissibleMessage(
+      message: i18n.feedbackSuccess.getForLocale(locale),
+    );
 
     // Log user feedback in analytics
     await DictionaryApp.analytics.logEvent(
