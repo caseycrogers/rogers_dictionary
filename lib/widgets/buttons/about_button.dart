@@ -88,7 +88,7 @@ class _AboutView extends StatelessWidget {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                           image: AssetImage(
-                            join('assets', 'images', 'glenn.jpg'),
+                            join('assets', 'images', 'glenn.png'),
                           ),
                         ),
                       ),

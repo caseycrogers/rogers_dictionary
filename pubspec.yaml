@@ -60,7 +60,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/glenn.jpg
+    - assets/images/glenn.png
     - assets/
 
 flutter_icons:
