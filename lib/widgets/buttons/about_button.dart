@@ -9,6 +9,7 @@ import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning.dart';
+import 'package:rogers_dictionary/versioning/versioning_base.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 

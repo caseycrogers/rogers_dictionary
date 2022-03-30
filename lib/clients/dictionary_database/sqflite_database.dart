@@ -12,7 +12,7 @@ import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:rogers_dictionary/versioning/versioning.dart';
+import 'package:rogers_dictionary/versioning/versioning_base.dart';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -42,7 +42,7 @@ class SqfliteDatabase extends DictionaryDatabase {
     _databasesPath = await _getDatabasePath();
 
     // Manually inject proper slash, don't use join it breaks on Windows.
-    _version = DatabaseVersionUtils.fromString(
+    _version = DatabaseVersionUtilsBase.fromString(
       await rootBundle.loadString('assets/$VERSION_FILE'),
     );
     _path = join(

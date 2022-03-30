@@ -5,12 +5,11 @@ import 'package:args/args.dart';
 import 'package:df/df.dart';
 import 'package:path/path.dart';
 
-
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/clients/dialogue_builders.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
-import 'package:rogers_dictionary/versioning/versioning.dart';
+import 'package:rogers_dictionary/versioning/versioning_base.dart';
 
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -104,7 +103,7 @@ Future<void> _uploadSqlFlite(
   bool verbose,
 ) async {
   final String versionPath = join('assets', 'database_version.json');
-  final DatabaseVersion version = DatabaseVersionUtils.fromDisk(
+  final DatabaseVersion version = DatabaseVersionUtilsBase.fromDisk(
     File(versionPath),
   );
   final path = join(Directory.current.path, 'assets',

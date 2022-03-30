@@ -13,7 +13,7 @@ import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:rogers_dictionary/versioning/versioning.dart';
+import 'package:rogers_dictionary/versioning/versioning_base.dart';
 
 import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -41,7 +41,7 @@ Future<Map<String, EntryBuilder>> _getBuilders(
     'scripts',
     'entry_database-${isSpanish ? SPANISH : ENGLISH}.csv',
   );
-  final DatabaseVersion version = DatabaseVersionUtils.fromDisk(
+  final DatabaseVersion version = DatabaseVersionUtilsBase.fromDisk(
     File(join('assets', 'database_version.json')),
   );
   if (!isSpanish) {
@@ -236,7 +236,7 @@ void _setOppositeEntries(
 }
 
 Future<void> uploadEntries(bool debug, bool verbose) async {
-  final DatabaseVersion version = DatabaseVersionUtils.fromDisk(
+  final DatabaseVersion version = DatabaseVersionUtilsBase.fromDisk(
     File(join('assets', 'database_version.json')),
   );
   print('\n\nReading csv\'s!');

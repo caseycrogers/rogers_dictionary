@@ -315,7 +315,10 @@ class _SubChapterTile extends StatelessWidget {
         child: ListTile(
           visualDensity: VisualDensity.compact,
           contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          title: Text(subChapter.title(context)),
+          title: Text(
+            subChapter.title(context),
+            style: Theme.of(context).textTheme.headline2,
+          ),
           subtitle: Text(subChapter.oppositeTitle(context)),
           onTap: onTap,
         ),
