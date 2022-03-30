@@ -23,10 +23,14 @@ class DictionaryFeedback {
 class _DictionaryFeedbackBuilder {
   String? body;
   DictionaryFeedbackType type = DictionaryFeedbackType.bug_report;
-  String? email;
+  String? _email;
+
+  String? get email => _email;
+
+  set email(String? newValue) => _email = newValue?.trimRight();
 
   DictionaryFeedback build() {
-    return DictionaryFeedback(body ?? '', type, email!);
+    return DictionaryFeedback(body ?? '', type, _email!);
   }
 }
 
@@ -143,7 +147,10 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
                           _feedbackBuilder.email = value;
                           if (_isValid) {
                             sharedPreferences.then(
-                              (db) => db.setString(feedbackEmail, value),
+                              (db) => db.setString(
+                                feedbackEmail,
+                                _feedbackBuilder.email!,
+                              ),
                             );
                           }
                         });
