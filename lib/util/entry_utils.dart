@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/i18n_base.dart' as i18n;
@@ -68,23 +69,28 @@ extension EntryUtils on Entry {
     'vphrase': i18n.verbPhrase,
     'fphrase': i18n.feminineNounPhrase,
     'fplphrase': i18n.femininePluralNounPhrase,
+    'mphrase': i18n.masculineNounPhrase,
     'mfphrase': i18n.masculineFeminineNounPhrase,
     'mfplphrase': i18n.masculineFeminineNounPhrase,
-    'mphrase': i18n.masculineNounPhrase,
     'mplphrase': i18n.masculinePluralNounPhrase,
     'm(pl)phrase': i18n.masculinePluralNounPhraseParen,
   };
 
-  static String longPartOfSpeech(
+  static String? longPartOfSpeech(
     String partOfSpeech,
     bool isSpanish,
   ) {
-    return partOfSpeech.replaceAll(' ', '').splitMapJoin(
+    bool wasInvalid = false;
+    final String result = partOfSpeech.replaceAll(' ', '').splitMapJoin(
       RegExp('[&,]'),
       onNonMatch: (String partOfSpeechComponent) {
-        return _partOfSpeechAbbreviationMap[partOfSpeechComponent]
-                ?.getFor(isSpanish) ??
-            '$partOfSpeechComponent*';
+        final String? converted =
+            _partOfSpeechAbbreviationMap[partOfSpeechComponent]
+                ?.getFor(isSpanish);
+        if (converted == null) {
+          wasInvalid = true;
+        }
+        return converted ?? partOfSpeechComponent;
       },
       onMatch: (Match separator) {
         //  == '&' ? ' and ' : ', ',
@@ -98,6 +104,10 @@ extension EntryUtils on Entry {
         }
       },
     );
+    if (wasInvalid) {
+      return null;
+    }
+    return result;
   }
 }
 

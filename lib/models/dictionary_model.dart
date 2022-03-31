@@ -64,6 +64,7 @@ class DictionaryModel {
   @visibleForTesting
   static void reset() {
     _instance = DictionaryModel();
+    _instance.currTranslationModel.dialoguesPageModel.reset();
   }
 
   ValueNotifier<List<String>> get currentAdKeywords {

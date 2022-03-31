@@ -44,6 +44,8 @@ Future<void> main() async {
   });
 
   tearDown(() {
+    dictionaryModel.englishPageModel.dialoguesPageModel.reset();
+    dictionaryModel.spanishPageModel.dialoguesPageModel.reset();
     DictionaryModel.reset();
     EntrySearchModel.reset();
     dictionaryModel = DictionaryModel.instance;
@@ -104,7 +106,9 @@ Future<void> main() async {
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('01-az_en'));
+        await binding.takeScreenshot(
+          screenshotName('01-az_en'),
+        );
       });
 
       testWidgets('Spanish search page ($locale) (${config.device.name}).',
@@ -130,7 +134,9 @@ Future<void> main() async {
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('02-az_es'));
+        await binding.takeScreenshot(
+          screenshotName('02-az_es'),
+        );
       });
 
       testWidgets('Bookmarks ($locale) (${config.device.name}).',
@@ -170,7 +176,9 @@ Future<void> main() async {
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('03-bookmarks_es'));
+        await binding.takeScreenshot(
+          screenshotName('03-bookmarks_es'),
+        );
       });
 
       testWidgets('Dialogue Chapters ($locale) (${config.device.name}).',
@@ -178,21 +186,26 @@ Future<void> main() async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Translated medical dialogues!',
-              '¡Diálogos médicos traducidos!',
+              'Translations for typical medical dialogues!',
+              '¡Traducciones para diálogos médicos típicos!',
             ),
             config: config,
             locale: locale,
           ),
         );
         dictionaryModel.currentTab.value = DictionaryTab.dialogues;
+        if (locale == es) {
+          dictionaryModel.onTranslationModeChanged();
+        }
         await pumpUntilFound(
           tester,
           find.byType(DialoguesPage),
         );
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('04-chapters_en'));
+        await binding.takeScreenshot(
+          screenshotName('04-chapters_${locale.languageCode}'),
+        );
       });
 
       testWidgets('Dialogues ($locale) (${config.device.name}).',
@@ -200,8 +213,8 @@ Future<void> main() async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Translated medical dialogues!',
-              '¡Diálogos médicos traducidos!',
+              'Browse translations for typical medical dialogues!',
+              '¡Traducciones para diálogos médicos típicos!',
             ),
             config: config,
             locale: locale,
@@ -210,6 +223,9 @@ Future<void> main() async {
         final DialoguesPageModel dialoguesModel =
             dictionaryModel.translationModel.value.dialoguesPageModel;
         dictionaryModel.currentTab.value = DictionaryTab.dialogues;
+        if (locale == es) {
+          dictionaryModel.onTranslationModeChanged();
+        }
         final DialogueChapter chapter = await pumpUntil(
           tester,
           () {
@@ -236,7 +252,9 @@ Future<void> main() async {
         );
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('05-dialogues_en'));
+        await binding.takeScreenshot(
+          screenshotName('05-dialogues_${locale.languageCode}'),
+        );
       });
 
       testWidgets('Live search ($locale) (${config.device.name}).',
@@ -245,32 +263,39 @@ Future<void> main() async {
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
               'Results appear as you type!',
-              '¡Los resultados aparecen a medida que escribes!',
+              '¡Los resultados aparecen a medida que escribe!',
             ),
             config: config,
             locale: locale,
           ),
         );
-        BuildContext context = await pumpUntilFound(
+        late BuildContext context;
+        if (locale == es) {
+          dictionaryModel.onTranslationModeChanged();
+        }
+        context = await pumpUntilFound(
           tester,
-          find.byHeadword('abdomen'),
+          find.byHeadword(locale == en ? 'abdomen' : 'abandono del tabaco'),
         );
         dictionaryModel.currTranslationModel.searchModel.entrySearchModel
             .onSearchStringChanged(
           context: context,
-          newSearchString: 'fl',
+          newSearchString: locale == en ? 'fl' : 'gri',
         );
+        final String headword = locale == en ? 'flu' : 'gripe';
         context = await pumpUntilFound(
           tester,
-          find.byHeadword('flu'),
+          find.byHeadword(headword),
         );
         if (config.isLargeScreen) {
-          dictionaryModel.onHeadwordSelected(context, 'flu');
+          dictionaryModel.onHeadwordSelected(context, headword);
           await pumpUntilNotFound(tester, find.byType(NoEntryBackground));
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('06-search_en'));
+        await binding.takeScreenshot(
+          screenshotName('06-search_${locale.languageCode}'),
+        );
       });
 
       testWidgets('Fullscreen entry ($locale) (${config.device.name}).',
@@ -297,7 +322,9 @@ Future<void> main() async {
         dictionaryModel.onHeadwordSelected(context, 'strain');
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('07-complex_entry_en'));
+        await binding.takeScreenshot(
+          screenshotName('07-complex_entry_en'),
+        );
       });
 
       testWidgets('Regional entry ($locale) (${config.device.name}).',
@@ -305,8 +332,8 @@ Future<void> main() async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Regionalized  translations!',
-              '¡Traducciones regionalizadas!',
+              'View regionalized translations!',
+              '¡Las traducciones incluyen regionalismos!',
             ),
             config: config,
             locale: locale,
@@ -328,7 +355,9 @@ Future<void> main() async {
         dictionaryModel.onHeadwordSelected(context, 'kissing bug');
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(screenshotName('08-regional_en'));
+        await binding.takeScreenshot(
+          screenshotName('08-regional_en'),
+        );
       });
     }
   }

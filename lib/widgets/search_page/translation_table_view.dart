@@ -1,5 +1,5 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/entry_utils.dart';
@@ -132,17 +132,31 @@ class _PartOfSpeechChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var pos = ['na', ''].contains(text) ? '-' : text;
+    final EntryViewModel model = EntryViewModel.of(context);
+    String? pos = ['na', ''].contains(text) ? '-' : text;
+    if (!EntryViewModel.of(context).isPreview) {
+      final String? longPos = EntryUtils.longPartOfSpeech(
+        pos,
+        Localizations.localeOf(context).languageCode == 'es',
+      );
+      if (longPos == null) {
+        FirebaseCrashlytics.instance.recordFlutterError(
+          FlutterErrorDetails(
+            exception: ArgumentError(
+              'Entry \'${model.entry.headword.text}\' contained unrecognized '
+              'part of speech \'$pos\'',
+            ),
+          ),
+        );
+        pos = '$pos*';
+      } else {
+        pos = longPos;
+      }
+    }
     if (Localizations.localeOf(context).languageCode == 'es') {
       pos = pos
           .replaceAll(i18n.phrase.en, i18n.phrase.es)
           .spanishAdjectiveReorder(i18n.phrase.es);
-    }
-    if (!EntryViewModel.of(context).isPreview) {
-      pos = EntryUtils.longPartOfSpeech(
-        pos,
-        Localizations.localeOf(context).languageCode == 'es',
-      );
     }
     return DictionaryChip(
       child: Padding(

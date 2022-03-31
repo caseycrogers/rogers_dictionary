@@ -210,6 +210,7 @@ class HighlightedText extends StatelessWidget {
                 EntryViewModel.of(context).isPreview,
                 SearchModel.of(context)
                     .searchString
+                    .trimRight()
                     .withoutDiacriticalMarks
                     .toLowerCase(),
               );

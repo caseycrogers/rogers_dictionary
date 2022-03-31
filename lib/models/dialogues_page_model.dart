@@ -12,6 +12,15 @@ class DialoguesPageModel {
     _initializeStream();
   }
 
+  @visibleForTesting
+  void reset() {
+    _dialogueStream = null;
+    _dialogues.clear();
+    _initializeStream();
+    selectedSubChapter = null;
+    selectedChapterNotifier.value = null;
+  }
+
   // All static because these can be shared across both translation modes.
   static final LinkedHashSet<DialogueChapter> _dialogues = LinkedHashSet();
   static Stream<DialogueChapter>? _dialogueStream;

@@ -6,6 +6,7 @@ import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
+import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 
 Future<void> main() async {
@@ -14,7 +15,7 @@ Future<void> main() async {
     DictionaryScreenshotTemplate(
       headerText: const i18n.Message(
         'Search thousands of terms!',
-        'buscar por ',
+        '¡Traduzca más de 16K términos médicos en inglés al español!',
       ),
       config: ScreenshotConfig(device: Devices.ios.iPhone13ProMax),
       locale: const Locale('es'),
@@ -64,21 +65,26 @@ class ScreenshotTemplate extends StatelessWidget {
                   child: Stack(
                     children: [
                       background,
-                      ListView(
-                        padding: EdgeInsets.zero,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(5),
-                            child: header,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            child: DeviceFrame(
-                              device: device,
-                              screen: _SimulatedNavBar(child: child),
+                      Padding(
+                        padding: const EdgeInsets.all(4 * kPad),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 2*kPad),
+                              child: header,
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 2 * kPad),
+                                child: DeviceFrame(
+                                  device: device,
+                                  screen: _SimulatedNavBar(child: child),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -107,19 +113,35 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenshotTemplate(
-      header: Text(
-        headerText.getForLocale(locale),
-        textAlign: TextAlign.center,
-        style: GoogleFonts.roboto(
-          color: Colors.white,
-          fontSize: 32,
+      header: Container(
+        constraints: BoxConstraints(
+            minHeight:
+                sizeBigEnoughForAdvanced(config.device.screenSize) ? 50 : 115),
+        alignment: Alignment.center,
+        child: Text(
+          headerText.getForLocale(locale),
+          textAlign: TextAlign.center,
+          style: GoogleFonts.roboto(
+            color: Colors.white,
+            fontSize: 32,
+          ),
         ),
       ),
       background: ValueListenableBuilder<TranslationModel>(
           valueListenable: DictionaryModel.instance.translationModel,
           builder: (context, translationModel, child) {
             return Container(
-              color: _backgroundColor,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _backgroundColor,
+                    Color.lerp(_backgroundColor, Colors.white, .7)!,
+                  ],
+                  stops: const [.7, 1.0],
+                ),
+              ),
             );
           }),
       device: config,
@@ -127,14 +149,14 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
     );
   }
 
+  Color get _primaryColor {
+    return DictionaryModel.instance.isEnglish
+        ? DictionaryApp.englishColorScheme.primary
+        : DictionaryApp.spanishColorScheme.primary;
+  }
+
   Color get _backgroundColor {
-    return Color.lerp(
-      DictionaryModel.instance.isEnglish
-          ? DictionaryApp.englishColorScheme.primary
-          : DictionaryApp.spanishColorScheme.primary,
-      Colors.white,
-      .2,
-    )!;
+    return Color.lerp(_primaryColor, Colors.white, .2)!;
   }
 }
 
