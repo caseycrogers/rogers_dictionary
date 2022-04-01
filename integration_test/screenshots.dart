@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:rogers_dictionary/clients/dialogue_builders.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
-
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dialogues_page_model.dart';
@@ -53,25 +52,41 @@ Future<void> main() async {
 
   for (final Locale locale in [
     en,
-    es,
+    //es,
   ]) {
     for (final ScreenshotConfig config in [
       // ios.
+      // https://help.apple.com/app-store-connect/#/devd274dd925
       ScreenshotConfig(
+        category: '6.5',
         device: Devices.ios.iPhone13ProMax,
         outputWidth: 1284,
         outputHeight: 2778,
       ),
-      ScreenshotConfig(device: Devices.ios.iPadPro11Inches),
+      ScreenshotConfig(
+        category: '5.8',
+        device: Devices.ios.iPhone13,
+        outputWidth: 1170,
+        outputHeight: 2532,
+      ),
+      ScreenshotConfig(
+        category: '5.5',
+        // Technically not the correct device but it's the same aspect ratio.
+        device: Devices.ios.iPhoneSE,
+        outputWidth: 1242,
+        outputHeight: 2208,
+      ),
+      //ScreenshotConfig(device: Devices.ios.iPadPro11Inches),
       // Android.
-      ScreenshotConfig(device: Devices.android.onePlus8Pro),
+      //ScreenshotConfig(device: Devices.android.onePlus8Pro),
     ]) {
       String screenshotName(String suffix) {
         return jsonEncode(
           ScreenshotIdentifier(
             path: [
+              // ignore: prefer_interpolation_to_compose_strings
               config.device.identifier.platform.name.enumString,
-              config.device.identifier.name,
+              '${config.device.identifier.name} (${config.category})',
               locale.languageCode,
               suffix,
             ],

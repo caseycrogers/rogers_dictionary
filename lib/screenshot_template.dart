@@ -17,7 +17,10 @@ Future<void> main() async {
         'Search thousands of terms!',
         '¡Traduzca más de 16K términos médicos en inglés al español!',
       ),
-      config: ScreenshotConfig(device: Devices.ios.iPhone13ProMax),
+      config: ScreenshotConfig(
+        category: '',
+        device: Devices.ios.iPad12Inches4thGen,
+      ),
       locale: const Locale('es'),
     ),
   );
@@ -53,7 +56,10 @@ class ScreenshotTemplate extends StatelessWidget {
               MediaQuery.of(context).devicePixelRatio,
           child: Transform.scale(
             alignment: Alignment.topLeft,
-            scale: (outputWidth / device.screenSize.width) /
+            // Separate x and y because the two may be off by a rounding error.
+            scaleX: (outputWidth / device.screenSize.width) /
+                MediaQuery.of(context).devicePixelRatio,
+            scaleY: (outputHeight / device.screenSize.height) /
                 MediaQuery.of(context).devicePixelRatio,
             child: Align(
               alignment: Alignment.topLeft,
@@ -70,13 +76,12 @@ class ScreenshotTemplate extends StatelessWidget {
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 2*kPad),
+                              padding: const EdgeInsets.only(bottom: 2 * kPad),
                               child: header,
                             ),
                             Expanded(
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 2 * kPad),
+                                padding: const EdgeInsets.only(top: 2 * kPad),
                                 child: DeviceFrame(
                                   device: device,
                                   screen: _SimulatedNavBar(child: child),
@@ -122,7 +127,7 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
           headerText.getForLocale(locale),
           textAlign: TextAlign.center,
           style: GoogleFonts.roboto(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 32,
           ),
         ),
@@ -133,13 +138,14 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                  begin: Alignment(translationModel.isEnglish ? .8 : -.8, -1),
+                  end: Alignment(translationModel.isEnglish ? -.8 : .8, 1),
                   colors: [
+                    Colors.white,
+                    Colors.white,
                     _backgroundColor,
-                    Color.lerp(_backgroundColor, Colors.white, .7)!,
                   ],
-                  stops: const [.7, 1.0],
+                  stops: const [.2, .3, 1.0],
                 ),
               ),
             );
@@ -156,22 +162,30 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
   }
 
   Color get _backgroundColor {
-    return Color.lerp(_primaryColor, Colors.white, .2)!;
+    return Color.lerp(_primaryColor, Colors.white, .1)!;
   }
 }
 
 class ScreenshotConfig {
   ScreenshotConfig({
+    required this.category,
     required this.device,
     double? outputWidth,
     double? outputHeight,
-  })  : assert((outputWidth ?? device.screenSize.width) /
-                (outputHeight ?? device.screenSize.height) ==
-            device.screenSize.aspectRatio),
+  })  : assert(
+            ((outputWidth ?? device.screenSize.width) /
+                            (outputHeight ?? device.screenSize.height) -
+                        device.screenSize.aspectRatio)
+                    .abs() <
+                .1,
+            'Different aspect ratio:\n'
+            'device:${device.screenSize.width}x${device.screenSize.height}\n'
+            'output:${outputWidth}x$outputHeight'),
         outputWidth = outputWidth ?? device.screenSize.width,
         outputHeight = outputHeight ?? device.screenSize.height,
         isLargeScreen = sizeBigEnoughForAdvanced(device.screenSize);
 
+  final String category;
   final DeviceInfo device;
   final double outputWidth;
   final double outputHeight;

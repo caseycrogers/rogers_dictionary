@@ -137,9 +137,9 @@ packages:
   device_frame:
     dependency: "direct dev"
     description:
-      name: device_frame
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../flutter_device_preview/device_frame"
+      relative: true
+    source: path
     version: "1.0.0"
   df:
     dependency: "direct dev"

@@ -53,7 +53,8 @@ dev_dependencies:
   screenshot: ^1.2.3
   sqflite_common_ffi: ^2.0.0
   test: ^1.19.5
-  device_frame: ^1.0.0
+  device_frame:
+    path: ../flutter_device_preview/device_frame
   image: ^3.1.1
 
 

@@ -172,9 +172,10 @@ Future<Map<String, EntryBuilder>> _getBuilders(
       partOfSpeech = row[PART_OF_SPEECH]!;
       // Reset the qualifier
       dominantHeadwordParentheticalQualifier = '';
-      if (EntryUtils.longPartOfSpeech(partOfSpeech, false).contains('*'))
+      if (EntryUtils.longPartOfSpeech(partOfSpeech, isSpanish) == null) {
         print('${preface(isSpanish)} $WARNING Unrecognized part of speech '
             '\'$partOfSpeech\' for headword ${row[HEADWORD]} at line ${i + 2}');
+      }
     }
     if (row[DOMINANT_HEADWORD_PARENTHETICAL_QUALIFIER]!.isNotEmpty) {
       dominantHeadwordParentheticalQualifier =

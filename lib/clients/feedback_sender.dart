@@ -54,15 +54,46 @@ class FeedbackSender {
   ) async {
     final DictionaryFeedback feedback =
         userFeedback.extra!['feedback'] as DictionaryFeedback;
-
+    final DateTime timestamp = DateTime.now().toUtc();
+    final String docId = '${feedback.email.split('@').first}'
+        '-${timestamp.toIso8601String().substring(0, 19).replaceAll(':', '-')}';
+    final Uri contentUrl = _feedbackUrl.replace(
+      queryParameters: <String, String>{'documentId': docId},
+    );
+    final Uri screenshotPost =
+        _screenshotUrl.resolve('feedback%2F$docId%2Fscreenshot.png');
     final http.Response response = await _client.post(
-      _feedbackUrl,
+      contentUrl,
       body: json.encode({
         'fields': {
+          'to': {'stringValue': 'caseycrogersdev+dictionaryFeedback@gmail.com'},
+          'cc': {'stringValue': 'glenntrogers+dictionaryFeedback@gmail.com'},
+          'replyTo': {'stringValue': feedback.email},
+          'message': {
+            'mapValue': {
+              'fields': {
+                'subject': {
+                  'stringValue': '[${feedback.type.toString().enumString}] '
+                      '${feedback.body.truncated(20)}...',
+                },
+                'html': {
+                  'stringValue': '''Feedback from ${feedback.email}:<br>
+--------------------------------------------<br>
+${feedback.body}<br>
+<br>
+<img height="750" src="$screenshotPost?alt=media"><br>
+<br>
+Extra details:<br>
+--------------------------------------------<br>
+${extraText ?? ''}<br>''',
+                },
+              }
+            },
+          },
           'type': {'stringValue': feedback.type.toString().enumString},
           'body': {'stringValue': feedback.body},
           'timestamp': {
-            'integerValue': DateTime.now().toUtc().millisecondsSinceEpoch,
+            'integerValue': timestamp.millisecondsSinceEpoch,
           },
           if (extraText != null) 'extra_text': extraText,
         },
@@ -73,7 +104,7 @@ class FeedbackSender {
         FlutterErrorDetails(
           exception: HttpException(
             'Failed to upload feedback content:\n ${response.body}',
-            uri: _feedbackUrl,
+            uri: contentUrl,
           ),
           stack: StackTrace.current,
         ),
@@ -85,11 +116,8 @@ class FeedbackSender {
           });
       return;
     }
-    final String docId = Uri.parse(jsonDecode(response.body)['name']! as String)
-        .pathSegments
-        .last;
     final http.Response storageResponse = await _client.post(
-      _screenshotUrl.resolve('feedback%2F$docId%2Fscreenshot.png'),
+      screenshotPost,
       headers: {'Content-Type': 'image/png'},
       body: userFeedback.screenshot,
     );

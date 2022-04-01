@@ -71,6 +71,10 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
   final Future<SharedPreferences> sharedPreferences =
       SharedPreferences.getInstance();
 
+  // Necessary to prevent double submissions from pressing the button
+  // repeatedly.
+  bool _submitted = false;
+
   @override
   void initState() {
     sharedPreferences.then((sharedPreferences) {
@@ -163,13 +167,18 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
             ),
           ),
           TextButton(
-            onPressed: _isValid
-                ? () => widget.onSubmit(
+            onPressed: _isValid && !_submitted
+                ? () {
+                    setState(() {
+                      _submitted = true;
+                    });
+                    widget.onSubmit(
                       '',
                       extras: <String, DictionaryFeedback>{
                         'feedback': _feedbackBuilder.build()
                       },
-                    )
+                    );
+                  }
                 : null,
             child: Text(i18n.submit.cap.get(context)),
           ),
