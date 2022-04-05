@@ -52,7 +52,7 @@ Future<void> main() async {
 
   for (final Locale locale in [
     en,
-    //es,
+    es,
   ]) {
     for (final ScreenshotConfig config in [
       // ios.
@@ -76,7 +76,18 @@ Future<void> main() async {
         outputWidth: 1242,
         outputHeight: 2208,
       ),
-      //ScreenshotConfig(device: Devices.ios.iPadPro11Inches),
+      ScreenshotConfig(
+        category: '12.9 gen2',
+        device: Devices.ios.iPad12InchesGen2,
+        outputHeight: 2732,
+        outputWidth: 2048,
+      ),
+      ScreenshotConfig(
+        category: '12.9 gen4',
+        device: Devices.ios.iPad12InchesGen4,
+        outputHeight: 2732,
+        outputWidth: 2048,
+      ),
       // Android.
       //ScreenshotConfig(device: Devices.android.onePlus8Pro),
     ]) {
@@ -113,11 +124,16 @@ Future<void> main() async {
         final BuildContext context = await pumpUntilFound(
           tester,
           find.byHeadword('abdomen'),
+          msg: 'abdomen',
         );
         if (config.isLargeScreen) {
           dictionaryModel.onHeadwordSelected(context, 'abdomen');
           // Wait until the widget has animated out of view.
-          await pumpUntilNotFound(tester, find.byType(NoEntryBackground));
+          await pumpUntilNotFound(
+            tester,
+            find.byType(NoEntryBackground),
+            msg: 'NoEntryBackground',
+          );
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
@@ -142,10 +158,15 @@ Future<void> main() async {
         final BuildContext context = await pumpUntilFound(
           tester,
           find.byHeadword('abandono del tabaco'),
+          msg: 'abandono del tabaco',
         );
         if (config.isLargeScreen) {
           dictionaryModel.onHeadwordSelected(context, 'abandono del tabaco');
-          await pumpUntilNotFound(tester, find.byType(NoEntryBackground));
+          await pumpUntilNotFound(
+            tester,
+            find.byType(NoEntryBackground),
+            msg: 'NoEntryBackground',
+          );
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
@@ -170,6 +191,7 @@ Future<void> main() async {
         BuildContext context = await pumpUntilFound(
           tester,
           find.byHeadword('abandono del tabaco'),
+          msg: 'abandono del tabaco',
         );
         context = await findAndBookmark(
             context, tester, TranslationMode.Spanish, 'pie');
@@ -187,7 +209,11 @@ Future<void> main() async {
         dictionaryModel.currentTab.value = DictionaryTab.bookmarks;
         if (config.isLargeScreen) {
           dictionaryModel.onHeadwordSelected(context, 'pie');
-          await pumpUntilNotFound(tester, find.byType(NoEntryBackground));
+          await pumpUntilNotFound(
+            tester,
+            find.byType(NoEntryBackground),
+            msg: 'NoEntryBackground',
+          );
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
@@ -215,6 +241,7 @@ Future<void> main() async {
         await pumpUntilFound(
           tester,
           find.byType(DialoguesPage),
+          msg: 'DialoguesPage',
         );
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
@@ -251,6 +278,7 @@ Future<void> main() async {
                 .emptyToNull
                 ?.first;
           },
+          msg: 'chapter: \'History and Physical\'',
         );
         final DialogueSubChapter subChapter =
             chapter.dialogueSubChapters.firstWhere((subChapter) {
@@ -259,11 +287,13 @@ Future<void> main() async {
         final BuildContext context = await pumpUntilFound(
           tester,
           find.byType(DialoguesPage),
+          msg: 'DialoguesPage',
         );
         dialoguesModel.onChapterSelected(context, chapter, subChapter);
         await pumpUntilFound(
           tester,
           find.byType(ChapterView),
+          msg: 'ChapterView',
         );
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
@@ -291,7 +321,11 @@ Future<void> main() async {
         context = await pumpUntilFound(
           tester,
           find.byHeadword(locale == en ? 'abdomen' : 'abandono del tabaco'),
+          msg: locale == en ? 'abdomen' : 'abandono del tabaco',
         );
+        // Necessary or else the search string won't update consistently
+        // for reasons unknown.
+        await tester.pumpAndSettle();
         dictionaryModel.currTranslationModel.searchModel.entrySearchModel
             .onSearchStringChanged(
           context: context,
@@ -301,10 +335,15 @@ Future<void> main() async {
         context = await pumpUntilFound(
           tester,
           find.byHeadword(headword),
+          msg: headword,
         );
         if (config.isLargeScreen) {
           dictionaryModel.onHeadwordSelected(context, headword);
-          await pumpUntilNotFound(tester, find.byType(NoEntryBackground));
+          await pumpUntilNotFound(
+            tester,
+            find.byType(NoEntryBackground),
+            msg: 'NoEntryBackground',
+          );
         }
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
@@ -328,7 +367,11 @@ Future<void> main() async {
         final BuildContext context = await pumpUntilFound(
           tester,
           find.byHeadword('abdomen'),
+          msg: 'abdomen',
         );
+        // Necessary or else the search string won't update consistently
+        // for reasons unknown.
+        await tester.pumpAndSettle();
         dictionaryModel.currTranslationModel.searchModel.entrySearchModel
             .onSearchStringChanged(
           context: context,
@@ -357,7 +400,11 @@ Future<void> main() async {
         BuildContext context = await pumpUntilFound(
           tester,
           find.byHeadword('abdomen'),
+          msg: 'abdomen',
         );
+        // Necessary or else the search string won't update consistently
+        // for reasons unknown.
+        await tester.pumpAndSettle();
         dictionaryModel.currTranslationModel.searchModel.entrySearchModel
             .onSearchStringChanged(
           context: context,
@@ -366,6 +413,7 @@ Future<void> main() async {
         context = await pumpUntilFound(
           tester,
           find.byHeadword('kissing bug'),
+          msg: 'kissing bug',
         );
         dictionaryModel.onHeadwordSelected(context, 'kissing bug');
         await tester.pumpAndSettle();
@@ -376,29 +424,6 @@ Future<void> main() async {
       });
     }
   }
-}
-
-Future<T> pumpUntil<T extends Object>(
-  WidgetTester tester,
-  T? Function() test, {
-  Duration timeout = const Duration(seconds: 5),
-}) async {
-  bool timerDone = false;
-  final timer = Timer(
-    timeout,
-    () => throw TimeoutException('Pump until has timed out'),
-  );
-  T? result;
-  while (timerDone != true) {
-    await tester.pump();
-    result = test();
-    if (result != null) {
-      timerDone = true;
-    }
-  }
-  timer.cancel();
-  // If we've broken out of the for loop result must be non-null.
-  return result!;
 }
 
 extension FinderUtils on CommonFinders {
@@ -423,6 +448,7 @@ Future<Element> pumpUntilFound(
   WidgetTester tester,
   Finder finder, {
   Duration timeout = const Duration(seconds: 5),
+  required String msg,
 }) {
   return pumpUntil(
     tester,
@@ -430,6 +456,7 @@ Future<Element> pumpUntilFound(
       final Iterable<Element> elements = finder.evaluate();
       return elements.isEmpty ? null : elements.first;
     },
+    msg: msg,
   );
 }
 
@@ -437,6 +464,7 @@ Future<void> pumpUntilNotFound(
   WidgetTester tester,
   Finder finder, {
   Duration timeout = const Duration(seconds: 5),
+  required String msg,
 }) {
   return pumpUntil(
     tester,
@@ -446,7 +474,34 @@ Future<void> pumpUntilNotFound(
       // to short-circuit `pumpUntil`.
       return elements.isEmpty ? Object() : null;
     },
+    msg: 'not $msg',
   );
+}
+
+Future<T> pumpUntil<T extends Object>(
+  WidgetTester tester,
+  T? Function() test, {
+  Duration timeout = const Duration(seconds: 5),
+  required String msg,
+}) async {
+  bool timerDone = false;
+  final timer = Timer(
+    timeout,
+    () {
+      throw TimeoutException('Pump until has timed out trying to find: $msg');
+    },
+  );
+  T? result;
+  while (timerDone != true) {
+    await tester.pump();
+    result = test();
+    if (result != null) {
+      timerDone = true;
+    }
+  }
+  timer.cancel();
+  // If we've broken out of the for loop result must be non-null.
+  return result!;
 }
 
 Future<BuildContext> findAndBookmark(
@@ -455,13 +510,19 @@ Future<BuildContext> findAndBookmark(
   TranslationMode mode,
   String headword,
 ) async {
+  // Necessary or else the search string won't update consistently
+  // for reasons unknown.
+  await tester.pumpAndSettle();
   DictionaryModel.instance.currTranslationModel.searchModel.entrySearchModel
       .onSearchStringChanged(
     context: context,
     newSearchString: headword,
   );
-  final Element element =
-      await pumpUntilFound(tester, find.byHeadword(headword));
+  final Element element = await pumpUntilFound(
+    tester,
+    find.byHeadword(headword),
+    msg: 'bookmarking: \'$headword\'',
+  );
   final Entry entry = (element.widget as EntryViewPreview).entry;
   await DictionaryApp.db.setBookmark(TranslationMode.Spanish, entry, true);
   return element;

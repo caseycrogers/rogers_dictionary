@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
+import 'package:rogers_dictionary/main.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
@@ -11,6 +12,8 @@ import 'package:rogers_dictionary/util/layout_picker.dart';
 
 Future<void> main() async {
   WidgetsApp.debugAllowBannerOverride = false;
+  WidgetsFlutterBinding.ensureInitialized();
+  await initialize();
   runApp(
     DictionaryScreenshotTemplate(
       headerText: const i18n.Message(
@@ -19,7 +22,9 @@ Future<void> main() async {
       ),
       config: ScreenshotConfig(
         category: '',
-        device: Devices.ios.iPad12Inches4thGen,
+        device: Devices.ios.iPad12InchesGen2,
+        outputHeight: 2732,
+        outputWidth: 2048,
       ),
       locale: const Locale('es'),
     ),
@@ -216,7 +221,9 @@ class _SimulatedNavBar extends StatelessWidget {
               height: 4,
               width: 175,
               decoration: BoxDecoration(
-                color: Colors.white38,
+                color: isBigEnoughForAdvanced(context)
+                    ? Colors.black38
+                    : Colors.white38,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

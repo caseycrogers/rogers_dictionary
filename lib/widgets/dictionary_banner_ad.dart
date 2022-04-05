@@ -10,7 +10,7 @@ class DictionaryBannerAd extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (const bool.fromEnvironment('is_screenshot')) {
+    if (true || const bool.fromEnvironment('is_screenshot')) {
       // Google ads make integration tests hang so skip them if we're in a test
       // environment. Dictionary app uses integration tests to automatically
       // generate screenshots.

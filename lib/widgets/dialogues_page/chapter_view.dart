@@ -86,38 +86,41 @@ class _ChapterViewState extends State<ChapterView> {
           subtitle: Text(widget.chapter.oppositeTitle(context)),
         ),
       ),
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              // Ghost tile to push down the scrolling view.
-              if (widget.chapter.hasSubChapters)
-                _SubChapterTile(
-                  subChapter: _currentSubChapter.value,
+      child: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2!,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                // Ghost tile to push down the scrolling view.
+                if (widget.chapter.hasSubChapters)
+                  _SubChapterTile(
+                    subChapter: _currentSubChapter.value,
+                  ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
+                    child: _dialoguesList(dialoguesModel),
+                  ),
                 ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
-                  child: _dialoguesList(dialoguesModel),
+              ],
+            ),
+            // Background tap-to-dismiss scrim.
+            IgnorePointer(
+              ignoring: !_isExpanded,
+              child: GestureDetector(
+                onTap: () => setState(() {
+                  _isExpanded = false;
+                }),
+                child: AnimatedContainer(
+                  color: _isExpanded ? Colors.black38 : Colors.transparent,
+                  duration: const Duration(milliseconds: 50),
                 ),
-              ),
-            ],
-          ),
-          // Background tap-to-dismiss scrim.
-          IgnorePointer(
-            ignoring: !_isExpanded,
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _isExpanded = false;
-              }),
-              child: AnimatedContainer(
-                color: _isExpanded ? Colors.black38 : Colors.transparent,
-                duration: const Duration(milliseconds: 50),
               ),
             ),
-          ),
-          if (widget.chapter.hasSubChapters) _subChapterSelector(),
-        ],
+            if (widget.chapter.hasSubChapters) _subChapterSelector(),
+          ],
+        ),
       ),
     );
   }
@@ -154,7 +157,8 @@ class _ChapterViewState extends State<ChapterView> {
                           style: Theme.of(context).textTheme.headline2,
                         ),
                         subtitle: Text(
-                            _currentSubChapter.value.oppositeTitle(context)),
+                          _currentSubChapter.value.oppositeTitle(context),
+                        ),
                       ),
                       progress: _subChapterProgress,
                       style: IndicatorStyle.linear,
@@ -214,7 +218,7 @@ class _ChapterViewState extends State<ChapterView> {
             visualDensity: VisualDensity.compact,
             title: Text(
               dialogue.content(context),
-              style: const TextStyle().asBold,
+              style: Theme.of(context).textTheme.bodyText2!.asBold,
             ),
             subtitle: Text(dialogue.oppositeContent(context)),
             tileColor: dialogueIndex % 2 == 0

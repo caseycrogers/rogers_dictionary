@@ -42,12 +42,16 @@ class TableOfContentsView extends StatelessWidget {
                   snapshot.data![index - 1].title(context)) {
             return Container();
           }
-          if (chapter.hasSubChapters)
+          if (chapter.hasSubChapters) {
             return ExpansionTile(
-              title: Text(
-                chapter.title(context),
-                style: TextStyle(color: AdaptiveMaterial.onColorOf(context))
-                    .asBold,
+              title: DefaultTextStyle(
+                style: Theme.of(context)
+                    .textTheme
+                    .headline1!
+                    .asColor(AdaptiveMaterial.onColorOf(context)!),
+                child: Text(
+                  chapter.title(context),
+                ),
               ),
               subtitle: Text(
                 chapter.oppositeTitle(context),
@@ -67,6 +71,7 @@ class TableOfContentsView extends StatelessWidget {
                   .toList(),
               iconColor: AdaptiveMaterial.secondaryOnColorOf(context),
             );
+          }
           return _clickableHeader(context, false, chapter: chapter);
         },
       );
@@ -86,9 +91,14 @@ class TableOfContentsView extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       minLeadingWidth: 0,
       leading: isSubHeader ? const IndentIcon() : null,
-      title: Text(
-        subChapter?.title(context) ?? chapter.title(context),
-        style: const TextStyle().asBold,
+      title: DefaultTextStyle(
+        style: Theme.of(context)
+            .textTheme
+            .headline1!
+            .asColor(AdaptiveMaterial.onColorOf(context)!),
+        child: Text(
+          subChapter?.title(context) ?? chapter.title(context),
+        ),
       ),
       subtitle: Text(
           subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context)),

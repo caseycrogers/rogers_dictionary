@@ -87,7 +87,6 @@ class EntrySearchModel {
       // Value hasn't changed, don't update.
       return;
     }
-    DictionaryApp.analytics.logSearch(searchTerm: newSearchString);
     if (!isBigEnoughForAdvanced(context) && newSearchString.isNotEmpty) {
       DictionaryModel.instance.clearSelectedEntry(
         context,
@@ -97,5 +96,6 @@ class EntrySearchModel {
       );
     }
     entries = [];
+    DictionaryApp.analytics.logSearch(searchTerm: newSearchString);
   }
 }
