@@ -18,17 +18,17 @@ Message aboutPassage = const Message(
       'a patient, including slang, regionalisms, and more.\n\n'
       'It also provides an extensive sample dialogue section based on my '
       '30-plus year history as an internist with Spanish-speaking patients in '
-      'outpatient, Med-Surg ward, and ICU settings.\n',
-  'Hola, bienvenido a mi applicación de traducción médica inglés/español, '
-      'la versión digital de la 5ta edición de mi diccionario médico bilingüe '
-      'que se publicará a finales de este año (2022). La app traduce cualquier '
+      'outpatient and hospital settings, both urban and rural.\n',
+  'Hola, bienvenido a mi applicación de traducción médica inglés/español, la '
+      'versión digital de la 5ta edición de mi diccionario médico bilingüe que '
+      'se publicará a finales de este año (2022). La app traduce cualquier '
       'término médico que pueda surgir en una conversación entre un '
       'profesional de la salud y un paciente, incluyendo jergas, regionalismos '
       'y más.\n\n'
-      'También proporciona una amplia sección de diálogos de muestra '
-      'basada en mi experiencia de más de 30 años como internista con '
-      'pacientes hispanohablantes en entornos ambulatorios y hospitalarios, '
-      'incluso en la UCI.\n',
+      'También proporciona una amplia sección de diálogos de muestra basada en '
+      'mi experiencia de más de 30 años como internista con pacientes '
+      'hispanohablantes en entornos ambulatorios y hospitalarios, tanto '
+      'urbanos como rurales.\n',
 );
 Message enjoyTheApp = const Message('Enjoy the app!', '¡Disfruta de la app!');
 
@@ -65,9 +65,8 @@ _CapMessage submit = _CapMessage('submit', 'enviar');
 Message feedbackError = const Message(
     'Unknown error, failed to submit feedback',
     'Error desconocido, no se pudo enviar comentarios');
-Message feedbackSuccess = const Message(
-    'Feedback submitted!',
-    '¡Comentarios enviados!');
+Message feedbackSuccess =
+    const Message('Feedback submitted!', '¡Comentarios enviados!');
 _CapMessage email = _CapMessage('email', 'correo electronico');
 _CapMessage emailError =
     _CapMessage('invalid email', 'correo electronico invalido');
@@ -115,7 +114,7 @@ Message transitiveVerb = const Message('transitive verb', 'verbo transitivo');
 Message phrase = const Message('phrase', 'frase');
 Message blank = const Message('', '');
 
-Message adjectivePhrase = const Message('adjective phrase', 'frase adjectival');
+Message adjectivePhrase = const Message('adjective phrase', 'frase adjetival');
 Message adverbPhrase = const Message('adverb phrase', 'frase adverbial');
 Message degreePhrase = const Message('degree phrase', 'frase de grado');
 Message nounPhrase = const Message('noun phrase', 'frase nominal');
@@ -125,8 +124,8 @@ Message prepositionPhrase =
 Message verbPhrase = const Message('verb phrase', 'frase verbal');
 Message feminineNounPhrase =
     const Message('feminine noun phrase', 'frase nominal femenina');
-Message femininePluralNounPhrase =
-    const Message('feminine plural noun phrase', 'frase nominal femenina');
+Message femininePluralNounPhrase = const Message(
+    'feminine plural noun phrase', 'frase nominal femenina plural');
 Message masculineFeminineNounPhrase = const Message(
     'masculine/feminine noun phrase', 'frase nominal masculina/femenina');
 Message masculineFemininePluralNounPhrase = const Message(
@@ -138,6 +137,7 @@ Message masculinePluralNounPhrase =
     const Message('masculine plural phrase', 'frase nominal masculina');
 Message masculinePluralNounPhraseParen =
     const Message('masculine (plural) phrase', 'frase nominal masculina');
+Message and = const Message('and', 'y');
 
 // Misc.
 _CapMessage loading = _CapMessage('loading', 'cargando');

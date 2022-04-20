@@ -57,39 +57,50 @@ Future<void> main() async {
     for (final ScreenshotConfig config in [
       // ios.
       // https://help.apple.com/app-store-connect/#/devd274dd925
-      ScreenshotConfig(
-        category: '6.5',
-        device: Devices.ios.iPhone13ProMax,
-        outputWidth: 1284,
-        outputHeight: 2778,
-      ),
-      ScreenshotConfig(
-        category: '5.8',
-        device: Devices.ios.iPhone13,
-        outputWidth: 1170,
-        outputHeight: 2532,
-      ),
-      ScreenshotConfig(
-        category: '5.5',
-        // Technically not the correct device but it's the same aspect ratio.
-        device: Devices.ios.iPhoneSE,
-        outputWidth: 1242,
-        outputHeight: 2208,
-      ),
-      ScreenshotConfig(
-        category: '12.9 gen2',
-        device: Devices.ios.iPad12InchesGen2,
-        outputHeight: 2732,
-        outputWidth: 2048,
-      ),
-      ScreenshotConfig(
-        category: '12.9 gen4',
-        device: Devices.ios.iPad12InchesGen4,
-        outputHeight: 2732,
-        outputWidth: 2048,
-      ),
+      //ScreenshotConfig(
+      //  category: '6.5',
+      //  device: Devices.ios.iPhone13ProMax,
+      //  outputWidth: 1284,
+      //  outputHeight: 2778,
+      //),
+      //ScreenshotConfig(
+      //  category: '5.8',
+      //  device: Devices.ios.iPhone13,
+      //  outputWidth: 1170,
+      //  outputHeight: 2532,
+      //),
+      //ScreenshotConfig(
+      //  category: '5.5',
+      //  // Technically not the correct device but it's the same aspect ratio.
+      //  device: Devices.ios.iPhoneSE,
+      //  outputWidth: 1242,
+      //  outputHeight: 2208,
+      //),
+      //ScreenshotConfig(
+      //  category: '12.9 gen2',
+      //  device: Devices.ios.iPad12InchesGen2,
+      //  outputHeight: 2732,
+      //  outputWidth: 2048,
+      //),
+      //ScreenshotConfig(
+      //  category: '12.9 gen4',
+      //  device: Devices.ios.iPad12InchesGen4,
+      //  outputHeight: 2732,
+      //  outputWidth: 2048,
+      //),
       // Android.
-      //ScreenshotConfig(device: Devices.android.onePlus8Pro),
+      ScreenshotConfig(
+        category: '',
+        device: Devices.android.onePlus8Pro,
+        outputHeight: 3168,
+        outputWidth: 1440,
+      ),
+      ScreenshotConfig(
+        category: '',
+        device: Devices.android.mediumTablet,
+        outputHeight: 1024,
+        outputWidth: 1350,
+      ),
     ]) {
       String screenshotName(String suffix) {
         return jsonEncode(

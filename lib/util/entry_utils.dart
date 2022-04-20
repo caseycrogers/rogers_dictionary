@@ -96,7 +96,7 @@ extension EntryUtils on Entry {
         //  == '&' ? ' and ' : ', ',
         switch (separator.group(0)) {
           case '&':
-            return ' and ';
+            return ' ${i18n.and.getFor(isSpanish)} ';
           case ',':
             return ', ';
           default:
