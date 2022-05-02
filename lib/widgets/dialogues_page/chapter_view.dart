@@ -9,6 +9,7 @@ import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -68,134 +69,146 @@ class _ChapterViewState extends State<ChapterView> {
   Widget build(BuildContext context) {
     final DialoguesPageModel dialoguesModel =
         TranslationModel.of(context).dialoguesPageModel;
-    return PageHeader(
-      scrollable: false,
-      padding: 0,
-      header: Container(
-        padding: const EdgeInsets.symmetric(horizontal: kPad),
-        color: Theme.of(context).cardColor,
-        child: ListTile(
-          visualDensity: VisualDensity.compact,
-          contentPadding: EdgeInsets.zero,
-          title: DefaultTextStyle(
-            style: Theme.of(context).textTheme.headline1!,
-            child: Text(
-              widget.chapter.title(context),
-            ),
-          ),
-          subtitle: Text(widget.chapter.oppositeTitle(context)),
-        ),
-      ),
-      child: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodyText2!,
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                // Ghost tile to push down the scrolling view.
-                if (widget.chapter.hasSubChapters)
-                  _SubChapterTile(
-                    subChapter: _currentSubChapter.value,
-                  ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
-                    child: _dialoguesList(dialoguesModel),
-                  ),
-                ),
-              ],
-            ),
-            // Background tap-to-dismiss scrim.
-            IgnorePointer(
-              ignoring: !_isExpanded,
-              child: GestureDetector(
-                onTap: () => setState(() {
-                  _isExpanded = false;
-                }),
-                child: AnimatedContainer(
-                  color: _isExpanded ? Colors.black38 : Colors.transparent,
-                  duration: const Duration(milliseconds: 50),
-                ),
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: kPad),
+          color: Theme.of(context).cardColor,
+          child: ListTile(
+            visualDensity: VisualDensity.compact,
+            contentPadding: EdgeInsets.zero,
+            title: DefaultTextStyle(
+              style: Theme.of(context).textTheme.headline1!,
+              child: Text(
+                widget.chapter.title(context),
               ),
             ),
-            if (widget.chapter.hasSubChapters) _subChapterSelector(),
-          ],
+            subtitle: Text(widget.chapter.oppositeTitle(context)),
+          ),
         ),
-      ),
+        Expanded(
+          child: DefaultTextStyle(
+            style: Theme.of(context).textTheme.bodyText2!,
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // Ghost tile to push down the scrolling view.
+                    if (widget.chapter.hasSubChapters)
+                      _SubChapterTile(
+                        subChapter: _currentSubChapter.value,
+                      ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
+                        child: _dialoguesList(dialoguesModel),
+                      ),
+                    ),
+                  ],
+                ),
+                // Background tap-to-dismiss scrim.
+                IgnorePointer(
+                  ignoring: !_isExpanded,
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      _isExpanded = false;
+                    }),
+                    child: AnimatedContainer(
+                      color: _isExpanded ? Colors.black38 : Colors.transparent,
+                      duration: const Duration(milliseconds: 50),
+                    ),
+                  ),
+                ),
+                if (widget.chapter.hasSubChapters) _subChapterSelector(),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _subChapterSelector() => ValueListenableBuilder(
         valueListenable: _currentSubChapter,
-        builder: (context, _, child) => SingleChildScrollView(
-          child: ColoredBox(
-            color: Theme.of(context).cardColor,
-            child: ExpansionPanelList(
-              expansionCallback: (index, _) {
-                assert(index == 0,
-                    'There should only ever be a single element in this list');
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              elevation: kGroundElevation,
-              expandedHeaderPadding: EdgeInsets.zero,
-              children: [
-                ExpansionPanel(
-                  backgroundColor: Colors.transparent,
-                  isExpanded: _isExpanded,
-                  canTapOnHeader: true,
-                  headerBuilder: (context, isOpen) {
-                    return DictionaryProgressIndicator(
-                      child: ListTile(
-                        tileColor: Colors.transparent,
-                        visualDensity: VisualDensity.compact,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 2 * kPad),
-                        title: Text(
-                          _currentSubChapter.value.title(context),
-                          style: Theme.of(context).textTheme.headline2,
-                        ),
-                        subtitle: Text(
-                          _currentSubChapter.value.oppositeTitle(context),
-                        ),
-                      ),
-                      progress: _subChapterProgress,
-                      style: IndicatorStyle.linear,
+        builder: (context, _, child) {
+          return SingleChildScrollView(
+            child: ColoredBox(
+              color: Theme.of(context).cardColor,
+              child: DictionaryProgressIndicator(
+                progress: _subChapterProgress,
+                style: IndicatorStyle.linear,
+                child: ExpansionPanelList(
+                  expansionCallback: (index, _) {
+                    assert(
+                      index == 0,
+                      'There should only ever be a single element in this list',
                     );
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
                   },
-                  body: Column(
-                    children: widget.chapter.dialogueSubChapters.map(
-                      (subChapter) {
-                        return _SubChapterTile(
-                          subChapter: subChapter,
-                          isSelected: subChapter == _currentSubChapter.value,
-                          onTap: () {
-                            _inProgrammaticScroll = true;
-                            _scrollController
-                                .scrollTo(
-                                  index: _subChapterToIndex(subChapter),
-                                  duration: const Duration(milliseconds: 100),
-                                )
-                                .then((_) => _inProgrammaticScroll = false);
-                            Future<void>.delayed(
-                                    const Duration(milliseconds: 50))
-                                .then((_) {
-                              _currentSubChapter.value = subChapter;
-                              setState(() {
-                                _isExpanded = false;
-                              });
-                            });
-                          },
+                  elevation: kGroundElevation,
+                  expandedHeaderPadding: EdgeInsets.zero,
+                  children: [
+                    ExpansionPanel(
+                      backgroundColor: Colors.transparent,
+                      isExpanded: _isExpanded,
+                      canTapOnHeader: true,
+                      headerBuilder: (context, isOpen) {
+                        return ListTile(
+                          tileColor: Colors.transparent,
+                          visualDensity: VisualDensity.compact,
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 2 * kPad),
+                          title: Text(
+                            _currentSubChapter.value.title(context),
+                            style: Theme.of(context).textTheme.headline2,
+                          ),
+                          subtitle: Text(
+                            _currentSubChapter.value.oppositeTitle(context),
+                          ),
                         );
                       },
-                    ).toList(),
-                  ),
+                      body: AdaptiveMaterial(
+                        adaptiveColor: AdaptiveColor.surface,
+                        child: Column(
+                          children: widget.chapter.dialogueSubChapters.map(
+                            (subChapter) {
+                              return _SubChapterTile(
+                                subChapter: subChapter,
+                                isSelected:
+                                    subChapter == _currentSubChapter.value,
+                                onTap: () {
+                                  _inProgrammaticScroll = true;
+                                  _scrollController
+                                      .scrollTo(
+                                        index: _subChapterToIndex(subChapter),
+                                        duration:
+                                            const Duration(milliseconds: 100),
+                                      )
+                                      .then(
+                                          (_) => _inProgrammaticScroll = false);
+                                  Future<void>.delayed(
+                                    const Duration(milliseconds: 50),
+                                  ).then((_) {
+                                    _currentSubChapter.value = subChapter;
+                                    setState(() {
+                                      _isExpanded = false;
+                                    });
+                                  });
+                                },
+                              );
+                            },
+                          ).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       );
 
   Widget _dialoguesList(DialoguesPageModel dialoguesModel) {

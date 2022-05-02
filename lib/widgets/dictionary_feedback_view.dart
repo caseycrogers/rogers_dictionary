@@ -1,10 +1,12 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:feedback/feedback.dart';
+import 'package:flutter/gestures.dart';
 
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/clients/database_constants.dart';
 
 import 'package:rogers_dictionary/i18n.dart' as i18n;
+import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -74,6 +76,10 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
   // Necessary to prevent double submissions from pressing the button
   // repeatedly.
   bool _submitted = false;
+
+  // Whether the user just attempted a failed submit. Used to determine if the
+  // invalid error should be displayed.
+  bool _failedSubmit = false;
 
   @override
   void initState() {
@@ -149,14 +155,6 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
                       onChanged: (value) {
                         setState(() {
                           _feedbackBuilder.email = value;
-                          if (_isValid) {
-                            sharedPreferences.then(
-                              (db) => db.setString(
-                                feedbackEmail,
-                                _feedbackBuilder.email!,
-                              ),
-                            );
-                          }
                         });
                       },
                     ),
@@ -167,8 +165,36 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
             ),
           ),
           TextButton(
-            onPressed: _isValid && !_submitted
+            // Display null if we've submitted or we've already failed to submit
+            // and haven't fixed the form yet.
+            onPressed: !_submitted && !(_failedSubmit && !_isValid)
                 ? () {
+                    if (!_isValid) {
+                      // Display error message and expand sheet.
+                      setState(() {
+                        _failedSubmit = true;
+                        BetterFeedback.of(context)
+                            .sheetController
+                            .animateTo(
+                              1,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.linear,
+                            )
+                            .then((_) {
+                          WidgetsBinding.instance!.addPostFrameCallback(
+                              (timeStamp) => _simulateDrag());
+                        });
+                      });
+                      return;
+                    }
+                    sharedPreferences.then(
+                      (db) {
+                        return db.setString(
+                          feedbackEmail,
+                          _feedbackBuilder.email!,
+                        );
+                      },
+                    );
                     setState(() {
                       _submitted = true;
                     });
@@ -182,15 +208,23 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
                 : null,
             child: Text(i18n.submit.cap.get(context)),
           ),
-          if (!_isValid)
+          if (_failedSubmit && !_isValid)
             Text(
               i18n.submitError.get(context),
               style: const TextStyle(color: Colors.red),
             ),
+          const SizedBox(height: kPad),
         ],
       ),
     );
   }
 
   bool get _isValid => EmailValidator.validate(_feedbackBuilder.email ?? '');
+
+  // Gross hack to keep the keyboard opening from
+  // resetting everything after a programmatic drag.
+  void _simulateDrag() {
+    (widget.controller.position as ScrollPositionWithSingleContext)
+        .applyUserOffset(.1);
+  }
 }

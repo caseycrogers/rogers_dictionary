@@ -12,7 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
+import 'package:rogers_dictionary/widgets/dictionary_feedback_view.dart';
 
 class FeedbackSender {
   FeedbackSender({

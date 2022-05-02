@@ -142,7 +142,10 @@ class _EntryListState extends State<_EntryList> {
                 searchModel.searchString.isEmpty &&
                 !searchModel.isBookmarkedOnly) ...[
               const CollapsingNoResultsWidget(),
-              const Divider(height: 0),
+              const Divider(
+                thickness: 1,
+                height: 1,
+              ),
             ],
             _EntryRow(entry: snap.data![index]),
             // Put no results widget at top

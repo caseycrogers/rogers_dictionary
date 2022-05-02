@@ -12,21 +12,21 @@ _CapMessage dialogues = _CapMessage('dialogues', 'diálogos');
 _CapMessage about = _CapMessage('about', 'sobre');
 Message aboutPassage = const Message(
   'Hi, welcome to my English/Spanish medical translation app, the digital '
-      'version of the 5th edition of my bilingual medical dictionary to be '
-      'published later this year (2022). The app translates any medical term'
-      ' likely to come up in a conversation between a health professional and '
-      'a patient, including slang, regionalisms, and more.\n\n'
+      'version of the fifth edition of my bilingual medical dictionary to be '
+      'published in print form later this year (2022). The app translates any '
+      'medical term likely to come up in a conversation between a health '
+      'professional and a patient, including slang, regionalisms, and more.\n\n'
       'It also provides an extensive sample dialogue section based on my '
-      '30-plus year history as an internist with Spanish-speaking patients in '
-      'outpatient and hospital settings, both urban and rural.\n',
+      '30-plus year history as an internist treating Spanish-speaking patients '
+      'in outpatient and hospital settings, both urban and rural.\n',
   'Hola, bienvenido a mi applicación de traducción médica inglés/español, la '
-      'versión digital de la 5ta edición de mi diccionario médico bilingüe que '
-      'se publicará a finales de este año (2022). La app traduce cualquier '
-      'término médico que pueda surgir en una conversación entre un '
-      'profesional de la salud y un paciente, incluyendo jergas, regionalismos '
-      'y más.\n\n'
+      'versión digital de la quinta edición de mi diccionario médico bilingüe que '
+      'se publicará en forma de libro más adelante durante este  año (2022). '
+      'La app traduce cualquier término médico que pueda surgir en una '
+      'conversación entre un profesional de la salud y un paciente, incluyendo '
+      'jergas, regionalismos y más.\n\n'
       'También proporciona una amplia sección de diálogos de muestra basada en '
-      'mi experiencia de más de 30 años como internista con pacientes '
+      'mi experiencia de más de 30 años como internista tratando pacientes '
       'hispanohablantes en entornos ambulatorios y hospitalarios, tanto '
       'urbanos como rurales.\n',
 );
@@ -70,8 +70,10 @@ Message feedbackSuccess =
 _CapMessage email = _CapMessage('email', 'correo electronico');
 _CapMessage emailError =
     _CapMessage('invalid email', 'correo electronico invalido');
-_CapMessage submitError = _CapMessage(
-    'specify a valid email', 'necesitas un correo electrónico válido');
+Message submitError = _CapMessage(
+  'You must specify a valid email. You\'ll only need to enter this once.',
+  'Necesitas un correo electrónico válido',
+);
 
 _CapMessage translationError =
     _CapMessage('translation error', 'error de traducción');

@@ -12,7 +12,7 @@ import 'package:rogers_dictionary/clients/snack_bar_notifier.dart';
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
-import 'package:rogers_dictionary/widgets/get_dictionary_feedback.dart';
+import 'package:rogers_dictionary/widgets/dictionary_feedback_view.dart';
 
 class DictionaryApp extends StatefulWidget {
   const DictionaryApp({this.overrideLocale, Key? key}) : super(key: key);

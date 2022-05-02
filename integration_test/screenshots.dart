@@ -98,8 +98,8 @@ Future<void> main() async {
       ScreenshotConfig(
         category: '',
         device: Devices.android.mediumTablet,
-        outputHeight: 1024,
-        outputWidth: 1350,
+        outputHeight: 1350,
+        outputWidth: 1024,
       ),
     ]) {
       String screenshotName(String suffix) {
@@ -125,8 +125,8 @@ Future<void> main() async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Search for 15k+ English medical translations!',
-              '¡Busca más de 15k traducciones médicas en inglés!',
+              'Translate over 16K medical terms from English to Spanish...',
+              '¡Traduzca más de 16K términos médicos del inglés al español...',
             ),
             config: config,
             locale: locale,
@@ -158,8 +158,8 @@ Future<void> main() async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              '...and 15k+ Spanish medical translations!',
-              '...y más de 15k traducciones médicas al español!',
+              'or from Spanish to English!',
+              'o del español al inglés!',
             ),
             config: config,
             locale: locale,
