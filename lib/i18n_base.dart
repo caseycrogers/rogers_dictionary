@@ -30,7 +30,7 @@ Message aboutPassage = const Message(
       'hispanohablantes en entornos ambulatorios y hospitalarios, tanto '
       'urbanos como rurales.\n',
 );
-Message enjoyTheApp = const Message('Enjoy the app!', '¡Disfruta de la app!');
+Message enjoyTheApp = const Message('Enjoy the app!', '¡Difrute de la app!');
 
 // Localization for EntryList.
 _CapMessage search = _CapMessage('search', 'buscar');
@@ -43,9 +43,9 @@ Message noBookmarksHint = const Message(
 Message typosHint = const Message('No results! Check for typos ',
     '¡No hay resultados! Compruebe si hay errores ortográficos ');
 Message swipeForSpanish = const Message('or swipe left for spanish mode.',
-    'o desliza a la izquierda para traducir términos en español.');
+    'o deslice a la izquierda para traducir términos en español.');
 Message swipeForEnglish = const Message('or swipe right for english mode.',
-    'o desliza a la derecha para traducir términos en inglés.');
+    'o deslice a la derecha para traducir términos en inglés.');
 
 // Localizations for EntryView.
 Message irregularInflections =

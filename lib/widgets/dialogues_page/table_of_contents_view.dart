@@ -27,57 +27,59 @@ class TableOfContentsView extends StatelessWidget {
   }
 
   Widget _buildTopic(BuildContext context,
-          AsyncSnapshot<List<DialogueChapter>> snapshot, int index) =>
-      Builder(
-        builder: (BuildContext context) {
-          if (snapshot.hasError) {
-            print(snapshot.error);
-          }
-          if (!snapshot.hasData) {
-            return const LoadingText();
-          }
-          final DialogueChapter chapter = snapshot.data![index];
-          if (index != 0 &&
-              chapter.title(context) ==
-                  snapshot.data![index - 1].title(context)) {
-            return Container();
-          }
-          if (chapter.hasSubChapters) {
-            return ExpansionTile(
-              title: DefaultTextStyle(
-                style: Theme.of(context)
-                    .textTheme
-                    .headline1!
-                    .asColor(AdaptiveMaterial.onColorOf(context)!),
-                child: Text(
-                  chapter.title(context),
-                ),
+      AsyncSnapshot<List<DialogueChapter>> snapshot, int index) {
+    return Builder(
+      builder: (BuildContext context) {
+        if (snapshot.hasError) {
+          print(snapshot.error);
+        }
+        if (!snapshot.hasData) {
+          return const LoadingText();
+        }
+        final DialogueChapter chapter = snapshot.data![index];
+        if (index != 0 &&
+            chapter.title(context) ==
+                snapshot.data![index - 1].title(context)) {
+          return Container();
+        }
+        if (chapter.hasSubChapters) {
+          return ExpansionTile(
+            title: DefaultTextStyle(
+              style: Theme.of(context)
+                  .textTheme
+                  .headline1!
+                  .asColor(AdaptiveMaterial.onColorOf(context)!),
+              child: Text(
+                chapter.title(context),
               ),
-              subtitle: Text(
-                chapter.oppositeTitle(context),
-                style: TextStyle(
-                    color: AdaptiveMaterial.secondaryOnColorOf(context)),
-              ),
-              key: _getKey(context, chapter),
-              children: chapter.dialogueSubChapters
-                  .map(
-                    (subChapter) => _clickableHeader(
-                      context,
-                      true,
-                      chapter: chapter,
-                      subChapter: subChapter,
-                    ),
-                  )
-                  .toList(),
-              iconColor: AdaptiveMaterial.secondaryOnColorOf(context),
-            );
-          }
-          return _clickableHeader(context, false, chapter: chapter);
-        },
-      );
+            ),
+            subtitle: Text(
+              chapter.oppositeTitle(context),
+              style: TextStyle(
+                  color: AdaptiveMaterial.secondaryOnColorOf(context)),
+            ),
+            key: _getKey(context, chapter),
+            children: chapter.dialogueSubChapters
+                .map(
+                  (subChapter) => _clickableHeader(
+                    context,
+                    true,
+                    chapter: chapter,
+                    subChapter: subChapter,
+                  ),
+                )
+                .toList(),
+            iconColor: AdaptiveMaterial.secondaryOnColorOf(context),
+          );
+        }
+        return _clickableHeader(context, false, chapter: chapter);
+      },
+    );
+  }
 
-  PageStorageKey _getKey(BuildContext context, DialogueChapter dialogue) =>
-      PageStorageKey<String>(dialogue.englishTitle);
+  PageStorageKey _getKey(BuildContext context, DialogueChapter dialogue) {
+    return PageStorageKey<String>(dialogue.englishTitle);
+  }
 
   Widget _clickableHeader(
     BuildContext context,
@@ -101,10 +103,12 @@ class TableOfContentsView extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-          subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context)),
+        subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context),
+      ),
       trailing: OpenPage(),
-      onTap: () =>
-          dialoguesModel.onChapterSelected(context, chapter, subChapter),
+      onTap: () {
+        dialoguesModel.onChapterSelected(context, chapter, subChapter);
+      },
     );
   }
 }
