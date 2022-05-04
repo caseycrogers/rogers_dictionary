@@ -1,6 +1,5 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:feedback/feedback.dart';
-import 'package:flutter/gestures.dart';
 
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/clients/database_constants.dart';
@@ -97,125 +96,144 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Column(
-        children: [
-          Expanded(
-            // The stack is necessary to make the feedback drag handle work.
-            child: Stack(
-              children: [
-                ListView(
-                  // 20 is the radius of feedback's rounded corners.
-                  padding: const EdgeInsets.all(20),
-                  controller: widget.controller,
+    return Stack(
+      children: [
+        SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Expanded(
+                // The stack is necessary to make the feedback drag handle work.
+                child: Stack(
                   children: [
-                    Row(
+                    ListView(
+                      // 20 is the radius of feedback's rounded corners.
+                      padding: const EdgeInsets.all(20),
+                      controller: widget.controller,
                       children: [
-                        Text('${i18n.feedbackType.cap.get(context)}: '),
-                        DropdownButton<DictionaryFeedbackType>(
-                          value: _feedbackBuilder.type,
-                          items: DictionaryFeedbackType.values.map(
-                            (type) {
-                              return DropdownMenuItem<DictionaryFeedbackType>(
-                                child: Text(
-                                  typeToString(
-                                    Localizations.localeOf(context),
-                                    type,
-                                  ),
-                                ),
-                                value: type,
-                              );
-                            },
-                          ).toList(),
-                          onChanged: (type) {
-                            setState(() => _feedbackBuilder.type = type!);
+                        Row(
+                          children: [
+                            Text('${i18n.feedbackType.cap.get(context)}: '),
+                            DropdownButton<DictionaryFeedbackType>(
+                              value: _feedbackBuilder.type,
+                              items: DictionaryFeedbackType.values.map(
+                                (feedbackType) {
+                                  return DropdownMenuItem<
+                                      DictionaryFeedbackType>(
+                                    child: Text(
+                                      typeToString(
+                                        Localizations.localeOf(context),
+                                        feedbackType,
+                                      ),
+                                    ),
+                                    value: feedbackType,
+                                  );
+                                },
+                              ).toList(),
+                              onChanged: (feedbackType) {
+                                setState(() {
+                                  _feedbackBuilder.type = feedbackType!;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        TextField(
+                          minLines: 1,
+                          maxLines: 10,
+                          decoration: InputDecoration(
+                            helperText: i18n.feedback.cap.get(context),
+                          ),
+                          onChanged: (value) => _feedbackBuilder.body = value,
+                        ),
+                        TextField(
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            errorText: _feedbackBuilder.email == null ||
+                                    EmailValidator.validate(
+                                        _feedbackBuilder.email!)
+                                ? null
+                                : i18n.emailError.cap.get(context),
+                            helperText: i18n.email.cap.get(context),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _feedbackBuilder.email = value;
+                            });
                           },
                         ),
                       ],
                     ),
-                    TextField(
-                      minLines: 1,
-                      maxLines: 10,
-                      decoration: InputDecoration(
-                        helperText: i18n.feedback.cap.get(context),
-                      ),
-                      onChanged: (value) => _feedbackBuilder.body = value,
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.emailAddress,
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        errorText: _feedbackBuilder.email == null ||
-                                EmailValidator.validate(_feedbackBuilder.email!)
-                            ? null
-                            : i18n.emailError.cap.get(context),
-                        helperText: i18n.email.cap.get(context),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _feedbackBuilder.email = value;
-                        });
-                      },
-                    ),
+                    const FeedbackSheetDragHandle(),
                   ],
                 ),
-                const FeedbackSheetDragHandle(),
-              ],
-            ),
-          ),
-          TextButton(
-            // Display null if we've submitted or we've already failed to submit
-            // and haven't fixed the form yet.
-            onPressed: !_submitted && !(_failedSubmit && !_isValid)
-                ? () {
-                    if (!_isValid) {
-                      // Display error message and expand sheet.
-                      setState(() {
-                        _failedSubmit = true;
-                        BetterFeedback.of(context)
-                            .sheetController
-                            .animateTo(
-                              1,
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.linear,
-                            )
-                            .then((_) {
-                          WidgetsBinding.instance!.addPostFrameCallback(
-                              (timeStamp) => _simulateDrag());
-                        });
-                      });
-                      return;
-                    }
-                    sharedPreferences.then(
-                      (db) {
-                        return db.setString(
-                          feedbackEmail,
-                          _feedbackBuilder.email!,
+              ),
+              TextButton(
+                // Display null if we've submitted or we've already failed to submit
+                // and haven't fixed the form yet.
+                onPressed: !_submitted && !(_failedSubmit && !_isValid)
+                    ? () {
+                        if (!_isValid) {
+                          // Display error message and expand sheet.
+                          setState(() {
+                            _failedSubmit = true;
+                            BetterFeedback.of(context)
+                                .sheetController
+                                .animateTo(
+                                  1,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.linear,
+                                )
+                                .then((_) {
+                              WidgetsBinding.instance!.addPostFrameCallback(
+                                  (timeStamp) => _simulateDrag());
+                            });
+                          });
+                          return;
+                        }
+                        sharedPreferences.then(
+                          (db) {
+                            return db.setString(
+                              feedbackEmail,
+                              _feedbackBuilder.email!,
+                            );
+                          },
                         );
-                      },
-                    );
-                    setState(() {
-                      _submitted = true;
-                    });
-                    widget.onSubmit(
-                      '',
-                      extras: <String, DictionaryFeedback>{
-                        'feedback': _feedbackBuilder.build()
-                      },
-                    );
-                  }
-                : null,
-            child: Text(i18n.submit.cap.get(context)),
+                        setState(() {
+                          _submitted = true;
+                        });
+                        widget.onSubmit(
+                          '',
+                          extras: <String, DictionaryFeedback>{
+                            'feedback': _feedbackBuilder.build()
+                          },
+                        );
+                      }
+                    : null,
+                child: Text(i18n.submit.cap.get(context)),
+              ),
+              if (_failedSubmit && !_isValid)
+                Text(
+                  i18n.submitError.get(context),
+                  style: const TextStyle(color: Colors.red),
+                ),
+              const SizedBox(height: kPad),
+            ],
           ),
-          if (_failedSubmit && !_isValid)
-            Text(
-              i18n.submitError.get(context),
-              style: const TextStyle(color: Colors.red),
+        ),
+        if (_submitted)
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.black12,
+            alignment: Alignment.bottomCenter,
+            child: const SizedBox(
+              height: 6,
+              child: LinearProgressIndicator(),
             ),
-          const SizedBox(height: kPad),
-        ],
-      ),
+          ),
+      ],
     );
   }
 

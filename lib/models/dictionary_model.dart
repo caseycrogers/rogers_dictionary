@@ -61,6 +61,7 @@ class DictionaryModel {
 
   static DictionaryModel get instance => _instance;
 
+  // Only used for taking screenshots.
   @visibleForTesting
   static void reset() {
     _instance = DictionaryModel();

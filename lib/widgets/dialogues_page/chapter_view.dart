@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/clients/dialogue_builders.dart';
 import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
-import 'package:rogers_dictionary/pages/page_header.dart';
 import 'package:rogers_dictionary/protobufs/dialogues.pb.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/dialogue_extensions.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
+import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
@@ -100,7 +100,9 @@ class _ChapterViewState extends State<ChapterView> {
                       ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2 * kPad,
+                        ),
                         child: _dialoguesList(dialoguesModel),
                       ),
                     ),
@@ -233,7 +235,7 @@ class _ChapterViewState extends State<ChapterView> {
               dialogue.content(context),
               style: Theme.of(context).textTheme.bodyText2!.asBold,
             ),
-            subtitle: Text(dialogue.oppositeContent(context)),
+            subtitle: OverflowMarkdown(dialogue.oppositeContent(context)),
             tileColor: dialogueIndex % 2 == 0
                 ? Theme.of(context).selectedRowColor
                 : Colors.transparent,

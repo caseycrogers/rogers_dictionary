@@ -20,9 +20,9 @@ Message aboutPassage = const Message(
       '30-plus year history as an internist treating Spanish-speaking patients '
       'in outpatient and hospital settings, both urban and rural.\n',
   'Hola, bienvenido a mi applicación de traducción médica inglés/español, la '
-      'versión digital de la quinta edición de mi diccionario médico bilingüe que '
-      'se publicará en forma de libro más adelante durante este  año (2022). '
-      'La app traduce cualquier término médico que pueda surgir en una '
+      'versión digital de la quinta edición de mi diccionario médico bilingüe '
+      'que se publicará en forma de libro más adelante durante este  año '
+      '(2022). La app traduce cualquier término médico que pueda surgir en una '
       'conversación entre un profesional de la salud y un paciente, incluyendo '
       'jergas, regionalismos y más.\n\n'
       'También proporciona una amplia sección de diálogos de muestra basada en '

@@ -12,7 +12,7 @@ class DialoguesPageModel {
     _initializeStream();
   }
 
-  @visibleForTesting
+  // Only used for taking screenshots.
   void reset() {
     _dialogueStream = null;
     _dialogues.clear();
