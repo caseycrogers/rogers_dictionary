@@ -229,7 +229,7 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
             color: Colors.black12,
             alignment: Alignment.bottomCenter,
             child: const SizedBox(
-              height: 6,
+              height: 4,
               child: LinearProgressIndicator(),
             ),
           ),
