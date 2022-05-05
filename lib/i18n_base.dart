@@ -72,12 +72,12 @@ _CapMessage emailError =
     _CapMessage('invalid email', 'correo electronico invalido');
 Message submitError = _CapMessage(
   'You must specify a valid email. You\'ll only need to enter this once.',
-  'Necesitas un correo electrónico válido',
+  'Necesitas un correo electrónico válido. Solo tiene que ingresarlo una vez.',
 );
 
 _CapMessage translationError =
     _CapMessage('translation error', 'error de traducción');
-_CapMessage bugReport = _CapMessage('bug report', 'error informático');
+_CapMessage bugReport = _CapMessage('bug report', 'informe de error');
 _CapMessage featureRequest =
     _CapMessage('feature request', 'solicitud de función');
 _CapMessage other = _CapMessage('other', 'otro');
@@ -153,7 +153,7 @@ Message audioPlaybackTimeoutMsg = const Message(
 );
 Message invalidEntry = const Message('Invalid entry', 'Entrada inválida');
 Message reportBug = const Message('report bug', 'reporte un error');
-Message retry = const Message('retry', 'rever');
+Message retry = const Message('retry', 'vuelva a intentar');
 
 class Message {
   const Message(this.en, this.es);
