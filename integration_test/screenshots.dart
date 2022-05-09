@@ -57,37 +57,37 @@ Future<void> main() async {
     for (final ScreenshotConfig config in [
       // ios.
       // https://help.apple.com/app-store-connect/#/devd274dd925
-      //ScreenshotConfig(
-      //  category: '6.5',
-      //  device: Devices.ios.iPhone13ProMax,
-      //  outputWidth: 1284,
-      //  outputHeight: 2778,
-      //),
-      //ScreenshotConfig(
-      //  category: '5.8',
-      //  device: Devices.ios.iPhone13,
-      //  outputWidth: 1170,
-      //  outputHeight: 2532,
-      //),
-      //ScreenshotConfig(
-      //  category: '5.5',
-      //  // Technically not the correct device but it's the same aspect ratio.
-      //  device: Devices.ios.iPhoneSE,
-      //  outputWidth: 1242,
-      //  outputHeight: 2208,
-      //),
-      //ScreenshotConfig(
-      //  category: '12.9 gen2',
-      //  device: Devices.ios.iPad12InchesGen2,
-      //  outputHeight: 2732,
-      //  outputWidth: 2048,
-      //),
-      //ScreenshotConfig(
-      //  category: '12.9 gen4',
-      //  device: Devices.ios.iPad12InchesGen4,
-      //  outputHeight: 2732,
-      //  outputWidth: 2048,
-      //),
+      ScreenshotConfig(
+        category: '6.5',
+        device: Devices.ios.iPhone13ProMax,
+        outputWidth: 1284,
+        outputHeight: 2778,
+      ),
+      ScreenshotConfig(
+        category: '5.8',
+        device: Devices.ios.iPhone13,
+        outputWidth: 1170,
+        outputHeight: 2532,
+      ),
+      ScreenshotConfig(
+        category: '5.5',
+        // Technically not the correct device but it's the same aspect ratio.
+        device: Devices.ios.iPhoneSE,
+        outputWidth: 1242,
+        outputHeight: 2208,
+      ),
+      ScreenshotConfig(
+        category: '12.9 gen2',
+        device: Devices.ios.iPad12InchesGen2,
+        outputHeight: 2732,
+        outputWidth: 2048,
+      ),
+      ScreenshotConfig(
+        category: '12.9 gen4',
+        device: Devices.ios.iPad12InchesGen4,
+        outputHeight: 2732,
+        outputWidth: 2048,
+      ),
       // Android.
       ScreenshotConfig(
         category: '',
@@ -119,14 +119,14 @@ Future<void> main() async {
         );
       }
 
-      testWidgets('English search page ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - English search page.',
           (WidgetTester tester) async {
         // English search page.
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Translate over 16K medical terms from English to Spanish...',
-              '¡Traduzca más de 16K términos médicos del inglés al español...',
+              'Translate over 16K English medical terms to Spanish!',
+              '¡Traduzca más de 16K términos médicos en inglés al español!',
             ),
             config: config,
             locale: locale,
@@ -153,13 +153,13 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Spanish search page ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Spanish search page.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'or from Spanish to English!',
-              'o del español al inglés!',
+              '...and over 16K Spanish medical terms to English!',
+              '¡...y más de 16K términos médicos del español al inglés!',
             ),
             config: config,
             locale: locale,
@@ -186,13 +186,13 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Bookmarks ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Bookmarks.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Bookmark words to study!',
-              '¡Marca palabras para estudiar!',
+              'Bookmark words you want to study!',
+              '¡Marque las palabras que quiere estudiar!',
             ),
             config: config,
             locale: locale,
@@ -233,13 +233,13 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Dialogue Chapters ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Dialogue Chapters.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Translations for typical medical dialogues!',
-              '¡Traducciones para diálogos médicos típicos!',
+              'Browse translations of typical medical dialogues!',
+              '¡Explore las traducciones de diálogos médicos típicos!',
             ),
             config: config,
             locale: locale,
@@ -261,13 +261,13 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Dialogues ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Dialogues.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Browse translations for typical medical dialogues!',
-              '¡Traducciones para diálogos médicos típicos!',
+              'Browse translations of typical medical dialogues!',
+              '¡Explore las traducciones de diálogos médicos típicos!',
             ),
             config: config,
             locale: locale,
@@ -313,7 +313,7 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Live search ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Live search.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
@@ -363,13 +363,13 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Fullscreen entry ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Fullscreen entry.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'Detailed and comprehensive translations!',
-              '¡Traducciones detalladas y completas!',
+              'Translations are detailed and comprehensive!',
+              '¡Las traducciones son detalladas y completas!',
             ),
             config: config,
             locale: locale,
@@ -396,13 +396,13 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('Regional entry ($locale) (${config.device.name}).',
+      testWidgets('($locale) (${config.device.name}) - Regional entry.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              'View regionalized translations!',
-              '¡Las traducciones incluyen regionalismos!',
+              '¡...and include regional terms and colloquialisms!',
+              '¡...e incluyen regionalismos y coloquialismos!',
             ),
             config: config,
             locale: locale,
