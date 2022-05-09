@@ -401,7 +401,7 @@ Future<void> main() async {
         await tester.pumpWidget(
           DictionaryScreenshotTemplate(
             headerText: const i18n.Message(
-              '¡...and include regional terms and colloquialisms!',
+              '...and include regional terms and colloquialisms!',
               '¡...e incluyen regionalismos y coloquialismos!',
             ),
             config: config,
