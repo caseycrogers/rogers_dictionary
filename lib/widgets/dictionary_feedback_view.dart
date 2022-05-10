@@ -170,8 +170,8 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
                 ),
               ),
               TextButton(
-                // Display null if we've submitted or we've already failed to submit
-                // and haven't fixed the form yet.
+                // Display null if we've submitted or we've already failed to
+                // submit and haven't fixed the form yet.
                 onPressed: !_submitted && !(_failedSubmit && !_isValid)
                     ? () {
                         if (!_isValid) {

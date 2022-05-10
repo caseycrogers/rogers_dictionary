@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -76,7 +78,7 @@ class _DictionaryBannerAdBaseState extends State<_DictionaryBannerAdBase> {
       _query.size.width.truncate(),
     );
     final BannerAd ad = BannerAd(
-      adUnitId: _testAdUnitId,
+      adUnitId: Platform.isIOS ? _iosAdUnitId : _androidAdUnitId,
       size: adSize ?? AdSize.banner,
       request: AdRequest(
         keywords: [
