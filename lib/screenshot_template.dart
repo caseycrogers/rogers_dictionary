@@ -22,9 +22,7 @@ Future<void> main() async {
       ),
       config: ScreenshotConfig(
         category: '',
-        device: Devices.ios.iPad12InchesGen2,
-        outputHeight: 2732,
-        outputWidth: 2048,
+        device: Devices.android.largeTablet,
       ),
       locale: const Locale('es'),
     ),
@@ -39,10 +37,10 @@ class ScreenshotTemplate extends StatelessWidget {
     required this.header,
     required this.background,
     required this.child,
-    required ScreenshotConfig device,
-  })  : device = device.device,
-        outputWidth = device.outputWidth,
-        outputHeight = device.outputHeight,
+    required ScreenshotConfig screenshotConfig,
+  })  : device = screenshotConfig.device,
+        outputWidth = screenshotConfig.outputWidth,
+        outputHeight = screenshotConfig.outputHeight,
         super(key: key);
 
   final Widget header;
@@ -155,7 +153,7 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
               ),
             );
           }),
-      device: config,
+      screenshotConfig: config,
       child: DictionaryAppBase(overrideLocale: locale),
     );
   }

@@ -98,14 +98,10 @@ Future<void> main() async {
       ScreenshotConfig(
         category: '10',
         device: Devices.android.largeTablet,
-        outputHeight: 1880,
-        outputWidth: 1280,
       ),
       ScreenshotConfig(
         category: '7',
         device: Devices.android.mediumTablet,
-        outputHeight: 1350,
-        outputWidth: 1024,
       ),
     ]) {
       String screenshotName(String suffix) {
