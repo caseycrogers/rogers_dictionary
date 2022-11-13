@@ -31,8 +31,7 @@ const Locale en = Locale('en', '');
 const Locale es = Locale('es', '');
 
 Future<void> main() async {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
-      as IntegrationTestWidgetsFlutterBinding;
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   DictionaryModel dictionaryModel = DictionaryModel.instance;
 
   setUpAll(() async {

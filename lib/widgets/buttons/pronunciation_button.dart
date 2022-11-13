@@ -43,7 +43,7 @@ class PronunciationButton extends StatelessWidget {
           );
         } else {
           currButton = _PlayingButton(text, mode, playbackStream, () {
-            WidgetsBinding.instance!.addPostFrameCallback((_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
               _currPlaybackStream.value = null;
             });
           });

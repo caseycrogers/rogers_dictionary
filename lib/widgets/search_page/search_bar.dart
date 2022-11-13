@@ -125,7 +125,7 @@ class _SearchBarBase extends StatelessWidget {
                         controller?.clear();
                         // Re-request focus after build is done otherwise the
                         // build takes focus right back.
-                        WidgetsBinding.instance!
+                        WidgetsBinding.instance
                             .addPostFrameCallback((timeStamp) {
                           focusNode.requestFocus();
                         });

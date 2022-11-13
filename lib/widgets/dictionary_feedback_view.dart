@@ -186,7 +186,7 @@ class _DictionaryFeedbackViewState extends State<DictionaryFeedbackView> {
                                   curve: Curves.linear,
                                 )
                                 .then((_) {
-                              WidgetsBinding.instance!.addPostFrameCallback(
+                              WidgetsBinding.instance.addPostFrameCallback(
                                   (timeStamp) => _simulateDrag());
                             });
                           });
