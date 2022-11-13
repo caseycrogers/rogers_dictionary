@@ -6,7 +6,12 @@ import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 
 class DictionaryTabBar extends StatelessWidget {
-  const DictionaryTabBar({Key? key}) : super(key: key);
+  const DictionaryTabBar({
+    Key? key,
+    this.expanded = true,
+  }) : super(key: key);
+
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +28,10 @@ class DictionaryTabBar extends StatelessWidget {
             text: tabToText(context, tab),
           );
         }).toList(),
-        isScrollable: true,
+        // Scrollable tab bars take up the minimum space possible.
+        // This is useful for when we're in advanced layout, but not in the
+        // regular layout.
+        isScrollable: !expanded,
         indicator: const BoxDecoration(),
       ),
     );

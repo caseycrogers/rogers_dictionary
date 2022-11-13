@@ -58,7 +58,7 @@ class _DictionaryTopBar extends StatelessWidget {
             const SizedBox(width: kPad),
             const TranslationModeSelector(),
             const Spacer(),
-            const DictionaryTabBar(),
+            const DictionaryTabBar(expanded: false),
             const SizedBox(width: 2),
             Container(
               margin: const EdgeInsets.symmetric(vertical: kPad),
