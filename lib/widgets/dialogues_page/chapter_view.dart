@@ -318,16 +318,12 @@ class _SubChapterTile extends StatelessWidget {
     this.isSelected = false,
     this.onTap,
     this.horizontalPadding = 2 * kPad,
-    this.titleColor,
-    this.subtitleColor,
   }) : super(key: key);
 
   final DialogueSubChapter subChapter;
   final bool isSelected;
   final VoidCallback? onTap;
   final double horizontalPadding;
-  final Color? titleColor;
-  final Color? subtitleColor;
 
   @override
   Widget build(BuildContext context) {
@@ -339,14 +335,10 @@ class _SubChapterTile extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           title: Text(
             subChapter.title(context),
-            style: Theme.of(context)
-                .textTheme
-                .headline2!
-                .copyWith(color: titleColor),
+            style: Theme.of(context).textTheme.headline2,
           ),
           subtitle: Text(
             subChapter.oppositeTitle(context),
-            style: TextStyle(color: subtitleColor),
           ),
           onTap: onTap,
         ),
