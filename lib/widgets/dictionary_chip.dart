@@ -25,12 +25,18 @@ class DictionaryChip extends StatelessWidget {
           left: kPad,
           right: kPad + 2,
         ),
-        child: Padding(
-          padding: childPadding ?? EdgeInsets.zero,
-          child: child,
+        child: DefaultTextStyle(
+          style: Theme.of(context)
+              .textTheme
+              .bodyText2!
+              .copyWith(color: Theme.of(context).chipTheme.labelStyle!.color),
+          child: Padding(
+            padding: childPadding ?? EdgeInsets.zero,
+            child: child,
+          ),
         ),
         decoration: BoxDecoration(
-          color: color ?? Colors.grey.shade300,
+          color: color ?? Theme.of(context).chipTheme.backgroundColor,
           borderRadius: BorderRadius.circular(borderRadius ?? 18),
         ),
       ),

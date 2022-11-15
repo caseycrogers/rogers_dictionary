@@ -26,6 +26,7 @@ class DictionaryAppBar extends StatelessWidget {
       // right colors.
       isVisible: false,
       child: AppBar(
+        backgroundColor: Colors.transparent,
         leadingWidth: 0,
         elevation: kGroundElevation,
         titleSpacing: 0,

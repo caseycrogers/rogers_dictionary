@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:implicit_navigator/implicit_navigator.dart';
+import 'package:rogers_dictionary/clients/local_persistence.dart';
 
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
@@ -25,7 +27,7 @@ int translationModeToIndex(TranslationMode translationMode) {
 }
 
 class DictionaryModel {
-  DictionaryModel()
+  DictionaryModel._()
       : currentTab = ValueNotifier(DictionaryTab.search),
         englishPageModel = TranslationModel(
           translationMode: TranslationMode.English,
@@ -39,7 +41,7 @@ class DictionaryModel {
     });
   }
 
-  static late DictionaryModel _instance = DictionaryModel();
+  static late DictionaryModel _instance = DictionaryModel._();
 
   final TranslationModel englishPageModel;
   final TranslationModel spanishPageModel;
@@ -61,10 +63,17 @@ class DictionaryModel {
 
   static DictionaryModel get instance => _instance;
 
+  ValueListenable<bool> get isDark => _isDark;
+
+  final PersistedValueNotifier<bool> _isDark = PersistedValueNotifier(
+    key: 'is_dark',
+    initialValue: false,
+  );
+
   // Only used for taking screenshots.
   @visibleForTesting
   static void reset() {
-    _instance = DictionaryModel();
+    _instance = DictionaryModel._();
     _instance.currTranslationModel.dialoguesPageModel.reset();
   }
 
@@ -153,6 +162,10 @@ class DictionaryModel {
       headword: newHeadword,
       referrer: SelectedEntryReferrer.oppositeHeadword,
     );
+  }
+
+  void onDarkModeToggled() {
+    _isDark.value = !_isDark.value;
   }
 
   void _onEntrySelected(

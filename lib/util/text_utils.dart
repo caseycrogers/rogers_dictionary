@@ -18,12 +18,6 @@ extension UtilStyle on TextStyle {
   TextStyle asColor(Color color) => copyWith(color: color);
 }
 
-const TextStyle kButtonTextStyle = TextStyle(
-  color: Colors.black,
-  fontSize: 18,
-  fontWeight: FontWeight.normal,
-);
-
 class Indent extends StatelessWidget {
   const Indent({required this.child, this.size});
 
@@ -80,28 +74,5 @@ class ParentheticalView extends StatelessWidget {
 
   List<InlineSpan> asSpans(BuildContext context) {
     return asWidgets().map((w) => WidgetSpan(child: w)).toList();
-  }
-}
-
-/// Overrides the text theme's base text style with the specified style. Used
-/// instead of `DefaultTextStyle` because default styles are really buggy when
-/// used with `Text.rich` and text spans.
-class BaseTextStyle extends StatelessWidget {
-  const BaseTextStyle({required this.style, required this.child, Key? key})
-      : super(key: key);
-
-  final Widget child;
-  final TextStyle style;
-
-  @override
-  Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData(
-        textTheme: Theme.of(context).textTheme.copyWith(
-              bodyText2: style,
-            ),
-      ),
-      child: child,
-    );
   }
 }

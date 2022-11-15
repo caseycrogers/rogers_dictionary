@@ -140,8 +140,7 @@ class _PlayingButton extends StatelessWidget {
             mode,
           ),
           style: IndicatorStyle.circular,
-          progress:
-              info.position.inMilliseconds / info.duration.inMilliseconds,
+          progress: info.position.inMilliseconds / info.duration.inMilliseconds,
         );
       },
     );
@@ -166,8 +165,8 @@ class _StopButton extends StatelessWidget {
       Icons.stop,
       // We need to make this opaque as it should fully occlude the indicator
       // under it
-      color: AdaptiveMaterial.secondaryOnColorOf(context)!
-          .bake(Theme.of(context).cardColor),
+      color:
+          Theme.of(context).iconTheme.color!.bake(Theme.of(context).cardColor),
       onPressed: () {
         _onDone();
         DictionaryApp.textToSpeech.stopIfPlaying(text, mode);

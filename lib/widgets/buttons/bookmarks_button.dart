@@ -24,6 +24,7 @@ class _BookmarksButtonState extends State<BookmarksButton> {
     return InlineIconButton(
       _icon,
       size: widget.size,
+      color: IconTheme.of(context).color,
       onPressed: () async {
         final bool newIsBookmarked =
             !DictionaryApp.db.isBookmarked(translationMode, widget.entry);

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 
-import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
 class InlineIconButton extends StatelessWidget {
   const InlineIconButton(this.icon, {
@@ -24,7 +23,7 @@ class InlineIconButton extends StatelessWidget {
           .size! / 2),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: kPad/2),
-        child: AdaptiveIcon(
+        child: Icon(
           icon,
           size: size ?? IconTheme
               .of(context)

@@ -56,7 +56,8 @@ class TableOfContentsView extends StatelessWidget {
             subtitle: Text(
               chapter.oppositeTitle(context),
               style: TextStyle(
-                  color: AdaptiveMaterial.secondaryOnColorOf(context)),
+                color: AdaptiveMaterial.secondaryOnColorOf(context),
+              ),
             ),
             key: _getKey(context, chapter),
             children: chapter.dialogueSubChapters
@@ -69,7 +70,6 @@ class TableOfContentsView extends StatelessWidget {
                   ),
                 )
                 .toList(),
-            iconColor: AdaptiveMaterial.secondaryOnColorOf(context),
           );
         }
         return _clickableHeader(context, false, chapter: chapter);
@@ -90,7 +90,6 @@ class TableOfContentsView extends StatelessWidget {
     final DialoguesPageModel dialoguesModel =
         TranslationModel.of(context).dialoguesPageModel;
     return ListTile(
-      visualDensity: VisualDensity.compact,
       minLeadingWidth: 0,
       leading: isSubHeader ? const IndentIcon() : null,
       title: DefaultTextStyle(
@@ -104,6 +103,9 @@ class TableOfContentsView extends StatelessWidget {
       ),
       subtitle: Text(
         subChapter?.oppositeTitle(context) ?? chapter.oppositeTitle(context),
+        style: TextStyle(
+          color: AdaptiveMaterial.secondaryOnColorOf(context),
+        ),
       ),
       trailing: OpenPage(),
       onTap: () {

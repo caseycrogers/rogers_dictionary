@@ -52,9 +52,9 @@ class ProgressGradient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color _positiveColor =
-        positiveColor ?? AdaptiveMaterial.onColorOf(context)!.withAlpha(20);
+        positiveColor ?? Theme.of(context).colorScheme.background;
     final Color _negativeColor =
-        negativeColor ?? AdaptiveMaterial.colorOf(context)!.withAlpha(20);
+        negativeColor ?? Theme.of(context).colorScheme.surface;
     switch (style) {
       case IndicatorStyle.linear:
         return Container(
