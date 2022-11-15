@@ -10,7 +10,8 @@ import 'package:rogers_dictionary/clients/dictionary_database/sqflite_database.d
 import 'package:rogers_dictionary/clients/feedback_sender.dart';
 import 'package:rogers_dictionary/clients/snack_bar_notifier.dart';
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
-import 'package:rogers_dictionary/models/translation_model.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
+import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/pages/dictionary_page.dart';
 import 'package:rogers_dictionary/widgets/dictionary_feedback_view.dart';
 
@@ -36,14 +37,36 @@ class DictionaryApp extends StatefulWidget {
 
   static final ColorScheme spanishColorScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.orange,
-    backgroundColor: Colors.grey.shade200,
   ).copyWith(onPrimary: Colors.white);
 
-  static ColorScheme themeOf(TranslationModel translationModel) {
-    if (translationModel.isEnglish) {
-      return englishColorScheme;
+  static final ColorScheme darkEnglishColorScheme = ColorScheme.fromSwatch(
+    primarySwatch: Colors.indigo,
+    backgroundColor: Color.lerp(Colors.white, Colors.black, .85),
+    brightness: Brightness.dark,
+  ).copyWith(
+    onPrimary: Colors.white,
+    primary: Color.lerp(Colors.indigo, Colors.black, .6),
+    surface: Color.lerp(Colors.white, Colors.black, .9),
+  );
+
+  static final ColorScheme darkSpanishColorScheme = ColorScheme.fromSwatch(
+    primarySwatch: Colors.orange,
+    backgroundColor: Colors.grey.shade800,
+    brightness: Brightness.dark,
+  ).copyWith(
+    onPrimary: Colors.white,
+    primary: Color.lerp(Colors.orange, Colors.black, .7),
+    surface: Color.lerp(Colors.white, Colors.black, .9),
+  );
+
+  static ColorScheme schemeFor(
+    TranslationMode translationMode,
+    bool isDark,
+  ) {
+    if (translationMode == TranslationMode.English) {
+      return isDark ? darkEnglishColorScheme : englishColorScheme;
     }
-    return spanishColorScheme;
+    return isDark ? darkSpanishColorScheme : spanishColorScheme;
   }
 
   static SnackBarNotifier get snackBarNotifier => _snackBarNotifier;
@@ -71,29 +94,27 @@ class _DictionaryAppState extends State<DictionaryApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        return BetterFeedback(
-          mode: FeedbackMode.draw,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          feedbackBuilder: (context, onSubmit, controller) {
-            return DictionaryFeedbackView(onSubmit, controller!);
-          },
-          child: Builder(
-            builder: (context) {
-              DictionaryApp._feedback = FeedbackSender(
-                locale: Localizations.localeOf(context),
-                feedbackController: BetterFeedback.of(context),
-              );
-              return const DictionaryAppBase();
-            }
-          ),
-        );
-      }
+    return BetterFeedback(
+      mode: FeedbackMode.draw,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      feedbackBuilder: (context, onSubmit, controller) {
+        return DictionaryFeedbackView(onSubmit, controller!);
+      },
+      // Builder is here to ensure that `BetterFeedback.of(context)` gets a
+      // context with an enclosing better feedback widget.
+      child: Builder(
+        builder: (context) {
+          DictionaryApp._feedback = FeedbackSender(
+            locale: Localizations.localeOf(context),
+            feedbackController: BetterFeedback.of(context),
+          );
+          return const DictionaryAppBase();
+        },
+      ),
     );
   }
 }
@@ -107,54 +128,72 @@ class DictionaryAppBase extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: MaterialApp(
-        title: 'Rogers Dictionary',
-        // Required for device frame to generate screenshots.
-        useInheritedMediaQuery: true,
-        home: Builder(builder: (context) {
+      child: ValueListenableBuilder<bool>(
+        valueListenable: DictionaryModel.instance.isDark,
+        builder: (context, isDark, child) {
+          return MaterialApp(
+            title: 'Rogers Dictionary',
+            // Required for device frame to generate screenshots.
+            useInheritedMediaQuery: true,
+            home: child!,
+            theme: ThemeData(
+              selectedRowColor: Colors.grey.shade200,
+              textTheme: TextTheme(
+                headline1: GoogleFonts.roboto(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+                headline2: GoogleFonts.roboto(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                // This should really be bold but google fonts has a bug where
+                // bolded styles can't be un-bolded:
+                // https://github.com/material-foundation/google-fonts-flutter/issues/141
+                headline3: GoogleFonts.roboto(
+                  fontSize: 22,
+                ),
+                bodyText2: GoogleFonts.roboto(
+                  fontSize: 20,
+                  // Pad the top height so that a line of text is the exact same
+                  // height as an icon.
+                  height: 24 / 20,
+                ),
+              ).apply(
+                displayColor: isDark ? Colors.grey.shade300 : Colors.black,
+                bodyColor: isDark ? Colors.grey.shade300 : Colors.black,
+              ),
+              iconTheme: IconThemeData(
+                size: 24,
+                color: Colors.grey.shade600,
+              ),
+              chipTheme: ChipThemeData(
+                backgroundColor: DictionaryModel.instance.isDark.value
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade300,
+                labelStyle: TextStyle(
+                  color: DictionaryModel.instance.isDark.value
+                      ? Colors.white
+                      : Colors.black,
+                ),
+              ),
+            ),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            locale: overrideLocale,
+            supportedLocales: const [
+              Locale('en', ''),
+              Locale('es', ''),
+            ],
+          );
+        },
+        child: Builder(builder: (context) {
           DictionaryApp._snackBarNotifier = SnackBarNotifier(context);
           return const DictionaryPage();
         }),
-        theme: ThemeData(
-          selectedRowColor: Colors.grey.shade200,
-          textTheme: TextTheme(
-            headline1: GoogleFonts.roboto(
-              color: Colors.black,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
-            headline2: GoogleFonts.roboto(
-              color: Colors.black,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-            // This should really be bold but google fonts has a bug where
-            // bolded styles can't be un-bolded:
-            // https://github.com/material-foundation/google-fonts-flutter/issues/141
-            headline3: GoogleFonts.roboto(
-              color: Colors.black,
-              fontSize: 22,
-            ),
-            bodyText2: GoogleFonts.roboto(
-              color: Colors.black,
-              fontSize: 20,
-              // Pad the top height so that a line of text is the exact same
-              // height as an icon.
-              height: 24 / 20,
-            ),
-          ),
-          iconTheme: const IconThemeData(size: 24),
-        ),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        locale: overrideLocale,
-        supportedLocales: const [
-          Locale('en', ''),
-          Locale('es', ''),
-        ],
       ),
     );
   }

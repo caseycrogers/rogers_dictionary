@@ -29,6 +29,7 @@ dependencies:
   implicit_navigator:
     path: ../implicit_navigator
   just_audio: ^0.9.7
+  notified_preferences: ^2.0.0
   package_info: ^2.0.0
   path: ^1.8.0
   path_provider: ^2.0.1

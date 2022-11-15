@@ -57,6 +57,8 @@ Message related = const Message('Related', 'Relacionado');
 // Localization for the help menu.
 Message giveFeedback = const Message('give feedback', 'dar opinión');
 Message aboutThisApp = const Message('about this app', 'sobre la app');
+Message darkMode = const Message('dark mode', 'modo oscuro');
+Message lightMode = const Message('light mode', 'modo de luz');
 
 // Localization for getting feedback.
 _CapMessage feedback = _CapMessage('feedback', 'comentarios');

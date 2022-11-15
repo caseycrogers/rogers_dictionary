@@ -39,39 +39,43 @@ class _DropDownWidgetState extends State<DropDownWidget> {
     if (upperLeft.dx > width / 2) {
       onLeft = false;
     }
+    final ThemeData exteriorTheme = Theme.of(context);
     BoxConstraints? prevConstraints;
     showDialog<void>(
       useRootNavigator: false,
       useSafeArea: false,
       context: context,
       builder: (context) {
-        return LayoutBuilder(builder: (context, constraints) {
-          if (prevConstraints != null && constraints != prevConstraints) {
-            _show();
-          }
-          prevConstraints = constraints;
-          return Stack(
-            children: [
-              Positioned(
-                top: upperLeft.dy + renderBox.size.height - kPad / 2,
-                left: onLeft ? upperLeft.dx : null,
-                right: onLeft
-                    ? null
-                    : width - upperLeft.dx - 2 * renderBox.size.width / 3,
-                child: AdaptiveMaterial(
-                  adaptiveColor: AdaptiveColor.surface,
-                  child: Padding(
-                    padding: widget.padding ?? const EdgeInsets.all(2),
-                    child: widget.builder(
-                      context,
-                      Navigator.of(context).pop,
+        return Theme(
+          data: exteriorTheme,
+          child: LayoutBuilder(builder: (context, constraints) {
+            if (prevConstraints != null && constraints != prevConstraints) {
+              _show();
+            }
+            prevConstraints = constraints;
+            return Stack(
+              children: [
+                Positioned(
+                  top: upperLeft.dy + renderBox.size.height - kPad / 2,
+                  left: onLeft ? upperLeft.dx : null,
+                  right: onLeft
+                      ? null
+                      : width - upperLeft.dx - 2 * renderBox.size.width / 3,
+                  child: AdaptiveMaterial(
+                    adaptiveColor: AdaptiveColor.surface,
+                    child: Padding(
+                      padding: widget.padding ?? const EdgeInsets.all(2),
+                      child: widget.builder(
+                        context,
+                        Navigator.of(context).pop,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
-        });
+              ],
+            );
+          }),
+        );
       },
     );
   }

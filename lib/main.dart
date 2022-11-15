@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:rogers_dictionary/clients/local_persistence.dart';
 
 import 'dictionary_app.dart';
 
@@ -45,4 +46,5 @@ Future<void> main() async {
 Future<void> initialize() async {
   await Firebase.initializeApp();
   await MobileAds.instance.initialize();
+  await LocalPersistence.instance.initialize();
 }

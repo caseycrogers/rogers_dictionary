@@ -69,7 +69,7 @@ class EntryViewPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextStyle baseStyle = DefaultTextStyle.of(context).style;
     return Theme(
-      data: ThemeData(
+      data: Theme.of(context).copyWith(
         textTheme: Theme.of(context).textTheme.copyWith(
               headline1: baseStyle.asBold,
               headline2: baseStyle.asBold,

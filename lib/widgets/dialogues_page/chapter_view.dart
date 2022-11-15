@@ -73,9 +73,8 @@ class _ChapterViewState extends State<ChapterView> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: kPad),
-          color: Theme.of(context).cardColor,
+          color: Theme.of(context).colorScheme.surface,
           child: ListTile(
-            visualDensity: VisualDensity.compact,
             contentPadding: EdgeInsets.zero,
             title: DefaultTextStyle(
               style: Theme.of(context).textTheme.headline1!,
@@ -159,7 +158,6 @@ class _ChapterViewState extends State<ChapterView> {
                       headerBuilder: (context, isOpen) {
                         return ListTile(
                           tileColor: Colors.transparent,
-                          visualDensity: VisualDensity.compact,
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 2 * kPad),
                           title: Text(
@@ -169,6 +167,7 @@ class _ChapterViewState extends State<ChapterView> {
                           subtitle: Text(
                             _currentSubChapter.value.oppositeTitle(context),
                           ),
+                          iconColor: Theme.of(context).iconTheme.color,
                         );
                       },
                       body: AdaptiveMaterial(
@@ -230,14 +229,15 @@ class _ChapterViewState extends State<ChapterView> {
           final DialogueChapter_Dialogue dialogue =
               _subChapterAndDialogueIndex[index].key.dialogues[dialogueIndex];
           final ListTile dialogueTile = ListTile(
-            visualDensity: VisualDensity.compact,
             title: Text(
               dialogue.content(context),
               style: Theme.of(context).textTheme.bodyText2!.asBold,
             ),
-            subtitle: OverflowMarkdown(dialogue.oppositeContent(context)),
-            tileColor: dialogueIndex % 2 == 0
-                ? Theme.of(context).selectedRowColor
+            subtitle: OverflowMarkdown(
+              dialogue.oppositeContent(context),
+            ),
+            tileColor: dialogueIndex.isEven
+                ? Theme.of(context).colorScheme.background
                 : Colors.transparent,
           );
           if (dialogueIndex + 1 == subChapter.dialogues.length &&
@@ -313,17 +313,21 @@ class _ChapterViewState extends State<ChapterView> {
 
 class _SubChapterTile extends StatelessWidget {
   const _SubChapterTile({
+    Key? key,
     required this.subChapter,
     this.isSelected = false,
     this.onTap,
     this.horizontalPadding = 2 * kPad,
-    Key? key,
+    this.titleColor,
+    this.subtitleColor,
   }) : super(key: key);
 
   final DialogueSubChapter subChapter;
   final bool isSelected;
   final VoidCallback? onTap;
   final double horizontalPadding;
+  final Color? titleColor;
+  final Color? subtitleColor;
 
   @override
   Widget build(BuildContext context) {
@@ -332,13 +336,18 @@ class _SubChapterTile extends StatelessWidget {
       child: Container(
         color: isSelected ? Theme.of(context).selectedRowColor : null,
         child: ListTile(
-          visualDensity: VisualDensity.compact,
           contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           title: Text(
             subChapter.title(context),
-            style: Theme.of(context).textTheme.headline2,
+            style: Theme.of(context)
+                .textTheme
+                .headline2!
+                .copyWith(color: titleColor),
           ),
-          subtitle: Text(subChapter.oppositeTitle(context)),
+          subtitle: Text(
+            subChapter.oppositeTitle(context),
+            style: TextStyle(color: subtitleColor),
+          ),
           onTap: onTap,
         ),
       ),

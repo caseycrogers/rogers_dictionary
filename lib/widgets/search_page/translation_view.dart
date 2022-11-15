@@ -119,7 +119,6 @@ class _ExamplePhraseView extends StatelessWidget {
       padding: const EdgeInsets.only(top: 4, bottom: kPad),
       child: DictionaryChip(
         childPadding: const EdgeInsets.all(kPad / 2),
-        color: Colors.grey.shade200,
         borderRadius: kPad,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

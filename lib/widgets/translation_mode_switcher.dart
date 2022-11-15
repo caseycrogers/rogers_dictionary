@@ -72,51 +72,61 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
     // switcher gets messed up.
     return LayoutBuilder(
       builder: (context, constraints) {
-        return PageView(
-          controller: _controller,
-          onPageChanged: (int index) => DictionaryModel.instance
-              .onTranslationModeChanged(indexToTranslationMode(index)),
-          children: [
-            Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: DictionaryApp.englishColorScheme,
-              ),
-              child: Row(
+        return ValueListenableBuilder<bool>(
+            valueListenable: DictionaryModel.instance.isDark,
+            builder: (context, isDark, _) {
+              return PageView(
+                controller: _controller,
+                onPageChanged: (int index) => DictionaryModel.instance
+                    .onTranslationModeChanged(indexToTranslationMode(index)),
                 children: [
-                  Expanded(
-                    key: const PageStorageKey<TranslationMode>(
-                      TranslationMode.English,
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: DictionaryApp.schemeFor(
+                        TranslationMode.English,
+                        isDark,
+                      ),
                     ),
-                    child: TranslationModelProvider(
-                      translationModel: dictionaryModel.englishPageModel,
-                      child: widget.child,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          key: const PageStorageKey<TranslationMode>(
+                            TranslationMode.English,
+                          ),
+                          child: TranslationModelProvider(
+                            translationModel: dictionaryModel.englishPageModel,
+                            child: widget.child,
+                          ),
+                        ),
+                        const VerticalDivider(width: .25, thickness: .25),
+                      ],
                     ),
                   ),
-                  const VerticalDivider(width: .25, thickness: .25),
-                ],
-              ),
-            ),
-            Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: DictionaryApp.spanishColorScheme,
-              ),
-              child: Row(
-                children: [
-                  const VerticalDivider(width: .25, thickness: .25),
-                  Expanded(
-                    key: const PageStorageKey<TranslationMode>(
-                      TranslationMode.Spanish,
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: DictionaryApp.schemeFor(
+                        TranslationMode.Spanish,
+                        isDark,
+                      ),
                     ),
-                    child: TranslationModelProvider(
-                      translationModel: dictionaryModel.spanishPageModel,
-                      child: widget.child,
+                    child: Row(
+                      children: [
+                        const VerticalDivider(width: .25, thickness: .25),
+                        Expanded(
+                          key: const PageStorageKey<TranslationMode>(
+                            TranslationMode.Spanish,
+                          ),
+                          child: TranslationModelProvider(
+                            translationModel: dictionaryModel.spanishPageModel,
+                            child: widget.child,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
-        );
+              );
+            });
       },
     );
   }

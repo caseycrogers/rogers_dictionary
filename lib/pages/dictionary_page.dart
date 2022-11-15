@@ -27,45 +27,54 @@ class DictionaryPage extends StatelessWidget {
       onTap: () {
         unFocus();
       },
-      child: ValueListenableBuilder<TranslationModel>(
-        valueListenable: DictionaryModel.instance.translationModel,
-        builder: (context, model, tabBarView) {
-          final ColorScheme scheme = DictionaryApp.themeOf(model);
-          return Theme(
-            data: Theme.of(context).copyWith(colorScheme: scheme),
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              body: AdaptiveMaterial(
-                adaptiveColor: AdaptiveColor.primary,
-                child: Column(
-                  children: [
-                    const DictionaryAppBar(),
-                    // Intentionally don't wrap this in theme, it'll cause
-                    // excess rebuilds.
-                    Expanded(
-                      child: DictionaryTabBarView(
-                        children: LinkedHashMap<DictionaryTab, Widget>.of({
-                          DictionaryTab.search: SearchPage(),
-                          DictionaryTab.bookmarks: BookmarksPage(),
-                          DictionaryTab.dialogues: DialoguesPage(),
-                        }),
-                      ),
-                    ),
-                    const DictionaryBannerAd(),
-                  ],
-                ),
-              ),
-              bottomNavigationBar: !isBigEnoughForAdvanced(context)
-                  ? const AdaptiveMaterial(
-                      adaptiveColor: AdaptiveColor.primary,
-                      child: SafeArea(
-                        child: DictionaryTabBar(),
-                      ),
-                    )
-                  : null,
-            ),
+      child: ValueListenableBuilder<bool>(
+        valueListenable: DictionaryModel.instance.isDark,
+        builder: (context, isDark, child) {
+          return ValueListenableBuilder<TranslationModel>(
+            valueListenable: DictionaryModel.instance.translationModel,
+            builder: (context, model, tabBarView) {
+              final ColorScheme scheme = DictionaryApp.schemeFor(
+                model.translationMode,
+                isDark,
+              );
+              return Theme(
+                data: Theme.of(context).copyWith(colorScheme: scheme),
+                child: child!,
+              );
+            },
           );
         },
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AdaptiveMaterial(
+            adaptiveColor: AdaptiveColor.primary,
+            child: Column(
+              children: [
+                const DictionaryAppBar(),
+                // Intentionally don't wrap this in theme, it'll cause
+                // excess rebuilds.
+                Expanded(
+                  child: DictionaryTabBarView(
+                    children: LinkedHashMap<DictionaryTab, Widget>.of({
+                      DictionaryTab.search: SearchPage(),
+                      DictionaryTab.bookmarks: BookmarksPage(),
+                      DictionaryTab.dialogues: DialoguesPage(),
+                    }),
+                  ),
+                ),
+                const DictionaryBannerAd(),
+              ],
+            ),
+          ),
+          bottomNavigationBar: !isBigEnoughForAdvanced(context)
+              ? const AdaptiveMaterial(
+                  adaptiveColor: AdaptiveColor.primary,
+                  child: SafeArea(
+                    child: DictionaryTabBar(),
+                  ),
+                )
+              : null,
+        ),
       ),
     );
   }

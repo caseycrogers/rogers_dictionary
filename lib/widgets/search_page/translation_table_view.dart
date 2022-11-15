@@ -187,7 +187,6 @@ class _IrregularInflectionsTable extends StatelessWidget {
       padding: const EdgeInsets.only(top: kPad / 2, bottom: kPad / 2),
       child: DictionaryChip(
         childPadding: const EdgeInsets.all(kPad / 2),
-        color: Colors.grey.shade200,
         borderRadius: kPad,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

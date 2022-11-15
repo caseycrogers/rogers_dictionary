@@ -113,9 +113,7 @@ class _SearchBarBase extends StatelessWidget {
           adaptiveColor: AdaptiveColor.surface,
           child: TextField(
             focusNode: focusNode,
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.bodyText2!.fontSize,
-            ),
+            style: Theme.of(context).textTheme.bodyText2,
             controller: controller,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
@@ -133,6 +131,7 @@ class _SearchBarBase extends StatelessWidget {
                       icon: const Icon(Icons.clear),
                     )
                   : null,
+              hintStyle: const TextStyle(color: Colors.grey),
               hintText: '${i18n.search.get(context)}...',
               border: InputBorder.none,
             ),

@@ -7,10 +7,10 @@ import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/pages/page_header.dart';
 import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning.dart';
 import 'package:rogers_dictionary/versioning/versioning_base.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
+import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
 import 'package:rogers_dictionary/widgets/loading_text.dart';
 
 class AboutButton extends StatelessWidget {
@@ -20,12 +20,10 @@ class AboutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      child: Text(
-        i18n.aboutThisApp.get(context),
-        style: kButtonTextStyle,
-      ),
-      onPressed: () {
+    return HelpMenuButton(
+      icon: Icons.info,
+      text: i18n.aboutThisApp.get(context),
+      onTap: () {
         DictionaryApp.analytics.logEvent(name: 'about_pressed');
         onPressed();
         showDialog<void>(
@@ -34,7 +32,7 @@ class AboutButton extends StatelessWidget {
           context: context,
           builder: (overlayContext) {
             return _AboutView(
-              () {
+                  () {
                 Navigator.of(overlayContext).pop();
               },
             );
@@ -116,7 +114,7 @@ class _DebugInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: const TextStyle(color: Colors.black38, fontSize: 20),
+      style: Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 20),
       child: Column(
         children: <String, Future<String>>{
           '': Future.value(Theme.of(context).platform.toString().enumString),
