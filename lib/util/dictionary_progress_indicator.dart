@@ -1,10 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
 class DictionaryProgressIndicator extends StatelessWidget {
   const DictionaryProgressIndicator({

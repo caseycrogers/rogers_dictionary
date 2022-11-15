@@ -37,6 +37,7 @@ class DictionaryApp extends StatefulWidget {
 
   static final ColorScheme spanishColorScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.orange,
+    backgroundColor: Colors.grey.shade200,
   ).copyWith(onPrimary: Colors.white);
 
   static final ColorScheme darkEnglishColorScheme = ColorScheme.fromSwatch(
@@ -51,7 +52,7 @@ class DictionaryApp extends StatefulWidget {
 
   static final ColorScheme darkSpanishColorScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.orange,
-    backgroundColor: Colors.grey.shade800,
+    backgroundColor: Color.lerp(Colors.white, Colors.black, .85),
     brightness: Brightness.dark,
   ).copyWith(
     onPrimary: Colors.white,
@@ -94,6 +95,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return BetterFeedback(
       mode: FeedbackMode.draw,
       localizationsDelegates: const [
@@ -138,6 +140,7 @@ class DictionaryAppBase extends StatelessWidget {
             home: child!,
             theme: ThemeData(
               selectedRowColor: Colors.grey.shade200,
+              dividerColor: Colors.grey.withOpacity(.4),
               textTheme: TextTheme(
                 headline1: GoogleFonts.roboto(
                   fontSize: 30,
