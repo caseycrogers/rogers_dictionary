@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:rogers_dictionary/clients/dialogue_builders.dart';
+import 'package:rogers_dictionary/clients/local_persistence.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';
@@ -32,21 +33,31 @@ const Locale es = Locale('es', '');
 
 Future<void> main() async {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  DictionaryModel dictionaryModel = DictionaryModel.instance;
+  late DictionaryModel dictionaryModel;
 
-  setUpAll(() async {
-    WidgetsApp.debugAllowBannerOverride = false;
-    await initialize();
-    await DictionaryApp.analytics.setAnalyticsCollectionEnabled(false);
-    await binding.convertFlutterSurfaceToImage();
-  });
+  Future<void>? isInitialized;
+
+  Future<void> _initialize() async {
+    if (isInitialized != null) {
+      await isInitialized;
+    } else {
+      WidgetsApp.debugAllowBannerOverride = false;
+      await initialize();
+      await DictionaryApp.analytics.setAnalyticsCollectionEnabled(false);
+      await binding.convertFlutterSurfaceToImage();
+    }
+    dictionaryModel = DictionaryModel.instance;
+  }
+
+  // Used instead of `setUpAll` because that doesn't support a future.
+  setUp(_initialize);
 
   tearDown(() {
+    LocalPersistence.instance.reset();
     dictionaryModel.englishPageModel.dialoguesPageModel.reset();
     dictionaryModel.spanishPageModel.dialoguesPageModel.reset();
     DictionaryModel.reset();
     EntrySearchModel.reset();
-    dictionaryModel = DictionaryModel.instance;
   });
 
   for (final Locale locale in [
@@ -88,20 +99,20 @@ Future<void> main() async {
       //  outputWidth: 2048,
       //),
       // Android.
+      ScreenshotConfig(
+        category: '',
+        device: Devices.android.onePlus8Pro,
+        outputHeight: 3168,
+        outputWidth: 1440,
+      ),
       //ScreenshotConfig(
-      //  category: '',
-      //  device: Devices.android.onePlus8Pro,
-      //  outputHeight: 3168,
-      //  outputWidth: 1440,
+      //  category: '10',
+      //  device: Devices.android.largeTablet,
       //),
-      ScreenshotConfig(
-        category: '10',
-        device: Devices.android.largeTablet,
-      ),
-      ScreenshotConfig(
-        category: '7',
-        device: Devices.android.mediumTablet,
-      ),
+      //ScreenshotConfig(
+      //  category: '7',
+      //  device: Devices.android.mediumTablet,
+      //),
     ]) {
       String screenshotName(String suffix) {
         return jsonEncode(
@@ -314,56 +325,6 @@ Future<void> main() async {
         );
       });
 
-      testWidgets('($locale) (${config.device.name}) - Live search.',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(
-          DictionaryScreenshotTemplate(
-            headerText: const i18n.Message(
-              'Results appear as you type!',
-              '¡Los resultados aparecen a medida que escribe!',
-            ),
-            config: config,
-            locale: locale,
-          ),
-        );
-        late BuildContext context;
-        if (locale == es) {
-          dictionaryModel.onTranslationModeChanged();
-        }
-        context = await pumpUntilFound(
-          tester,
-          find.byHeadword(locale == en ? 'abdomen' : 'abandono del tabaco'),
-          msg: locale == en ? 'abdomen' : 'abandono del tabaco',
-        );
-        // Necessary or else the search string won't update consistently
-        // for reasons unknown.
-        await tester.pumpAndSettle();
-        dictionaryModel.currTranslationModel.searchModel.entrySearchModel
-            .onSearchStringChanged(
-          context: context,
-          newSearchString: locale == en ? 'fl' : 'gri',
-        );
-        final String headword = locale == en ? 'flu' : 'gripe';
-        context = await pumpUntilFound(
-          tester,
-          find.byHeadword(headword),
-          msg: headword,
-        );
-        if (config.isLargeScreen) {
-          dictionaryModel.onHeadwordSelected(context, headword);
-          await pumpUntilNotFound(
-            tester,
-            find.byType(NoEntryBackground),
-            msg: 'NoEntryBackground',
-          );
-        }
-        await tester.pumpAndSettle();
-        await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(
-          screenshotName('06-search_${locale.languageCode}'),
-        );
-      });
-
       testWidgets('($locale) (${config.device.name}) - Fullscreen entry.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
@@ -393,7 +354,7 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('07-complex_entry_en'),
+          screenshotName('06-complex_entry_en'),
         );
       });
 
@@ -431,9 +392,61 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('08-regional_en'),
+          screenshotName('07-regional_en'),
         );
       });
+
+
+      testWidgets('($locale) (${config.device.name}) - dark mode.',
+              (WidgetTester tester) async {
+            dictionaryModel.onDarkModeToggled();
+            await tester.pumpWidget(
+              DictionaryScreenshotTemplate(
+                headerText: const i18n.Message(
+                  'Dark mode reduces eye strain!',
+                  '¡Los resultados aparecen a medida que escribe!',
+                ),
+                config: config,
+                locale: locale,
+              ),
+            );
+            late BuildContext context;
+            if (locale == es) {
+              dictionaryModel.onTranslationModeChanged();
+            }
+            context = await pumpUntilFound(
+              tester,
+              find.byHeadword(locale == en ? 'abdomen' : 'abandono del tabaco'),
+              msg: locale == en ? 'abdomen' : 'abandono del tabaco',
+            );
+            // Necessary or else the search string won't update consistently
+            // for reasons unknown.
+            await tester.pumpAndSettle();
+            dictionaryModel.currTranslationModel.searchModel.entrySearchModel
+                .onSearchStringChanged(
+              context: context,
+              newSearchString: locale == en ? 'fl' : 'gri',
+            );
+            final String headword = locale == en ? 'flu' : 'gripe';
+            context = await pumpUntilFound(
+              tester,
+              find.byHeadword(headword),
+              msg: headword,
+            );
+            if (config.isLargeScreen) {
+              dictionaryModel.onHeadwordSelected(context, headword);
+              await pumpUntilNotFound(
+                tester,
+                find.byType(NoEntryBackground),
+                msg: 'NoEntryBackground',
+              );
+            }
+            await tester.pumpAndSettle();
+            await tester.pump(const Duration(milliseconds: 200));
+            await binding.takeScreenshot(
+              screenshotName('08-dark_${locale.languageCode}'),
+            );
+          });
     }
   }
 }

@@ -130,7 +130,7 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
           headerText.getForLocale(locale),
           textAlign: TextAlign.center,
           style: GoogleFonts.roboto(
-            color: Colors.black,
+            color: colorScheme.onSurface,
             fontSize: 32,
           ),
         ),
@@ -144,9 +144,9 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
                   begin: Alignment(translationModel.isEnglish ? .8 : -.8, -1),
                   end: Alignment(translationModel.isEnglish ? -.8 : .8, 1),
                   colors: [
-                    Colors.white,
-                    Colors.white,
-                    _backgroundColor,
+                    colorScheme.surface,
+                    colorScheme.surface,
+                    colorScheme.primary,
                   ],
                   stops: const [.2, .3, 1.0],
                 ),
@@ -158,14 +158,10 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
     );
   }
 
-  Color get _primaryColor {
+  ColorScheme get colorScheme {
     return DictionaryModel.instance.isEnglish
-        ? DictionaryApp.englishColorScheme.primary
-        : DictionaryApp.spanishColorScheme.primary;
-  }
-
-  Color get _backgroundColor {
-    return Color.lerp(_primaryColor, Colors.white, .1)!;
+        ? DictionaryApp.englishColorScheme
+        : DictionaryApp.spanishColorScheme;
   }
 }
 

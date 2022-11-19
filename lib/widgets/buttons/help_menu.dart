@@ -18,6 +18,11 @@ class HelpMenu extends StatelessWidget {
             FeedbackButton(onPressed: closeMenu),
             AboutButton(onPressed: closeMenu),
             ToggleDarkModeButton(onPressed: closeMenu),
+            HelpMenuButton(
+              icon: Icons.attach_money,
+              text: 'remove ads',
+              onTap: () {},
+            ),
           ],
         );
       },

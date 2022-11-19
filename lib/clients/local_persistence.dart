@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:notified_preferences/notified_preferences.dart';
 
 class LocalPersistence {
@@ -8,10 +9,15 @@ class LocalPersistence {
   static final LocalPersistence instance = LocalPersistence._();
 
   Future<void> initialize([FutureOr<SharedPreferences>? preferences]) async {
-    _prefs = await (preferences ?? SharedPreferences.getInstance());
+    _prefs ??= await (preferences ?? SharedPreferences.getInstance());
   }
 
   SharedPreferences? _prefs;
+
+  @visibleForTesting
+  Future<void> reset() async {
+    await _prefs!.clear();
+  }
 }
 
 class PersistedValueNotifier<T> extends PreferenceNotifier<T> {

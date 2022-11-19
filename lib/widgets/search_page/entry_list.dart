@@ -181,7 +181,7 @@ class _EntryRow extends StatelessWidget {
         return InkWell(
             child: Material(
               color: shouldHighlight
-                  ? Theme.of(context).selectedRowColor
+                  ? Theme.of(context).colorScheme.secondary
                   : Colors.transparent,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2 * kPad),
