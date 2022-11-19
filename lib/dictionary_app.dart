@@ -107,7 +107,6 @@ class _DictionaryAppState extends State<DictionaryApp> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return BetterFeedback(
       mode: FeedbackMode.draw,
       localizationsDelegates: const [
