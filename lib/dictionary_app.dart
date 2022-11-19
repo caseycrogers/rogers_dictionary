@@ -1,10 +1,14 @@
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:feedback/feedback.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info/package_info.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/clients/dictionary_database/dictionary_database.dart';
 import 'package:rogers_dictionary/clients/dictionary_database/sqflite_database.dart';
 import 'package:rogers_dictionary/clients/feedback_sender.dart';

@@ -1,6 +1,8 @@
+// Dart imports:
 import 'dart:convert';
 import 'dart:io';
 
+// Project imports:
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
 
 extension DatabaseVersionUtilsBase on DatabaseVersion {

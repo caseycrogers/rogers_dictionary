@@ -1,5 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';

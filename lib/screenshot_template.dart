@@ -1,7 +1,11 @@
-import 'package:device_frame/device_frame.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:device_frame/device_frame.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/main.dart';

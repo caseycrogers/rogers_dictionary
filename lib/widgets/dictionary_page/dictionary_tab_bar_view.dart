@@ -1,8 +1,13 @@
+// Dart imports:
 import 'dart:collection';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Package imports:
 import 'package:implicit_navigator/implicit_navigator.dart';
+
+// Project imports:
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/util/animation_utils.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';

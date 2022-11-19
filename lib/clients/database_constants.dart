@@ -1,3 +1,4 @@
+// Project imports:
 import 'package:rogers_dictionary/models/translation_mode.dart';
 
 const WARNING = 'WARN:';

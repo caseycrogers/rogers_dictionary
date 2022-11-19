@@ -1,5 +1,7 @@
+// Package imports:
 import 'package:collection/collection.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/i18n_base.dart' as i18n;
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';

@@ -1,17 +1,22 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:rogers_dictionary/clients/local_persistence.dart';
-import 'package:rogers_dictionary/models/dictionary_model.dart';
 
-import 'dictionary_app.dart';
+// Package imports:
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+// Project imports:
+import 'package:rogers_dictionary/clients/local_persistence.dart';
+import 'package:rogers_dictionary/dictionary_app.dart';
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

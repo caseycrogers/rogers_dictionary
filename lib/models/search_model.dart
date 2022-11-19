@@ -1,10 +1,11 @@
+// Flutter imports:
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+// Project imports:
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/pages/bookmarks_page.dart';
-
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';
-
 import 'entry_search_model.dart';
 import 'translation_model.dart';
 

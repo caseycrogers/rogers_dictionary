@@ -1,13 +1,16 @@
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:email_validator/email_validator.dart';
 import 'package:feedback/feedback.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:flutter/material.dart';
+// Project imports:
 import 'package:rogers_dictionary/clients/database_constants.dart';
-
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DictionaryFeedback {
   DictionaryFeedback(this.body, this.type, this.email);

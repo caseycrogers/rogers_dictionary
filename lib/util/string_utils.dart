@@ -1,5 +1,7 @@
+// Package imports:
 import 'package:characters/characters.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 

@@ -1,7 +1,9 @@
+// Package imports:
+import 'package:test/test.dart';
+
+// Project imports:
 import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
-
-import 'package:test/test.dart';
 
 void main() {
   test('Can replace diacritic characters with non-diacritic characters', () {

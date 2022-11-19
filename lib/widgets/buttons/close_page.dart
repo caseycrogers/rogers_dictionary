@@ -1,5 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
 class ClosePage extends StatelessWidget {

@@ -1,6 +1,10 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
 import 'package:flutter/cupertino.dart';
+
+// Package imports:
 import 'package:notified_preferences/notified_preferences.dart';
 
 class LocalPersistence {

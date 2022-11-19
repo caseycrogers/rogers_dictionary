@@ -1,5 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 
 class NamingStandardView extends StatelessWidget {

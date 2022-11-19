@@ -1,10 +1,15 @@
+// Dart imports:
 import 'dart:core';
 
+// Flutter imports:
+import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:async_list_view/async_list_view.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/material.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/protobufs/entry.pb.dart';

@@ -1,6 +1,8 @@
+// Dart imports:
 import 'dart:convert';
 import 'dart:io';
 
+// Package imports:
 import 'package:image/image.dart';
 import 'package:integration_test/integration_test_driver_extended.dart';
 import 'package:path/path.dart';

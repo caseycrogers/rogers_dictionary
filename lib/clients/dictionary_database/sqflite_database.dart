@@ -1,9 +1,16 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
+// Flutter imports:
 import 'package:flutter/services.dart';
-import 'package:path/path.dart';
 
+// Package imports:
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+// Project imports:
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/clients/dictionary_database/dictionary_database.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
@@ -13,9 +20,6 @@ import 'package:rogers_dictionary/protobufs/entry.pb.dart';
 import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning_base.dart';
-
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class SqfliteDatabase extends DictionaryDatabase {
   factory SqfliteDatabase() {

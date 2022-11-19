@@ -1,6 +1,8 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
+// Project imports:
+import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dialogues_page/selected_dialogue_switcher.dart';
 import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 

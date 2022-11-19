@@ -1,6 +1,9 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+// Flutter imports:
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class LoggingStreamBuilder<T> extends StatelessWidget {
   const LoggingStreamBuilder({

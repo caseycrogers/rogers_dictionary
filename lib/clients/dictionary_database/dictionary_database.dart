@@ -1,10 +1,14 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
+// Package imports:
 import 'package:path/path.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';

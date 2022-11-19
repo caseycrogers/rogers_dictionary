@@ -1,8 +1,11 @@
+// Dart imports:
 import 'dart:collection';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/dictionary_app.dart';
 
+// Project imports:
+import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/pages/dialogues_page.dart';
@@ -14,7 +17,6 @@ import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_app_bar.dar
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab_bar_view.dart';
-
 import 'bookmarks_page.dart';
 import 'search_page.dart';
 

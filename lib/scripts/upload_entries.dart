@@ -1,10 +1,15 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:io';
 
+// Package imports:
 import 'package:args/args.dart';
 import 'package:df/df.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqlite_api.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+// Project imports:
 import 'package:rogers_dictionary/clients/database_constants.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
 import 'package:rogers_dictionary/protobufs/database_version.pb.dart';
@@ -14,9 +19,6 @@ import 'package:rogers_dictionary/util/entry_utils.dart';
 import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning_base.dart';
-
-import 'package:sqflite/sqlite_api.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const EN = '(EN)';
 const ES = '(ES)';

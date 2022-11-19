@@ -1,13 +1,17 @@
+// Dart imports:
 import 'dart:async';
 import 'dart:math';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
+// Flutter imports:
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+// Package imports:
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:implicit_navigator/implicit_navigator.dart';
-import 'package:rogers_dictionary/clients/local_persistence.dart';
 
+// Project imports:
+import 'package:rogers_dictionary/clients/local_persistence.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/search_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';

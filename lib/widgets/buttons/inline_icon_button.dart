@@ -1,6 +1,8 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/util/constants.dart';
 
+// Project imports:
+import 'package:rogers_dictionary/util/constants.dart';
 
 class InlineIconButton extends StatelessWidget {
   const InlineIconButton(this.icon, {

@@ -1,5 +1,10 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Package imports:
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+// Project imports:
 import 'package:rogers_dictionary/clients/dialogue_builders.dart';
 import 'package:rogers_dictionary/models/dialogues_page_model.dart';
 import 'package:rogers_dictionary/models/translation_model.dart';
@@ -10,8 +15,6 @@ import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
 import 'package:rogers_dictionary/util/overflow_markdown.dart';
 import 'package:rogers_dictionary/util/text_utils.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
-
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ChapterView extends StatefulWidget {
   ChapterView({

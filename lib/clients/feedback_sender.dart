@@ -1,14 +1,17 @@
+// Dart imports:
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:feedback/feedback.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-
+// Flutter imports:
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// Package imports:
+import 'package:feedback/feedback.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
 
+// Project imports:
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/util/string_utils.dart';
