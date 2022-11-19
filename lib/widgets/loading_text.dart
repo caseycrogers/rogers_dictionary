@@ -15,7 +15,7 @@ class LoadingText extends StatelessWidget {
     return LoggingStreamBuilder<String>(
       builder: (context, snap) => Text(
         snap.data ?? '',
-        style: const TextStyle().asColor(Colors.black45),
+        style: const TextStyle().asColor(Colors.grey),
       ),
       stream: _infiniteTextStream(text),
     );

@@ -33,20 +33,27 @@ class DictionaryApp extends StatefulWidget {
   static final ColorScheme englishColorScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.indigo,
     backgroundColor: Colors.grey.shade200,
+  ).copyWith(
+    secondary: Colors.grey.shade300,
+    onPrimary: Colors.white,
   );
 
   static final ColorScheme spanishColorScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.orange,
     backgroundColor: Colors.grey.shade200,
-  ).copyWith(onPrimary: Colors.white);
+  ).copyWith(
+    secondary: Colors.grey.shade300,
+    onPrimary: Colors.white,
+  );
 
   static final ColorScheme darkEnglishColorScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.indigo,
     backgroundColor: Color.lerp(Colors.white, Colors.black, .85),
     brightness: Brightness.dark,
   ).copyWith(
-    onPrimary: Colors.white,
     primary: Color.lerp(Colors.indigo, Colors.black, .6),
+    secondary: Colors.grey.shade600,
+    onPrimary: Colors.white,
     surface: Color.lerp(Colors.white, Colors.black, .9),
   );
 
@@ -57,6 +64,7 @@ class DictionaryApp extends StatefulWidget {
   ).copyWith(
     onPrimary: Colors.white,
     primary: Color.lerp(Colors.orange, Colors.black, .7),
+    secondary: Colors.grey.shade600,
     surface: Color.lerp(Colors.white, Colors.black, .9),
   );
 
@@ -139,7 +147,6 @@ class DictionaryAppBase extends StatelessWidget {
             useInheritedMediaQuery: true,
             home: child!,
             theme: ThemeData(
-              selectedRowColor: Colors.grey.shade200,
               dividerColor: Colors.grey.withOpacity(.4),
               textTheme: TextTheme(
                 headline1: GoogleFonts.roboto(
@@ -172,8 +179,8 @@ class DictionaryAppBase extends StatelessWidget {
               ),
               chipTheme: ChipThemeData(
                 backgroundColor: DictionaryModel.instance.isDark.value
-                    ? Colors.grey.shade600
-                    : Colors.grey.shade300,
+                    ? Colors.white38
+                    : Colors.black12,
                 labelStyle: TextStyle(
                   color: DictionaryModel.instance.isDark.value
                       ? Colors.white

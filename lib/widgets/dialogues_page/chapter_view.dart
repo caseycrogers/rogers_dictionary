@@ -73,7 +73,6 @@ class _ChapterViewState extends State<ChapterView> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: kPad),
-          color: Theme.of(context).colorScheme.surface,
           child: ListTile(
             contentPadding: EdgeInsets.zero,
             title: DefaultTextStyle(
@@ -133,79 +132,76 @@ class _ChapterViewState extends State<ChapterView> {
         valueListenable: _currentSubChapter,
         builder: (context, _, child) {
           return SingleChildScrollView(
-            child: ColoredBox(
-              color: Theme.of(context).cardColor,
-              child: DictionaryProgressIndicator(
-                progress: _subChapterProgress,
-                style: IndicatorStyle.linear,
-                child: ExpansionPanelList(
-                  expansionCallback: (index, _) {
-                    assert(
-                      index == 0,
-                      'There should only ever be a single element in this list',
-                    );
-                    setState(() {
-                      _isExpanded = !_isExpanded;
-                    });
-                  },
-                  elevation: kGroundElevation,
-                  expandedHeaderPadding: EdgeInsets.zero,
-                  children: [
-                    ExpansionPanel(
-                      backgroundColor: Colors.transparent,
-                      isExpanded: _isExpanded,
-                      canTapOnHeader: true,
-                      headerBuilder: (context, isOpen) {
-                        return ListTile(
-                          tileColor: Colors.transparent,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 2 * kPad),
-                          title: Text(
-                            _currentSubChapter.value.title(context),
-                            style: Theme.of(context).textTheme.headline2,
-                          ),
-                          subtitle: Text(
-                            _currentSubChapter.value.oppositeTitle(context),
-                          ),
-                          iconColor: Theme.of(context).iconTheme.color,
-                        );
-                      },
-                      body: AdaptiveMaterial(
-                        adaptiveColor: AdaptiveColor.surface,
-                        child: Column(
-                          children: widget.chapter.dialogueSubChapters.map(
-                            (subChapter) {
-                              return _SubChapterTile(
-                                subChapter: subChapter,
-                                isSelected:
-                                    subChapter == _currentSubChapter.value,
-                                onTap: () {
-                                  _inProgrammaticScroll = true;
-                                  _scrollController
-                                      .scrollTo(
-                                        index: _subChapterToIndex(subChapter),
-                                        duration:
-                                            const Duration(milliseconds: 100),
-                                      )
-                                      .then(
-                                          (_) => _inProgrammaticScroll = false);
-                                  Future<void>.delayed(
-                                    const Duration(milliseconds: 50),
-                                  ).then((_) {
-                                    _currentSubChapter.value = subChapter;
-                                    setState(() {
-                                      _isExpanded = false;
-                                    });
-                                  });
-                                },
-                              );
-                            },
-                          ).toList(),
+            child: DictionaryProgressIndicator(
+              progress: _subChapterProgress,
+              style: IndicatorStyle.linear,
+              child: ExpansionPanelList(
+                expansionCallback: (index, _) {
+                  assert(
+                    index == 0,
+                    'There should only ever be a single element in this list',
+                  );
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                elevation: kGroundElevation,
+                expandedHeaderPadding: EdgeInsets.zero,
+                children: [
+                  ExpansionPanel(
+                    backgroundColor: Colors.transparent,
+                    isExpanded: _isExpanded,
+                    canTapOnHeader: true,
+                    headerBuilder: (context, isOpen) {
+                      return ListTile(
+                        tileColor: Colors.transparent,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 2 * kPad),
+                        title: Text(
+                          _currentSubChapter.value.title(context),
+                          style: Theme.of(context).textTheme.headline2,
                         ),
+                        subtitle: Text(
+                          _currentSubChapter.value.oppositeTitle(context),
+                        ),
+                        iconColor: Theme.of(context).iconTheme.color,
+                      );
+                    },
+                    body: AdaptiveMaterial(
+                      adaptiveColor: AdaptiveColor.surface,
+                      child: Column(
+                        children: widget.chapter.dialogueSubChapters.map(
+                          (subChapter) {
+                            return _SubChapterTile(
+                              subChapter: subChapter,
+                              isSelected:
+                                  subChapter == _currentSubChapter.value,
+                              onTap: () {
+                                _inProgrammaticScroll = true;
+                                _scrollController
+                                    .scrollTo(
+                                      index: _subChapterToIndex(subChapter),
+                                      duration:
+                                          const Duration(milliseconds: 100),
+                                    )
+                                    .then(
+                                        (_) => _inProgrammaticScroll = false);
+                                Future<void>.delayed(
+                                  const Duration(milliseconds: 50),
+                                ).then((_) {
+                                  _currentSubChapter.value = subChapter;
+                                  setState(() {
+                                    _isExpanded = false;
+                                  });
+                                });
+                              },
+                            );
+                          },
+                        ).toList(),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -330,7 +326,7 @@ class _SubChapterTile extends StatelessWidget {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.headline2!,
       child: Container(
-        color: isSelected ? Theme.of(context).selectedRowColor : null,
+        color: isSelected ? Theme.of(context).colorScheme.secondary: null,
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           title: Text(

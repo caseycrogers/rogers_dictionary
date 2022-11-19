@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -166,6 +167,11 @@ class DictionaryModel {
 
   void onDarkModeToggled() {
     _isDark.value = !_isDark.value;
+    FirebaseAnalytics.instance.logEvent(name: 'dark_mode_toggled');
+    FirebaseAnalytics.instance.setUserProperty(
+      name: 'dark_mode',
+      value: _isDark.value.toString(),
+    );
   }
 
   void _onEntrySelected(
