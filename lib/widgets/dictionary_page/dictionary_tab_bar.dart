@@ -1,8 +1,8 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 // Project imports:
+import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/util/collection_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';

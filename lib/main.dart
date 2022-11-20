@@ -12,9 +12,9 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:rogers_dictionary/clients/analytics.dart';
 
 // Project imports:
+import 'package:rogers_dictionary/clients/analytics.dart';
 import 'package:rogers_dictionary/clients/local_persistence.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
