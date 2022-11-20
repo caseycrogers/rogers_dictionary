@@ -40,7 +40,7 @@ String tabToText(BuildContext context, DictionaryTab tab) {
   }
 }
 
-class DictionaryTabEntry extends StatefulWidget {
+class DictionaryTabEntry extends StatelessWidget {
   const DictionaryTabEntry({
     required this.icon,
     required this.text,
@@ -48,44 +48,14 @@ class DictionaryTabEntry extends StatefulWidget {
   });
 
   final Widget icon;
-  final String? text;
+  final String text;
   final int index;
 
   @override
-  _DictionaryTabEntryState createState() => _DictionaryTabEntryState();
-}
-
-class _DictionaryTabEntryState extends State<DictionaryTabEntry> {
-  bool _isInitialized = false;
-  late TabController _controller;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isInitialized) {
-      _isInitialized = true;
-      _controller = DefaultTabController.of(context)!;
-      _controller.addListener(_onTabSelected);
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(_onTabSelected);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Tab(
-      icon: widget.icon,
-      text: _controller.index == widget.index ? widget.text : null,
+    return NavigationDestination(
+      icon: icon,
+      label: text,
     );
-  }
-
-  void _onTabSelected() {
-    if (mounted) {
-      setState(() {});
-    }
   }
 }

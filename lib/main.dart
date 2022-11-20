@@ -12,6 +12,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:rogers_dictionary/clients/analytics.dart';
 
 // Project imports:
 import 'package:rogers_dictionary/clients/local_persistence.dart';
@@ -35,11 +36,12 @@ Future<void> main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
       systemNavigationBarIconBrightness: Brightness.light,
       statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      systemStatusBarContrastEnforced: false,
     ),
   );
 
@@ -64,6 +66,7 @@ Future<void> initialize() async {
   await Firebase.initializeApp();
   await MobileAds.instance.initialize();
   await LocalPersistence.instance.initialize();
+  await disableIfTestDevice();
 
   // Don't hang or throw on logging.
   unawaited(FirebaseAnalytics.instance.setUserProperty(

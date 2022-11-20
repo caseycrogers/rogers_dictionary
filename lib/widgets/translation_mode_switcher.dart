@@ -70,65 +70,64 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
 
   Widget pages(BuildContext context) {
     final DictionaryModel dictionaryModel = DictionaryModel.instance;
-    // Used to force rebuilds on phone rotation. Otherwise translation mode
-    // switcher gets messed up.
     return LayoutBuilder(
       builder: (context, constraints) {
         return ValueListenableBuilder<bool>(
-            valueListenable: DictionaryModel.instance.isDark,
-            builder: (context, isDark, _) {
-              return PageView(
-                controller: _controller,
-                onPageChanged: (int index) => DictionaryModel.instance
-                    .onTranslationModeChanged(indexToTranslationMode(index)),
-                children: [
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: DictionaryApp.schemeFor(
-                        TranslationMode.English,
-                        isDark,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          key: const PageStorageKey<TranslationMode>(
-                            TranslationMode.English,
-                          ),
-                          child: TranslationModelProvider(
-                            translationModel: dictionaryModel.englishPageModel,
-                            child: widget.child,
-                          ),
-                        ),
-                        const VerticalDivider(width: .25, thickness: .25),
-                      ],
+          valueListenable: DictionaryModel.instance.isDark,
+          builder: (context, isDark, _) {
+            return PageView(
+              controller: _controller,
+              onPageChanged: (int index) => DictionaryModel.instance
+                  .onTranslationModeChanged(indexToTranslationMode(index)),
+              children: [
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: DictionaryApp.schemeFor(
+                      TranslationMode.English,
+                      isDark,
                     ),
                   ),
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: DictionaryApp.schemeFor(
-                        TranslationMode.Spanish,
-                        isDark,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const VerticalDivider(width: .25, thickness: .25),
-                        Expanded(
-                          key: const PageStorageKey<TranslationMode>(
-                            TranslationMode.Spanish,
-                          ),
-                          child: TranslationModelProvider(
-                            translationModel: dictionaryModel.spanishPageModel,
-                            child: widget.child,
-                          ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        key: const PageStorageKey<TranslationMode>(
+                          TranslationMode.English,
                         ),
-                      ],
+                        child: TranslationModelProvider(
+                          translationModel: dictionaryModel.englishPageModel,
+                          child: widget.child,
+                        ),
+                      ),
+                      const SizedBox(width: .25),
+                    ],
+                  ),
+                ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: DictionaryApp.schemeFor(
+                      TranslationMode.Spanish,
+                      isDark,
                     ),
                   ),
-                ],
-              );
-            });
+                  child: Row(
+                    children: [
+                      const SizedBox(width: .25),
+                      Expanded(
+                        key: const PageStorageKey<TranslationMode>(
+                          TranslationMode.Spanish,
+                        ),
+                        child: TranslationModelProvider(
+                          translationModel: dictionaryModel.spanishPageModel,
+                          child: widget.child,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }

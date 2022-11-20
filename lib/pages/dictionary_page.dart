@@ -46,11 +46,11 @@ class DictionaryPage extends StatelessWidget {
             },
           );
         },
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: AdaptiveMaterial(
-            adaptiveColor: AdaptiveColor.primary,
-            child: Column(
+        child: AdaptiveMaterial(
+          adaptiveColor: AdaptiveColor.primary,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Column(
               children: [
                 const DictionaryAppBar(),
                 // Intentionally don't wrap this in theme, it'll cause
@@ -67,15 +67,15 @@ class DictionaryPage extends StatelessWidget {
                 const DictionaryBannerAd(),
               ],
             ),
+            bottomNavigationBar: !isBigEnoughForAdvanced(context)
+                ? const AdaptiveMaterial(
+                    adaptiveColor: AdaptiveColor.primary,
+                    child: SafeArea(
+                      child: DictionaryTabBar(),
+                    ),
+                  )
+                : null,
           ),
-          bottomNavigationBar: !isBigEnoughForAdvanced(context)
-              ? const AdaptiveMaterial(
-                  adaptiveColor: AdaptiveColor.primary,
-                  child: SafeArea(
-                    child: DictionaryTabBar(),
-                  ),
-                )
-              : null,
         ),
       ),
     );

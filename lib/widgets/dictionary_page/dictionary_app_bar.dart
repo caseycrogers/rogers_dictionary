@@ -20,19 +20,19 @@ class DictionaryAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveMaterial(
+    return const AdaptiveMaterial(
       adaptiveColor: AdaptiveColor.primary,
       // Let the background color show through to avoid a bug where there's a
       // mis-colored seam in screenshots.
       // This is just to ensure that the adaptive widgets on top of this use the
       // right colors.
       isVisible: false,
-      child: AppBar(
-        backgroundColor: Colors.transparent,
-        leadingWidth: 0,
-        elevation: kGroundElevation,
-        titleSpacing: 0,
-        title: const _DictionaryTopBar(),
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: kToolbarHeight,
+          child: _DictionaryTopBar(),
+        ),
       ),
     );
   }
@@ -54,27 +54,31 @@ class _DictionaryTopBar extends StatelessWidget {
       );
     }
     return Container(
-        height: kToolbarHeight,
         child: Row(
-          children: [
-            const _LandscapeBackAndSearch(),
-            const SizedBox(width: kPad),
-            const TranslationModeSelector(),
-            const Spacer(),
-            const DictionaryTabBar(expanded: false),
-            const SizedBox(width: 2),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: kPad),
-              width: 1,
-              decoration: BoxDecoration(
-                color: Colors.white70,
-                borderRadius: BorderRadius.circular(.5),
-              ),
-            ),
-            const HelpMenu(),
-            const SizedBox(width: kPad),
-          ],
-        ));
+      children: [
+        const _LandscapeBackAndSearch(),
+        const SizedBox(width: kPad),
+        const TranslationModeSelector(),
+        const Spacer(),
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 200,
+          ),
+          child: const DictionaryTabBar(),
+        ),
+        const SizedBox(width: 4),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: kPad),
+          width: 1,
+          decoration: BoxDecoration(
+            color: Colors.white70,
+            borderRadius: BorderRadius.circular(.5),
+          ),
+        ),
+        const HelpMenu(),
+        const SizedBox(width: kPad),
+      ],
+    ));
   }
 }
 
@@ -84,7 +88,9 @@ class _LandscapeBackAndSearch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: _width(context)),
+      constraints: BoxConstraints(
+        maxWidth: _width(context),
+      ),
       child: ValueListenableBuilder<DictionaryTab>(
           valueListenable: DictionaryModel.instance.currentTab,
           child: const SearchBar(),
@@ -123,7 +129,12 @@ class _DictionaryBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: kPad),
-      child: const ImplicitNavigatorBackButton(),
+      child: IconTheme(
+        data: IconThemeData(
+          color: AdaptiveMaterial.onColorOf(context),
+        ),
+        child: const ImplicitNavigatorBackButton(),
+      ),
     );
   }
 }

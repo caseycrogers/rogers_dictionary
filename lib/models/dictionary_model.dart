@@ -116,6 +116,10 @@ class DictionaryModel {
         newTranslationMode ?? oppTranslationModel.translationMode);
   }
 
+  void onTabSelected(DictionaryTab tab) {
+    currentTab.value = tab;
+  }
+
   Future<void> onBookmarkSet(
     BuildContext context,
     Entry entry,
