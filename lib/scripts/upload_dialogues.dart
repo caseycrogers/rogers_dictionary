@@ -23,7 +23,7 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
   final String filePath = join(
     'lib',
     'scripts',
-    'dialogue_database.csv',
+    'Master Dictionary Database - dialogue.csv',
   );
   print('Uploading: $filePath.');
   final DataFrame df = await DataFrame.fromCsv(filePath);

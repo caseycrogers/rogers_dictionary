@@ -76,6 +76,9 @@ class _ChapterViewState extends State<ChapterView> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: kPad),
+          // Required to avoid a weird bug where the scroll view contents bleed
+          // above into the list tile.
+          color: Theme.of(context).colorScheme.surface,
           child: ListTile(
             contentPadding: EdgeInsets.zero,
             title: DefaultTextStyle(
@@ -100,12 +103,7 @@ class _ChapterViewState extends State<ChapterView> {
                         subChapter: _currentSubChapter.value,
                       ),
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 2 * kPad,
-                        ),
-                        child: _dialoguesList(dialoguesModel),
-                      ),
+                      child: _dialoguesList(dialoguesModel),
                     ),
                   ],
                 ),
@@ -220,6 +218,9 @@ class _ChapterViewState extends State<ChapterView> {
       itemScrollController: _scrollController,
       itemCount: widget.chapter.dialogueSubChapters.fold<int>(
           0, (sum, subChapter) => sum += subChapter.dialogues.length),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 2 * kPad,
+      ),
       itemBuilder: (context, index) => Builder(
         builder: (context) {
           final DialogueChapter_SubChapter subChapter =

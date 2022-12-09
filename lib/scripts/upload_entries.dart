@@ -41,7 +41,9 @@ Future<Map<String, EntryBuilder>> _getBuilders(
   final String csvPath = join(
     'lib',
     'scripts',
-    'entry_database-${isSpanish ? SPANISH : ENGLISH}.csv',
+    'Master Dictionary Database - '
+        '${!isSpanish ? SPANISH : ENGLISH}_to_'
+        '${isSpanish ? SPANISH : ENGLISH}.csv',
   );
   final DatabaseVersion version = DatabaseVersionUtilsBase.fromDisk(
     File(join('assets', 'database_version.json')),

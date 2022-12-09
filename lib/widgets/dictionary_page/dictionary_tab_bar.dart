@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 // Project imports:
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/util/collection_utils.dart';
-import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 

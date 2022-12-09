@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:rogers_dictionary/widgets/buttons/about_button.dart';
 import 'package:rogers_dictionary/widgets/buttons/drop_down_widget.dart';
 import 'package:rogers_dictionary/widgets/buttons/feedback_button.dart';
-import 'package:rogers_dictionary/widgets/buttons/toggle_dark_mode_button.dart';
 
 class HelpMenu extends StatelessWidget {
   const HelpMenu({Key? key}) : super(key: key);
@@ -19,12 +18,12 @@ class HelpMenu extends StatelessWidget {
           children: [
             FeedbackButton(onPressed: closeMenu),
             AboutButton(onPressed: closeMenu),
-            ToggleDarkModeButton(onPressed: closeMenu),
-            HelpMenuButton(
-              icon: Icons.attach_money,
-              text: 'remove ads',
-              onTap: () {},
-            ),
+            // TODO(caseycrogers): add this back in.
+            //HelpMenuButton(
+            //  icon: Icons.attach_money,
+            //  text: 'remove ads',
+            //  onTap: () {},
+            //),
           ],
         );
       },
@@ -40,17 +39,25 @@ class HelpMenu extends StatelessWidget {
 class HelpMenuButton extends StatelessWidget {
   const HelpMenuButton({
     Key? key,
+    this.showLabel = true,
     required this.icon,
     required this.text,
     required this.onTap,
   }) : super(key: key);
 
+  final bool showLabel;
   final IconData icon;
   final String text;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    if (!showLabel) {
+      return IconButton(
+        icon: Icon(icon, color: Colors.white),
+        onPressed: onTap,
+      );
+    }
     return InkWell(
       child: Padding(
         padding: const EdgeInsets.all(6),

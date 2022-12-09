@@ -10,6 +10,7 @@ import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
+import 'package:rogers_dictionary/widgets/buttons/toggle_dark_mode_button.dart';
 import 'package:rogers_dictionary/widgets/buttons/translation_mode_selector.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
 import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
@@ -49,6 +50,7 @@ class _DictionaryTopBar extends StatelessWidget {
           _DictionaryBackButton(),
           TranslationModeSelector(),
           Spacer(),
+          ToggleDarkModeButton(),
           HelpMenu(),
         ],
       );
@@ -75,6 +77,7 @@ class _DictionaryTopBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(.5),
           ),
         ),
+        const ToggleDarkModeButton(),
         const HelpMenu(),
         const SizedBox(width: kPad),
       ],

@@ -2,8 +2,8 @@
 import 'package:rogers_dictionary/util/string_utils.dart';
 
 //  Localization for DictionaryPage.
-_CapMessage english = _CapMessage('english', 'inglés');
-_CapMessage spanish = _CapMessage('spanish', 'español');
+_CapMessage english = _CapMessage('eng', 'eng');
+_CapMessage spanish = _CapMessage('esp', 'esp');
 
 _CapMessage dictionary = _CapMessage('terms', 'términos');
 _CapMessage bookmarks = _CapMessage('bookmarks', 'marcadores');

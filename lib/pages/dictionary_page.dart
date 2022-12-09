@@ -57,11 +57,13 @@ class DictionaryPage extends StatelessWidget {
                 // excess rebuilds.
                 Expanded(
                   child: DictionaryTabBarView(
-                    children: LinkedHashMap<DictionaryTab, Widget>.of({
-                      DictionaryTab.search: SearchPage(),
-                      DictionaryTab.bookmarks: BookmarksPage(),
-                      DictionaryTab.dialogues: DialoguesPage(),
-                    }),
+                    children: LinkedHashMap<DictionaryTab, Widget>.of(
+                      {
+                        DictionaryTab.search: SearchPage(),
+                        DictionaryTab.bookmarks: BookmarksPage(),
+                        DictionaryTab.dialogues: DialoguesPage(),
+                      },
+                    ),
                   ),
                 ),
                 const DictionaryBannerAd(),

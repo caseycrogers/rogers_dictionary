@@ -10,23 +10,31 @@ import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
 class ToggleDarkModeButton extends StatelessWidget {
   const ToggleDarkModeButton({
     Key? key,
-    required this.onPressed,
+    this.wide = false,
+    this.onTapSideEffect,
   }) : super(key: key);
 
-  final VoidCallback onPressed;
+  final bool wide;
+  final VoidCallback? onTapSideEffect;
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = DictionaryModel.instance.isDark.value;
-    return HelpMenuButton(
-      icon: isDark ? Icons.light_mode : Icons.dark_mode,
-      text: isDark ?  i18n.lightMode.get(context) : i18n.darkMode.get(context),
-      onTap: () {
-        DictionaryApp.analytics.logEvent(
-          name: 'light_mode_${DictionaryModel.instance.isDark}',
+    return ValueListenableBuilder<bool>(
+      valueListenable: DictionaryModel.instance.isDark,
+      builder: (context, isDark, _) {
+        return HelpMenuButton(
+          icon: isDark ? Icons.light_mode : Icons.dark_mode,
+          text:
+              isDark ? i18n.lightMode.get(context) : i18n.darkMode.get(context),
+          showLabel: wide,
+          onTap: () {
+            DictionaryApp.analytics.logEvent(
+              name: 'light_mode_${DictionaryModel.instance.isDark}',
+            );
+            onTapSideEffect?.call();
+            DictionaryModel.instance.onDarkModeToggled();
+          },
         );
-        onPressed();
-        DictionaryModel.instance.onDarkModeToggled();
       },
     );
   }

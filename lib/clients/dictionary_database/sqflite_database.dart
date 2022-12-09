@@ -282,7 +282,7 @@ OFFSET $offset;''';
         await _copyDb('$BOOKMARKS_DB.db', _bookmarksPath);
       }
     } else {
-      print('Opening existing database');
+      print('Opening existing database.');
     }
     // open the database
     return _openDatabase();
