@@ -50,7 +50,7 @@ class _TranslationModeSwitcherState extends State<TranslationModeSwitcher> {
         }
         _controller!.animateToPage(
           targetPage,
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 100),
           curve: Curves.easeIn,
         );
       });

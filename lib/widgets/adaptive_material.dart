@@ -1,5 +1,6 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
+import 'package:rogers_dictionary/util/color_utils.dart';
 
 enum AdaptiveColor {
   primary,
@@ -51,7 +52,7 @@ class AdaptiveMaterial extends StatelessWidget {
   }
 
   static Color? secondaryOnColorOf(BuildContext context) {
-    return onColorOf(context)?.withAlpha(120);
+    return onColorOf(context)!.withAlpha(120).bake(colorOf(context)!);
   }
 
   static AdaptiveColor? _adaptiveColorOf(BuildContext context) {

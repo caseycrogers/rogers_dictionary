@@ -258,8 +258,10 @@ class HighlightedText extends StatelessWidget {
           return MapEntry(
             OverrideRule(styleIndex: e.key, start: start, stop: stop),
             TextStyle(
-              backgroundColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(.25),
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withOpacity(DictionaryModel.instance.isDark.value ? 1 : .25),
             ),
           );
         },

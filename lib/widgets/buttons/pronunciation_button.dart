@@ -168,8 +168,7 @@ class _StopButton extends StatelessWidget {
       Icons.stop,
       // We need to make this opaque as it should fully occlude the indicator
       // under it
-      color:
-          Theme.of(context).iconTheme.color!.bake(Theme.of(context).cardColor),
+      color: AdaptiveMaterial.secondaryOnColorOf(context),
       onPressed: () {
         _onDone();
         DictionaryApp.textToSpeech.stopIfPlaying(text, mode);
