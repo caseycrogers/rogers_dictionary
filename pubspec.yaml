@@ -3,7 +3,7 @@ description: The electronic version of Dr Rogers Spanish Medical Dictionary.
 
 publish_to: 'none'
 
-version: 1.1.0+23
+version: 1.1.0+25
 
 environment:
   sdk: '>=2.13.0 <3.0.0'

@@ -330,7 +330,7 @@ class _SubChapterTile extends StatelessWidget {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.headline2!,
       child: Container(
-        color: isSelected ? Theme.of(context).colorScheme.secondary: null,
+        color: isSelected ? Theme.of(context).colorScheme.secondary : null,
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           title: Text(

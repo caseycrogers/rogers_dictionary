@@ -18,7 +18,7 @@ class HelpMenu extends StatelessWidget {
           children: [
             FeedbackButton(onPressed: closeMenu),
             AboutButton(onPressed: closeMenu),
-            // TODO(caseycrogers): add this back in.
+            // TODO(caseycrogers): add this back in when paid is launched.
             //HelpMenuButton(
             //  icon: Icons.attach_money,
             //  text: 'remove ads',
