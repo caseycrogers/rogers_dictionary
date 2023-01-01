@@ -26,7 +26,7 @@ Future<void> main() async {
       ),
       config: ScreenshotConfig(
         category: '',
-        device: Devices.android.largeTablet,
+        device: Devices.ios.iPhoneSE,
       ),
       locale: const Locale('es'),
     ),

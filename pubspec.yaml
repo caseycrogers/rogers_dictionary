@@ -17,7 +17,7 @@ dependencies:
   email_validator: ^2.0.1
   feedback:
     path: ../feedback/feedback
-  firebase_analytics: ^10.0.5
+  firebase_analytics: ^10.1.0
   firebase_core: ^2.2.0
   firebase_crashlytics: ^3.0.5
   flutter:

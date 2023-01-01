@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+		<key>NSMicrophoneUsageDescription</key>
+        <string>This app uses your microphone when you use speech to test to search for a word.</string>
 		<key>GADApplicationIdentifier</key>
 		<string>ca-app-pub-4592603753721232~3411302836</string>
 		<key>CFBundleDevelopmentRegion</key>
@@ -45,5 +47,7 @@
 		</array>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
-	</dict>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+</dict>
 </plist>
