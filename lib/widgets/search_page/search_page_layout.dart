@@ -8,7 +8,7 @@ import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
+import 'package:rogers_dictionary/widgets/search_page/dictionary_search_bar.dart';
 import 'package:rogers_dictionary/widgets/search_page/selected_entry_switcher.dart';
 import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 import 'entry_list.dart';
@@ -45,7 +45,7 @@ class _PortraitLayout extends StatelessWidget {
       header: _isSearch(context)
           ? const Padding(
               padding: EdgeInsets.symmetric(horizontal: kPad),
-              child: SearchBar(),
+              child: DictionarySearchBar(),
             )
           : null,
       child: const AdaptiveMaterial(
@@ -84,10 +84,10 @@ class _LandscapeLayout extends StatelessWidget {
                 ),
               ),
             ),
-            Flexible(
+            const Flexible(
               flex: kLandscapeRightFlex,
               child: Row(
-                children: const [
+                children: [
                   VerticalDivider(width: 1),
                   Expanded(
                     child: SelectedEntrySwitcher(),

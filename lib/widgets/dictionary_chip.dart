@@ -31,7 +31,7 @@ class DictionaryChip extends StatelessWidget {
         child: DefaultTextStyle(
           style: Theme.of(context)
               .textTheme
-              .bodyText2!
+              .bodyMedium!
               .copyWith(color: Theme.of(context).chipTheme.labelStyle!.color),
           child: Padding(
             padding: childPadding ?? EdgeInsets.zero,

@@ -54,11 +54,14 @@ class HeadwordView extends StatelessWidget {
                       // default text size.
                       size: model.isPreview
                           ? null
-                          : Theme.of(context).textTheme.headline1!.fontSize! +
+                          : Theme.of(context)
+                                  .textTheme
+                                  .displayLarge!
+                                  .fontSize! +
                               (IconTheme.of(context).size! -
                                   Theme.of(context)
                                       .textTheme
-                                      .bodyText2!
+                                      .bodyMedium!
                                       .fontSize!),
                       entry: model.entry,
                     ),
@@ -86,7 +89,7 @@ class _AlternateHeadwordView extends StatelessWidget {
       return Container();
     }
     return DefaultTextStyle(
-      style: Theme.of(context).textTheme.headline3!.asBold,
+      style: Theme.of(context).textTheme.displaySmall!.asBold,
       child: Builder(
         builder: (context) {
           return Row(

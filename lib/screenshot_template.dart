@@ -158,7 +158,10 @@ class DictionaryScreenshotTemplate extends StatelessWidget {
             );
           }),
       screenshotConfig: config,
-      child: DictionaryAppBase(overrideLocale: locale),
+      child: DictionaryAppBase(
+        overrideLocale: locale,
+        overridePlatform: config.device.identifier.platform,
+      ),
     );
   }
 

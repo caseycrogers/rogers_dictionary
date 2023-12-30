@@ -4,9 +4,8 @@ import 'dart:io';
 
 // Package imports:
 import 'package:args/args.dart';
-import 'package:df/df.dart';
+import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:path/path.dart';
-import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Project imports:
@@ -26,10 +25,11 @@ Future<void> uploadDialogues(bool debug, bool verbose) async {
     'Master Dictionary Database - dialogue.csv',
   );
   print('Uploading: $filePath.');
-  final DataFrame df = await DataFrame.fromCsv(filePath);
+  final DataFrame df = await fromCsv(filePath);
 
+  // TODO: this is not coherent.
   final Iterable<Map<String, String>> rows =
-      df.rows.map((row) => row.map(_parseCell));
+      df.rows.map((row) => (row as Map<String, String>).map(_parseCell));
   String? englishSubChapter;
   String? spanishSubChapter;
   DialogueChapterBuilder? builder;

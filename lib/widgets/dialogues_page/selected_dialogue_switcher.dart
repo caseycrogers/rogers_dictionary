@@ -20,7 +20,7 @@ class SelectedDialogueSwitcher extends StatelessWidget {
       maintainHistory: true,
       maintainState: false,
       valueNotifier: dialoguesModel.selectedChapterNotifier,
-      builder: (context, selectedChapter, _, __) => selectedChapter == null
+      builder: (context, selectedChapter) => selectedChapter == null
           ? TableOfContentsView()
           : ChapterView(
               chapter: selectedChapter,

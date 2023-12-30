@@ -9,7 +9,6 @@ import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/i18n.dart' as i18n;
 import 'package:rogers_dictionary/models/translation_mode.dart';
-import 'package:rogers_dictionary/util/color_utils.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/dictionary_progress_indicator.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
@@ -45,11 +44,18 @@ class PronunciationButton extends StatelessWidget {
             _currPlaybackStream,
           );
         } else {
-          currButton = _PlayingButton(text, mode, playbackStream, () {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _currPlaybackStream.value = null;
-            });
-          });
+          currButton = _PlayingButton(
+            text,
+            mode,
+            playbackStream,
+            () {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) {
+                  _currPlaybackStream.value = null;
+                },
+              );
+            },
+          );
         }
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 20),
@@ -117,8 +123,14 @@ class _PlayingButton extends StatelessWidget {
           if (snap.error is TimeoutException) {
             message = i18n.audioPlaybackTimeoutMsg.get(context);
           }
-          DictionaryApp.snackBarNotifier.showErrorMessage(
-              message: message, extraText: snap.error.toString());
+          DictionaryApp.scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                '$message\n'
+                '${snap.error.toString()}',
+              ),
+            ),
+          );
           _onDone();
         }
         if (snap.connectionState == ConnectionState.done) {

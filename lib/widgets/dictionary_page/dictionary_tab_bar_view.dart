@@ -36,7 +36,7 @@ class DictionaryTabBarView extends StatelessWidget {
         maintainHistory: true,
         maintainState: false,
         valueNotifier: currentTab,
-        builder: (context, tab, animation, secondaryAnimation) {
+        builder: (context, tab) {
           // Save a reference earlier so that the listener can reference it.
           return children[tab]!;
         },

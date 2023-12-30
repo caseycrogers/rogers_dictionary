@@ -6,33 +6,33 @@ publish_to: 'none'
 version: 1.1.0+25
 
 environment:
-  sdk: '>=2.13.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   animations: ^2.0.0
   async: ^2.8.1
   async_list_view: ^1.0.0
   cupertino_icons: ^1.0.3
-  device_info_plus: ^8.0.0
+  device_info_plus: ^9.0.2
   email_validator: ^2.0.1
   feedback:
     path: ../feedback/feedback
-  firebase_analytics: ^10.1.0
-  firebase_core: ^2.2.0
-  firebase_crashlytics: ^3.0.5
+  firebase_analytics: ^10.5.0
+  firebase_core: ^2.16.0
+  firebase_crashlytics: ^3.3.6
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  google_fonts: ^3.0.1
-  google_mobile_ads: ^2.2.0
-  http: ^0.13.3
+  google_fonts: ^6.1.0
+  google_mobile_ads: ^4.0.0
+  http: ^1.1.0
   implicit_navigator:
     path: ../implicit_navigator
   in_app_purchase: ^3.0.8
-  just_audio: ^0.9.7
+  just_audio: ^0.9.35
   notified_preferences: ^2.0.0
-  package_info: ^2.0.0
+  package_info_plus: ^5.0.1
   path: ^1.8.0
   path_provider: ^2.0.1
   scrollable_positioned_list: ^0.3.5
@@ -40,10 +40,9 @@ dependencies:
   sqflite: ^2.0.0+3
 
 dev_dependencies:
-  df: ^0.4.0-nullsafety.0
   firedart: ^0.9.0+1
   # flutter pub run flutter_launcher_icons:main
-  flutter_launcher_icons: ^0.11.0
+  flutter_launcher_icons: ^0.13.1
   # flutter pub run flutter_native_splash:create
   flutter_native_splash: ^2.0.1+1
   # flutter pub run import_sorter:main
@@ -55,12 +54,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   msix: ^3.7.0
-  screenshot: ^1.2.3
+  screenshot: ^2.1.0
   sqflite_common_ffi: ^2.0.0
-  test: ^1.19.5
+  test: ^1.24.1
   device_frame:
     path: ../flutter_device_preview/device_frame
-  image: ^3.1.1
+  image: ^4.0.17
+  ml_dataframe: ^1.6.0
 
 
 flutter:

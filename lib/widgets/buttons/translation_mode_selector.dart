@@ -118,7 +118,7 @@ class _Button extends StatelessWidget {
             mode == TranslationMode.English
                 ? i18n.english.cap.get(context)
                 : i18n.spanish.cap.get(context),
-            style: Theme.of(context).textTheme.headline2!.copyWith(
+            style: Theme.of(context).textTheme.displayMedium!.copyWith(
                   color: Colors.white,
                 ),
           ),

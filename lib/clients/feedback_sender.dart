@@ -112,11 +112,17 @@ ${extraText ?? ''}<br>''',
           stack: StackTrace.current,
         ),
       );
-      DictionaryApp.snackBarNotifier.showRetryMessage(
-          message: i18n.feedbackError.getForLocale(locale),
-          retry: () {
-            _onFeedback(userFeedback, locale, extraText);
-          });
+      DictionaryApp.scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(i18n.feedbackError.getForLocale(locale)),
+          action: SnackBarAction(
+            label: 'retry',
+            onPressed: () {
+              _onFeedback(userFeedback, locale, extraText);
+            },
+          ),
+        ),
+      );
       return;
     }
     final http.Response storageResponse = await _client.post(
@@ -135,8 +141,10 @@ ${extraText ?? ''}<br>''',
         ),
       );
     }
-    DictionaryApp.snackBarNotifier.showDismissibleMessage(
-      message: i18n.feedbackSuccess.getForLocale(locale),
+    DictionaryApp.scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text(i18n.feedbackSuccess.getForLocale(locale)),
+      ),
     );
 
     // Log user feedback in analytics

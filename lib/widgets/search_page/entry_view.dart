@@ -43,12 +43,12 @@ class EntryViewPage extends StatelessWidget {
           entry: entry,
           child: PageHeader(
             header: DefaultTextStyle.merge(
-              style: Theme.of(context).textTheme.headline1!,
+              style: Theme.of(context).textTheme.displayLarge!,
               child: const HeadwordView(),
             ),
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 SizedBox(height: kPad),
                 TranslationTableView(),
                 EditorialNotesView(),
@@ -73,17 +73,17 @@ class EntryViewPreview extends StatelessWidget {
     return Theme(
       data: Theme.of(context).copyWith(
         textTheme: Theme.of(context).textTheme.copyWith(
-              headline1: baseStyle.asBold,
-              headline2: baseStyle.asBold,
-              headline3: baseStyle.asBold,
+              displayLarge: baseStyle.asBold,
+              displayMedium: baseStyle.asBold,
+              displaySmall: baseStyle.asBold,
             ),
       ),
       child: EntryViewModelProvider(
         preview: true,
         entry: entry,
-        child: Column(
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             HeadwordView(),
             TranslationTableView(),
           ],
@@ -139,7 +139,7 @@ class _EntryNotFoundView extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageHeader(
       header: DefaultTextStyle.merge(
-        style: Theme.of(context).textTheme.headline1!,
+        style: Theme.of(context).textTheme.displayLarge!,
         child: Text('${i18n.invalidEntry.get(context)}: \'$headword\''),
       ),
       child: InkWell(

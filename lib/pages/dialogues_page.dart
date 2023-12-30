@@ -26,9 +26,9 @@ class DialoguesPage extends StatelessWidget {
           child: Theme(
             data: ThemeData(
               textTheme: textTheme.copyWith(
-                caption: textTheme.bodyText2!.copyWith(
-                  color: textTheme.bodyText2!.color!.withOpacity(.75),
-                  fontSize: textTheme.bodyText2!.fontSize! - 2,
+                bodySmall: textTheme.bodyMedium!.copyWith(
+                  color: textTheme.bodyMedium!.color!.withOpacity(.75),
+                  fontSize: textTheme.bodyMedium!.fontSize! - 2,
                 ),
               ),
             ),

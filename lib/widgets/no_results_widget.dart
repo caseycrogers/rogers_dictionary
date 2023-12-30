@@ -87,7 +87,7 @@ class _CollapsingScrollEntryState extends State<_CollapsingScrollEntry> {
 
   @override
   void didChangeDependencies() {
-    final ScrollPosition newPosition = Scrollable.of(context)!.position;
+    final ScrollPosition newPosition = Scrollable.of(context).position;
     if (newPosition != _position) {
       _position?.removeListener(_onScroll);
       _position = newPosition..addListener(_onScroll);

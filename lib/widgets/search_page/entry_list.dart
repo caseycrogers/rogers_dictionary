@@ -64,9 +64,9 @@ class _SwitchOnSearchStringState extends State<_SwitchOnSearchString> {
       transitionDuration: const Duration(milliseconds: 1),
       initialHistory: const [
         // Ensure we have a base page on translation mode changed.
-        ValueHistoryEntry(0, ''),
+        (depth: 0, value: ''),
       ],
-      builder: (context, searchString, _, __) {
+      builder: (context, searchString) {
         if (searchString != _lastSearchString) {
           _i += 1;
           _lastSearchString = searchString;

@@ -41,10 +41,12 @@ Future<void> main() async {
     if (isInitialized != null) {
       await isInitialized;
     } else {
-      WidgetsApp.debugAllowBannerOverride = false;
-      await initialize();
-      await DictionaryApp.analytics.setAnalyticsCollectionEnabled(false);
-      await binding.convertFlutterSurfaceToImage();
+      isInitialized = () async {
+        WidgetsApp.debugAllowBannerOverride = false;
+        await initialize();
+        await DictionaryApp.analytics.setAnalyticsCollectionEnabled(false);
+        await binding.convertFlutterSurfaceToImage();
+      }();
     }
     dictionaryModel = DictionaryModel.instance;
   }
@@ -99,20 +101,20 @@ Future<void> main() async {
         outputWidth: 2048,
       ),
       // Android.
-      //ScreenshotConfig(
-      //  category: '',
-      //  device: Devices.android.onePlus8Pro,
-      //  outputHeight: 3168,
-      //  outputWidth: 1440,
-      //),
-      //ScreenshotConfig(
-      //  category: '10',
-      //  device: Devices.android.largeTablet,
-      //),
-      //ScreenshotConfig(
-      //  category: '7',
-      //  device: Devices.android.mediumTablet,
-      //),
+      ScreenshotConfig(
+        category: '',
+        device: Devices.android.onePlus8Pro,
+        outputHeight: 3168,
+        outputWidth: 1440,
+      ),
+      ScreenshotConfig(
+        category: '10',
+        device: Devices.android.largeTablet,
+      ),
+      ScreenshotConfig(
+        category: '7',
+        device: Devices.android.mediumTablet,
+      ),
     ]) {
       String screenshotName(String suffix) {
         return jsonEncode(
@@ -201,6 +203,57 @@ Future<void> main() async {
         );
       });
 
+      testWidgets('($locale) (${config.device.name}) - dark mode.',
+          (WidgetTester tester) async {
+        dictionaryModel.onDarkModeToggled();
+        await tester.pumpWidget(
+          DictionaryScreenshotTemplate(
+            headerText: const i18n.Message(
+              'Dark mode reduces eye strain!',
+              '¡El modo oscuro reduce la fatiga visual!',
+            ),
+            config: config,
+            locale: locale,
+          ),
+        );
+        late BuildContext context;
+        if (locale == es) {
+          dictionaryModel.onTranslationModeChanged();
+        }
+        context = await pumpUntilFound(
+          tester,
+          find.byHeadword(locale == en ? 'abdomen' : 'abandonar'),
+          msg: locale == en ? 'abdomen' : 'abandonar',
+        );
+        // Necessary or else the search string won't update consistently
+        // for reasons unknown.
+        await tester.pumpAndSettle();
+        dictionaryModel.currTranslationModel.searchModel.entrySearchModel
+            .onSearchStringChanged(
+          context: context,
+          newSearchString: locale == en ? 'fl' : 'gri',
+        );
+        final String headword = locale == en ? 'flu' : 'gripe';
+        context = await pumpUntilFound(
+          tester,
+          find.byHeadword(headword),
+          msg: headword,
+        );
+        if (config.isLargeScreen) {
+          dictionaryModel.onHeadwordSelected(context, headword);
+          await pumpUntilNotFound(
+            tester,
+            find.byType(NoEntryBackground),
+            msg: 'NoEntryBackground',
+          );
+        }
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 200));
+        await binding.takeScreenshot(
+          screenshotName('03-dark_${locale.languageCode}'),
+        );
+      });
+
       testWidgets('($locale) (${config.device.name}) - Bookmarks.',
           (WidgetTester tester) async {
         await tester.pumpWidget(
@@ -244,7 +297,7 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('03-bookmarks_es'),
+          screenshotName('04-bookmarks_es'),
         );
       });
 
@@ -272,7 +325,7 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('04-chapters_${locale.languageCode}'),
+          screenshotName('05-chapters_${locale.languageCode}'),
         );
       });
 
@@ -324,7 +377,7 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('05-dialogues_${locale.languageCode}'),
+          screenshotName('06-dialogues_${locale.languageCode}'),
         );
       });
 
@@ -357,7 +410,7 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('06-complex_entry_en'),
+          screenshotName('07-complex_entry_en'),
         );
       });
 
@@ -395,58 +448,7 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.pump(const Duration(milliseconds: 200));
         await binding.takeScreenshot(
-          screenshotName('07-regional_en'),
-        );
-      });
-
-      testWidgets('($locale) (${config.device.name}) - dark mode.',
-          (WidgetTester tester) async {
-        dictionaryModel.onDarkModeToggled();
-        await tester.pumpWidget(
-          DictionaryScreenshotTemplate(
-            headerText: const i18n.Message(
-              'Dark mode reduces eye strain!',
-              '¡El modo oscuro reduce la fatiga visual!',
-            ),
-            config: config,
-            locale: locale,
-          ),
-        );
-        late BuildContext context;
-        if (locale == es) {
-          dictionaryModel.onTranslationModeChanged();
-        }
-        context = await pumpUntilFound(
-          tester,
-          find.byHeadword(locale == en ? 'abdomen' : 'abandonar'),
-          msg: locale == en ? 'abdomen' : 'abandonar',
-        );
-        // Necessary or else the search string won't update consistently
-        // for reasons unknown.
-        await tester.pumpAndSettle();
-        dictionaryModel.currTranslationModel.searchModel.entrySearchModel
-            .onSearchStringChanged(
-          context: context,
-          newSearchString: locale == en ? 'fl' : 'gri',
-        );
-        final String headword = locale == en ? 'flu' : 'gripe';
-        context = await pumpUntilFound(
-          tester,
-          find.byHeadword(headword),
-          msg: headword,
-        );
-        if (config.isLargeScreen) {
-          dictionaryModel.onHeadwordSelected(context, headword);
-          await pumpUntilNotFound(
-            tester,
-            find.byType(NoEntryBackground),
-            msg: 'NoEntryBackground',
-          );
-        }
-        await tester.pumpAndSettle();
-        await tester.pump(const Duration(milliseconds: 200));
-        await binding.takeScreenshot(
-          screenshotName('08-dark_${locale.languageCode}'),
+          screenshotName('08-regional_en'),
         );
       });
     }

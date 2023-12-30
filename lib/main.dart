@@ -17,6 +17,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:rogers_dictionary/clients/analytics.dart';
 import 'package:rogers_dictionary/clients/local_persistence.dart';
 import 'package:rogers_dictionary/dictionary_app.dart';
+import 'package:rogers_dictionary/firebase_options.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 Future<void> main() async {
@@ -49,21 +50,19 @@ Future<void> main() async {
     return runApp(const DictionaryApp());
   }
   await initialize();
-  return runZonedGuarded<void>(
-    () async {
-      await FirebaseCrashlytics.instance
-          .setCustomKey('mode', kDebugMode ? 'debug' : 'release');
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  await FirebaseCrashlytics.instance
+      .setCustomKey('mode', kDebugMode ? 'debug' : 'release');
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-      runApp(const DictionaryApp());
-    },
-    FirebaseCrashlytics.instance.recordError,
-  );
+  runApp(const DictionaryApp());
 }
 
 // Exposed so that the screenshot system can access it.
 Future<void> initialize() async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await MobileAds.instance.initialize();
   await LocalPersistence.instance.initialize();
   await disableIfTestDevice();

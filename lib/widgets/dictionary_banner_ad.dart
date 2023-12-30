@@ -1,14 +1,12 @@
-// Dart imports:
-import 'dart:io';
-
 // Flutter imports:
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Project imports:
-import 'package:rogers_dictionary/dictionary_app.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 
 class DictionaryBannerAd extends StatelessWidget {
@@ -74,35 +72,38 @@ class _DictionaryBannerAdBaseState extends State<_DictionaryBannerAdBase> {
   late Future<BannerAd> _bannerAd = _getBannerAd();
   late MediaQueryData _query = MediaQuery.of(context);
 
+
   Future<BannerAd> _getBannerAd() async {
+    final Completer<BannerAd> adCompleter = Completer();
     final AdSize? adSize = await AdSize.getAnchoredAdaptiveBannerAdSize(
       _query.orientation,
       // Don't allow the ad to be wider than the screen height so that it
       // doesn't overdraw on screen rotate.
       _query.size.width.truncate(),
     );
-    final BannerAd ad = BannerAd(
-      adUnitId: Platform.isIOS ? _iosAdUnitId : _androidAdUnitId,
-      size: adSize ?? AdSize.banner,
+    await BannerAd(
+      size: adSize ?? AdSize.fluid,
+      adUnitId: _testAdUnitId,
+      //adUnitId: Platform.isIOS ? _iosAdUnitId : _androidAdUnitId,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          adCompleter.complete(ad as BannerAd);
+        },
+        onAdFailedToLoad: (ad, error) {
+          FlutterError.reportError(FlutterErrorDetails(exception: error));
+          adCompleter.completeError(error);
+        },
+      ),
       request: AdRequest(
         keywords: [
           ..._universalKeywords,
           ...adKeywords.value,
         ],
-        nonPersonalizedAds: true,
       ),
-      listener: BannerAdListener(
-        onAdFailedToLoad: (Ad ad, loadAdError) {
-          DictionaryApp.analytics.logEvent(
-            name: 'ad_load_error',
-            parameters: {'ad': ad.toString(), 'error': loadAdError.toString()},
-          );
-          print(loadAdError);
-        },
-      ),
+    ).load().onError(
+          (error, stackTrace) => adCompleter.completeError(error!, stackTrace),
     );
-    await ad.load();
-    return ad;
+    return adCompleter.future;
   }
 
   @override

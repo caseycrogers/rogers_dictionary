@@ -54,10 +54,13 @@ class _AboutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
         onClose();
-        return true;
       },
       child: AdaptiveMaterial(
         adaptiveColor: AdaptiveColor.surface,
@@ -65,11 +68,11 @@ class _AboutView extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: DefaultTextStyle(
-              style: Theme.of(context).textTheme.headline3!,
+              style: Theme.of(context).textTheme.displaySmall!,
               child: PageHeader(
                 header: Text(
                   i18n.about.cap.get(context),
-                  style: Theme.of(context).textTheme.headline1,
+                  style: Theme.of(context).textTheme.displayLarge,
                 ),
                 onClose: onClose,
                 child: Column(
@@ -118,7 +121,7 @@ class _DebugInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 20),
+      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 20),
       child: Column(
         children: <String, Future<String>>{
           '': Future.value(Theme.of(context).platform.toString().enumString),

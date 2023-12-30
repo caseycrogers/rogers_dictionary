@@ -50,7 +50,7 @@ class TableOfContentsView extends StatelessWidget {
             title: DefaultTextStyle(
               style: Theme.of(context)
                   .textTheme
-                  .headline1!
+                  .displayLarge!
                   .asColor(AdaptiveMaterial.onColorOf(context)!),
               child: Text(
                 chapter.title(context),
@@ -98,7 +98,7 @@ class TableOfContentsView extends StatelessWidget {
       title: DefaultTextStyle(
         style: Theme.of(context)
             .textTheme
-            .headline1!
+            .displayLarge!
             .asColor(AdaptiveMaterial.onColorOf(context)!),
         child: Text(
           subChapter?.title(context) ?? chapter.title(context),

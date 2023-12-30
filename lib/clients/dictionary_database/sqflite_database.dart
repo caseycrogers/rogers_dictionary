@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 
 // Package imports:
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Project imports:

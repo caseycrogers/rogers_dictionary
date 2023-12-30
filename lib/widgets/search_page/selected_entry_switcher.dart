@@ -45,13 +45,12 @@ class _SelectedEntrySwitcherState extends State<SelectedEntrySwitcher> {
       key: _getKey(context),
       maintainHistory: true,
       maintainState: false,
-      takeFocus: false,
       valueNotifier: SearchModel.of(context).currSelectedEntry,
       // Ensure that a base page is in the history on opposite headword.
       initialHistory: const [
-        ValueHistoryEntry(0, null),
+        (depth: 0, value: null),
       ],
-      builder: (context, selectedEntry, _, __) {
+      builder: (context, selectedEntry) {
         _navigator = ImplicitNavigator.of<SelectedEntry?>(context);
         if (selectedEntry == null) {
           if (isBigEnoughForAdvanced(context)) {

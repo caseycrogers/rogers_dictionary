@@ -81,14 +81,17 @@ class _TranslationLine extends StatelessWidget {
                   text: translation.parentheticalQualifier,
                 ).asSpans(context),
                 WidgetSpan(
-                  child: PronunciationButton(
-                    text: translation.text.pronounceable,
-                    pronunciation: translation.pronunciationOverride
-                        .split('|')
-                        .join(
-                            ' <break time="350ms"/>${i18n.or.get(context)}<break time="150ms"/> ')
-                        .emptyToNull,
-                    mode: oppositeMode(SearchModel.of(context).mode),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: kPad),
+                    child: PronunciationButton(
+                      text: translation.text.pronounceable,
+                      pronunciation: translation.pronunciationOverride
+                          .split('|')
+                          .join(
+                              ' <break time="350ms"/>${i18n.or.get(context)}<break time="150ms"/> ')
+                          .emptyToNull,
+                      mode: oppositeMode(SearchModel.of(context).mode),
+                    ),
                   ),
                 ),
                 if (translation.oppositeHeadword.isNotEmpty)

@@ -4,9 +4,7 @@ import 'dart:io';
 
 // Package imports:
 import 'package:args/args.dart';
-import 'package:df/df.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Project imports:
@@ -20,6 +18,8 @@ import 'package:rogers_dictionary/util/overflow_markdown_base.dart';
 import 'package:rogers_dictionary/util/string_utils.dart';
 import 'package:rogers_dictionary/versioning/versioning_base.dart';
 
+import 'package:ml_dataframe/ml_dataframe.dart';
+
 const EN = '(EN)';
 const ES = '(ES)';
 
@@ -27,12 +27,14 @@ String preface(bool isSpanish) => isSpanish ? ES : EN;
 
 Future<Iterable<Map<String, String>>> _getRows(
     bool isSpanish, String csvPath) async {
-  final DataFrame df = await DataFrame.fromCsv(csvPath);
+  final DataFrame df = await fromCsv(csvPath);
 
   var i = 0;
   return df.rows.map((row) {
     final int j = i++;
-    return row.map((k, v) => _parseCell(isSpanish, j, k, v));
+    // TODO: this is incoherent.
+    return (row as Map<String, String>)
+        .map((k, v) => _parseCell(isSpanish, j, k, v));
   });
 }
 

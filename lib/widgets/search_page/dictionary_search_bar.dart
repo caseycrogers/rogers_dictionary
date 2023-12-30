@@ -10,22 +10,19 @@ import 'package:rogers_dictionary/models/translation_model.dart';
 import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 
-class SearchBar extends StatefulWidget {
-  const SearchBar();
+class DictionarySearchBar extends StatefulWidget {
+  const DictionarySearchBar();
 
   @override
-  _SearchBarState createState() => _SearchBarState();
+  _DictionarySearchBarState createState() => _DictionarySearchBarState();
 }
 
-class _SearchBarState extends State<SearchBar> {
+class _DictionarySearchBarState extends State<DictionarySearchBar> {
   late TextEditingController _controller;
 
   late SearchModel _searchModel;
 
   bool _shouldInit = true;
-
-  // Save the node up here in a stateful widget so that it persists.
-  final FocusNode _node = FocusNode();
 
   @override
   void didChangeDependencies() {
@@ -58,8 +55,7 @@ class _SearchBarState extends State<SearchBar> {
       builder: (context, translationPage, child) {
         return child!;
       },
-      child: _SearchBarBase(
-        focusNode: _node,
+      child: _DictionarySearchBarBase(
         controller: _controller,
       ),
     );
@@ -94,15 +90,13 @@ class _SearchBarState extends State<SearchBar> {
   }
 }
 
-class _SearchBarBase extends StatelessWidget {
-  const _SearchBarBase({
+class _DictionarySearchBarBase extends StatelessWidget {
+  const _DictionarySearchBarBase({
     Key? key,
-    required this.focusNode,
     this.controller,
   }) : super(key: key);
 
   final TextEditingController? controller;
-  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +108,7 @@ class _SearchBarBase extends StatelessWidget {
         child: AdaptiveMaterial(
           adaptiveColor: AdaptiveColor.surface,
           child: TextField(
-            focusNode: focusNode,
-            style: Theme.of(context).textTheme.bodyText2,
+            style: Theme.of(context).textTheme.bodyMedium,
             controller: controller,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
@@ -123,12 +116,6 @@ class _SearchBarBase extends StatelessWidget {
                   ? IconButton(
                       onPressed: () {
                         controller?.clear();
-                        // Re-request focus after build is done otherwise the
-                        // build takes focus right back.
-                        WidgetsBinding.instance
-                            .addPostFrameCallback((timeStamp) {
-                          focusNode.requestFocus();
-                        });
                       },
                       icon: const Icon(Icons.clear),
                     )

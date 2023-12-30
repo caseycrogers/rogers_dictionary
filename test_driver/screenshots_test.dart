@@ -1,6 +1,7 @@
 // Dart imports:
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 // Package imports:
 import 'package:image/image.dart';
@@ -10,7 +11,11 @@ import 'package:path/path.dart';
 Future<void> main() async {
   try {
     await integrationDriver(
-      onScreenshot: (String name, List<int> screenshotBytes) async {
+      onScreenshot: (
+        String name,
+        List<int> screenshotBytes, [
+        Map<String, Object?>? args,
+      ]) async {
         final ScreenshotIdentifier args = ScreenshotIdentifier.fromJson(
             jsonDecode(name) as Map<String, dynamic>);
         final File imageFile = File('${joinAll([
@@ -42,13 +47,13 @@ List<int> _processImage(
   required int? offsetX,
   required int? offsetY,
 }) {
-  final Image image = decodeImage(bytes)!;
+  final Image image = decodeImage(Uint8List.fromList(bytes))!;
   final Image cropped = copyCrop(
     image,
-    offsetX ?? 0,
-    offsetY ?? 0,
-    width,
-    height,
+    x: offsetX ?? 0,
+    y: offsetY ?? 0,
+    width: width,
+    height: height,
   );
   return encodePng(cropped);
 }

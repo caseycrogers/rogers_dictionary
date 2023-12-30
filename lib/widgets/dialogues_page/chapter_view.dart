@@ -82,7 +82,7 @@ class _ChapterViewState extends State<ChapterView> {
           child: ListTile(
             contentPadding: EdgeInsets.zero,
             title: DefaultTextStyle(
-              style: Theme.of(context).textTheme.headline1!,
+              style: Theme.of(context).textTheme.displayLarge!,
               child: Text(
                 widget.chapter.title(context),
               ),
@@ -92,7 +92,7 @@ class _ChapterViewState extends State<ChapterView> {
         ),
         Expanded(
           child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.bodyText2!,
+            style: Theme.of(context).textTheme.bodyMedium!,
             child: Stack(
               children: [
                 Column(
@@ -160,7 +160,7 @@ class _ChapterViewState extends State<ChapterView> {
                             const EdgeInsets.symmetric(horizontal: 2 * kPad),
                         title: Text(
                           _currentSubChapter.value.title(context),
-                          style: Theme.of(context).textTheme.headline2,
+                          style: Theme.of(context).textTheme.displayMedium,
                         ),
                         subtitle: Text(
                           _currentSubChapter.value.oppositeTitle(context),
@@ -231,7 +231,7 @@ class _ChapterViewState extends State<ChapterView> {
           final ListTile dialogueTile = ListTile(
             title: Text(
               dialogue.content(context),
-              style: Theme.of(context).textTheme.bodyText2!.asBold,
+              style: Theme.of(context).textTheme.bodyMedium!.asBold,
             ),
             subtitle: OverflowMarkdown(
               dialogue.oppositeContent(context),
@@ -328,14 +328,14 @@ class _SubChapterTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: Theme.of(context).textTheme.headline2!,
+      style: Theme.of(context).textTheme.displayMedium!,
       child: Container(
         color: isSelected ? Theme.of(context).colorScheme.secondary : null,
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           title: Text(
             subChapter.title(context),
-            style: Theme.of(context).textTheme.headline2,
+            style: Theme.of(context).textTheme.displayMedium,
           ),
           subtitle: Text(
             subChapter.oppositeTitle(context),

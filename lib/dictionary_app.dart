@@ -6,13 +6,12 @@ import 'package:feedback/feedback.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 // Project imports:
 import 'package:rogers_dictionary/clients/dictionary_database/dictionary_database.dart';
 import 'package:rogers_dictionary/clients/dictionary_database/sqflite_database.dart';
 import 'package:rogers_dictionary/clients/feedback_sender.dart';
-import 'package:rogers_dictionary/clients/snack_bar_notifier.dart';
 import 'package:rogers_dictionary/clients/text_to_speech.dart';
 import 'package:rogers_dictionary/models/dictionary_model.dart';
 import 'package:rogers_dictionary/models/translation_mode.dart';
@@ -30,8 +29,8 @@ class DictionaryApp extends StatefulWidget {
   static final TextToSpeech textToSpeech = TextToSpeech();
   static final Future<PackageInfo> packageInfo = PackageInfo.fromPlatform();
   static final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static late SnackBarNotifier _snackBarNotifier;
-  static late FeedbackSender _feedback;
+  static late ScaffoldMessengerState scaffoldMessenger;
+  static late FeedbackSender feedback;
 
   // Color stuff.
   static final ColorScheme englishColorScheme = ColorScheme.fromSwatch(
@@ -40,6 +39,7 @@ class DictionaryApp extends StatefulWidget {
   ).copyWith(
     secondary: Colors.grey.shade300,
     onPrimary: Colors.white,
+    outline: Colors.grey.withOpacity(.4),
   );
 
   static final ColorScheme spanishColorScheme = ColorScheme.fromSwatch(
@@ -48,6 +48,7 @@ class DictionaryApp extends StatefulWidget {
   ).copyWith(
     secondary: Colors.grey.shade300,
     onPrimary: Colors.white,
+    outline: Colors.grey.withOpacity(.4),
   );
 
   static final ColorScheme darkEnglishColorScheme = ColorScheme.fromSwatch(
@@ -59,6 +60,7 @@ class DictionaryApp extends StatefulWidget {
     secondary: Colors.grey.shade600,
     onPrimary: Colors.white,
     surface: Color.lerp(Colors.white, Colors.black, .9),
+    outline: Colors.grey.withOpacity(.4),
   );
 
   static final ColorScheme darkSpanishColorScheme = ColorScheme.fromSwatch(
@@ -70,6 +72,7 @@ class DictionaryApp extends StatefulWidget {
     primary: Color.lerp(Colors.orange, Colors.black, .7),
     secondary: Colors.grey.shade600,
     surface: Color.lerp(Colors.white, Colors.black, .9),
+    outline: Colors.grey.withOpacity(.4),
   );
 
   static ColorScheme schemeFor(
@@ -81,10 +84,6 @@ class DictionaryApp extends StatefulWidget {
     }
     return isDark ? darkSpanishColorScheme : spanishColorScheme;
   }
-
-  static SnackBarNotifier get snackBarNotifier => _snackBarNotifier;
-
-  static FeedbackSender get feedback => _feedback;
 
   static FirebaseAnalyticsObserver get observer =>
       FirebaseAnalyticsObserver(analytics: analytics);
@@ -121,7 +120,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
       // context with an enclosing better feedback widget.
       child: Builder(
         builder: (context) {
-          DictionaryApp._feedback = FeedbackSender(
+          DictionaryApp.feedback = FeedbackSender(
             locale: Localizations.localeOf(context),
             feedbackController: BetterFeedback.of(context),
           );
@@ -133,9 +132,14 @@ class _DictionaryAppState extends State<DictionaryApp> {
 }
 
 class DictionaryAppBase extends StatelessWidget {
-  const DictionaryAppBase({this.overrideLocale, Key? key}) : super(key: key);
+  const DictionaryAppBase({
+    super.key,
+    this.overrideLocale,
+    this.overridePlatform,
+  });
 
   final Locale? overrideLocale;
+  final TargetPlatform? overridePlatform;
 
   @override
   Widget build(BuildContext context) {
@@ -146,27 +150,28 @@ class DictionaryAppBase extends StatelessWidget {
         builder: (context, isDark, child) {
           return MaterialApp(
             title: 'Rogers Dictionary',
-            // Required for device frame to generate screenshots.
-            useInheritedMediaQuery: true,
             home: child!,
             theme: ThemeData(
-              dividerColor: Colors.grey.withOpacity(.4),
+              platform: overridePlatform,
+              dividerTheme: DividerThemeData(
+                color: Colors.grey.withOpacity(.4),
+              ),
               textTheme: TextTheme(
-                headline1: GoogleFonts.roboto(
+                displayLarge: GoogleFonts.roboto(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
-                headline2: GoogleFonts.roboto(
+                displayMedium: GoogleFonts.roboto(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
                 // This should really be bold but google fonts has a bug where
                 // bolded styles can't be un-bolded:
                 // https://github.com/material-foundation/google-fonts-flutter/issues/141
-                headline3: GoogleFonts.roboto(
+                displaySmall: GoogleFonts.roboto(
                   fontSize: 22,
                 ),
-                bodyText2: GoogleFonts.roboto(
+                bodyMedium: GoogleFonts.roboto(
                   fontSize: 20,
                   // Pad the top height so that a line of text is the exact same
                   // height as an icon.
@@ -203,10 +208,12 @@ class DictionaryAppBase extends StatelessWidget {
             ],
           );
         },
-        child: Builder(builder: (context) {
-          DictionaryApp._snackBarNotifier = SnackBarNotifier(context);
-          return const DictionaryPage();
-        }),
+        child: Builder(
+          builder: (context) {
+            DictionaryApp.scaffoldMessenger = ScaffoldMessenger.of(context);
+            return const DictionaryPage();
+          },
+        ),
       ),
     );
   }

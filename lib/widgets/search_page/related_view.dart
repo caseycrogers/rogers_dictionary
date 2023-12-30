@@ -37,7 +37,7 @@ class RelatedView extends StatelessWidget {
                     headword,
                     defaultStyle: Theme.of(context)
                         .textTheme
-                        .bodyText2!
+                        .bodyMedium!
                         .asColor(Colors.blue),
                   ),
                 ),

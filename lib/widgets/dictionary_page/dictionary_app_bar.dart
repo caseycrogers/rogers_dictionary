@@ -13,7 +13,7 @@ import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
 import 'package:rogers_dictionary/widgets/buttons/toggle_dark_mode_button.dart';
 import 'package:rogers_dictionary/widgets/buttons/translation_mode_selector.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
+import 'package:rogers_dictionary/widgets/search_page/dictionary_search_bar.dart';
 import 'dictionary_tab_bar.dart';
 
 class DictionaryAppBar extends StatelessWidget {
@@ -45,8 +45,8 @@ class _DictionaryTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isBigEnoughForAdvanced(context)) {
-      return Row(
-        children: const [
+      return const Row(
+        children: [
           _DictionaryBackButton(),
           TranslationModeSelector(),
           Spacer(),
@@ -96,7 +96,7 @@ class _LandscapeBackAndSearch extends StatelessWidget {
       ),
       child: ValueListenableBuilder<DictionaryTab>(
           valueListenable: DictionaryModel.instance.currentTab,
-          child: const SearchBar(),
+          child: const DictionarySearchBar(),
           builder: (context, _, searchBar) {
             if (_shouldDisplaySearchBar(context)) {
               return Row(
