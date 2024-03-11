@@ -6,6 +6,7 @@ bool isBigEnoughForAdvanced(BuildContext context) {
 }
 
 bool sizeBigEnoughForAdvanced(Size size) {
+  // Magic number decided on by just demo'ing the advanced layout at different screen widths.
   if (size.width < 600) {
     return false;
   }
