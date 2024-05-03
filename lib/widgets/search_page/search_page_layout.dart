@@ -8,7 +8,6 @@ import 'package:rogers_dictionary/util/constants.dart';
 import 'package:rogers_dictionary/util/layout_picker.dart';
 import 'package:rogers_dictionary/widgets/adaptive_material.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
 import 'package:rogers_dictionary/widgets/search_page/selected_entry_switcher.dart';
 import 'package:rogers_dictionary/widgets/translation_mode_switcher.dart';
 import 'entry_list.dart';
@@ -26,9 +25,9 @@ class SearchPageLayout extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, _) {
         if (isBigEnoughForAdvanced(context)) {
-          return const _LandscapeLayout();
+          return _LandscapeLayout(searchbar: searchBar);
         }
-        return const _PortraitLayout();
+        return _PortraitLayout(searchBar: searchBar);
       },
     );
   }
@@ -37,15 +36,18 @@ class SearchPageLayout extends StatelessWidget {
 class _PortraitLayout extends StatelessWidget {
   const _PortraitLayout({
     Key? key,
+    required this.searchBar,
   }) : super(key: key);
+
+  final Widget? searchBar;
 
   @override
   Widget build(BuildContext context) {
     return TranslationModeSwitcher(
       header: _isSearch(context)
-          ? const Padding(
-              padding: EdgeInsets.symmetric(horizontal: kPad),
-              child: SearchBar(),
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kPad),
+              child: searchBar,
             )
           : null,
       child: const AdaptiveMaterial(
@@ -57,7 +59,12 @@ class _PortraitLayout extends StatelessWidget {
 }
 
 class _LandscapeLayout extends StatelessWidget {
-  const _LandscapeLayout({Key? key}) : super(key: key);
+  const _LandscapeLayout({
+    Key? key,
+    required this.searchbar,
+  }) : super(key: key);
+
+  final Widget? searchbar;
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +91,10 @@ class _LandscapeLayout extends StatelessWidget {
                 ),
               ),
             ),
-            Flexible(
+            const Flexible(
               flex: kLandscapeRightFlex,
               child: Row(
-                children: const [
+                children: [
                   VerticalDivider(width: 1),
                   Expanded(
                     child: SelectedEntrySwitcher(),

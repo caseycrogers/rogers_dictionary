@@ -52,7 +52,7 @@ class DictionaryPage extends StatelessWidget {
             backgroundColor: Colors.transparent,
             body: Column(
               children: [
-                const DictionaryAppBar(),
+                const DictionaryAppBar(searchBar: SearchBar()),
                 // Intentionally don't wrap this in theme, it'll cause
                 // excess rebuilds.
                 Expanded(

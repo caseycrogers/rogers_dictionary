@@ -13,15 +13,19 @@ import 'package:rogers_dictionary/widgets/buttons/help_menu.dart';
 import 'package:rogers_dictionary/widgets/buttons/toggle_dark_mode_button.dart';
 import 'package:rogers_dictionary/widgets/buttons/translation_mode_selector.dart';
 import 'package:rogers_dictionary/widgets/dictionary_page/dictionary_tab.dart';
-import 'package:rogers_dictionary/widgets/search_page/search_bar.dart';
 import 'dictionary_tab_bar.dart';
 
 class DictionaryAppBar extends StatelessWidget {
-  const DictionaryAppBar({Key? key}) : super(key: key);
+  const DictionaryAppBar({
+    Key? key,
+    required this.searchBar,
+  }) : super(key: key);
+
+  final Widget? searchBar;
 
   @override
   Widget build(BuildContext context) {
-    return const AdaptiveMaterial(
+    return AdaptiveMaterial(
       adaptiveColor: AdaptiveColor.primary,
       // Let the background color show through to avoid a bug where there's a
       // mis-colored seam in screenshots.
@@ -32,7 +36,7 @@ class DictionaryAppBar extends StatelessWidget {
         bottom: false,
         child: SizedBox(
           height: kToolbarHeight,
-          child: _DictionaryTopBar(),
+          child: _DictionaryTopBar(searchBar: searchBar),
         ),
       ),
     );
@@ -40,13 +44,18 @@ class DictionaryAppBar extends StatelessWidget {
 }
 
 class _DictionaryTopBar extends StatelessWidget {
-  const _DictionaryTopBar({Key? key}) : super(key: key);
+  const _DictionaryTopBar({
+    Key? key,
+    required this.searchBar,
+  }) : super(key: key);
+
+  final Widget? searchBar;
 
   @override
   Widget build(BuildContext context) {
     if (!isBigEnoughForAdvanced(context)) {
-      return Row(
-        children: const [
+      return const Row(
+        children: [
           _DictionaryBackButton(),
           TranslationModeSelector(),
           Spacer(),
@@ -58,7 +67,7 @@ class _DictionaryTopBar extends StatelessWidget {
     return Container(
         child: Row(
       children: [
-        const _LandscapeBackAndSearch(),
+        _LandscapeBackAndSearch(searchbar: searchBar),
         const SizedBox(width: kPad),
         const TranslationModeSelector(),
         const Spacer(),
@@ -86,7 +95,12 @@ class _DictionaryTopBar extends StatelessWidget {
 }
 
 class _LandscapeBackAndSearch extends StatelessWidget {
-  const _LandscapeBackAndSearch({Key? key}) : super(key: key);
+  const _LandscapeBackAndSearch({
+    Key? key,
+    required this.searchbar,
+  }) : super(key: key);
+
+  final Widget? searchbar;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +110,7 @@ class _LandscapeBackAndSearch extends StatelessWidget {
       ),
       child: ValueListenableBuilder<DictionaryTab>(
           valueListenable: DictionaryModel.instance.currentTab,
-          child: const SearchBar(),
+          child: searchbar,
           builder: (context, _, searchBar) {
             if (_shouldDisplaySearchBar(context)) {
               return Row(

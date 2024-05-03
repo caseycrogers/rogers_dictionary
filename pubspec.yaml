@@ -13,7 +13,7 @@ dependencies:
   async: ^2.8.1
   async_list_view: ^1.0.0
   cupertino_icons: ^1.0.3
-  device_info_plus: ^8.0.0
+  device_info_plus: ^10.1.0
   email_validator: ^2.0.1
   feedback:
     path: ../feedback/feedback
@@ -24,11 +24,10 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  google_fonts: ^3.0.1
-  google_mobile_ads: ^2.2.0
-  http: ^0.13.3
-  implicit_navigator:
-    path: ../implicit_navigator
+  google_fonts: ^6.2.1
+  google_mobile_ads: ^5.0.0
+  http: ^1.2.1
+  implicit_navigator: ^1.4.0
   in_app_purchase: ^3.0.8
   just_audio: ^0.9.7
   notified_preferences: ^2.0.0
@@ -40,10 +39,9 @@ dependencies:
   sqflite: ^2.0.0+3
 
 dev_dependencies:
-  df: ^0.4.0-nullsafety.0
   firedart: ^0.9.0+1
   # flutter pub run flutter_launcher_icons:main
-  flutter_launcher_icons: ^0.11.0
+  flutter_launcher_icons: ^0.13.1
   # flutter pub run flutter_native_splash:create
   flutter_native_splash: ^2.0.1+1
   # flutter pub run import_sorter:main
@@ -55,12 +53,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   msix: ^3.7.0
-  screenshot: ^1.2.3
+  screenshot: ^2.3.0
   sqflite_common_ffi: ^2.0.0
   test: ^1.19.5
   device_frame:
     path: ../flutter_device_preview/device_frame
-  image: ^3.1.1
+  image: ^4.1.7
 
 
 flutter:
